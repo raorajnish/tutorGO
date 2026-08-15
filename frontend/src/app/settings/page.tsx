@@ -1,0 +1,56 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
+import { Tabs } from "@/components/ui/Tabs";
+import { Button } from "@/components/ui/Button";
+import { InstituteDetailsTab } from "@/components/settings/InstituteDetailsTab";
+import { TeamTab } from "@/components/settings/TeamTab";
+import { SubscriptionTab } from "@/components/settings/SubscriptionTab";
+
+const TABS = [
+  { id: "details", label: "Institute details" },
+  { id: "team", label: "Team" },
+  { id: "subscription", label: "Subscription" },
+];
+
+export default function SettingsPage() {
+  const { user } = useAuth();
+  const [tab, setTab] = useState("details");
+
+  if (!user) return null;
+
+  if (user.role === "OWNER" && !user.currentInstituteId) {
+    return (
+      <div className="space-y-4">
+        <h1 className="font-display text-3xl font-bold text-foreground">Settings</h1>
+        <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+          Enter an institute to manage its settings.
+          <div className="mt-4">
+            <Link href="/dashboard">
+              <Button variant="secondary">Go to dashboard</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="font-display text-3xl font-bold text-foreground">Settings</h1>
+        <p className="text-sm text-muted-foreground">{user.institute?.name}</p>
+      </div>
+
+      <Tabs tabs={TABS} activeId={tab} onChange={setTab} />
+
+      <div>
+        {tab === "details" && <InstituteDetailsTab />}
+        {tab === "team" && <TeamTab />}
+        {tab === "subscription" && <SubscriptionTab />}
+      </div>
+    </div>
+  );
+}

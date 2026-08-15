@@ -1,0 +1,84 @@
+:root {
+  --background: #e8f1f5;
+  --foreground: #132238;
+  --card: #ffffff;
+  --card-foreground: #132238;
+  --primary: #132238;
+  --primary-foreground: #ffffff;
+  --secondary: #eef6fb;
+  --secondary-foreground: #132238;
+  --muted: #f5f8fa;
+  --muted-foreground: #828e9e;
+  --accent: #f26a36;
+  --accent-foreground: #ffffff;
+  --border: #dbe3ea;
+  --ring: #f26a36;
+  --radius: 0.625rem;
+
+  /* Supplementary status tokens (not part of the supplied palette) — kept
+     subdued so coral stays reserved for CTAs/selection per design.md. */
+  --success: #2f7d5c;
+  --success-foreground: #ffffff;
+  --success-soft: #e6f3ee;
+  --warning: #b5790f;
+  --warning-foreground: #ffffff;
+  --warning-soft: #faf1de;
+  --danger: #b3423a;
+  --danger-foreground: #ffffff;
+  --danger-soft: #f8e9e7;
+}
+
+.dark {
+  --background: #132238;
+  --foreground: #ffffff;
+  --card: #1b2b43;
+  --card-foreground: #ffffff;
+  --primary: #f26a36;
+  --primary-foreground: #ffffff;
+  --secondary: #243550;
+  --secondary-foreground: #ffffff;
+  --muted: #2a3b55;
+  --muted-foreground: #b9c3d0;
+  --accent: #f26a36;
+  --accent-foreground: #ffffff;
+  --border: #3c4d64;
+  --ring: #f26a36;
+
+  --success: #4fb488;
+  --success-foreground: #0c1f17;
+  --success-soft: #1d3a2d;
+  --warning: #e0a539;
+  --warning-foreground: #241a02;
+  --warning-soft: #3a2f14;
+  --danger: #e2685e;
+  --danger-foreground: #250908;
+  --danger-soft: #3d211e;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --radius-xl: var(--radius);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-soft: var(--danger-soft);
+}

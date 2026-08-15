@@ -1,0 +1,442 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  runtime  = "nodejs"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  SUPERADMIN
+  OWNER
+  ADMIN
+  ACCOUNTANT
+  FACULTY
+  RECEPTION
+  STUDENT
+}
+
+enum ModuleCode {
+  ENQUIRY
+  ADMISSION
+  ATTENDANCE
+  FEES
+  PAYROLL
+  EXPENSE
+}
+
+enum EnquirySource {
+  WALK_IN
+  REFERRAL
+  SOCIAL
+  PHONE
+  OTHER
+}
+
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  LOST
+}
+
+enum EnquiryActivityType {
+  CONTACTED
+  CONVERTED
+  LOST
+}
+
+// ---------------------------------------------------------------------------
+// Plans — per-institute role headcount limits
+// ---------------------------------------------------------------------------
+
+/// A subscription tier, assigned per Institute (not per Organization — two
+/// branches under the same org can be on different plans). Caps apply to the
+/// institute-level roles only: ADMIN, ACCOUNTANT, FACULTY, RECEPTION, STUDENT.
+/// OWNER is one-per-Organization and SUPERADMIN is platform-only, so neither
+/// is capped here.
+model Plan {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String
+  description   String?
+  maxAdmins     Int      @default(1)
+  maxAccountants Int     @default(2)
+  maxFaculty    Int      @default(5)
+  maxReception  Int      @default(2)
+  maxStudents   Int      @default(100)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  institutes Institute[]
+
+  @@map("plans")
+}
+
+// ---------------------------------------------------------------------------
+// Platform layer
+// ---------------------------------------------------------------------------
+
+/// One paying customer. Has exactly one Owner and one or more Institutes
+/// (branches). Institutes never share data with each other, even though
+/// they roll up to the same Organization.
+model Organization {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  gstin     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownerId String? @unique
+  owner   User?   @relation("OrganizationOwner", fields: [ownerId], references: [id])
+
+  institutes Institute[]
+
+  @@map("organizations")
+}
+
+/// A single branch/campus. The hard tenant-isolation boundary — every
+/// operational record (students, fees, attendance, ...) carries an
+/// instituteId and is only ever queried scoped to one Institute at a time.
+model Institute {
+  id               String   @id @default(cuid())
+  organizationId   String
+  planId           String?
+  code             String   @unique
+  name             String
+  email            String?
+  phone            String?
+  address          String?
+  city             String?
+  state            String?
+  isActive         Boolean  @default(true)
+  biometricEnabled Boolean  @default(false)
+  onboardingStep   Int      @default(0)
+  onboardingDone   Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan?        @relation(fields: [planId], references: [id])
+  users        User[]
+  modules      InstituteModule[]
+  courses      Course[]
+  subjects     Subject[]
+  batches      Batch[]
+  enquiries    Enquiry[]
+  students     Student[]
+
+  @@index([organizationId])
+  @@map("institutes")
+}
+
+model Module {
+  id          String     @id @default(cuid())
+  code        ModuleCode @unique
+  label       String
+  description String?
+  createdAt   DateTime   @default(now())
+
+  institutes InstituteModule[]
+
+  @@map("modules")
+}
+
+model InstituteModule {
+  id          String   @id @default(cuid())
+  instituteId String
+  moduleId    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  module    Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([instituteId, moduleId])
+  @@map("institute_modules")
+}
+
+// ---------------------------------------------------------------------------
+// Users
+// ---------------------------------------------------------------------------
+
+model User {
+  id                 String    @id @default(cuid())
+  /// Set for ADMIN/FACULTY/RECEPTION/STUDENT (tied to exactly one institute).
+  /// Null for SUPERADMIN (platform-only) and OWNER (tied to an Organization
+  /// instead — see ownedOrganization).
+  instituteId        String?
+  email              String    @unique
+  passwordHash       String
+  fullName           String
+  phone              String?
+  role               Role
+  isActive           Boolean   @default(true)
+  mustChangePassword Boolean   @default(false)
+  termsAcceptedAt    DateTime?
+  lastLoginAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  institute         Institute?    @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  ownedOrganization Organization? @relation("OrganizationOwner")
+
+  @@index([instituteId])
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// Global platform config + logs
+// ---------------------------------------------------------------------------
+
+/// Singleton row (id = "default") — the platform's outbound SMTP transport.
+model EmailConfig {
+  id           String   @id @default("default")
+  host         String
+  port         Int
+  secure       Boolean  @default(false)
+  username     String
+  password     String
+  fromName     String   @default("TutorGO")
+  fromEmail    String
+  isConfigured Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+
+  @@map("email_config")
+}
+
+model MessageLog {
+  id             String   @id @default(cuid())
+  organizationId String?
+  instituteId    String?
+  toEmail        String
+  subject        String
+  purpose        String
+  delivered      Boolean  @default(false)
+  error          String?
+  createdAt      DateTime @default(now())
+
+  @@index([instituteId])
+  @@index([organizationId])
+  @@map("message_logs")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String?
+  instituteId    String?
+  userId         String?
+  action         String
+  targetType     String?
+  targetId       String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  @@index([instituteId])
+  @@index([organizationId])
+  @@map("audit_logs")
+}
+
+// ---------------------------------------------------------------------------
+// Academics — Courses / Subjects / Batches (Phase 2)
+// ---------------------------------------------------------------------------
+
+/// Doubles as the institute's "class/standard" — e.g. "10th Standard" (code
+/// "10"), "12th — JEE" (code "12JEE"). `code` is short, staff-defined once at
+/// setup, and feeds directly into Student.studentCode generation — no
+/// free-text parsing needed at admission time.
+model Course {
+  id             String   @id @default(cuid())
+  instituteId    String
+  name           String
+  code           String
+  durationMonths Int?
+  description    String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  institute Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  batches   Batch[]
+  enquiries Enquiry[]
+  students  Student[]
+  subjects  CourseSubject[]
+
+  @@unique([instituteId, code])
+  @@index([instituteId])
+  @@map("courses")
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  instituteId String
+  name        String
+  shortCode   String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  institute Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  courses   CourseSubject[]
+
+  @@unique([instituteId, shortCode])
+  @@index([instituteId])
+  @@map("subjects")
+}
+
+/// Explicit many-to-many: a subject (e.g. "Physics") is often taught across
+/// several courses (e.g. both a JEE and a NEET course), not owned by one.
+model CourseSubject {
+  id        String @id @default(cuid())
+  courseId  String
+  subjectId String
+
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, subjectId])
+  @@index([subjectId])
+  @@map("course_subjects")
+}
+
+model Batch {
+  id          String    @id @default(cuid())
+  instituteId String
+  courseId    String
+  name        String
+  startDate   DateTime  @db.Date
+  endDate     DateTime? @db.Date
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  institute Institute      @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course    Course         @relation(fields: [courseId], references: [id])
+  students  StudentBatch[]
+
+  @@index([instituteId])
+  @@index([courseId])
+  @@map("batches")
+}
+
+// ---------------------------------------------------------------------------
+// Enquiry → Admission → Students (Phase 3)
+// ---------------------------------------------------------------------------
+
+model Enquiry {
+  id               String        @id @default(cuid())
+  instituteId      String
+  name             String
+  phone            String
+  courseId         String?
+  source           EnquirySource @default(OTHER)
+  status           EnquiryStatus @default(NEW)
+  nextFollowUpDate DateTime?     @db.Date
+  notes            String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course    Course?   @relation(fields: [courseId], references: [id])
+  student   Student?
+  activities EnquiryActivity[]
+
+  @@index([instituteId, status])
+  @@map("enquiries")
+}
+
+/// Follow-up trail — one row per contact attempt / status transition, kept
+/// forever so the pipeline history survives even after the lead converts or
+/// goes cold. `createdByName` is a point-in-time snapshot (not a relation) so
+/// the trail still reads correctly if the staff account is later removed.
+model EnquiryActivity {
+  id              String              @id @default(cuid())
+  enquiryId       String
+  type            EnquiryActivityType
+  note            String?
+  nextFollowUpDate DateTime?          @db.Date
+  createdByName   String?
+  createdAt       DateTime            @default(now())
+
+  enquiry Enquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+
+  @@index([enquiryId])
+  @@map("enquiry_activities")
+}
+
+/// Internal bookkeeping only — one gapless sequence per (institute, admission
+/// year, course code), used to generate Student.studentCode atomically.
+model StudentCodeCounter {
+  id          String @id @default(cuid())
+  instituteId String
+  year        Int
+  courseCode  String
+  seq         Int    @default(0)
+
+  @@unique([instituteId, year, courseCode])
+  @@map("student_code_counters")
+}
+
+model Student {
+  id            String    @id @default(cuid())
+  instituteId   String
+  studentCode   String    @unique
+  enquiryId     String?   @unique
+  courseId      String
+  name          String
+  email         String    @unique
+  phone         String?
+  parentPhone   String?
+  dob           DateTime? @db.Date
+  fatherName    String?
+  motherName    String?
+  school        String?
+  admissionDate DateTime  @db.Date
+  fingerprintId String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  institute Institute      @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  enquiry   Enquiry?       @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
+  course    Course         @relation(fields: [courseId], references: [id])
+  batches   StudentBatch[]
+
+  @@index([instituteId, isActive])
+  @@index([courseId])
+  @@map("students")
+}
+
+/// Batch enrollment history — never edited or deleted after the fact.
+/// Reassigning a student closes the currently-open row (leftAt) and opens a
+/// new one, rather than mutating which batch a row points to.
+model StudentBatch {
+  id        String    @id @default(cuid())
+  studentId String
+  batchId   String
+  joinedAt  DateTime  @db.Date
+  leftAt    DateTime? @db.Date
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  batch   Batch   @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([batchId])
+  @@map("student_batches")
+}

@@ -1,0 +1,201 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { Role } from "@/lib/types";
+import { navForRole, type NavIcon } from "@/lib/navigation";
+import { useAuth } from "@/lib/auth-context";
+
+interface SidebarProps {
+  role: Role;
+  instituteName?: string | null;
+  workspaceLabel?: string | null;
+  open: boolean;
+  onClose: () => void;
+}
+
+const ICONS: Record<NavIcon, React.ReactNode> = {
+  dashboard: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="7" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+      <rect x="13" y="13" width="7" height="7" rx="1.5" />
+    </svg>
+  ),
+  settings: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="3" />
+      <path
+        d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.55 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.7 1.7 0 004.6 15a1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09A1.7 1.7 0 004.6 9a1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34H9a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06A1.7 1.7 0 0019.4 9a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.55 1z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  platform: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" strokeLinejoin="round" />
+    </svg>
+  ),
+  organizations: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="10" width="7" height="11" rx="1" />
+      <rect x="14" y="4" width="7" height="17" rx="1" />
+      <path d="M6 14h1M6 17h1M17 8h1M17 11h1M17 14h1" strokeLinecap="round" />
+    </svg>
+  ),
+  mail: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  institutes: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  plans: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 3l9 5-9 5-9-5 9-5z" strokeLinejoin="round" />
+      <path d="M3 13l9 5 9-5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 18l9 5 9-5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  academics: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 4L3 8l9 4 9-4-9-4z" strokeLinejoin="round" />
+      <path d="M6 10v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  enquiries: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  admissions: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinejoin="round" />
+      <path d="M14 2v6h6" strokeLinejoin="round" />
+      <path d="M12 18v-6M9 15l3-3 3 3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  students: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21v-1a7 7 0 0114 0v1" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+};
+
+export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: SidebarProps) {
+  const pathname = usePathname();
+  const { logout, user } = useAuth();
+  const activeModules = user?.institute?.activeModules ?? [];
+  const sections = navForRole(role, activeModules);
+
+  // Pick the single most specific (longest) matching href across all items —
+  // otherwise a parent route like /platform matches every /platform/* child too.
+  const allHrefs = sections.flatMap((s) => s.items.map((i) => i.href));
+  const activeHref = allHrefs
+    .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort((a, b) => b.length - a.length)[0];
+
+  return (
+    <>
+      {/* Mobile backdrop — blurred, dimmed, closes the menu on click */}
+      <div
+        className={`fixed inset-0 z-30 bg-black/20 backdrop-blur-[2px] transition-opacity duration-200 lg:hidden ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex w-62.5 flex-col bg-card transition-transform duration-200 ease-out lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex h-16 items-center justify-between gap-2 px-5">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <span className="font-display truncate text-lg font-bold text-foreground">TutorGO</span>
+            <span className="text-accent">.</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary lg:hidden"
+            aria-label="Close menu"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-2">
+          {sections.map((section) => (
+            <div key={section.section || "root"}>
+              {section.section && (
+                <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {section.section}
+                </p>
+              )}
+              <ul className="space-y-1.5">
+                {section.items.map((item) => {
+                  const active = item.href === activeHref;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={onClose}
+                        className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+                          active
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        }`}
+                      >
+                        {ICONS[item.icon]}
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        <div className="space-y-2 p-4 pt-0">
+          {(instituteName || workspaceLabel) && (
+            <div className="flex items-center gap-2.5 rounded-xl border border-border bg-muted px-3.5 py-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-sm font-bold text-accent-foreground">
+                {(instituteName ?? workspaceLabel ?? "?").charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-foreground">{instituteName ?? workspaceLabel}</p>
+                {instituteName && workspaceLabel && (
+                  <p className="truncate text-xs text-muted-foreground">{workspaceLabel}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={logout}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Log out
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}
