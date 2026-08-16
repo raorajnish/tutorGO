@@ -1,7 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-  runtime  = "nodejs"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  runtime      = "nodejs"
   moduleFormat = "esm"
 }
 
@@ -53,6 +53,21 @@ enum EnquiryActivityType {
   LOST
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LEAVE
+  LATE
+  HOLIDAY
+  PRESENT_BIOMETRIC
+}
+
+enum MessageTemplateType {
+  LECTURE_SCHEDULED
+  LECTURE_CANCELLED
+  ATTENDANCE_MARKED
+}
+
 // ---------------------------------------------------------------------------
 // Plans — per-institute role headcount limits
 // ---------------------------------------------------------------------------
@@ -63,18 +78,18 @@ enum EnquiryActivityType {
 /// OWNER is one-per-Organization and SUPERADMIN is platform-only, so neither
 /// is capped here.
 model Plan {
-  id            String   @id @default(cuid())
-  code          String   @unique
-  name          String
-  description   String?
-  maxAdmins     Int      @default(1)
-  maxAccountants Int     @default(2)
-  maxFaculty    Int      @default(5)
-  maxReception  Int      @default(2)
-  maxStudents   Int      @default(100)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String   @id @default(cuid())
+  code           String   @unique
+  name           String
+  description    String?
+  maxAdmins      Int      @default(1)
+  maxAccountants Int      @default(2)
+  maxFaculty     Int      @default(5)
+  maxReception   Int      @default(2)
+  maxStudents    Int      @default(100)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   institutes Institute[]
 
@@ -131,15 +146,17 @@ model Institute {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  plan         Plan?        @relation(fields: [planId], references: [id])
-  users        User[]
-  modules      InstituteModule[]
-  courses      Course[]
-  subjects     Subject[]
-  batches      Batch[]
-  enquiries    Enquiry[]
-  students     Student[]
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan             Plan?             @relation(fields: [planId], references: [id])
+  users            User[]
+  modules          InstituteModule[]
+  courses          Course[]
+  subjects         Subject[]
+  batches          Batch[]
+  enquiries        Enquiry[]
+  students         Student[]
+  lectures         Lecture[]
+  messageTemplates MessageTemplate[]
 
   @@index([organizationId])
   @@map("institutes")
@@ -194,8 +211,10 @@ model User {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  institute         Institute?    @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  ownedOrganization Organization? @relation("OrganizationOwner")
+  institute           Institute?          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  ownedOrganization   Organization?       @relation("OrganizationOwner")
+  lecturesTaught      Lecture[]
+  teachingAssignments FacultyAssignment[]
 
   @@index([instituteId])
   @@map("users")
@@ -272,11 +291,12 @@ model Course {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  institute Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  batches   Batch[]
-  enquiries Enquiry[]
-  students  Student[]
-  subjects  CourseSubject[]
+  institute   Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  batches     Batch[]
+  enquiries   Enquiry[]
+  students    Student[]
+  subjects    CourseSubject[]
+  assignments FacultyAssignment[]
 
   @@unique([instituteId, code])
   @@index([instituteId])
@@ -292,8 +312,10 @@ model Subject {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  institute Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  courses   CourseSubject[]
+  institute   Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  courses     CourseSubject[]
+  lectures    Lecture[]
+  assignments FacultyAssignment[]
 
   @@unique([instituteId, shortCode])
   @@index([instituteId])
@@ -329,6 +351,7 @@ model Batch {
   institute Institute      @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   course    Course         @relation(fields: [courseId], references: [id])
   students  StudentBatch[]
+  lectures  Lecture[]
 
   @@index([instituteId])
   @@index([courseId])
@@ -352,9 +375,9 @@ model Enquiry {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
-  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  course    Course?   @relation(fields: [courseId], references: [id])
-  student   Student?
+  institute  Institute         @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course     Course?           @relation(fields: [courseId], references: [id])
+  student    Student?
   activities EnquiryActivity[]
 
   @@index([instituteId, status])
@@ -366,13 +389,13 @@ model Enquiry {
 /// goes cold. `createdByName` is a point-in-time snapshot (not a relation) so
 /// the trail still reads correctly if the staff account is later removed.
 model EnquiryActivity {
-  id              String              @id @default(cuid())
-  enquiryId       String
-  type            EnquiryActivityType
-  note            String?
-  nextFollowUpDate DateTime?          @db.Date
-  createdByName   String?
-  createdAt       DateTime            @default(now())
+  id               String              @id @default(cuid())
+  enquiryId        String
+  type             EnquiryActivityType
+  note             String?
+  nextFollowUpDate DateTime?           @db.Date
+  createdByName    String?
+  createdAt        DateTime            @default(now())
 
   enquiry Enquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
 
@@ -413,10 +436,11 @@ model Student {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  institute Institute      @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  enquiry   Enquiry?       @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
-  course    Course         @relation(fields: [courseId], references: [id])
-  batches   StudentBatch[]
+  institute  Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  enquiry    Enquiry?           @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
+  course     Course             @relation(fields: [courseId], references: [id])
+  batches    StudentBatch[]
+  attendance AttendanceRecord[]
 
   @@index([instituteId, isActive])
   @@index([courseId])
@@ -439,4 +463,89 @@ model StudentBatch {
   @@index([studentId])
   @@index([batchId])
   @@map("student_batches")
+}
+
+// ---------------------------------------------------------------------------
+// Attendance (Phase 4a — staff-facing only; student self-view deferred)
+// ---------------------------------------------------------------------------
+
+/// One scheduled class session. Roster is derived at read time from
+/// StudentBatch rows active on `date`, never stored here — so a lecture
+/// never goes stale if a student is later reassigned to a different batch.
+model Lecture {
+  id           String    @id @default(cuid())
+  instituteId  String
+  batchId      String
+  subjectId    String
+  facultyId    String
+  date         DateTime  @db.Date
+  startTime    DateTime  @db.Time
+  endTime      DateTime  @db.Time
+  cancelledAt  DateTime?
+  cancelReason String?
+  note         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  institute  Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  batch      Batch              @relation(fields: [batchId], references: [id])
+  subject    Subject            @relation(fields: [subjectId], references: [id])
+  faculty    User               @relation(fields: [facultyId], references: [id])
+  attendance AttendanceRecord[]
+
+  @@index([instituteId, date])
+  @@index([batchId, date])
+  @@map("lectures")
+}
+
+model AttendanceRecord {
+  id         String           @id @default(cuid())
+  lectureId  String
+  studentId  String
+  status     AttendanceStatus
+  markedAt   DateTime         @default(now())
+  markedById String?
+
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([lectureId, studentId])
+  @@index([studentId])
+  @@map("attendance_records")
+}
+
+/// Which courses (and optionally which specific subjects within them) a
+/// faculty member is eligible to teach. A course with no subject-scoped rows
+/// means "all of that course's linked subjects" — the common case. No DB
+/// uniqueness on [facultyId, courseId, subjectId]: Postgres treats every
+/// NULL as distinct, so the API always replaces a faculty's full set in one
+/// transaction (delete-then-recreate) rather than relying on a constraint.
+model FacultyAssignment {
+  id        String  @id @default(cuid())
+  facultyId String
+  courseId  String
+  subjectId String?
+
+  faculty User     @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@index([facultyId])
+  @@index([courseId])
+  @@map("faculty_assignments")
+}
+
+/// One row per (institute, type). Missing row = the frontend falls back to a
+/// built-in default string, so institutes that never touch Settings still
+/// get a usable WhatsApp-ready message.
+model MessageTemplate {
+  id          String              @id @default(cuid())
+  instituteId String
+  type        MessageTemplateType
+  body        String
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@unique([instituteId, type])
+  @@map("message_templates")
 }

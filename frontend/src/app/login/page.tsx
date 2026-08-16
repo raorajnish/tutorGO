@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 
 export default function LoginPage() {
   return (
@@ -20,9 +21,9 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const invited = searchParams.get("email") !== null;
   const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -93,10 +94,13 @@ function LoginForm() {
           <span className="hidden text-2xl text-accent lg:inline" aria-hidden="true">
             ✦
           </span>
-          <h2 className="font-display mt-2 text-2xl font-semibold text-foreground sm:text-3xl">Welcome back</h2>
+          <h2 className="font-display mt-2 text-2xl font-semibold text-foreground sm:text-3xl">
+            {invited ? "You're invited" : "Welcome back"}
+          </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Sign in to your institute workspace. Admissions, attendance, fees and payroll — all in
-            one place.
+            {invited
+              ? "Enter the temporary password from your invite email to sign in and set up your account."
+              : "Sign in to your institute workspace. Admissions, attendance, fees and payroll — all in one place."}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-7 space-y-4">
@@ -111,40 +115,15 @@ function LoginForm() {
               placeholder="you@institute.com"
             />
 
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-transparent focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground hover:text-foreground"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.5 5.2A9.8 9.8 0 0112 5c5 0 9 4 10 7-.4 1.2-1.2 2.5-2.3 3.7M6.4 6.4C4.5 7.7 3 9.6 2 12c1 3 5 7 10 7 1.3 0 2.5-.3 3.6-.7" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z" strokeLinecap="round" strokeLinejoin="round" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
+            <PasswordInput
+              id="password"
+              label="Password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+            />
 
             {error && (
               <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">

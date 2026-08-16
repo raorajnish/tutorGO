@@ -62,3 +62,24 @@ export const EnquiryActivityType = {
 } as const
 
 export type EnquiryActivityType = (typeof EnquiryActivityType)[keyof typeof EnquiryActivityType]
+
+
+export const AttendanceStatus = {
+  PRESENT: 'PRESENT',
+  ABSENT: 'ABSENT',
+  LEAVE: 'LEAVE',
+  LATE: 'LATE',
+  HOLIDAY: 'HOLIDAY',
+  PRESENT_BIOMETRIC: 'PRESENT_BIOMETRIC'
+} as const
+
+export type AttendanceStatus = (typeof AttendanceStatus)[keyof typeof AttendanceStatus]
+
+
+export const MessageTemplateType = {
+  LECTURE_SCHEDULED: 'LECTURE_SCHEDULED',
+  LECTURE_CANCELLED: 'LECTURE_CANCELLED',
+  ATTENDANCE_MARKED: 'ATTENDANCE_MARKED'
+} as const
+
+export type MessageTemplateType = (typeof MessageTemplateType)[keyof typeof MessageTemplateType]

@@ -13,6 +13,7 @@ import { TrendChart } from "@/components/dashboard/TrendChart";
 import { MODULE_LABELS, MODULE_CODES } from "@/lib/types";
 import { CreateInstituteModal } from "@/components/organization/CreateInstituteModal";
 import { ManageInstituteDrawer } from "@/components/organization/ManageInstituteDrawer";
+import { UpcomingLecturesWidget } from "@/components/attendance/UpcomingLecturesWidget";
 
 const ICON_SHIELD = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -246,6 +247,8 @@ function OwnerOrgDashboard() {
 function InstituteDashboard() {
   const { user } = useAuth();
   const institute = user!.institute;
+  const isAdmin = user!.role === "OWNER" || user!.role === "ADMIN";
+  const showUpcomingLectures = user!.role === "FACULTY" && institute?.activeModules.includes("ATTENDANCE");
 
   const quickLinks =
     user!.role === "OWNER" || user!.role === "ADMIN"
@@ -263,6 +266,7 @@ function InstituteDashboard() {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:col-span-2">
           <BentoCard
             variant="featured"
+            className={isAdmin ? undefined : "sm:col-span-2"}
             badge={institute?.code ?? "Institute"}
             title={institute?.name ?? "No institute linked"}
             description={institute ? `${institute.organizationName} · ${institute.planName ?? "No plan"} plan` : undefined}
@@ -270,43 +274,52 @@ function InstituteDashboard() {
             footer={
               institute && (
                 <>
-                  <Badge tone="accent">{institute.activeModules.length} modules active</Badge>
+                  {isAdmin && <Badge tone="accent">{institute.activeModules.length} modules active</Badge>}
                   <span className="text-sm text-primary-foreground/70 capitalize">{user!.role.toLowerCase()}</span>
                 </>
               )
             }
           />
-          <BentoCard
-            variant="light"
-            badge="Onboarding"
-            title={institute?.onboardingDone ? "Complete" : `Step ${institute?.onboardingStep ?? 0} of 4`}
-            description={institute?.onboardingDone ? "This institute is fully set up." : "Setup is still in progress."}
-          />
-          <BentoCard
-            variant="tinted"
-            className="sm:col-span-2"
-            badge="Modules"
-            title="What's enabled here"
-            description={
-              institute && institute.activeModules.length
-                ? MODULE_CODES.filter((m) => institute.activeModules.includes(m))
-                    .map((m) => MODULE_LABELS[m])
-                    .join(" · ")
-                : "No modules enabled for this institute yet."
-            }
-          />
+          {isAdmin && (
+            <>
+              <BentoCard
+                variant="light"
+                badge="Onboarding"
+                title={institute?.onboardingDone ? "Complete" : `Step ${institute?.onboardingStep ?? 0} of 4`}
+                description={institute?.onboardingDone ? "This institute is fully set up." : "Setup is still in progress."}
+              />
+              <BentoCard
+                variant="tinted"
+                className="sm:col-span-2"
+                badge="Modules"
+                title="What's enabled here"
+                description={
+                  institute && institute.activeModules.length
+                    ? MODULE_CODES.filter((m) => institute.activeModules.includes(m))
+                        .map((m) => MODULE_LABELS[m])
+                        .join(" · ")
+                    : "No modules enabled for this institute yet."
+                }
+              />
+            </>
+          )}
         </div>
 
         <div className="space-y-5">
           <ProfileCard
             name={user!.fullName}
             subtitle={institute?.name ?? "No institute"}
-            stats={[
-              { label: "Role", value: user!.role.charAt(0) + user!.role.slice(1).toLowerCase() },
-              { label: "Modules", value: institute?.activeModules.length ?? 0 },
-              { label: "Setup", value: institute?.onboardingDone ? "Done" : "Pending" },
-            ]}
+            stats={
+              isAdmin
+                ? [
+                    { label: "Role", value: user!.role.charAt(0) + user!.role.slice(1).toLowerCase() },
+                    { label: "Modules", value: institute?.activeModules.length ?? 0 },
+                    { label: "Setup", value: institute?.onboardingDone ? "Done" : "Pending" },
+                  ]
+                : [{ label: "Role", value: user!.role.charAt(0) + user!.role.slice(1).toLowerCase() }]
+            }
           />
+          {showUpcomingLectures && <UpcomingLecturesWidget />}
           <ListSection
             title="Quick links"
             items={quickLinks}

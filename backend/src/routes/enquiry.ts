@@ -8,10 +8,11 @@ import { auditLog } from "../services/audit.js";
 
 export const enquiryRouter = Router();
 
-enquiryRouter.use(authenticate, requireInstitute, requireModule("ENQUIRY"));
-
 const MANAGE_ROLES = ["OWNER", "ADMIN", "RECEPTION"] as const;
-const EDIT_ROLES = ["OWNER", "ADMIN", "RECEPTION", "FACULTY"] as const;
+
+// Enquiry is a reception/front-office workflow — faculty and every other
+// institute role are kept out entirely, not just off write actions.
+enquiryRouter.use(authenticate, requireInstitute, requireModule("ENQUIRY"), requireRoles(...MANAGE_ROLES));
 
 const STATUS_ENUM = z.enum(["NEW", "CONTACTED", "CONVERTED", "LOST"]);
 const SOURCE_ENUM = z.enum(["WALK_IN", "REFERRAL", "SOCIAL", "PHONE", "OTHER"]);
@@ -99,7 +100,7 @@ async function loadOpenEnquiry(id: string, instituteId: string) {
   return enquiry;
 }
 
-enquiryRouter.patch("/:id", requireRoles(...EDIT_ROLES), validateBody(updateEnquirySchema), async (req, res, next) => {
+enquiryRouter.patch("/:id", requireRoles(...MANAGE_ROLES), validateBody(updateEnquirySchema), async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;
     const body = req.body as z.infer<typeof updateEnquirySchema>;

@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { apiFetch, ApiClientError } from "@/lib/api";
-import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { OnboardingLayout } from "@/components/onboarding/OnboardingLayout";
 import { nextOnboardingRoute } from "@/lib/onboarding";
@@ -76,20 +76,18 @@ export default function SetPasswordPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <Input
+        <PasswordInput
           id="newPassword"
           label="New password"
-          type="password"
           required
           autoComplete="new-password"
           minLength={8}
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
         />
-        <Input
+        <PasswordInput
           id="confirmPassword"
           label="Confirm new password"
-          type="password"
           required
           autoComplete="new-password"
           minLength={8}

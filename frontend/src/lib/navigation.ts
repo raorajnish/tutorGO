@@ -11,7 +11,8 @@ export type NavIcon =
   | "academics"
   | "enquiries"
   | "admissions"
-  | "students";
+  | "students"
+  | "attendance";
 
 export interface NavItem {
   label: string;
@@ -46,9 +47,16 @@ export const NAV_SECTIONS: NavSection[] = [
     section: "Institute",
     items: [
       { label: "Academics", href: "/academics", icon: "academics", roles: ["OWNER", "ADMIN", "RECEPTION"] },
-      { label: "Enquiries", href: "/enquiries", icon: "enquiries", roles: ["OWNER", "ADMIN", "RECEPTION", "FACULTY"], module: "ENQUIRY" },
+      { label: "Enquiries", href: "/enquiries", icon: "enquiries", roles: ["OWNER", "ADMIN", "RECEPTION"], module: "ENQUIRY" },
       { label: "Admissions", href: "/admissions", icon: "admissions", roles: ["OWNER", "ADMIN", "RECEPTION"], module: "ADMISSION" },
       { label: "Students", href: "/students", icon: "students", roles: ["OWNER", "ADMIN", "RECEPTION"] },
+      {
+        label: "Attendance",
+        href: "/attendance",
+        icon: "attendance",
+        roles: ["OWNER", "ADMIN", "RECEPTION", "FACULTY"],
+        module: "ATTENDANCE",
+      },
     ],
   },
   {

@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/Button";
 import { InstituteDetailsTab } from "@/components/settings/InstituteDetailsTab";
 import { TeamTab } from "@/components/settings/TeamTab";
 import { SubscriptionTab } from "@/components/settings/SubscriptionTab";
+import { MessageTemplatesTab } from "@/components/settings/MessageTemplatesTab";
 
 const TABS = [
   { id: "details", label: "Institute details" },
   { id: "team", label: "Team" },
   { id: "subscription", label: "Subscription" },
+  { id: "messages", label: "Message templates" },
 ];
 
 export default function SettingsPage() {
@@ -50,6 +52,7 @@ export default function SettingsPage() {
         {tab === "details" && <InstituteDetailsTab />}
         {tab === "team" && <TeamTab />}
         {tab === "subscription" && <SubscriptionTab />}
+        {tab === "messages" && <MessageTemplatesTab />}
       </div>
     </div>
   );

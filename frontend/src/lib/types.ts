@@ -484,3 +484,106 @@ export interface AdmitStudentPayload {
   batchId: string;
   fingerprintId?: string;
 }
+
+// ---------------------------------------------------------------------------
+// Attendance (Phase 4a — staff-facing)
+// ---------------------------------------------------------------------------
+
+// HOLIDAY intentionally left out of the offered toggle options (§ mark-attendance UX
+// feedback: a holiday is calendar-wide, not a per-student choice) but kept in the type
+// so any already-marked HOLIDAY records still render a label instead of crashing.
+export const ATTENDANCE_STATUSES = ["PRESENT", "ABSENT", "LATE", "LEAVE"] as const;
+export type AttendanceStatus = (typeof ATTENDANCE_STATUSES)[number] | "HOLIDAY" | "PRESENT_BIOMETRIC";
+
+export const ATTENDANCE_STATUS_LABELS: Record<AttendanceStatus, string> = {
+  PRESENT: "Present",
+  ABSENT: "Absent",
+  LEAVE: "Leave",
+  LATE: "Late",
+  HOLIDAY: "Holiday",
+  PRESENT_BIOMETRIC: "Present (biometric)",
+};
+
+export interface FacultyRef {
+  id: string;
+  fullName: string;
+}
+
+export interface SubjectRef {
+  id: string;
+  name: string;
+  shortCode: string;
+}
+
+export interface Lecture {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  cancelled: boolean;
+  cancelReason: string | null;
+  note: string | null;
+  batch: { id: string; name: string; course: CourseRef };
+  subject: SubjectRef;
+  faculty: FacultyRef;
+  markedCount: number;
+}
+
+export const MESSAGE_TEMPLATE_TYPES = ["LECTURE_SCHEDULED", "LECTURE_CANCELLED", "ATTENDANCE_MARKED"] as const;
+export type MessageTemplateType = (typeof MESSAGE_TEMPLATE_TYPES)[number];
+
+export const MESSAGE_TEMPLATE_LABELS: Record<MessageTemplateType, string> = {
+  LECTURE_SCHEDULED: "Lecture scheduled",
+  LECTURE_CANCELLED: "Lecture cancelled",
+  ATTENDANCE_MARKED: "Attendance marked",
+};
+
+export interface MessageTemplate {
+  type: MessageTemplateType;
+  body: string;
+  isDefault: boolean;
+}
+
+export interface LectureSummary extends Lecture {
+  expected: number;
+  present: number;
+  absent: number;
+  leave: number;
+  late: number;
+  holiday: number;
+  unmarked: number;
+}
+
+export interface RosterEntry {
+  student: { id: string; name: string; studentCode: string };
+  status: AttendanceStatus | null;
+  markedAt: string | null;
+  markedByName: string | null;
+}
+
+export interface AttendanceStats {
+  total: number;
+  today: number;
+  upcoming: number;
+}
+
+export interface FacultyCourseAssignment {
+  course: CourseRef;
+  allSubjects: boolean;
+  subjects: SubjectRef[];
+}
+
+export interface FacultyAssignmentInput {
+  courseId: string;
+  subjectIds: string[];
+}
+
+export interface ScheduleLecturePayload {
+  batchId: string;
+  subjectId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  facultyId?: string;
+  note?: string;
+}

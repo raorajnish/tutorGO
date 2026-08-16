@@ -39,7 +39,15 @@
       "Read(//c/tmp/**)",
       "PowerShell(Get-NetTCPConnection -LocalPort 3000,4000 -State Listen -ErrorAction SilentlyContinue)",
       "PowerShell(Get-Process -Id 26056,4944)",
-      "PowerShell(Stop-Process -Id 26056,4944 -Force)"
+      "PowerShell(Stop-Process -Id 26056,4944 -Force)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:4000/api/auth/me)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:3000)",
+      "Bash(node enable-attendance.mjs)",
+      "Bash(node -e \"console.log\\('noop'\\)\")",
+      "Bash(grep -E \"\\\\.ts$\")",
+      "Bash(grep -v \"^src$\\\\|tsconfig\")",
+      "Bash(curl -s -X POST http://127.0.0.1:4000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"rajnish.18310@sakec.ac.in\",\"password\":\"WRONG\"}' -o /dev/null -w '%{http_code}')",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const subs=JSON.parse\\(d\\);subs.forEach\\(s=>console.log\\(s.id,s.name,s.courses.map\\(c=>c.code\\)\\)\\)}\\)\")"
     ]
   }
 }

@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { FacultyAssignmentModal } from "@/components/settings/FacultyAssignmentModal";
 import { TEAM_ROLES, TEAM_ROLE_LABELS, type TeamMember, type TeamRole } from "@/lib/types";
 
 export function TeamTab() {
@@ -13,6 +14,7 @@ export function TeamTab() {
   const [error, setError] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [assignFaculty, setAssignFaculty] = useState<TeamMember | null>(null);
 
   function load() {
     apiFetch<TeamMember[]>("/org/team")
@@ -71,9 +73,16 @@ export function TeamTab() {
                   <Badge tone={m.isActive ? "success" : "danger"}>{m.isActive ? "Active" : "Inactive"}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Button variant="ghost" disabled={busyId === m.id} onClick={() => toggleActive(m)}>
-                    {m.isActive ? "Deactivate" : "Activate"}
-                  </Button>
+                  <div className="flex justify-end gap-2">
+                    {m.role === "FACULTY" && (
+                      <Button variant="ghost" onClick={() => setAssignFaculty(m)}>
+                        Assign courses
+                      </Button>
+                    )}
+                    <Button variant="ghost" disabled={busyId === m.id} onClick={() => toggleActive(m)}>
+                      {m.isActive ? "Deactivate" : "Activate"}
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -89,6 +98,8 @@ export function TeamTab() {
       </div>
 
       <InviteTeamModal open={inviteOpen} onClose={() => setInviteOpen(false)} onInvited={load} />
+
+      <FacultyAssignmentModal faculty={assignFaculty} onClose={() => setAssignFaculty(null)} />
     </div>
   );
 }

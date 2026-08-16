@@ -9,6 +9,8 @@ import { sendMail } from "../services/mailer.js";
 import { inviteEmailHtml } from "../lib/emailTemplates.js";
 import { auditLog } from "../services/audit.js";
 import { assertRoleCapacity, type CappedRole } from "../services/planLimits.js";
+import { DEFAULT_MESSAGE_TEMPLATES, MESSAGE_TEMPLATE_TYPES } from "../lib/messageTemplates.js";
+import type { MessageTemplateType } from "../generated/prisma/enums.js";
 
 export const orgRouter = Router();
 
@@ -190,7 +192,7 @@ orgRouter.post("/team", requireRoles("OWNER", "ADMIN"), validateBody(inviteTeamS
       metadata: { email, role: body.role },
     });
 
-    const loginUrl = `${process.env.FRONTEND_URL ?? "http://127.0.0.1:3000"}/login`;
+    const loginUrl = `${process.env.FRONTEND_URL ?? "http://127.0.0.1:3000"}/login?email=${encodeURIComponent(email)}`;
     const mailResult = await sendMail({
       to: email,
       subject: `You're set up on TutorGO — ${institute.name}`,
@@ -281,6 +283,74 @@ orgRouter.get("/plan", requireRoles("OWNER", "ADMIN"), async (req, res, next) =>
         },
       },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// WhatsApp-ready message templates (lecture scheduled/cancelled, attendance)
+// ---------------------------------------------------------------------------
+
+orgRouter.get("/message-templates", async (req, res, next) => {
+  try {
+    const rows = await prisma.messageTemplate.findMany({ where: { instituteId: req.tenantId! } });
+    const byType = new Map(rows.map((r) => [r.type, r.body]));
+
+    res.json(
+      MESSAGE_TEMPLATE_TYPES.map((type) => ({
+        type,
+        body: byType.get(type) ?? DEFAULT_MESSAGE_TEMPLATES[type],
+        isDefault: !byType.has(type),
+      }))
+    );
+  } catch (err) {
+    next(err);
+  }
+});
+
+const updateTemplateSchema = z.object({
+  body: z.string().min(1, "Template body is required").max(2000, "Template must be 2000 characters or fewer"),
+});
+
+orgRouter.put(
+  "/message-templates/:type",
+  requireRoles("OWNER", "ADMIN"),
+  validateBody(updateTemplateSchema),
+  async (req, res, next) => {
+    try {
+      const rawType = req.params.type as string;
+      if (!MESSAGE_TEMPLATE_TYPES.includes(rawType as (typeof MESSAGE_TEMPLATE_TYPES)[number])) {
+        throw ApiError.badRequest("Unknown template type");
+      }
+      const type = rawType as MessageTemplateType;
+      const body = (req.body as z.infer<typeof updateTemplateSchema>).body;
+      const instituteId = req.tenantId!;
+
+      const updated = await prisma.messageTemplate.upsert({
+        where: { instituteId_type: { instituteId, type } },
+        create: { instituteId, type, body },
+        update: { body },
+      });
+
+      res.json({ type: updated.type, body: updated.body, isDefault: false });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+orgRouter.delete("/message-templates/:type", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const rawType = req.params.type as string;
+    if (!MESSAGE_TEMPLATE_TYPES.includes(rawType as (typeof MESSAGE_TEMPLATE_TYPES)[number])) {
+      throw ApiError.badRequest("Unknown template type");
+    }
+    const type = rawType as MessageTemplateType;
+    const instituteId = req.tenantId!;
+
+    await prisma.messageTemplate.deleteMany({ where: { instituteId, type } });
+    res.json({ type, body: DEFAULT_MESSAGE_TEMPLATES[rawType as (typeof MESSAGE_TEMPLATE_TYPES)[number]], isDefault: true });
   } catch (err) {
     next(err);
   }

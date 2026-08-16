@@ -149,3 +149,32 @@ export type Student = Prisma.StudentModel
  * new one, rather than mutating which batch a row points to.
  */
 export type StudentBatch = Prisma.StudentBatchModel
+/**
+ * Model Lecture
+ * One scheduled class session. Roster is derived at read time from
+ * StudentBatch rows active on `date`, never stored here — so a lecture
+ * never goes stale if a student is later reassigned to a different batch.
+ */
+export type Lecture = Prisma.LectureModel
+/**
+ * Model AttendanceRecord
+ * 
+ */
+export type AttendanceRecord = Prisma.AttendanceRecordModel
+/**
+ * Model FacultyAssignment
+ * Which courses (and optionally which specific subjects within them) a
+ * faculty member is eligible to teach. A course with no subject-scoped rows
+ * means "all of that course's linked subjects" — the common case. No DB
+ * uniqueness on [facultyId, courseId, subjectId]: Postgres treats every
+ * NULL as distinct, so the API always replaces a faculty's full set in one
+ * transaction (delete-then-recreate) rather than relying on a constraint.
+ */
+export type FacultyAssignment = Prisma.FacultyAssignmentModel
+/**
+ * Model MessageTemplate
+ * One row per (institute, type). Missing row = the frontend falls back to a
+ * built-in default string, so institutes that never touch Settings still
+ * get a usable WhatsApp-ready message.
+ */
+export type MessageTemplate = Prisma.MessageTemplateModel

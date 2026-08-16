@@ -68,7 +68,11 @@ export const ModelName = {
   EnquiryActivity: 'EnquiryActivity',
   StudentCodeCounter: 'StudentCodeCounter',
   Student: 'Student',
-  StudentBatch: 'StudentBatch'
+  StudentBatch: 'StudentBatch',
+  Lecture: 'Lecture',
+  AttendanceRecord: 'AttendanceRecord',
+  FacultyAssignment: 'FacultyAssignment',
+  MessageTemplate: 'MessageTemplate'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -360,6 +364,57 @@ export const StudentBatchScalarFieldEnum = {
 } as const
 
 export type StudentBatchScalarFieldEnum = (typeof StudentBatchScalarFieldEnum)[keyof typeof StudentBatchScalarFieldEnum]
+
+
+export const LectureScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  batchId: 'batchId',
+  subjectId: 'subjectId',
+  facultyId: 'facultyId',
+  date: 'date',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  cancelledAt: 'cancelledAt',
+  cancelReason: 'cancelReason',
+  note: 'note',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LectureScalarFieldEnum = (typeof LectureScalarFieldEnum)[keyof typeof LectureScalarFieldEnum]
+
+
+export const AttendanceRecordScalarFieldEnum = {
+  id: 'id',
+  lectureId: 'lectureId',
+  studentId: 'studentId',
+  status: 'status',
+  markedAt: 'markedAt',
+  markedById: 'markedById'
+} as const
+
+export type AttendanceRecordScalarFieldEnum = (typeof AttendanceRecordScalarFieldEnum)[keyof typeof AttendanceRecordScalarFieldEnum]
+
+
+export const FacultyAssignmentScalarFieldEnum = {
+  id: 'id',
+  facultyId: 'facultyId',
+  courseId: 'courseId',
+  subjectId: 'subjectId'
+} as const
+
+export type FacultyAssignmentScalarFieldEnum = (typeof FacultyAssignmentScalarFieldEnum)[keyof typeof FacultyAssignmentScalarFieldEnum]
+
+
+export const MessageTemplateScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  type: 'type',
+  body: 'body'
+} as const
+
+export type MessageTemplateScalarFieldEnum = (typeof MessageTemplateScalarFieldEnum)[keyof typeof MessageTemplateScalarFieldEnum]
 
 
 export const SortOrder = {

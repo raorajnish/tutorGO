@@ -315,6 +315,8 @@ export type InstituteWhereInput = {
   batches?: Prisma.BatchListRelationFilter
   enquiries?: Prisma.EnquiryListRelationFilter
   students?: Prisma.StudentListRelationFilter
+  lectures?: Prisma.LectureListRelationFilter
+  messageTemplates?: Prisma.MessageTemplateListRelationFilter
 }
 
 export type InstituteOrderByWithRelationInput = {
@@ -343,6 +345,8 @@ export type InstituteOrderByWithRelationInput = {
   batches?: Prisma.BatchOrderByRelationAggregateInput
   enquiries?: Prisma.EnquiryOrderByRelationAggregateInput
   students?: Prisma.StudentOrderByRelationAggregateInput
+  lectures?: Prisma.LectureOrderByRelationAggregateInput
+  messageTemplates?: Prisma.MessageTemplateOrderByRelationAggregateInput
 }
 
 export type InstituteWhereUniqueInput = Prisma.AtLeast<{
@@ -374,6 +378,8 @@ export type InstituteWhereUniqueInput = Prisma.AtLeast<{
   batches?: Prisma.BatchListRelationFilter
   enquiries?: Prisma.EnquiryListRelationFilter
   students?: Prisma.StudentListRelationFilter
+  lectures?: Prisma.LectureListRelationFilter
+  messageTemplates?: Prisma.MessageTemplateListRelationFilter
 }, "id" | "code">
 
 export type InstituteOrderByWithAggregationInput = {
@@ -446,6 +452,8 @@ export type InstituteCreateInput = {
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateInput = {
@@ -472,6 +480,8 @@ export type InstituteUncheckedCreateInput = {
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUpdateInput = {
@@ -498,6 +508,8 @@ export type InstituteUpdateInput = {
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateInput = {
@@ -524,6 +536,8 @@ export type InstituteUncheckedUpdateInput = {
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateManyInput = {
@@ -850,6 +864,34 @@ export type InstituteUpdateOneRequiredWithoutStudentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutStudentsInput, Prisma.InstituteUpdateWithoutStudentsInput>, Prisma.InstituteUncheckedUpdateWithoutStudentsInput>
 }
 
+export type InstituteCreateNestedOneWithoutLecturesInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutLecturesInput, Prisma.InstituteUncheckedCreateWithoutLecturesInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutLecturesInput
+  connect?: Prisma.InstituteWhereUniqueInput
+}
+
+export type InstituteUpdateOneRequiredWithoutLecturesNestedInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutLecturesInput, Prisma.InstituteUncheckedCreateWithoutLecturesInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutLecturesInput
+  upsert?: Prisma.InstituteUpsertWithoutLecturesInput
+  connect?: Prisma.InstituteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutLecturesInput, Prisma.InstituteUpdateWithoutLecturesInput>, Prisma.InstituteUncheckedUpdateWithoutLecturesInput>
+}
+
+export type InstituteCreateNestedOneWithoutMessageTemplatesInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutMessageTemplatesInput, Prisma.InstituteUncheckedCreateWithoutMessageTemplatesInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutMessageTemplatesInput
+  connect?: Prisma.InstituteWhereUniqueInput
+}
+
+export type InstituteUpdateOneRequiredWithoutMessageTemplatesNestedInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutMessageTemplatesInput, Prisma.InstituteUncheckedCreateWithoutMessageTemplatesInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutMessageTemplatesInput
+  upsert?: Prisma.InstituteUpsertWithoutMessageTemplatesInput
+  connect?: Prisma.InstituteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutMessageTemplatesInput, Prisma.InstituteUpdateWithoutMessageTemplatesInput>, Prisma.InstituteUncheckedUpdateWithoutMessageTemplatesInput>
+}
+
 export type InstituteCreateWithoutPlanInput = {
   id?: string
   code: string
@@ -873,6 +915,8 @@ export type InstituteCreateWithoutPlanInput = {
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutPlanInput = {
@@ -898,6 +942,8 @@ export type InstituteUncheckedCreateWithoutPlanInput = {
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutPlanInput = {
@@ -971,6 +1017,8 @@ export type InstituteCreateWithoutOrganizationInput = {
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutOrganizationInput = {
@@ -996,6 +1044,8 @@ export type InstituteUncheckedCreateWithoutOrganizationInput = {
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutOrganizationInput = {
@@ -1047,6 +1097,8 @@ export type InstituteCreateWithoutModulesInput = {
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutModulesInput = {
@@ -1072,6 +1124,8 @@ export type InstituteUncheckedCreateWithoutModulesInput = {
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutModulesInput = {
@@ -1113,6 +1167,8 @@ export type InstituteUpdateWithoutModulesInput = {
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutModulesInput = {
@@ -1138,6 +1194,8 @@ export type InstituteUncheckedUpdateWithoutModulesInput = {
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutUsersInput = {
@@ -1163,6 +1221,8 @@ export type InstituteCreateWithoutUsersInput = {
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutUsersInput = {
@@ -1188,6 +1248,8 @@ export type InstituteUncheckedCreateWithoutUsersInput = {
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutUsersInput = {
@@ -1229,6 +1291,8 @@ export type InstituteUpdateWithoutUsersInput = {
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutUsersInput = {
@@ -1254,6 +1318,8 @@ export type InstituteUncheckedUpdateWithoutUsersInput = {
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutCoursesInput = {
@@ -1279,6 +1345,8 @@ export type InstituteCreateWithoutCoursesInput = {
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutCoursesInput = {
@@ -1304,6 +1372,8 @@ export type InstituteUncheckedCreateWithoutCoursesInput = {
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutCoursesInput = {
@@ -1345,6 +1415,8 @@ export type InstituteUpdateWithoutCoursesInput = {
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutCoursesInput = {
@@ -1370,6 +1442,8 @@ export type InstituteUncheckedUpdateWithoutCoursesInput = {
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutSubjectsInput = {
@@ -1395,6 +1469,8 @@ export type InstituteCreateWithoutSubjectsInput = {
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutSubjectsInput = {
@@ -1420,6 +1496,8 @@ export type InstituteUncheckedCreateWithoutSubjectsInput = {
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutSubjectsInput = {
@@ -1461,6 +1539,8 @@ export type InstituteUpdateWithoutSubjectsInput = {
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutSubjectsInput = {
@@ -1486,6 +1566,8 @@ export type InstituteUncheckedUpdateWithoutSubjectsInput = {
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutBatchesInput = {
@@ -1511,6 +1593,8 @@ export type InstituteCreateWithoutBatchesInput = {
   subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutBatchesInput = {
@@ -1536,6 +1620,8 @@ export type InstituteUncheckedCreateWithoutBatchesInput = {
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutBatchesInput = {
@@ -1577,6 +1663,8 @@ export type InstituteUpdateWithoutBatchesInput = {
   subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutBatchesInput = {
@@ -1602,6 +1690,8 @@ export type InstituteUncheckedUpdateWithoutBatchesInput = {
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutEnquiriesInput = {
@@ -1627,6 +1717,8 @@ export type InstituteCreateWithoutEnquiriesInput = {
   subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutEnquiriesInput = {
@@ -1652,6 +1744,8 @@ export type InstituteUncheckedCreateWithoutEnquiriesInput = {
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutEnquiriesInput = {
@@ -1693,6 +1787,8 @@ export type InstituteUpdateWithoutEnquiriesInput = {
   subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutEnquiriesInput = {
@@ -1718,6 +1814,8 @@ export type InstituteUncheckedUpdateWithoutEnquiriesInput = {
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutStudentsInput = {
@@ -1743,6 +1841,8 @@ export type InstituteCreateWithoutStudentsInput = {
   subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
   batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutStudentsInput = {
@@ -1768,6 +1868,8 @@ export type InstituteUncheckedCreateWithoutStudentsInput = {
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
   batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
   enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutStudentsInput = {
@@ -1809,6 +1911,8 @@ export type InstituteUpdateWithoutStudentsInput = {
   subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutStudentsInput = {
@@ -1834,6 +1938,256 @@ export type InstituteUncheckedUpdateWithoutStudentsInput = {
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteCreateWithoutLecturesInput = {
+  id?: string
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
+  plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
+  users?: Prisma.UserCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteUncheckedCreateWithoutLecturesInput = {
+  id?: string
+  organizationId: string
+  planId?: string | null
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteCreateOrConnectWithoutLecturesInput = {
+  where: Prisma.InstituteWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutLecturesInput, Prisma.InstituteUncheckedCreateWithoutLecturesInput>
+}
+
+export type InstituteUpsertWithoutLecturesInput = {
+  update: Prisma.XOR<Prisma.InstituteUpdateWithoutLecturesInput, Prisma.InstituteUncheckedUpdateWithoutLecturesInput>
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutLecturesInput, Prisma.InstituteUncheckedCreateWithoutLecturesInput>
+  where?: Prisma.InstituteWhereInput
+}
+
+export type InstituteUpdateToOneWithWhereWithoutLecturesInput = {
+  where?: Prisma.InstituteWhereInput
+  data: Prisma.XOR<Prisma.InstituteUpdateWithoutLecturesInput, Prisma.InstituteUncheckedUpdateWithoutLecturesInput>
+}
+
+export type InstituteUpdateWithoutLecturesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
+  plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
+  users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteUncheckedUpdateWithoutLecturesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteCreateWithoutMessageTemplatesInput = {
+  id?: string
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
+  plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
+  users?: Prisma.UserCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteUncheckedCreateWithoutMessageTemplatesInput = {
+  id?: string
+  organizationId: string
+  planId?: string | null
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteCreateOrConnectWithoutMessageTemplatesInput = {
+  where: Prisma.InstituteWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutMessageTemplatesInput, Prisma.InstituteUncheckedCreateWithoutMessageTemplatesInput>
+}
+
+export type InstituteUpsertWithoutMessageTemplatesInput = {
+  update: Prisma.XOR<Prisma.InstituteUpdateWithoutMessageTemplatesInput, Prisma.InstituteUncheckedUpdateWithoutMessageTemplatesInput>
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutMessageTemplatesInput, Prisma.InstituteUncheckedCreateWithoutMessageTemplatesInput>
+  where?: Prisma.InstituteWhereInput
+}
+
+export type InstituteUpdateToOneWithWhereWithoutMessageTemplatesInput = {
+  where?: Prisma.InstituteWhereInput
+  data: Prisma.XOR<Prisma.InstituteUpdateWithoutMessageTemplatesInput, Prisma.InstituteUncheckedUpdateWithoutMessageTemplatesInput>
+}
+
+export type InstituteUpdateWithoutMessageTemplatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
+  plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
+  users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteUncheckedUpdateWithoutMessageTemplatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateManyPlanInput = {
@@ -1877,6 +2231,8 @@ export type InstituteUpdateWithoutPlanInput = {
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutPlanInput = {
@@ -1902,6 +2258,8 @@ export type InstituteUncheckedUpdateWithoutPlanInput = {
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateManyWithoutPlanInput = {
@@ -1963,6 +2321,8 @@ export type InstituteUpdateWithoutOrganizationInput = {
   batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutOrganizationInput = {
@@ -1988,6 +2348,8 @@ export type InstituteUncheckedUpdateWithoutOrganizationInput = {
   batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
   students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateManyWithoutOrganizationInput = {
@@ -2021,6 +2383,8 @@ export type InstituteCountOutputType = {
   batches: number
   enquiries: number
   students: number
+  lectures: number
+  messageTemplates: number
 }
 
 export type InstituteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2031,6 +2395,8 @@ export type InstituteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   batches?: boolean | InstituteCountOutputTypeCountBatchesArgs
   enquiries?: boolean | InstituteCountOutputTypeCountEnquiriesArgs
   students?: boolean | InstituteCountOutputTypeCountStudentsArgs
+  lectures?: boolean | InstituteCountOutputTypeCountLecturesArgs
+  messageTemplates?: boolean | InstituteCountOutputTypeCountMessageTemplatesArgs
 }
 
 /**
@@ -2092,6 +2458,20 @@ export type InstituteCountOutputTypeCountStudentsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.StudentWhereInput
 }
 
+/**
+ * InstituteCountOutputType without action
+ */
+export type InstituteCountOutputTypeCountLecturesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LectureWhereInput
+}
+
+/**
+ * InstituteCountOutputType without action
+ */
+export type InstituteCountOutputTypeCountMessageTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageTemplateWhereInput
+}
+
 
 export type InstituteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2119,6 +2499,8 @@ export type InstituteSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   batches?: boolean | Prisma.Institute$batchesArgs<ExtArgs>
   enquiries?: boolean | Prisma.Institute$enquiriesArgs<ExtArgs>
   students?: boolean | Prisma.Institute$studentsArgs<ExtArgs>
+  lectures?: boolean | Prisma.Institute$lecturesArgs<ExtArgs>
+  messageTemplates?: boolean | Prisma.Institute$messageTemplatesArgs<ExtArgs>
   _count?: boolean | Prisma.InstituteCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["institute"]>
 
@@ -2194,6 +2576,8 @@ export type InstituteInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   batches?: boolean | Prisma.Institute$batchesArgs<ExtArgs>
   enquiries?: boolean | Prisma.Institute$enquiriesArgs<ExtArgs>
   students?: boolean | Prisma.Institute$studentsArgs<ExtArgs>
+  lectures?: boolean | Prisma.Institute$lecturesArgs<ExtArgs>
+  messageTemplates?: boolean | Prisma.Institute$messageTemplatesArgs<ExtArgs>
   _count?: boolean | Prisma.InstituteCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InstituteIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2217,6 +2601,8 @@ export type $InstitutePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     batches: Prisma.$BatchPayload<ExtArgs>[]
     enquiries: Prisma.$EnquiryPayload<ExtArgs>[]
     students: Prisma.$StudentPayload<ExtArgs>[]
+    lectures: Prisma.$LecturePayload<ExtArgs>[]
+    messageTemplates: Prisma.$MessageTemplatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2638,6 +3024,8 @@ export interface Prisma__InstituteClient<T, Null = never, ExtArgs extends runtim
   batches<T extends Prisma.Institute$batchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$batchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   enquiries<T extends Prisma.Institute$enquiriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$enquiriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EnquiryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   students<T extends Prisma.Institute$studentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$studentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  lectures<T extends Prisma.Institute$lecturesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$lecturesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LecturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messageTemplates<T extends Prisma.Institute$messageTemplatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$messageTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3268,6 +3656,54 @@ export type Institute$studentsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.StudentScalarFieldEnum | Prisma.StudentScalarFieldEnum[]
+}
+
+/**
+ * Institute.lectures
+ */
+export type Institute$lecturesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Lecture
+   */
+  select?: Prisma.LectureSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Lecture
+   */
+  omit?: Prisma.LectureOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LectureInclude<ExtArgs> | null
+  where?: Prisma.LectureWhereInput
+  orderBy?: Prisma.LectureOrderByWithRelationInput | Prisma.LectureOrderByWithRelationInput[]
+  cursor?: Prisma.LectureWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LectureScalarFieldEnum | Prisma.LectureScalarFieldEnum[]
+}
+
+/**
+ * Institute.messageTemplates
+ */
+export type Institute$messageTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessageTemplate
+   */
+  select?: Prisma.MessageTemplateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessageTemplate
+   */
+  omit?: Prisma.MessageTemplateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageTemplateInclude<ExtArgs> | null
+  where?: Prisma.MessageTemplateWhereInput
+  orderBy?: Prisma.MessageTemplateOrderByWithRelationInput | Prisma.MessageTemplateOrderByWithRelationInput[]
+  cursor?: Prisma.MessageTemplateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageTemplateScalarFieldEnum | Prisma.MessageTemplateScalarFieldEnum[]
 }
 
 /**
