@@ -265,6 +265,7 @@ academicsRouter.get("/batches", async (req, res, next) => {
       include: {
         course: { select: { id: true, name: true, code: true } },
         students: { where: { leftAt: null } },
+        _count: { select: { lectures: true } },
       },
       orderBy: { startDate: "desc" },
     });
@@ -278,7 +279,7 @@ academicsRouter.get("/batches", async (req, res, next) => {
         endDate: b.endDate,
         isActive: b.isActive,
         enrolledCount: b.students.length,
-        lectureCount: 0, // populated once Attendance (Phase 4) exists
+        lectureCount: b._count.lectures,
       }))
     );
   } catch (err) {
@@ -342,7 +343,11 @@ academicsRouter.patch("/batches/:id", requireRoles(...MANAGE_ROLES), validateBod
     const updated = await prisma.batch.update({
       where: { id: batch.id },
       data: body,
-      include: { course: { select: { id: true, name: true, code: true } }, students: { where: { leftAt: null } } },
+      include: {
+        course: { select: { id: true, name: true, code: true } },
+        students: { where: { leftAt: null } },
+        _count: { select: { lectures: true } },
+      },
     });
 
     res.json({
@@ -353,9 +358,135 @@ academicsRouter.patch("/batches/:id", requireRoles(...MANAGE_ROLES), validateBod
       endDate: updated.endDate,
       isActive: updated.isActive,
       enrolledCount: updated.students.length,
-      lectureCount: 0,
+      lectureCount: updated._count.lectures,
     });
   } catch (err) {
     next(err);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Fee structures (reusable, course-scoped fee templates — see fees.ts for
+// how they're attached to a student's FeeAccount)
+// ---------------------------------------------------------------------------
+
+function serializeFeeStructure(s: {
+  id: string;
+  name: string;
+  planType: string;
+  courseFee: unknown;
+  installmentCount: number | null;
+  monthlyAmount: unknown;
+  billingDay: number | null;
+  isActive: boolean;
+  course: { id: string; name: string; code: string };
+}) {
+  return {
+    id: s.id,
+    name: s.name,
+    planType: s.planType,
+    course: s.course,
+    courseFee: s.courseFee !== null ? String(s.courseFee) : null,
+    installmentCount: s.installmentCount,
+    monthlyAmount: s.monthlyAmount !== null ? String(s.monthlyAmount) : null,
+    billingDay: s.billingDay,
+    isActive: s.isActive,
+  };
+}
+
+const feeStructureInclude = { course: { select: { id: true, name: true, code: true } } } as const;
+
+academicsRouter.get("/fee-structures", async (req, res, next) => {
+  try {
+    const courseId = typeof req.query.courseId === "string" ? req.query.courseId : undefined;
+    const structures = await prisma.feeStructure.findMany({
+      where: { instituteId: req.tenantId!, courseId },
+      include: feeStructureInclude,
+      orderBy: { name: "asc" },
+    });
+    res.json(structures.map(serializeFeeStructure));
+  } catch (err) {
+    next(err);
+  }
+});
+
+const feeStructureSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    courseId: z.string().min(1, "Course is required"),
+    planType: z.enum(["ONE_TIME", "RECURRING"]),
+    courseFee: z.number().nonnegative().optional(),
+    installmentCount: z.number().int().positive().optional(),
+    monthlyAmount: z.number().nonnegative().optional(),
+    billingDay: z.number().int().min(1).max(28).optional(),
+  })
+  .superRefine((body, ctx) => {
+    if (body.planType === "ONE_TIME" && !body.installmentCount) {
+      ctx.addIssue({ code: "custom", message: "Installment count is required for a one-time plan", path: ["installmentCount"] });
+    }
+    if (body.planType === "RECURRING" && !body.billingDay) {
+      ctx.addIssue({ code: "custom", message: "Billing day is required for a recurring plan", path: ["billingDay"] });
+    }
+  });
+
+academicsRouter.post("/fee-structures", requireRoles(...MANAGE_ROLES), validateBody(feeStructureSchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof feeStructureSchema>;
+    const instituteId = req.tenantId!;
+
+    const course = await prisma.course.findUnique({ where: { id: body.courseId } });
+    if (!course || course.instituteId !== instituteId) throw ApiError.badRequest("Course not found");
+
+    const structure = await prisma.feeStructure.create({
+      data: {
+        instituteId,
+        courseId: body.courseId,
+        name: body.name,
+        planType: body.planType,
+        courseFee: body.planType === "ONE_TIME" ? body.courseFee : undefined,
+        installmentCount: body.planType === "ONE_TIME" ? body.installmentCount : undefined,
+        monthlyAmount: body.planType === "RECURRING" ? body.monthlyAmount : undefined,
+        billingDay: body.planType === "RECURRING" ? body.billingDay : undefined,
+      },
+      include: feeStructureInclude,
+    });
+
+    res.status(201).json(serializeFeeStructure(structure));
+  } catch (err) {
+    next(err);
+  }
+});
+
+const updateFeeStructureSchema = z.object({
+  name: z.string().min(1).optional(),
+  courseFee: z.number().nonnegative().optional(),
+  installmentCount: z.number().int().positive().optional(),
+  monthlyAmount: z.number().nonnegative().optional(),
+  billingDay: z.number().int().min(1).max(28).optional(),
+  isActive: z.boolean().optional(),
+});
+
+academicsRouter.patch(
+  "/fee-structures/:id",
+  requireRoles(...MANAGE_ROLES),
+  validateBody(updateFeeStructureSchema),
+  async (req, res, next) => {
+    try {
+      const instituteId = req.tenantId!;
+      const body = req.body as z.infer<typeof updateFeeStructureSchema>;
+
+      const structure = await prisma.feeStructure.findUnique({ where: { id: req.params.id as string } });
+      if (!structure || structure.instituteId !== instituteId) throw ApiError.notFound("Fee structure not found");
+
+      const updated = await prisma.feeStructure.update({
+        where: { id: structure.id },
+        data: body,
+        include: feeStructureInclude,
+      });
+
+      res.json(serializeFeeStructure(updated));
+    } catch (err) {
+      next(err);
+    }
+  }
+);

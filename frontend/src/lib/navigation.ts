@@ -12,7 +12,9 @@ export type NavIcon =
   | "enquiries"
   | "admissions"
   | "students"
-  | "attendance";
+  | "attendance"
+  | "fees"
+  | "payroll";
 
 export interface NavItem {
   label: string;
@@ -56,6 +58,20 @@ export const NAV_SECTIONS: NavSection[] = [
         icon: "attendance",
         roles: ["OWNER", "ADMIN", "RECEPTION", "FACULTY"],
         module: "ATTENDANCE",
+      },
+      {
+        label: "Fees",
+        href: "/fees",
+        icon: "fees",
+        roles: ["OWNER", "ADMIN", "RECEPTION"],
+        module: "FEES",
+      },
+      {
+        label: "Payroll",
+        href: "/payroll",
+        icon: "payroll",
+        roles: ["OWNER", "ADMIN", "ACCOUNTANT", "FACULTY"],
+        module: "PAYROLL",
       },
     ],
   },

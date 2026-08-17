@@ -43,6 +43,21 @@ const SAMPLE_VARS: Record<MessageTemplateType, Record<string, string>> = {
     leaveNames: "\n🟡 Leave: Priya Nair (informed)",
     note: "",
   },
+  FEE_OVERDUE_REMINDER: {
+    studentName: "Aditi Sharma",
+    amount: "3,333.34",
+    dueDate: "5 Aug",
+    daysOverdue: "11",
+    course: "10th Standard (10)",
+  },
+  PAYROLL_PAYMENT_RECORDED: {
+    name: "Rajnish Sharma",
+    amount: "5,000.00",
+    mode: "Bank transfer",
+    paidOn: "16 Aug",
+    pendingAmount: "0.00",
+    instituteName: "Super20 Academy",
+  },
 };
 
 const PLACEHOLDER_LEGEND: Record<MessageTemplateType, string[]> = {
@@ -63,6 +78,8 @@ const PLACEHOLDER_LEGEND: Record<MessageTemplateType, string[]> = {
     "leaveNames",
     "note",
   ],
+  FEE_OVERDUE_REMINDER: ["studentName", "amount", "dueDate", "daysOverdue", "course"],
+  PAYROLL_PAYMENT_RECORDED: ["name", "amount", "mode", "paidOn", "pendingAmount", "instituteName"],
 };
 
 export function MessageTemplatesTab() {
@@ -111,8 +128,9 @@ export function MessageTemplatesTab() {
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Customize the WhatsApp-ready messages staff can copy after scheduling a lecture, cancelling one, or marking
-        attendance. Uses WhatsApp&apos;s own formatting — <code>*bold*</code>, <code>_italic_</code>.
+        Customize the WhatsApp-ready messages staff can copy after scheduling a lecture, cancelling one, marking
+        attendance, or reminding a parent about an overdue fee. Uses WhatsApp&apos;s own formatting —{" "}
+        <code>*bold*</code>, <code>_italic_</code>.
       </p>
 
       {error && <div className="rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{error}</div>}

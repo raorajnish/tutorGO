@@ -429,6 +429,7 @@ export interface StudentListItem {
   currentBatch: BatchRef | null;
   admissionDate: string;
   isActive: boolean;
+  hasFeeAccount: boolean;
 }
 
 export interface StudentsResponse {
@@ -465,8 +466,10 @@ export interface StudentDetail {
   isActive: boolean;
   enquiry: { id: string; source: EnquirySource; createdAt: string } | null;
   batchHistory: StudentBatchHistoryEntry[];
-  feeAccount: null;
-  recentAttendance: never[];
+  feesModuleEnabled: boolean;
+  feeAccount: { planType: FeePlanType; status: FeeAccountStatus; totalDue: string; totalPaid: string; balance: string } | null;
+  attendanceModuleEnabled: boolean;
+  recentAttendance: { lectureId: string; date: string; subject: string; batch: string; status: AttendanceStatus }[];
 }
 
 export interface AdmitStudentPayload {
@@ -529,13 +532,21 @@ export interface Lecture {
   markedCount: number;
 }
 
-export const MESSAGE_TEMPLATE_TYPES = ["LECTURE_SCHEDULED", "LECTURE_CANCELLED", "ATTENDANCE_MARKED"] as const;
+export const MESSAGE_TEMPLATE_TYPES = [
+  "LECTURE_SCHEDULED",
+  "LECTURE_CANCELLED",
+  "ATTENDANCE_MARKED",
+  "FEE_OVERDUE_REMINDER",
+  "PAYROLL_PAYMENT_RECORDED",
+] as const;
 export type MessageTemplateType = (typeof MESSAGE_TEMPLATE_TYPES)[number];
 
 export const MESSAGE_TEMPLATE_LABELS: Record<MessageTemplateType, string> = {
   LECTURE_SCHEDULED: "Lecture scheduled",
   LECTURE_CANCELLED: "Lecture cancelled",
   ATTENDANCE_MARKED: "Attendance marked",
+  FEE_OVERDUE_REMINDER: "Fee overdue reminder",
+  PAYROLL_PAYMENT_RECORDED: "Payroll payment recorded",
 };
 
 export interface MessageTemplate {
@@ -586,4 +597,391 @@ export interface ScheduleLecturePayload {
   endTime: string;
   facultyId?: string;
   note?: string;
+}
+
+
+// ---------------------------------------------------------------------------
+// Fees (Phase 5a — staff-facing)
+// ---------------------------------------------------------------------------
+
+export const FEE_PLAN_TYPES = ["ONE_TIME", "RECURRING"] as const;
+export type FeePlanType = (typeof FEE_PLAN_TYPES)[number];
+
+export const FEE_PLAN_TYPE_LABELS: Record<FeePlanType, string> = {
+  ONE_TIME: "One-time plan",
+  RECURRING: "Monthly recurring",
+};
+
+export const FEE_ACCOUNT_STATUSES = ["ACTIVE", "CLOSED"] as const;
+export type FeeAccountStatus = (typeof FEE_ACCOUNT_STATUSES)[number];
+
+export const PAYMENT_MODES = ["UPI", "CASH", "CARD", "BANK_TRANSFER", "CHEQUE"] as const;
+export type PaymentMode = (typeof PAYMENT_MODES)[number];
+
+export const PAYMENT_MODE_LABELS: Record<PaymentMode, string> = {
+  UPI: "UPI",
+  CASH: "Cash",
+  CARD: "Card",
+  BANK_TRANSFER: "Bank transfer",
+  CHEQUE: "Cheque",
+};
+
+export const INSTALLMENT_STATUSES = ["PENDING", "PARTIAL", "PAID", "OVERDUE"] as const;
+export type InstallmentStatus = (typeof INSTALLMENT_STATUSES)[number];
+
+export const INSTALLMENT_STATUS_LABELS: Record<InstallmentStatus, string> = {
+  PENDING: "Pending",
+  PARTIAL: "Partial",
+  PAID: "Paid",
+  OVERDUE: "Overdue",
+};
+
+export interface FeeStudentRef {
+  id: string;
+  name: string;
+  studentCode: string;
+  course?: CourseRef;
+}
+
+export interface FeeStructure {
+  id: string;
+  name: string;
+  course: CourseRef;
+  planType: FeePlanType;
+  courseFee: string | null;
+  installmentCount: number | null;
+  monthlyAmount: string | null;
+  billingDay: number | null;
+  isActive: boolean;
+}
+
+export interface CreateFeeStructurePayload {
+  name: string;
+  courseId: string;
+  planType: FeePlanType;
+  courseFee?: number;
+  installmentCount?: number;
+  monthlyAmount?: number;
+  billingDay?: number;
+}
+
+export interface FeeInstallment {
+  id: string;
+  seq: number;
+  dueDate: string;
+  originalDueDate: string | null;
+  amount: string;
+  paidAmount: string;
+  waived: boolean;
+  status: InstallmentStatus;
+}
+
+/** One line item within a payment — how much of that one transaction went
+ * toward one specific installment. A single payment can span several
+ * installments (waterfall allocation, see fees.ts). */
+export interface PaymentAllocationRef {
+  installmentId: string;
+  installmentSeq: number;
+  amount: string;
+}
+
+export interface FeePayment {
+  id: string;
+  amount: string;
+  mode: PaymentMode;
+  paidOn: string;
+  receiptNumber: string;
+  notes: string | null;
+  createdByName: string | null;
+  voided: boolean;
+  voidReason: string | null;
+  voidedByName: string | null;
+  createdAt: string;
+  allocations: PaymentAllocationRef[];
+}
+
+export interface FeeAccount {
+  id: string;
+  studentId: string;
+  planType: FeePlanType;
+  status: FeeAccountStatus;
+  feeStructure: { id: string; name: string } | null;
+  courseFee: string | null;
+  discount: string | null;
+  finalFee: string | null;
+  installmentCount: number | null;
+  monthlyAmount: string | null;
+  billingDay: number | null;
+  installments: FeeInstallment[];
+  payments: FeePayment[];
+  totalDue: string;
+  totalPaid: string;
+  totalWaived: string;
+  balance: string;
+}
+
+export interface FeeAccountResponse {
+  student: FeeStudentRef;
+  account: FeeAccount | null;
+}
+
+export interface InstallmentInput {
+  dueDate: string;
+  amount: number;
+}
+
+export interface CreateFeeAccountPayload {
+  studentId: string;
+  feeStructureId?: string;
+  planType?: FeePlanType;
+  courseFee?: number;
+  discount?: number;
+  installmentCount?: number;
+  firstDueDate?: string;
+  installments?: InstallmentInput[];
+  monthlyAmount?: number;
+  billingDay?: number;
+  startDate?: string;
+}
+
+export interface RecordPaymentPayload {
+  studentId: string;
+  amount: number;
+  mode: PaymentMode;
+  paidOn: string;
+  notes?: string;
+}
+
+export interface OverdueEntry {
+  installment: FeeInstallment;
+  daysOverdue: number;
+  student: FeeStudentRef & { phone: string | null; parentPhone: string | null };
+  outstanding: string;
+}
+
+export interface ReceiptDetail extends FeePayment {
+  student: FeeStudentRef & { course: CourseRef };
+  accountTotals: { totalDue: string; totalPaid: string; totalWaived: string; balance: string };
+}
+
+export interface ReceiptListItem extends FeePayment {
+  student: { id: string; name: string; studentCode: string; phone: string | null };
+}
+
+// ---------------------------------------------------------------------------
+// Payroll (Phase 6)
+// ---------------------------------------------------------------------------
+
+export const SALARY_TYPES = ["FIXED", "PER_LECTURE"] as const;
+export type SalaryType = (typeof SALARY_TYPES)[number];
+
+export const SALARY_TYPE_LABELS: Record<SalaryType, string> = {
+  FIXED: "Fixed monthly",
+  PER_LECTURE: "Per lecture",
+};
+
+export const PAYROLL_ELIGIBLE_ROLES = ["ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION"] as const;
+export type PayrollEligibleRole = (typeof PAYROLL_ELIGIBLE_ROLES)[number];
+
+export interface SalaryProfileListItem {
+  id: string;
+  name: string;
+  title: string | null;
+  isExternal: boolean;
+  externalEmail: string | null;
+  externalPhone: string | null;
+  salaryType: SalaryType;
+  monthlyRate: string | null;
+  perLectureRate: string | null;
+  isActive: boolean;
+  pendingAmount: string;
+  lastPaidOn: string | null;
+  lastPaidAmount: string | null;
+}
+
+export interface UnconfiguredStaffUser {
+  id: string;
+  fullName: string;
+  role: PayrollEligibleRole;
+}
+
+export interface PayrollStaffResponse {
+  staff: SalaryProfileListItem[];
+  unconfigured: UnconfiguredStaffUser[];
+}
+
+export interface UpdateSalaryProfilePayload {
+  title?: string | null;
+  externalEmail?: string | null;
+  externalPhone?: string | null;
+  monthlyRate?: number;
+  perLectureRate?: number;
+  isActive?: boolean;
+}
+
+export interface RateHistoryEntry {
+  id: string;
+  changedByName: string | null;
+  changedAt: string;
+  from: { monthlyRate: string | null; perLectureRate: string | null } | null;
+  to: { monthlyRate: string | null; perLectureRate: string | null } | null;
+}
+
+export type PayrollLineItemKind = "SALARY" | "LECTURE";
+export type PayrollLineItemStatus = "UNPAID" | "PARTIAL" | "PAID";
+
+export interface PayrollLineItem {
+  id: string;
+  kind: PayrollLineItemKind;
+  periodMonth: string;
+  lectureId: string | null;
+  label: string;
+  amount: string;
+  paidAmount: string;
+  status: PayrollLineItemStatus;
+}
+
+export interface PayrollPeriodGroup {
+  periodMonth: string;
+  label: string;
+  totalAmount: string;
+  totalPaid: string;
+  totalOutstanding: string;
+  lineItems: PayrollLineItem[];
+}
+
+export interface PayrollLedgerTotals {
+  lecturesCount: number;
+  totalEarned: string;
+  totalPaid: string;
+  totalPending: string;
+}
+
+export interface PayrollLedger {
+  id: string | null;
+  name?: string;
+  title?: string | null;
+  salaryType?: SalaryType;
+  monthlyRate?: string | null;
+  perLectureRate?: string | null;
+  isActive?: boolean;
+  advanceBalance: string;
+  totals: PayrollLedgerTotals;
+  periods: PayrollPeriodGroup[];
+}
+
+export interface PayrollPaymentAllocationRef {
+  lineItemId: string | null;
+  amount: string;
+}
+
+export interface PayrollPayment {
+  id: string;
+  amount: string;
+  mode: PaymentMode;
+  paidOn: string;
+  notes: string | null;
+  voided: boolean;
+  voidReason: string | null;
+  createdByName: string | null;
+  voidedByName: string | null;
+  createdAt: string;
+  allocations: PayrollPaymentAllocationRef[];
+}
+
+export const PAYROLL_RUN_STATUSES = ["DRAFT", "APPROVED", "PAID"] as const;
+export type PayrollRunStatus = (typeof PAYROLL_RUN_STATUSES)[number];
+
+export interface PayrollRunStaffSummary {
+  salaryProfileId: string;
+  name: string;
+  totalAmount: string;
+  totalPaid: string;
+  totalOutstanding: string;
+}
+
+export interface PayrollRunSummary {
+  staff: PayrollRunStaffSummary[];
+  totalAmount: string;
+  totalPaid: string;
+  totalOutstanding: string;
+}
+
+export interface PayrollRun {
+  id: string;
+  periodMonth: string;
+  label: string;
+  status: PayrollRunStatus;
+  approvedAt: string | null;
+  paidAt: string | null;
+  createdAt: string;
+  summary?: PayrollRunSummary;
+}
+
+export interface PayrollRunPreview {
+  periodMonth: string;
+  label: string;
+  staff: { salaryProfileId: string; name: string; projectedAmount: string }[];
+  totalAmount: string;
+}
+
+export interface CreateSalaryProfilePayload {
+  userId?: string;
+  externalName?: string;
+  externalEmail?: string;
+  externalPhone?: string;
+  title?: string;
+  salaryType: SalaryType;
+  monthlyRate?: number;
+  perLectureRate?: number;
+}
+
+export interface RecordPayrollPaymentPayload {
+  salaryProfileId: string;
+  amount: number;
+  mode: PaymentMode;
+  paidOn: string;
+  lineItemIds: string[];
+  notes?: string;
+  autoApplyCredit: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Institute email settings (Settings → Email)
+// ---------------------------------------------------------------------------
+
+export interface InstituteEmailConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  username: string;
+  fromName: string;
+  fromEmail: string;
+  isEnabled: boolean;
+  updatedAt: string;
+}
+
+export interface UpdateInstituteEmailConfigPayload {
+  host: string;
+  port: number;
+  secure: boolean;
+  username: string;
+  password?: string;
+  fromName: string;
+  fromEmail: string;
+  isEnabled: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// In-app notifications
+// ---------------------------------------------------------------------------
+
+export interface AppNotification {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  metadata: Record<string, unknown> | null;
+  read: boolean;
+  createdAt: string;
 }

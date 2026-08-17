@@ -79,7 +79,61 @@ export type AttendanceStatus = (typeof AttendanceStatus)[keyof typeof Attendance
 export const MessageTemplateType = {
   LECTURE_SCHEDULED: 'LECTURE_SCHEDULED',
   LECTURE_CANCELLED: 'LECTURE_CANCELLED',
-  ATTENDANCE_MARKED: 'ATTENDANCE_MARKED'
+  ATTENDANCE_MARKED: 'ATTENDANCE_MARKED',
+  FEE_OVERDUE_REMINDER: 'FEE_OVERDUE_REMINDER',
+  PAYROLL_PAYMENT_RECORDED: 'PAYROLL_PAYMENT_RECORDED'
 } as const
 
 export type MessageTemplateType = (typeof MessageTemplateType)[keyof typeof MessageTemplateType]
+
+
+export const PaymentMode = {
+  UPI: 'UPI',
+  CASH: 'CASH',
+  CARD: 'CARD',
+  BANK_TRANSFER: 'BANK_TRANSFER',
+  CHEQUE: 'CHEQUE'
+} as const
+
+export type PaymentMode = (typeof PaymentMode)[keyof typeof PaymentMode]
+
+
+export const FeePlanType = {
+  ONE_TIME: 'ONE_TIME',
+  RECURRING: 'RECURRING'
+} as const
+
+export type FeePlanType = (typeof FeePlanType)[keyof typeof FeePlanType]
+
+
+export const FeeAccountStatus = {
+  ACTIVE: 'ACTIVE',
+  CLOSED: 'CLOSED'
+} as const
+
+export type FeeAccountStatus = (typeof FeeAccountStatus)[keyof typeof FeeAccountStatus]
+
+
+export const SalaryType = {
+  FIXED: 'FIXED',
+  PER_LECTURE: 'PER_LECTURE'
+} as const
+
+export type SalaryType = (typeof SalaryType)[keyof typeof SalaryType]
+
+
+export const PayrollLineItemKind = {
+  SALARY: 'SALARY',
+  LECTURE: 'LECTURE'
+} as const
+
+export type PayrollLineItemKind = (typeof PayrollLineItemKind)[keyof typeof PayrollLineItemKind]
+
+
+export const PayrollRunStatus = {
+  DRAFT: 'DRAFT',
+  APPROVED: 'APPROVED',
+  PAID: 'PAID'
+} as const
+
+export type PayrollRunStatus = (typeof PayrollRunStatus)[keyof typeof PayrollRunStatus]

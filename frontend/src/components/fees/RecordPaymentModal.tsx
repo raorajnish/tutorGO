@@ -1,0 +1,120 @@
+"use client";
+
+import { useEffect, useState, type FormEvent } from "react";
+import { apiFetch, ApiClientError } from "@/lib/api";
+import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Dropdown } from "@/components/ui/Dropdown";
+import { Textarea } from "@/components/ui/Textarea";
+import { formatMoney, parseMoney } from "@/lib/money";
+import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type PaymentMode } from "@/lib/types";
+
+function todayInput() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  onSaved: () => void;
+  studentId: string;
+  /** Account's current balance (string money) — caps the amount client-side;
+   * the server re-validates this regardless (never trusts client input). */
+  remainingBalance: string;
+}
+
+/** No installment targeting — a payment is one transaction against the whole
+ * plan; the backend waterfalls it across installments in seq order (fills
+ * the earliest open one, rolls any excess into the next). See fees.ts. */
+export function RecordPaymentModal({ open, onClose, onSaved, studentId, remainingBalance }: Props) {
+  const [amount, setAmount] = useState("");
+  const [mode, setMode] = useState<PaymentMode>("UPI");
+  const [paidOn, setPaidOn] = useState(todayInput());
+  const [notes, setNotes] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const remaining = parseMoney(remainingBalance);
+  // Live, on-every-keystroke feedback — not just a submit-time check — so
+  // the amount that would be rejected server-side is never a surprise.
+  const amountError =
+    amount !== "" && Number(amount) > remaining ? `Exceeds the remaining balance of ${formatMoney(remaining)}` : undefined;
+
+  useEffect(() => {
+    if (!open) return;
+    setAmount("");
+    setMode("UPI");
+    setPaidOn(todayInput());
+    setNotes("");
+    setError(null);
+  }, [open]);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    if (amountError) {
+      setError(amountError);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await apiFetch("/fees/payments", {
+        method: "POST",
+        body: JSON.stringify({ studentId, amount: Number(amount), mode, paidOn, notes: notes || undefined }),
+      });
+      onSaved();
+      onClose();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not record this payment.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Record payment"
+      description={`Remaining on this plan: ${formatMoney(remaining)}`}
+      width="sm"
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" form="record-payment-form" disabled={submitting || !!amountError || !amount}>
+            {submitting ? "Saving…" : "Record payment"}
+          </Button>
+        </>
+      }
+    >
+      <form id="record-payment-form" onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Amount (₹)"
+          type="number"
+          min={0.01}
+          max={remaining}
+          step="0.01"
+          required
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          error={amountError}
+        />
+        <Dropdown
+          label="Payment mode"
+          value={mode}
+          onChange={(v) => setMode(v as PaymentMode)}
+          options={PAYMENT_MODES.map((m) => ({ value: m, label: PAYMENT_MODE_LABELS[m] }))}
+        />
+        <Input label="Paid on" type="date" required value={paidOn} onChange={(e) => setPaidOn(e.target.value)} />
+        <Textarea label="Notes (optional)" maxLength={300} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
+      </form>
+    </Modal>
+  );
+}

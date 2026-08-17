@@ -5,11 +5,13 @@ import { Tabs } from "@/components/ui/Tabs";
 import { CoursesTab } from "@/components/academics/CoursesTab";
 import { SubjectsTab } from "@/components/academics/SubjectsTab";
 import { BatchesTab } from "@/components/academics/BatchesTab";
+import { FeeStructuresTab } from "@/components/academics/FeeStructuresTab";
 
 const TABS = [
   { id: "courses", label: "Courses" },
   { id: "subjects", label: "Subjects" },
   { id: "batches", label: "Batches" },
+  { id: "fee-structures", label: "Fee structures" },
 ];
 
 export default function AcademicsPage() {
@@ -31,6 +33,7 @@ export default function AcademicsPage() {
         {tab === "courses" && <CoursesTab />}
         {tab === "subjects" && <SubjectsTab />}
         {tab === "batches" && <BatchesTab />}
+        {tab === "fee-structures" && <FeeStructuresTab />}
       </div>
     </div>
   );

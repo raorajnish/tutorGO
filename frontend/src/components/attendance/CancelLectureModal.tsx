@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Textarea } from "@/components/ui/Textarea";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/Button";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import { useMessageTemplate } from "@/lib/useMessageTemplate";
@@ -16,17 +17,30 @@ interface Props {
   onCancelled: () => void;
 }
 
+const CANCELLATION_REASONS = [
+  { value: "Faculty unavailable", label: "Faculty unavailable" },
+  { value: "Batch rescheduled", label: "Batch rescheduled" },
+  { value: "Low attendance expected", label: "Low attendance expected" },
+  { value: "Holiday / institute closed", label: "Holiday / institute closed" },
+  { value: "Venue unavailable", label: "Venue unavailable" },
+  { value: "Other", label: "Other (specify)" },
+];
+
 export function CancelLectureModal({ lecture, onClose, onCancelled }: Props) {
-  const [reason, setReason] = useState("");
+  const [reasonOption, setReasonOption] = useState("");
+  const [customReason, setCustomReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cancelled, setCancelled] = useState<Lecture | null>(null);
 
   const template = useMessageTemplate(cancelled ? "LECTURE_CANCELLED" : null);
+  const isOther = reasonOption === "Other";
+  const reason = isOther ? customReason.trim() : reasonOption;
 
   useEffect(() => {
     if (!lecture) return;
-    setReason("");
+    setReasonOption("");
+    setCustomReason("");
     setError(null);
     setCancelled(null);
   }, [lecture]);
@@ -34,8 +48,12 @@ export function CancelLectureModal({ lecture, onClose, onCancelled }: Props) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!lecture) return;
-    if (!reason.trim()) {
-      setError("A reason is required.");
+    if (!reasonOption) {
+      setError("Select a reason.");
+      return;
+    }
+    if (isOther && !reason) {
+      setError("Enter a reason.");
       return;
     }
     setError(null);
@@ -86,21 +104,31 @@ export function CancelLectureModal({ lecture, onClose, onCancelled }: Props) {
           <Button variant="ghost" onClick={onClose}>
             Back
           </Button>
-          <Button variant="destructive" type="submit" form="cancel-lecture-form" disabled={submitting}>
+          <Button variant="destructive" type="submit" form="cancel-lecture-form" disabled={submitting || !reasonOption || (isOther && !customReason.trim())}>
             {submitting ? "Cancelling…" : "Cancel lecture"}
           </Button>
         </>
       }
     >
       <form id="cancel-lecture-form" onSubmit={handleSubmit} className="space-y-4">
-        <Textarea
+        <Dropdown
           label="Reason for cancellation"
-          required
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          maxLength={MAX_NOTE_LENGTH}
-          placeholder="e.g. Faculty unavailable, batch rescheduled to next week…"
+          value={reasonOption}
+          onChange={setReasonOption}
+          options={CANCELLATION_REASONS}
+          placeholder="Select a reason…"
         />
+
+        {isOther && (
+          <Textarea
+            label="Specify reason"
+            required
+            value={customReason}
+            onChange={(e) => setCustomReason(e.target.value)}
+            maxLength={MAX_NOTE_LENGTH}
+            placeholder="e.g. Faculty unavailable, batch rescheduled to next week…"
+          />
+        )}
 
         {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
       </form>

@@ -66,6 +66,42 @@ enum MessageTemplateType {
   LECTURE_SCHEDULED
   LECTURE_CANCELLED
   ATTENDANCE_MARKED
+  FEE_OVERDUE_REMINDER
+  PAYROLL_PAYMENT_RECORDED
+}
+
+enum PaymentMode {
+  UPI
+  CASH
+  CARD
+  BANK_TRANSFER
+  CHEQUE
+}
+
+enum FeePlanType {
+  ONE_TIME
+  RECURRING
+}
+
+enum FeeAccountStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum SalaryType {
+  FIXED
+  PER_LECTURE
+}
+
+enum PayrollLineItemKind {
+  SALARY
+  LECTURE
+}
+
+enum PayrollRunStatus {
+  DRAFT
+  APPROVED
+  PAID
 }
 
 // ---------------------------------------------------------------------------
@@ -146,8 +182,8 @@ model Institute {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  plan             Plan?             @relation(fields: [planId], references: [id])
+  organization     Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan             Plan?                 @relation(fields: [planId], references: [id])
   users            User[]
   modules          InstituteModule[]
   courses          Course[]
@@ -157,6 +193,14 @@ model Institute {
   students         Student[]
   lectures         Lecture[]
   messageTemplates MessageTemplate[]
+  feeStructures    FeeStructure[]
+  feeAccounts      FeeAccount[]
+  payments         Payment[]
+  salaryProfiles   SalaryProfile[]
+  payrollPayments  PayrollPayment[]
+  payrollRuns      PayrollRun[]
+  notifications    Notification[]
+  emailConfig      InstituteEmailConfig?
 
   @@index([organizationId])
   @@map("institutes")
@@ -215,6 +259,8 @@ model User {
   ownedOrganization   Organization?       @relation("OrganizationOwner")
   lecturesTaught      Lecture[]
   teachingAssignments FacultyAssignment[]
+  notifications       Notification[]
+  salaryProfile       SalaryProfile?
 
   @@index([instituteId])
   @@map("users")
@@ -224,7 +270,10 @@ model User {
 // Global platform config + logs
 // ---------------------------------------------------------------------------
 
-/// Singleton row (id = "default") — the platform's outbound SMTP transport.
+/// Singleton row (id = "default") — the platform's outbound SMTP transport,
+/// used as the fallback whenever an institute hasn't configured its own
+/// (see InstituteEmailConfig) — e.g. team invites before an owner has set
+/// anything up, or any institute that never bothers to.
 model EmailConfig {
   id           String   @id @default("default")
   host         String
@@ -238,6 +287,31 @@ model EmailConfig {
   updatedAt    DateTime @updatedAt
 
   @@map("email_config")
+}
+
+/// An institute's own outbound SMTP transport, set by OWNER/ADMIN in
+/// Settings → Email. When present and `isEnabled`, every email triggered for
+/// that institute (payroll notifications, team invites, ...) goes out from
+/// here instead of the platform's shared EmailConfig — see
+/// services/mailer.ts's fallback order. `isEnabled` is a separate flag from
+/// "has credentials saved" so an owner can pause institute-branded email
+/// without deleting the configuration.
+model InstituteEmailConfig {
+  id          String   @id @default(cuid())
+  instituteId String   @unique
+  host        String
+  port        Int
+  secure      Boolean  @default(false)
+  username    String
+  password    String
+  fromName    String
+  fromEmail   String
+  isEnabled   Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@map("institute_email_configs")
 }
 
 model MessageLog {
@@ -272,6 +346,30 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+/// A real, persisted in-app notification — what NotificationDrawer.tsx reads
+/// (replacing its earlier hardcoded demo list). Only makes sense for users
+/// with a login; a no-login external staff member can't see this drawer, so
+/// they're reached via email instead (see SalaryProfile.externalEmail) —
+/// there's no in-app channel possible for them by construction.
+model Notification {
+  id          String    @id @default(cuid())
+  instituteId String
+  userId      String
+  type        String
+  title       String
+  body        String
+  metadata    Json?
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([instituteId])
+  @@map("notifications")
+}
+
 // ---------------------------------------------------------------------------
 // Academics — Courses / Subjects / Batches (Phase 2)
 // ---------------------------------------------------------------------------
@@ -291,12 +389,19 @@ model Course {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  institute   Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  batches     Batch[]
-  enquiries   Enquiry[]
-  students    Student[]
-  subjects    CourseSubject[]
-  assignments FacultyAssignment[]
+  /// Pre-fills FeeAccount.courseFee when creating a ONE_TIME plan for a
+  /// student in this course — editable per-student, just a sane default.
+  defaultFee        Decimal? @db.Decimal(10, 2)
+  /// Same idea for RECURRING plans — pre-fills FeeAccount.monthlyAmount.
+  defaultMonthlyFee Decimal? @db.Decimal(10, 2)
+
+  institute     Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  batches       Batch[]
+  enquiries     Enquiry[]
+  students      Student[]
+  subjects      CourseSubject[]
+  assignments   FacultyAssignment[]
+  feeStructures FeeStructure[]
 
   @@unique([instituteId, code])
   @@index([instituteId])
@@ -441,6 +546,7 @@ model Student {
   course     Course             @relation(fields: [courseId], references: [id])
   batches    StudentBatch[]
   attendance AttendanceRecord[]
+  feeAccount FeeAccount?
 
   @@index([instituteId, isActive])
   @@index([courseId])
@@ -487,11 +593,12 @@ model Lecture {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  institute  Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  batch      Batch              @relation(fields: [batchId], references: [id])
-  subject    Subject            @relation(fields: [subjectId], references: [id])
-  faculty    User               @relation(fields: [facultyId], references: [id])
-  attendance AttendanceRecord[]
+  institute       Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  batch           Batch              @relation(fields: [batchId], references: [id])
+  subject         Subject            @relation(fields: [subjectId], references: [id])
+  faculty         User               @relation(fields: [facultyId], references: [id])
+  attendance      AttendanceRecord[]
+  payrollLineItem PayrollLineItem?
 
   @@index([instituteId, date])
   @@index([batchId, date])
@@ -548,4 +655,295 @@ model MessageTemplate {
 
   @@unique([instituteId, type])
   @@map("message_templates")
+}
+
+// ---------------------------------------------------------------------------
+// Fees (Phase 5a — staff-facing only; student self-view deferred)
+// ---------------------------------------------------------------------------
+
+/// A reusable, course-scoped fee template ("10th Standard — 3 Installments
+/// ₹30,000", "JEE Batch — Monthly ₹5,000"), managed from Academics alongside
+/// Course/Subject/Batch. Attaching one to a student snapshots its values onto
+/// a new FeeAccount below — editing or deactivating a structure never
+/// retroactively reprices students already attached to it.
+model FeeStructure {
+  id               String      @id @default(cuid())
+  instituteId      String
+  courseId         String
+  name             String
+  planType         FeePlanType
+  courseFee        Decimal?    @db.Decimal(10, 2)
+  installmentCount Int?
+  monthlyAmount    Decimal?    @db.Decimal(10, 2)
+  billingDay       Int?
+  isActive         Boolean     @default(true)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  institute   Institute    @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  feeAccounts FeeAccount[]
+
+  @@index([instituteId])
+  @@index([courseId])
+  @@map("fee_structures")
+}
+
+/// One per student. ONE_TIME accounts use courseFee/discount/finalFee/
+/// installmentCount; RECURRING accounts use monthlyAmount/billingDay instead
+/// (those fields stay null) — see changes.md's Fees addendum. `finalFee` is
+/// stored (not computed on read) so a later change to Course.defaultFee
+/// never silently reprices an existing student's account. Values are
+/// snapshotted from the attached FeeStructure at creation time; `feeStructureId`
+/// is kept only for provenance/display.
+model FeeAccount {
+  id               String           @id @default(cuid())
+  instituteId      String
+  studentId        String           @unique
+  feeStructureId   String?
+  planType         FeePlanType
+  status           FeeAccountStatus @default(ACTIVE)
+  courseFee        Decimal?         @db.Decimal(10, 2)
+  discount         Decimal?         @default(0) @db.Decimal(10, 2)
+  finalFee         Decimal?         @db.Decimal(10, 2)
+  installmentCount Int?
+  monthlyAmount    Decimal?         @db.Decimal(10, 2)
+  billingDay       Int?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  institute    Institute        @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  student      Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feeStructure FeeStructure?    @relation(fields: [feeStructureId], references: [id], onDelete: SetNull)
+  installments FeeInstallment[]
+  payments     Payment[]
+
+  @@index([instituteId])
+  @@index([feeStructureId])
+  @@map("fee_accounts")
+}
+
+/// Status is *derived*, not stored — this table stores only the facts
+/// (amount owed, amount paid), never a status enum that could drift out of
+/// sync with the payments that are supposed to justify it. `originalDueDate`
+/// is set once, on the first reschedule only. `paidAmount` can never exceed
+/// `amount` — enforced by the waterfall-allocation payment engine in fees.ts,
+/// not by a DB constraint (Decimal comparison isn't expressible as one).
+model FeeInstallment {
+  id              String    @id @default(cuid())
+  feeAccountId    String
+  seq             Int
+  dueDate         DateTime  @db.Date
+  originalDueDate DateTime? @db.Date
+  amount          Decimal   @db.Decimal(10, 2)
+  paidAmount      Decimal   @default(0) @db.Decimal(10, 2)
+  waived          Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  feeAccount  FeeAccount          @relation(fields: [feeAccountId], references: [id], onDelete: Cascade)
+  allocations PaymentAllocation[]
+
+  @@unique([feeAccountId, seq])
+  @@map("fee_installments")
+}
+
+/// One payment transaction (one receipt). A single payment can settle across
+/// several installments — see PaymentAllocation — so it's linked to the
+/// FeeAccount directly, not to one installment. Never hard-deleted — a
+/// wrongly-recorded one is voided (every allocation reversed, row kept with
+/// voidedAt/voidReason for audit) rather than removed, so the receipt-number
+/// sequence and payment history stay trustworthy.
+model Payment {
+  id              String      @id @default(cuid())
+  instituteId     String
+  feeAccountId    String
+  amount          Decimal     @db.Decimal(10, 2)
+  mode            PaymentMode
+  paidOn          DateTime    @db.Date
+  receiptNumber   String      @unique
+  notes           String?
+  createdByUserId String?
+  voidedAt        DateTime?
+  voidReason      String?
+  voidedByUserId  String?
+  createdAt       DateTime    @default(now())
+
+  institute   Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  feeAccount  FeeAccount          @relation(fields: [feeAccountId], references: [id], onDelete: Cascade)
+  allocations PaymentAllocation[]
+
+  @@index([instituteId])
+  @@index([feeAccountId])
+  @@map("payments")
+}
+
+/// One line item within a Payment — how much of that one transaction went
+/// toward one specific installment. sum(allocations.amount) for a payment
+/// always equals payment.amount, enforced transactionally in fees.ts (never
+/// trusted from client input). This is what makes "pay ₹14,000 against a
+/// ₹10,500 installment" correctly close that installment and roll the
+/// ₹3,500 excess into the next one, instead of silently over-crediting a
+/// single installment past its target.
+model PaymentAllocation {
+  id            String  @id @default(cuid())
+  paymentId     String
+  installmentId String
+  amount        Decimal @db.Decimal(10, 2)
+
+  payment     Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  installment FeeInstallment @relation(fields: [installmentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@index([installmentId])
+  @@map("payment_allocations")
+}
+
+/// Same atomic-upsert pattern as StudentCodeCounter — one gapless sequence
+/// per (institute, year+month), used to generate Payment.receiptNumber
+/// (RCT-YYMM-SEQ).
+model ReceiptCounter {
+  id          String @id @default(cuid())
+  instituteId String
+  yearMonth   String
+  seq         Int    @default(0)
+
+  @@unique([instituteId, yearMonth])
+  @@map("receipt_counters")
+}
+
+// ---------------------------------------------------------------------------
+// Payroll (Phase 6 — see changes.md addendum for full design)
+// ---------------------------------------------------------------------------
+
+/// A payable person — either a platform User (any staff role) or someone
+/// entirely outside the platform (no login, no User row). PER_LECTURE is
+/// only valid when userId is set and that User's role is FACULTY, since
+/// lecture attribution runs through Lecture.facultyId -> User.id. Rates are
+/// snapshotted onto each generated PayrollLineItem at creation time — the
+/// same FeeStructure->FeeAccount snapshot pattern — so a later rate change
+/// never retroactively reprices an already-generated period.
+model SalaryProfile {
+  id             String     @id @default(cuid())
+  instituteId    String
+  userId         String?    @unique
+  externalName   String?
+  /// Optional contact info for no-login staff — entirely optional (never
+  /// required to set up a profile). When present, payment notifications go
+  /// here by email; platform staff (userId set) use their User.email
+  /// instead. With neither, no email goes out — the in-app notification
+  /// (for userId-linked profiles) or the copy-to-WhatsApp payslip (either
+  /// kind) are the fallback.
+  externalEmail  String?
+  externalPhone  String?
+  title          String?
+  salaryType     SalaryType
+  monthlyRate    Decimal?   @db.Decimal(10, 2)
+  perLectureRate Decimal?   @db.Decimal(10, 2)
+  isActive       Boolean    @default(true)
+  /// Set automatically the moment isActive flips to false, cleared on
+  /// reactivation. Used to pro-rate the FIXED-salary line item for whatever
+  /// period contains the departure date, and to cap PER_LECTURE generation
+  /// at their last day — see services/payrollSync.ts.
+  deactivatedAt  DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  lineItems PayrollLineItem[]
+  payments  PayrollPayment[]
+
+  @@index([instituteId])
+  @@map("salary_profiles")
+}
+
+/// One earned amount, generated lazily (never all at once). `periodMonth` is
+/// "YYYY-MM". `lectureId` is set only for LECTURE rows; nullable + a plain
+/// unique constraint works because Postgres treats every NULL as distinct,
+/// the same trick already relied on for FacultyAssignment.subjectId.
+model PayrollLineItem {
+  id              String              @id @default(cuid())
+  salaryProfileId String
+  kind            PayrollLineItemKind
+  periodMonth     String
+  lectureId       String?             @unique
+  label           String
+  amount          Decimal             @db.Decimal(10, 2)
+  paidAmount      Decimal             @default(0) @db.Decimal(10, 2)
+  createdAt       DateTime            @default(now())
+
+  salaryProfile SalaryProfile              @relation(fields: [salaryProfileId], references: [id], onDelete: Cascade)
+  lecture       Lecture?                   @relation(fields: [lectureId], references: [id], onDelete: SetNull)
+  allocations   PayrollPaymentAllocation[]
+
+  @@index([salaryProfileId, periodMonth])
+  @@map("payroll_line_items")
+}
+
+/// One payout transaction. Mirrors Payment: never hard-deleted, corrected via
+/// void. Can span multiple periods/line items in one transaction.
+model PayrollPayment {
+  id              String      @id @default(cuid())
+  instituteId     String
+  salaryProfileId String
+  amount          Decimal     @db.Decimal(10, 2)
+  mode            PaymentMode
+  paidOn          DateTime    @db.Date
+  notes           String?
+  createdByUserId String?
+  voidedAt        DateTime?
+  voidReason      String?
+  voidedByUserId  String?
+  createdAt       DateTime    @default(now())
+
+  institute     Institute                  @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  salaryProfile SalaryProfile              @relation(fields: [salaryProfileId], references: [id], onDelete: Cascade)
+  allocations   PayrollPaymentAllocation[]
+
+  @@index([instituteId])
+  @@index([salaryProfileId])
+  @@map("payroll_payments")
+}
+
+/// lineItemId nullable = the *advance* case: the portion of a payment not yet
+/// matched to a specific line item, because none existed yet at payment time.
+/// sum(allocations.amount) for a payment always equals payment.amount,
+/// enforced in payroll.ts. An advance row's `amount` is mutated down as new
+/// line items are generated and consume it — a running balance, not a
+/// settled fact, until fully absorbed.
+model PayrollPaymentAllocation {
+  id         String  @id @default(cuid())
+  paymentId  String
+  lineItemId String?
+  amount     Decimal @db.Decimal(10, 2)
+
+  payment  PayrollPayment   @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  lineItem PayrollLineItem? @relation(fields: [lineItemId], references: [id], onDelete: SetNull)
+
+  @@index([paymentId])
+  @@index([lineItemId])
+  @@map("payroll_payment_allocations")
+}
+
+/// One per (institute, periodMonth). "In scope" for a run is always derived
+/// (every PayrollLineItem across every active SalaryProfile with that
+/// periodMonth) — a run is a status + approval record, not a second copy of
+/// the data.
+model PayrollRun {
+  id               String           @id @default(cuid())
+  instituteId      String
+  periodMonth      String
+  status           PayrollRunStatus @default(DRAFT)
+  approvedAt       DateTime?
+  approvedByUserId String?
+  paidAt           DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@unique([instituteId, periodMonth])
+  @@map("payroll_runs")
 }

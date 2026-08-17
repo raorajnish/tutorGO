@@ -12,9 +12,14 @@ interface CachedConfig {
 }
 
 let cached: CachedConfig | null | undefined; // undefined = not loaded yet, null = none configured
+const instituteCache = new Map<string, CachedConfig | null>();
 
 export function invalidateEmailConfigCache() {
   cached = undefined;
+}
+
+export function invalidateInstituteEmailConfigCache(instituteId: string) {
+  instituteCache.delete(instituteId);
 }
 
 async function loadConfig(): Promise<CachedConfig | null> {
@@ -36,6 +41,30 @@ async function loadConfig(): Promise<CachedConfig | null> {
   return cached;
 }
 
+/** An institute's own SMTP transport, set in Settings → Email. Only used
+ * when present *and* enabled — an owner can save credentials without
+ * switching on institute-branded email yet. */
+async function loadInstituteConfig(instituteId: string): Promise<CachedConfig | null> {
+  if (instituteCache.has(instituteId)) return instituteCache.get(instituteId)!;
+
+  const row = await prisma.instituteEmailConfig.findUnique({ where: { instituteId } });
+  const resolved =
+    row && row.isEnabled
+      ? {
+          host: row.host,
+          port: row.port,
+          secure: row.secure,
+          username: row.username,
+          password: row.password,
+          fromName: row.fromName,
+          fromEmail: row.fromEmail,
+        }
+      : null;
+
+  instituteCache.set(instituteId, resolved);
+  return resolved;
+}
+
 interface SendMailInput {
   to: string;
   subject: string;
@@ -52,7 +81,11 @@ interface SendMailResult {
 }
 
 export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
-  const config = await loadConfig();
+  // Prefer the institute's own SMTP transport when they've set one up and
+  // switched it on; otherwise fall back to the platform-wide default so
+  // every existing flow (invites, etc.) keeps working unchanged for
+  // institutes that never touch Settings → Email.
+  const config = (input.instituteId ? await loadInstituteConfig(input.instituteId) : null) ?? (await loadConfig());
 
   if (!config) {
     console.log(`[mailer] SMTP not configured — would send to ${input.to}: ${input.subject}`);

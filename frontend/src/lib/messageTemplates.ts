@@ -1,4 +1,5 @@
-import type { Lecture, RosterEntry } from "./types";
+import type { Lecture, OverdueEntry, RosterEntry } from "./types";
+import { formatMoney } from "./money";
 
 // WhatsApp's own formatting marks — *bold*, _italic_ — used directly in
 // template bodies rather than any markdown/HTML the app would have to
@@ -73,4 +74,32 @@ export function attendanceMarkedVars(lecture: Lecture, roster: RosterEntry[]): R
  * which message a "Copy" action should generate (scheduled vs. attendance). */
 export function isFullyMarked(roster: RosterEntry[]): boolean {
   return roster.length > 0 && roster.every((r) => r.status !== null);
+}
+
+export function payrollPaymentRecordedVars(input: {
+  name: string;
+  amount: string;
+  mode: string;
+  paidOn: string;
+  pendingAmount: string;
+  instituteName: string;
+}): Record<string, string> {
+  return {
+    name: input.name,
+    amount: formatMoney(input.amount).replace("₹", ""),
+    mode: input.mode,
+    paidOn: formatRelativeDate(input.paidOn),
+    pendingAmount: formatMoney(input.pendingAmount).replace("₹", ""),
+    instituteName: input.instituteName,
+  };
+}
+
+export function feeOverdueReminderVars(entry: OverdueEntry): Record<string, string> {
+  return {
+    studentName: entry.student.name,
+    amount: formatMoney(entry.outstanding).replace("₹", ""),
+    dueDate: formatRelativeDate(entry.installment.dueDate),
+    daysOverdue: String(entry.daysOverdue),
+    course: entry.student.course ? `${entry.student.course.name} (${entry.student.course.code})` : "",
+  };
 }

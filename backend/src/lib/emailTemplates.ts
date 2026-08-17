@@ -133,3 +133,76 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
+interface PayslipEmailInput {
+  recipientName: string;
+  instituteName: string;
+  amount: string;
+  mode: string;
+  paidOn: string;
+  pendingAmount: string;
+}
+
+export function payslipEmailHtml(input: PayslipEmailInput): string {
+  return `
+  <!doctype html>
+  <html>
+    <body style="margin:0;padding:0;background:${COLORS.background};font-family:${FONT_STACK};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${COLORS.background};padding:40px 16px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:${COLORS.card};border-radius:20px;overflow:hidden;border:1px solid ${COLORS.border};">
+              <tr>
+                <td align="center" style="background:${COLORS.primary};padding:32px 24px;">
+                  <span style="font-size:18px;font-weight:700;color:${COLORS.primaryForeground};">${escapeHtml(input.instituteName)}</span>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:36px 32px 8px;">
+                  <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:${COLORS.accent};text-transform:uppercase;letter-spacing:0.06em;">
+                    Payment recorded
+                  </p>
+                  <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:${COLORS.foreground};line-height:1.3;">
+                    ₹${escapeHtml(input.amount)} paid to ${escapeHtml(input.recipientName)}
+                  </h1>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:0 32px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${COLORS.muted};border:1px solid ${COLORS.border};border-radius:14px;">
+                    <tr>
+                      <td style="padding:16px 20px;border-bottom:1px solid ${COLORS.border};">
+                        <p style="margin:0 0 2px;font-size:11px;font-weight:600;color:${COLORS.mutedForeground};text-transform:uppercase;letter-spacing:0.05em;">Mode</p>
+                        <p style="margin:0;font-size:15px;font-weight:600;color:${COLORS.foreground};">${escapeHtml(input.mode)}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:16px 20px;border-bottom:1px solid ${COLORS.border};">
+                        <p style="margin:0 0 2px;font-size:11px;font-weight:600;color:${COLORS.mutedForeground};text-transform:uppercase;letter-spacing:0.05em;">Paid on</p>
+                        <p style="margin:0;font-size:15px;font-weight:600;color:${COLORS.foreground};">${escapeHtml(input.paidOn)}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:16px 20px;">
+                        <p style="margin:0 0 2px;font-size:11px;font-weight:600;color:${COLORS.mutedForeground};text-transform:uppercase;letter-spacing:0.05em;">Pending balance</p>
+                        <p style="margin:0;font-size:15px;font-weight:600;color:${COLORS.foreground};">₹${escapeHtml(input.pendingAmount)}</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:28px 32px 36px;">
+                  <p style="margin:0;font-size:12px;line-height:1.6;color:${COLORS.mutedForeground};">
+                    This is an automated payroll notification from ${escapeHtml(input.instituteName)}.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  `;
+}

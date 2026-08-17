@@ -236,7 +236,7 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
           <Button variant="ghost" onClick={handleClose}>
             Cancel
           </Button>
-          <Button type="submit" form="schedule-lecture-form" disabled={submitting}>
+          <Button type="submit" form="schedule-lecture-form" disabled={submitting || !batchId}>
             {submitting ? "Scheduling…" : "Schedule lecture"}
           </Button>
         </>

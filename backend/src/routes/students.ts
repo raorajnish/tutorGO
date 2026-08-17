@@ -1,10 +1,57 @@
 import { Router } from "express";
 import { z } from "zod";
+import { Prisma } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../lib/http.js";
 import { authenticate, requireInstitute, requireModule, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
 import { auditLog } from "../services/audit.js";
+import { money } from "../lib/money.js";
+
+async function isModuleActive(instituteId: string, code: "FEES" | "ATTENDANCE"): Promise<boolean> {
+  const sub = await prisma.instituteModule.findFirst({ where: { instituteId, isActive: true, module: { code } } });
+  return !!sub;
+}
+
+async function loadFeeAccountSummary(studentId: string) {
+  const account = await prisma.feeAccount.findUnique({
+    where: { studentId },
+    include: { installments: true },
+  });
+  if (!account) return null;
+
+  const totalDue = account.installments.reduce((sum, i) => sum.plus(i.amount), new Prisma.Decimal(0));
+  const totalPaid = account.installments.reduce((sum, i) => sum.plus(i.paidAmount), new Prisma.Decimal(0));
+  const totalWaived = account.installments.reduce(
+    (sum, i) => (i.waived ? sum.plus(i.amount.minus(i.paidAmount)) : sum),
+    new Prisma.Decimal(0)
+  );
+  const balance = totalDue.minus(totalPaid).minus(totalWaived);
+
+  return {
+    planType: account.planType,
+    status: account.status,
+    totalDue: money(totalDue),
+    totalPaid: money(totalPaid),
+    balance: money(balance),
+  };
+}
+
+async function loadRecentAttendance(studentId: string) {
+  const records = await prisma.attendanceRecord.findMany({
+    where: { studentId },
+    include: { lecture: { include: { subject: { select: { name: true } }, batch: { select: { name: true } } } } },
+    orderBy: { lecture: { date: "desc" } },
+    take: 10,
+  });
+  return records.map((r) => ({
+    lectureId: r.lectureId,
+    date: r.lecture.date,
+    subject: r.lecture.subject.name,
+    batch: r.lecture.batch.name,
+    status: r.status,
+  }));
+}
 
 export const studentsRouter = Router();
 
@@ -15,12 +62,26 @@ studentsRouter.get("/", async (req, res, next) => {
     const instituteId = req.tenantId!;
     const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
     const status = typeof req.query.status === "string" ? req.query.status : "active";
+    const courseId = typeof req.query.courseId === "string" ? req.query.courseId : undefined;
+    const batchId = typeof req.query.batchId === "string" ? req.query.batchId : undefined;
+    const sort = typeof req.query.sort === "string" ? req.query.sort : "admissionDate_desc";
+
+    const orderBy: Record<string, "asc" | "desc"> =
+      sort === "admissionDate_asc"
+        ? { admissionDate: "asc" }
+        : sort === "name_asc"
+          ? { name: "asc" }
+          : sort === "name_desc"
+            ? { name: "desc" }
+            : { admissionDate: "desc" };
 
     const [students, activeCount, totalCount, activeBatchCount] = await Promise.all([
       prisma.student.findMany({
         where: {
           instituteId,
           isActive: status === "all" ? undefined : status === "inactive" ? false : true,
+          courseId,
+          batches: batchId ? { some: { batchId, leftAt: null } } : undefined,
           OR: search
             ? [
                 { name: { contains: search, mode: "insensitive" } },
@@ -33,8 +94,9 @@ studentsRouter.get("/", async (req, res, next) => {
         include: {
           course: { select: { id: true, name: true, code: true } },
           batches: { where: { leftAt: null }, include: { batch: { select: { id: true, name: true } } } },
+          feeAccount: { select: { id: true } },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy,
       }),
       prisma.student.count({ where: { instituteId, isActive: true } }),
       prisma.student.count({ where: { instituteId } }),
@@ -52,6 +114,7 @@ studentsRouter.get("/", async (req, res, next) => {
         currentBatch: s.batches[0]?.batch ?? null,
         admissionDate: s.admissionDate,
         isActive: s.isActive,
+        hasFeeAccount: s.feeAccount !== null,
       })),
       stats: {
         activeStudents: activeCount,
@@ -83,7 +146,13 @@ async function loadStudent(id: string, instituteId: string) {
 
 studentsRouter.get("/:id", async (req, res, next) => {
   try {
-    const student = await loadStudent(req.params.id as string, req.tenantId!);
+    const instituteId = req.tenantId!;
+    const student = await loadStudent(req.params.id as string, instituteId);
+
+    const [feesEnabled, attendanceEnabled] = await Promise.all([
+      isModuleActive(instituteId, "FEES"),
+      isModuleActive(instituteId, "ATTENDANCE"),
+    ]);
 
     res.json({
       id: student.id,
@@ -107,9 +176,10 @@ studentsRouter.get("/:id", async (req, res, next) => {
         joinedAt: sb.joinedAt,
         leftAt: sb.leftAt,
       })),
-      // Stubs — populated once Fees (Phase 5) / Attendance (Phase 4) exist.
-      feeAccount: null,
-      recentAttendance: [],
+      feesModuleEnabled: feesEnabled,
+      feeAccount: feesEnabled ? await loadFeeAccountSummary(student.id) : null,
+      attendanceModuleEnabled: attendanceEnabled,
+      recentAttendance: attendanceEnabled ? await loadRecentAttendance(student.id) : [],
     });
   } catch (err) {
     next(err);

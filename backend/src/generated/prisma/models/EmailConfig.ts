@@ -14,7 +14,10 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model EmailConfig
- * Singleton row (id = "default") — the platform's outbound SMTP transport.
+ * Singleton row (id = "default") — the platform's outbound SMTP transport,
+ * used as the fallback whenever an institute hasn't configured its own
+ * (see InstituteEmailConfig) — e.g. team invites before an owner has set
+ * anything up, or any institute that never bothers to.
  */
 export type EmailConfigModel = runtime.Types.Result.DefaultSelection<Prisma.$EmailConfigPayload>
 

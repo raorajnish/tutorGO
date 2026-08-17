@@ -610,3 +610,764 @@ Rendering is a plain `{{key}}` string replace — no templating engine dependenc
    roster → copy, mark partial roster → no copy prompt, edit a template in Settings → confirm the
    next generated message reflects it).
 
+---
+
+# Addendum — Fees (Phase 5), full plan (planned, not yet built)
+
+> Written before implementation per discussion. Supersedes/extends §4–§6 above with three
+> decisions confirmed in discussion: (1) support both a fixed-installment plan **and** an
+> open-ended recurring-monthly plan, since not every course is "one total fee split N ways" —
+> some batches are billed month-to-month for as long as the student stays enrolled; (2)
+> rescheduling one installment's due date shifts **only that installment**, later ones keep their
+> original dates (simplest, matches how a one-off late payment is actually handled in practice —
+> cascading reschedule is not built now, flagged as a possible future toggle if it turns out to be
+> needed); (3) "billing for each installment paid" means every receipt records *which staff user*
+> recorded the payment — this is an accountability/audit feature, not faculty payroll (payroll
+> tied to fees collected, if ever wanted, is Phase 6 territory and out of scope here).
+
+## 1. Fee plan types
+
+```prisma
+enum FeePlanType {
+  ONE_TIME   // fixed total, split into N installments (original §4 design)
+  RECURRING  // open-ended monthly billing, no fixed total or end date
+}
+
+enum FeeAccountStatus {
+  ACTIVE
+  CLOSED // student left / course completed — stops future installment generation
+}
+```
+
+`FeeAccount` gains `planType FeePlanType` and `status FeeAccountStatus @default(ACTIVE)`.
+
+- **`ONE_TIME`** — unchanged from §4: `courseFee`, `discount`, `finalFee`, `installmentCount` are
+  all required, all `FeeInstallment` rows generated up front at account creation.
+- **`RECURRING`** — `courseFee`/`discount`/`finalFee`/`installmentCount` are all nullable on the
+  account (not applicable); instead the account stores `monthlyAmount Decimal` and `billingDay
+  Int` (1–28, day-of-month a new installment's `dueDate` lands on — capped at 28 to avoid
+  Feb/30-day-month edge cases). Installments are **not** all generated up front — there's no
+  fixed end. Instead:
+  - On account creation, generate the first 3 months of installments (this month + next 2) —
+    enough for the UI to show a plan without generating years of rows for a student who might
+    leave next month.
+  - A lightweight **rolling-window job**, run lazily on `GET /accounts/:studentId` (not a cron —
+    matches the project's existing "derive/backfill on read" instinct used for installment
+    status, §5): if the account is `ACTIVE` and has fewer than 2 future unpaid/upcoming
+    installments, generate the next one (`seq = max(seq) + 1`, `dueDate` = next occurrence of
+    `billingDay` after the last existing installment's due date). Keeps the plan always showing
+    "next 2–3 months" without ever needing a background scheduler.
+  - Closing the account (`status = CLOSED`, e.g. student withdraws) stops generation; existing
+    installments (paid or not) are untouched — historical fact, same principle as Attendance's
+    `Lecture` rows surviving a later `FacultyAssignment` change.
+
+`Course` gains a second optional default field for symmetry with the existing `defaultFee`:
+`defaultMonthlyFee Decimal? @db.Decimal(10, 2)` — pre-fills `monthlyAmount` when creating a
+`RECURRING` account for a student in that course, same "template value, editable per student"
+pattern as `defaultFee`/`durationMonths` elsewhere.
+
+`POST /fees/accounts` body becomes a discriminated shape: `{ studentId, planType, ...}` where
+`ONE_TIME` requires `courseFee?, discount?, installmentCount, firstDueDate` (as before) and
+`RECURRING` requires `monthlyAmount?, billingDay, startDate` (`monthlyAmount` defaults to
+`Course.defaultMonthlyFee` if omitted, mirroring `courseFee`'s default).
+
+## 2. Installment rescheduling
+
+New endpoint: `PATCH /fees/accounts/:studentId/installments/:id/reschedule` — body `{ dueDate }`.
+Roles: `OWNER, ADMIN, RECEPTION`. Confirmed behavior: **only the targeted installment's `dueDate`
+changes**; every other installment (earlier and later) is untouched. No cascading shift.
+
+- Rejects if the installment is already `PAID` or `waived` (nothing to reschedule — a settled
+  installment's due date is a closed historical fact; if the *amount* needs correcting after
+  settlement, that's a different problem, see §6 refunds/void below).
+- `FeeInstallment` gains `originalDueDate DateTime? @db.Date` — set once, on the *first*
+  reschedule only (`null` means "never rescheduled"), so the UI can show "Rescheduled from 5 Sep"
+  without needing a separate history table for what's expected to be a rare, single-shot edit per
+  installment.
+- No re-validation against neighboring installments' dates — an admin can legitimately move
+  installment 2's due date past installment 3's (e.g. a genuine hardship case), the UI just sorts
+  by `seq` (plan order), not by `dueDate`, so the list stays coherent either way.
+
+## 3. Payment allocation & overpayment
+
+Confirmed scope for this pass, kept deliberately simple:
+
+- A payment always targets exactly one installment (explicit `installmentId`, or auto-resolved to
+  the earliest non-fully-paid one, per §5's original design — unchanged).
+- **No auto-spillover across installments.** If a payment amount would exceed that installment's
+  outstanding balance, it's still accepted (small overpayments happen — rounding, a parent paying
+  a bit extra) and simply pushes `paidAmount` above `amount`, which the status function (§5,
+  unchanged) already treats as `PAID`. There's no mechanism to auto-apply the excess to the *next*
+  installment — if a payer wants to pay two installments at once, that's two `POST /payments`
+  calls (one per installment), which also keeps each receipt tied to exactly one installment,
+  matching how a physical receipt book works. Flagged as the deliberately simple MVP behavior;
+  auto-spillover / "pay any amount, auto-allocate across the plan" is a real future enhancement if
+  it turns out staff want it, not built now.
+
+## 4. Voiding a payment (not deleting)
+
+Payments are financial records — hard-deleting one breaks the receipt-number sequence's meaning
+(a gap that isn't a cancelled receipt looks like data loss) and silently changes `paidAmount`
+history with no trace. Instead:
+
+```prisma
+model Payment {
+  // ...existing fields from §4 above...
+  voidedAt        DateTime?
+  voidReason       String?
+  voidedByUserId   String?
+}
+```
+
+- `POST /fees/payments/:id/void` — body `{ reason }`. Roles: `OWNER, ADMIN` only (stricter than
+  recording a payment — voiding is a correction of the record, not routine data entry). One
+  `$transaction`: decrements the installment's `paidAmount` by the voided payment's `amount`
+  (clamped at 0 as a safety floor), sets `voidedAt`/`voidReason`/`voidedByUserId` on the payment.
+  The row stays forever — receipt number, original amount, everything — just excluded from
+  "active" payment totals and visually struck through / badged "Voided" in the UI.
+- `installmentStatus()` (§5) and every sum (`GET /accounts/:studentId`, dashboard stat cards)
+  filters `voidedAt: null` — a voided payment contributes nothing to balances, exactly as if it
+  had been deleted, but the audit trail survives.
+- Receipts for voided payments still resolve (`GET /payments/:id/receipt`) so the paper trail is
+  inspectable, clearly marked "VOID" if printed/viewed after the fact.
+
+## 5. Discount edits after installments exist
+
+§4's original MVP restriction (discount only editable at creation time, before installments
+exist) is confirmed as staying for this pass — genuinely a separate feature ("apply a discount
+mid-plan and reflow remaining installments") with its own design questions (does it reduce future
+installments only, or retroactively re-split the whole remaining balance?) that don't need
+answering to ship the core module. Noted here so it isn't silently forgotten, not because it's
+being built now.
+
+## 6. Overdue handling — what actually happens when `OVERDUE`
+
+§5's `installmentStatus()` already computes `OVERDUE` correctly on every read. This pass adds the
+operational surface that makes that status actually useful day-to-day, rather than just a badge:
+
+- `GET /fees/overdue?asOf=` — every `OVERDUE` installment across the institute, joined with
+  student name/contact, sorted by days-overdue descending. Roles: `OWNER, ADMIN, RECEPTION`.
+  Powers a "Defaulters" view/tab on `/fees` — the thing a reception desk actually works off of
+  every morning, not just a per-student detail page nobody opens until a parent calls.
+- No automated late-fee charge, no automated reminder message in this pass — flagged as a natural
+  next candidate for the WhatsApp copy-message pattern (already used for lecture-scheduled/
+  cancelled/attendance-marked) once this view exists: a "Copy reminder" button per overdue row
+  generating a payment-reminder message, same client-side-template approach as the existing
+  addendum. Not built now — the dev plan itself names "fee-payment-received" style messages as a
+  deferred candidate (see `handoff.md` §5) and this extends that list with "fee-overdue-reminder"
+  rather than committing to build it this pass.
+
+## 7. Receipts — numbering, void marking, still no PDF
+
+Unchanged from §4/§6: `RCT-YYMM-SEQ` per institute via `ReceiptCounter`, receipt detail endpoint
+renders a printable/downloadable view client-side, no server-side PDF generation (consistent with
+the rest of the app). One addition: the receipt view surfaces `createdByUserId` (resolved to a
+staff name) prominently — "Recorded by {{staffName}} on {{date}}" — directly answering the
+"billing for each installment paid" ask from a plain accountability angle (§ intro).
+
+## 8. Frontend additions (extends §7's original `/fees` plan)
+
+- **Fee account creation**: a plan-type toggle (One-time plan / Monthly recurring) at the top of
+  "Set up fee account" — switches the form between the §4 fixed-installment fields and the §1
+  recurring fields (`monthlyAmount`, `billingDay`, `startDate`).
+- **Installment list**: each row gets a "Reschedule" action (small date-picker popover, not a full
+  modal — it's a single-field edit) next to the existing status badge; a rescheduled row shows a
+  small "was 5 Sep" strikethrough hint using `originalDueDate`.
+- **Payment row / receipt list**: voided payments render struck-through with a "Voided" badge and
+  the void reason on hover/expand; a "Void" action (OWNER/ADMIN only, per §4) opens a small
+  reason-required confirm, same pattern as `CancelLectureModal`'s reason-required cancel.
+- **New "Defaulters" tab** on `/fees` (alongside the existing student-search-first view): the
+  `GET /fees/overdue` list, StatCard row (total overdue amount, overdue installment count, count
+  of distinct students affected), each row linking straight into that student's fee account.
+- **Recurring accounts** show their installment list the same way as one-time ones (both are just
+  `FeeInstallment[]` under the hood) — the only visual difference is there's no fixed "N of N"
+  count, just an open-ended list that grows as the rolling-window job (§1) adds to it, plus a
+  "Close account" action (sets `status = CLOSED`, confirm-required, same `ConfirmModal` pattern
+  used everywhere else) for when a student leaves a month-to-month course.
+
+## 9. What's explicitly still out of scope this pass
+
+Named directly so it isn't ambiguous later:
+
+- **Late fees / penalty amounts** — no automatic surcharge for overdue installments. §6's
+  Defaulters view is the operational tool for now; if late fees are wanted later, likely shape is
+  a `lateFeePolicy` on `Course` plus a computed (not stored) surcharge added to `OVERDUE`
+  installments' effective amount — deliberately not designed further here.
+- **Refunds** — no refund/negative-payment flow. A wrongly-recorded payment is corrected via void
+  (§4) + a fresh correct payment, not a refund transaction.
+- **Cascading reschedule** — confirmed single-installment-only for this pass (§2); a "shift this
+  and everything after it" toggle is a small addition later if it turns out to be wanted, not
+  built speculatively now.
+- **Retroactive discount re-split** — §5.
+- **Auto-spillover payment allocation across installments** — §3.
+- **Student self-view ("My fees")** — still deferred to the dedicated student-portal pass, §1
+  above; nothing in this addendum changes that plan, `RECURRING` accounts are modeled the same
+  read-layer-on-top way.
+- **Faculty payroll tied to fees collected** — Phase 6 territory, not this module (confirmed in
+  discussion, § intro).
+
+## Build order (this addendum, layered onto §"Build order" above)
+
+1. Schema: `FeePlanType`/`FeeAccountStatus` enums, `FeeAccount.planType/status/monthlyAmount/
+   billingDay`, `FeeInstallment.originalDueDate`, `Payment.voidedAt/voidReason/voidedByUserId`,
+   `Course.defaultMonthlyFee` — additive, layers onto §4's original schema before the first
+   `prisma db push` for this phase (i.e. build the full schema, including this addendum, in one
+   migration rather than two).
+2. `fees.ts` router: account creation (both plan types), installment generation (fixed-N and
+   rolling-window-lazy), reschedule, payments (record/auto-target/void), overdue list, receipt
+   detail — per §1–§7.
+3. `/fees` frontend: plan-type-aware account creation, installment list with reschedule + status
+   badges, payment recording + void, Defaulters tab, receipt view with recorder attribution — §8.
+4. `navigation.ts`/`Sidebar` gating — unchanged from §7's original plan (`FEES` module,
+   `OWNER/ADMIN/RECEPTION`).
+5. Type-check + lint pass on both sides.
+6. Smoke-test: create a `ONE_TIME` account → generate installments → pay partially → pay fully →
+   status flips to `PAID`; create a `RECURRING` account → confirm 3 months generate → advance past
+   them (or manually insert a past `dueDate`) → confirm the rolling-window job tops back up to 2
+   future installments on next `GET`; reschedule an installment → confirm only that one moves;
+   record a payment → void it → confirm balances reverse and the row survives with a `Voided`
+   badge; hit `GET /fees/overdue` → confirm correct sort/filter; cross-institute isolation checks,
+   same rigor as every prior phase.
+
+---
+
+# Addendum — Phase 6 (Staff + Payroll) + Phase 7 §2.10 Expenses (planned, not yet built)
+
+> Written before implementation per discussion. Scope for this pass, per discussion: **Staff +
+> Payroll first, Expenses second, Ledger deferred** — `2.10`'s "Combined Ledger view with CSV
+> export" is explicitly out of scope here even though the schema below lays a `FinanceEntry` table
+> that pass will read from. Triggered by a detailed walkthrough of how payroll actually needs to
+> feel day-to-day: pay a faculty member for a month by looking at their individual lectures and
+> deselecting the ones you don't want to pay yet; pay across several months at once, each shown as
+> a collapsible group; hand it a lump sum and let it auto-apply oldest-first, carrying any
+> shortfall forward as a normal outstanding balance and any *excess* forward as a credit that
+> automatically absorbs future dues; support both lecture-rate and flat-monthly faculty under the
+> same mechanism; and support people who draw a salary but were never a platform login at all
+> (caretaker, housekeeping).
+
+## 0. How this reuses Fees, and the one place it deliberately doesn't
+
+Payroll's core money-tracking shape is **structurally identical to Fees**: a persistent account
+per payee, dated line items owed against it, payments that can span several line items, void-not-
+delete for corrections. Reusing that shape directly (§2 below mirrors `FeeAccount` →
+`FeeInstallment` → `Payment` → `PaymentAllocation` almost one-for-one) means payroll inherits
+everything already proven out — derived status, transactional reconciliation, the audit trail
+pattern — instead of re-deriving it.
+
+**The one deliberate difference:** Fees' waterfall (`fees.ts`, the `POST /payments` handler)
+*rejects* an amount that exceeds every open installment's balance ("Amount exceeds the remaining
+balance on this plan"). Payroll needs the opposite — a payment that exceeds the selected line
+items' total is expected and should be **accepted as a credit**, silently absorbed by whatever line
+item is generated next (a lecture happens, a new month rolls over). That single behavioral fork is
+why payroll isn't just "Fees with different labels" and gets its own allocation rules in §4, even
+though the underlying tables rhyme.
+
+The shared *algorithm* (given a payment amount and an ordered list of `{id, outstanding}` targets,
+apply oldest-first, return allocations + leftover) is worth factoring out once payroll needs its
+own copy — see Build order §9 step 2.
+
+## 1. Staff directory — what's new vs. what already exists
+
+**Already built, untouched by this pass:** `Settings → Team` (`TeamTab.tsx` +
+`POST/PATCH /org/team`) is the identity/access surface — invite a `User` with role `ADMIN`,
+`ACCOUNTANT`, `FACULTY`, or `RECEPTION`, assign FACULTY course/subject teaching scope. That stays
+exactly as-is; Payroll doesn't touch login, roles, or invites.
+
+**New in this pass:** a `SalaryProfile` — the thing that makes someone *payable*. It's a separate,
+opt-in record (same "not automatic, admin explicitly sets it up" relationship `FeeAccount` has to
+`Student` — a `User` existing doesn't imply a salary any more than a `Student` existing implies a
+fee plan). Two shapes:
+
+- **Platform staff** — `userId` set, pointing at an existing `User` (any of `ADMIN`, `ACCOUNTANT`,
+  `FACULTY`, `RECEPTION`; `OWNER`/`SUPERADMIN` excluded, they're not institute payroll subjects).
+  Name/role badge always resolved by joining `User`, never duplicated onto the profile.
+- **External staff** — `userId` null, `externalName` + `title` stored directly (e.g. "Ramesh Yadav"
+  / "Caretaker", "Sunita Devi" / "Housekeeping"). No login, no `User` row, ever — these people exist
+  only as payroll records. `title` is also settable (optional override) for platform staff, e.g. a
+  FACULTY user whose payroll title should read "Senior Faculty — Physics" rather than just their
+  role.
+
+This directory lives on a **new `/payroll` route**, not inside Settings — it's about compensation,
+not access, and belongs next to the ledger/payment UI it feeds.
+
+```prisma
+enum SalaryType {
+  FIXED       // flat amount per period (YYYY-MM)
+  PER_LECTURE // rate × validated lecture count in the period — FACULTY (platform) only
+}
+```
+
+```prisma
+/// A payable person — either a platform User (any staff role) or someone
+/// entirely outside the platform (no login, no User row). PER_LECTURE is
+/// only valid when userId is set and that User's role is FACULTY, since
+/// lecture attribution runs through Lecture.facultyId → User.id; there's no
+/// way to count "lectures" for an external caretaker. Rates are snapshotted
+/// onto each generated PayrollLineItem at creation time (§2) — exactly the
+/// FeeStructure→FeeAccount snapshot pattern — so a later rate change never
+/// retroactively reprices an already-generated period.
+model SalaryProfile {
+  id             String     @id @default(cuid())
+  instituteId    String
+  userId         String?    @unique
+  externalName   String?
+  title          String?
+  salaryType     SalaryType
+  monthlyRate    Decimal?   @db.Decimal(10, 2) // required when salaryType = FIXED
+  perLectureRate Decimal?   @db.Decimal(10, 2) // required when salaryType = PER_LECTURE
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  lineItems PayrollLineItem[]
+  payments  PayrollPayment[]
+
+  @@index([instituteId])
+  @@map("salary_profiles")
+}
+```
+
+Validation in the create/update handler (not the DB — same "enforced transactionally in the
+router, not a constraint" precedent as `PaymentAllocation`'s sum invariant): exactly one of
+`userId`/`externalName` set; if `userId` set, that `User.instituteId` must match and role must be
+one of the four payroll-eligible roles; `salaryType = PER_LECTURE` requires `userId` set and that
+user's role to be `FACULTY`; `monthlyRate`/`perLectureRate` required to match `salaryType`.
+Deactivating (`isActive = false`) stops future line-item generation (§2) but never touches
+existing ones — same non-retroactive principle as `FeeAccount.status = CLOSED`.
+
+## 2. Line items — the per-period, per-lecture ledger
+
+```prisma
+enum PayrollLineItemKind {
+  SALARY  // one per (profile, periodMonth) for FIXED profiles
+  LECTURE // one per Lecture for PER_LECTURE profiles
+}
+
+/// One earned amount, generated lazily (§3), never all at once. `periodMonth`
+/// is "YYYY-MM" in the institute's local sense (matches ReceiptCounter's
+/// yearMonth convention, just month-grain instead of "YYMM" — kept as the
+/// full 4-digit year here since payroll periods get referenced in the UI far
+/// more explicitly than a receipt's month ever is). `lectureId` is set only
+/// for LECTURE rows and is what makes "list of lectures with their amount,
+/// deselect one" possible — nullable + a plain unique constraint works
+/// because Postgres treats every NULL as distinct, the same trick already
+/// relied on for FacultyAssignment.subjectId.
+model PayrollLineItem {
+  id            String              @id @default(cuid())
+  salaryProfileId String
+  kind          PayrollLineItemKind
+  periodMonth   String              // "YYYY-MM"
+  lectureId     String?             @unique
+  label         String              // "Salary — August 2026" / "Physics — 10th Std A — 16 Aug, 10:00"
+  amount        Decimal             @db.Decimal(10, 2)
+  paidAmount    Decimal             @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime            @default(now())
+
+  salaryProfile SalaryProfile       @relation(fields: [salaryProfileId], references: [id], onDelete: Cascade)
+  lecture       Lecture?            @relation(fields: [lectureId], references: [id], onDelete: SetNull)
+  allocations   PayrollPaymentAllocation[]
+
+  @@index([salaryProfileId, periodMonth])
+  @@map("payroll_line_items")
+}
+```
+
+No DB uniqueness on `(salaryProfileId, periodMonth)` for `SALARY` rows (a `WHERE lectureId IS
+NULL` partial unique index isn't expressible in the Prisma schema DSL without raw SQL) — the
+generator function (§3) does a `findFirst`-before-`create` instead, same "enforced in code"
+category as everything else transactional here.
+
+`status` is derived exactly like `installmentStatus()` — `PAID` (`paidAmount >= amount`),
+`PARTIAL` (`0 < paidAmount < amount`), `UNPAID` (`paidAmount = 0`) — no `OVERDUE` concept, payroll
+line items don't have a due date in the way a fee installment does.
+
+## 3. Generation — lazy, on-read, same instinct as Fees' rolling window
+
+No cron, no webhook off the attendance-marking endpoint. Instead, **every** read of a staff
+member's ledger (`GET /payroll/staff/:id/ledger`) and **every** run-draft creation
+(`POST /payroll/runs`, §5) first calls a shared `syncLineItems(salaryProfileId, upToPeriod)`:
+
+- **`FIXED`** — for every `periodMonth` from the profile's `createdAt` month up to `upToPeriod`
+  (default: current month) with no existing `SALARY` row yet, create one: `amount =
+  profile.monthlyRate`, `label = "Salary — {Month Year}"`.
+- **`PER_LECTURE`** — query `Lecture` where `facultyId = profile.userId`, `cancelledAt IS NULL`,
+  `date <= today`, and **at least one `AttendanceRecord` exists for it** (the working definition of
+  "validated" — attendance was actually marked, not just scheduled; flagged here since the dev
+  plan says "validated lecture count" without defining it precisely). For every such lecture with
+  no existing `PayrollLineItem` (`lectureId` not already used), create one: `amount =
+  profile.perLectureRate`, `periodMonth` derived from `lecture.date`, `label` built from
+  `subject.name`, `batch.name`, and the lecture's date/time.
+
+Same principle as `Lecture` rows surviving a later `FacultyAssignment` change: a line item, once
+generated, is a historical fact. If a lecture is cancelled or a rate is edited *after* its line
+item exists, nothing retroactively changes — flagged as an accepted edge case, not solved here (an
+admin who needs to correct an already-generated item does it manually; no "delete a paid-against
+line item" endpoint is being built this pass, mirroring Fees not letting a paid installment be
+removed either).
+
+**Immediately after generating any new line items, `syncLineItems` also runs advance
+reconciliation** — see §4's last paragraph. This is what makes "pay too much this month, it quietly
+covers next month automatically" work without a separate background job.
+
+## 4. Payments — selectable line items, waterfall within the selection, credit beyond it
+
+```prisma
+/// One payout transaction (one entry in a faculty/staff member's payment
+/// history). Mirrors Payment: never hard-deleted, corrected via void. Can
+/// span multiple periods/line items in one transaction, same reasoning as a
+/// parent paying two fee installments at once — except here it's normal, not
+/// an edge case (see §0).
+model PayrollPayment {
+  id              String       @id @default(cuid())
+  instituteId     String
+  salaryProfileId String
+  amount          Decimal      @db.Decimal(10, 2)
+  mode            PaymentMode
+  paidOn          DateTime     @db.Date
+  notes           String?
+  createdByUserId String?
+  voidedAt        DateTime?
+  voidReason      String?
+  voidedByUserId  String?
+  createdAt       DateTime     @default(now())
+
+  institute     Institute                  @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  salaryProfile SalaryProfile              @relation(fields: [salaryProfileId], references: [id], onDelete: Cascade)
+  allocations   PayrollPaymentAllocation[]
+
+  @@index([instituteId])
+  @@index([salaryProfileId])
+  @@map("payroll_payments")
+}
+
+/// lineItemId nullable = the *advance* case (§0): the portion of a payment
+/// not yet matched to a specific line item, because none existed yet at
+/// payment time. sum(allocations.amount) for a payment always equals
+/// payment.amount, same invariant as PaymentAllocation, enforced in
+/// payroll.ts. Unlike a real allocation (immutable once made — audit trail),
+/// an advance row's `amount` is mutated down as syncLineItems consumes it
+/// against newly generated items — it's a running balance, not a settled fact,
+/// until it's fully absorbed.
+model PayrollPaymentAllocation {
+  id            String  @id @default(cuid())
+  paymentId     String
+  lineItemId    String?
+  amount        Decimal @db.Decimal(10, 2)
+
+  payment  PayrollPayment   @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  lineItem PayrollLineItem? @relation(fields: [lineItemId], references: [id], onDelete: SetNull)
+
+  @@index([paymentId])
+  @@index([lineItemId])
+  @@map("payroll_payment_allocations")
+}
+```
+
+`POST /payroll/pay` — body `{ salaryProfileId, amount, mode, paidOn, lineItemIds: string[],
+notes? }`. Roles: `OWNER, ADMIN` only (stricter than Fees' `MANAGE_ROLES`, which includes
+`RECEPTION` — payroll is money leaving the institute, not coming in; matches the dev plan's
+"manage: OWNER/ADMIN" for §2.11 directly). One `$transaction`:
+
+1. Load exactly the `PayrollLineItem`s named in `lineItemIds` that belong to this
+   `salaryProfileId` and aren't already fully paid — this is the **selection**: anything the
+   caller deselected in the accordion UI (§7) simply isn't in this list, full stop, no special
+   "skip" flag needed.
+2. Sort selected items oldest-first (`periodMonth` asc, then `createdAt` asc within a period —
+   covers both "pay August before September" and "pay lecture 1 before lecture 2 within August").
+3. Waterfall the payment `amount` across them in that order — identical algorithm to Fees' (§0),
+   `applied = min(outstanding, remaining)` per item.
+4. **If `remaining > 0` after every selected item is fully covered** (the "amount is high" case):
+   create one more `PayrollPaymentAllocation` with `lineItemId: null`, `amount: remaining` — the
+   advance. No error, no cap, unlike Fees.
+5. **If the selection's total outstanding exceeds `amount`** (the "amount is low" case): nothing
+   special — the waterfall simply stops when `remaining` hits 0, whichever selected items are last
+   in sort order stay `PARTIAL`/`UNPAID`. They're still selectable in a future `POST /payroll/pay`
+   call ("later I should be able to pay the remaining lectures too") since selectability is just
+   "not yet fully paid," same as Fees installments.
+6. Increment `paidAmount` on every line item touched.
+
+**Advance reconciliation** (invoked at the end of `syncLineItems`, §3, whenever new line items are
+generated for a profile): find that profile's unconsumed advance allocations
+(`lineItemId: null`), oldest `payment.paidOn` first; for each newly created line item, greedily
+apply advance amount to it (`applied = min(advance.amount, lineItem.amount)`) by creating a *new*
+allocation row pointing `lineItemId` at the new item and decrementing the advance row's `amount` in
+place (deleting it once it hits zero) — a plain balance transfer inside the same payment, not a new
+payment. This is what "in future a lecture happens then the balance is done" means concretely: the
+faculty's next lecture (or next month's salary row) shows up already partially or fully paid, no
+action needed from the admin.
+
+`POST /payroll/pay/:id/void` — `OWNER, ADMIN`. Same shape as Fees' void: reverses every allocation
+(decrements `paidAmount` on real line items, clamped at 0; deletes advance-row allocations
+outright since there's nothing downstream to preserve for them), sets
+`voidedAt`/`voidReason`/`voidedByUserId`, row survives for audit.
+
+## 5. Run lifecycle — an institute-wide sign-off layer on top of the live ledger
+
+This is the one place this addendum makes an explicit interpretive call, flagged rather than
+silently assumed: the dev plan's Preview → Draft → Approve → Paid → Reopen lifecycle reads as one
+formal, institute-wide monthly process, while everything in §2–§4 is a continuously-live per-staff
+ledger (a lecture can generate a payable line item on the 3rd of the month; nothing about it should
+have to wait for a monthly "run"). **Resolution: `PayrollRun` is a sign-off/reporting wrapper for a
+period, not a gate that blocks the granular flow.** Payments can be recorded against a staff
+member's line items at any time, run or no run — the run exists for the "close out August" ritual:
+see the whole month's total obligation before committing, lock in a draft, approve it, and use
+"mark paid" as a bulk sweep for anyone not already paid individually.
+
+```prisma
+enum PayrollRunStatus {
+  DRAFT
+  APPROVED
+  PAID
+}
+
+/// One per (institute, periodMonth) — enforced by the unique constraint, not
+/// by any snapshot of which line items belong to it. "In scope" for a run is
+/// always derived (every PayrollLineItem across every active SalaryProfile
+/// with that periodMonth), same derive-don't-duplicate instinct as everywhere
+/// else — a run is a status + approval record, not a second copy of the data.
+model PayrollRun {
+  id               String           @id @default(cuid())
+  instituteId      String
+  periodMonth      String
+  status           PayrollRunStatus @default(DRAFT)
+  approvedAt       DateTime?
+  approvedByUserId String?
+  paidAt           DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@unique([instituteId, periodMonth])
+  @@map("payroll_runs")
+}
+```
+
+- `GET /payroll/runs/preview?period=YYYY-MM` — **dry run, nothing saved**: for every active
+  `SalaryProfile`, compute (don't persist) what `syncLineItems` *would* generate for that period,
+  return per-profile + institute-wide totals. No `PayrollLineItem`, no `PayrollRun` row written —
+  matches "nothing saved" from the spec literally.
+- `POST /payroll/runs` — body `{ period }`. Creates the `PayrollRun` (`DRAFT`) and, unlike preview,
+  actually calls `syncLineItems` for every active profile up to that period — this is the moment
+  preview numbers become real, referenceable rows. 409 if a run for that period already exists (one
+  run per period, per spec).
+- `POST /payroll/runs/:id/approve` — `DRAFT → APPROVED`. `OWNER, ADMIN`. Purely a status/sign-off
+  flip; doesn't move money.
+- `POST /payroll/runs/:id/pay` — `APPROVED → PAID`. `OWNER, ADMIN`. Bulk convenience: for every
+  active profile with an outstanding balance in this period, auto-record one full-balance
+  `PayrollPayment` (mode fixed to `BANK_TRANSFER` unless the request specifies otherwise) covering
+  everything still unpaid — the "just pay everyone the rest for this month" fast path, for whoever
+  wasn't already handled individually via §4. Does not touch profiles already fully paid.
+- `POST /payroll/runs/:id/reopen` — `APPROVED` or `PAID → DRAFT`. `OWNER, ADMIN`. Resets the run's
+  own status/approval metadata only — **does not reverse any `PayrollPayment`s already made**, same
+  "financial records aren't undone, only voided" principle as Fees (§4 of the Fees addendum). A
+  reopened run just means more line items can be reviewed/added before re-approving; individual
+  corrections still go through void (§4).
+- `GET /payroll/runs` / `GET /payroll/runs/:id` — list/detail, `OWNER, ADMIN, ACCOUNTANT`
+  (accountants can review without approving).
+
+## 6. Faculty self-view — "My payslips"
+
+`GET /payroll/my-payslips` — any authenticated user with a `SalaryProfile` where `userId === self`
+(not restricted to role `FACULTY` specifically, even though that's the dev plan's stated common
+case — an ADMIN or RECEPTION user with a salary profile gets the same read for free, no extra
+code). Returns the same period-grouped shape as the admin ledger (§7) minus any pay/select
+controls: `periodMonth`, `totalEarned`, `totalPaid`, `status` (`PAID`/`PARTIAL`/`UNPAID` per
+period), and per-lecture line items for `PER_LECTURE` profiles. Read-only.
+
+## 7. Last-paid / pending — derived, not stored
+
+`GET /payroll/staff` (the directory) and `GET /payroll/staff/:id` (detail) compute, per profile:
+
+- `pendingAmount` = `sum(lineItem.amount - lineItem.paidAmount)` across all line items, **minus**
+  any unconsumed advance total (§4) — can go negative, displayed as a credit ("₹450 credit") rather
+  than clamped to zero, so an admin immediately sees a faculty member is pre-paid.
+- `lastPaidOn` / `lastPaidAmount` = the most recent non-voided `PayrollPayment.paidOn`/`amount` for
+  that profile.
+
+Both computed on every read, same as `installmentStatus()` and every Fees stat card — nothing
+stored that could drift.
+
+## 8. Frontend
+
+**New `/payroll` route**, tabs gated by role:
+
+- **Staff** (`OWNER, ADMIN`) — directory table: name, title/role, salary type + rate, pending
+  amount, last paid. Rows for platform users without a `SalaryProfile` yet show "Set up salary"
+  (same empty-state pattern as Fees' "Not set up" badge); "Add external staff" button opens a
+  lighter modal (name, title, monthly rate only — `salaryType` fixed to `FIXED`, `userId` omitted).
+- **Staff ledger** (drill-in from a directory row) — the accordion UI, one collapsible section per
+  `periodMonth` (newest first), each header showing that month's combined outstanding amount; open
+  a section to see its line items (lecture rows for `PER_LECTURE`, single salary row for `FIXED`)
+  each with a checkbox, pre-checked by default. Checkbox state is a single flat `Set<lineItemId>`
+  lifted above the accordion so **selecting across multiple open months at once** (the explicit
+  ask — "if I'm paying multiple months, combined amt in that month list format") works in one
+  payment. A running "Selected total: ₹X" + an editable amount field (defaults to the selected
+  total, but overridable — typing a smaller number demonstrates the "if low" partial case live, a
+  larger number demonstrates the credit case) + "Record payment" button calling `POST
+  /payroll/pay` with exactly the checked `lineItemIds`. A visible "Credit balance: ₹X" chip when
+  `pendingAmount` is negative.
+- **Runs** (`OWNER, ADMIN, ACCOUNTANT`) — period picker → preview totals (before a run exists) or
+  run detail + status badge + Approve/Mark paid/Reopen buttons (role/status-gated) once one does.
+- **My payslips** (`FACULTY` and anyone else with a `SalaryProfile` pointing at themselves) — same
+  accordion visual, read-only, no checkboxes/pay button.
+
+Reuses `StatCard`, `Modal`, `Dropdown`, `Badge`, `Button`, `ConfirmModal` throughout, same as every
+module so far. The accordion itself is the one new primitive this phase needs (a plain
+`<details>`-backed or controlled-open-state list group — no library, matches the project's
+"no new UI primitives unless the interaction genuinely doesn't exist yet" bar).
+
+`navigation.ts` + `Sidebar`: one `PAYROLL`-gated nav item, visible to `OWNER, ADMIN, ACCOUNTANT,
+FACULTY` (last one sees only "My payslips").
+
+## 9. Expenses (Phase 7 §2.10) — ledger deferred, this pass is CRUD + categories + the mirror table
+
+Deliberately smaller scope, confirmed in discussion: build the expense recording surface and the
+`FinanceEntry` mirror table now (so nothing has to migrate later), but the **combined Ledger
+view / CSV export is a separate future pass** — this addendum only wires `Expense` creation into
+`FinanceEntry`, not Fee `Payment`s or `PayrollPayment`s (those get mirrored in when the Ledger pass
+actually reads from this table; wiring them now with no reader would be speculative).
+
+```prisma
+enum FinanceEntryKind {
+  INCOME
+  EXPENSE
+}
+
+model ExpenseCategory {
+  id          String            @id @default(cuid())
+  instituteId String
+  name        String
+  kind        FinanceEntryKind  @default(EXPENSE) // optional income/expense flag, per spec
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+
+  institute Institute  @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+
+  @@unique([instituteId, name])
+  @@map("expense_categories")
+}
+
+model Expense {
+  id              String   @id @default(cuid())
+  instituteId     String
+  categoryId      String
+  title           String
+  amount          Decimal  @db.Decimal(10, 2)
+  date            DateTime @db.Date
+  notes           String?
+  createdByUserId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  institute    Institute     @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  category     ExpenseCategory @relation(fields: [categoryId], references: [id])
+  financeEntry FinanceEntry?
+
+  @@index([instituteId, date])
+  @@map("expenses")
+}
+
+/// The future Ledger pass's read model. One row per originating financial
+/// event across the whole institute — this pass only ever writes EXPENSE
+/// rows (source = "EXPENSE"), but the shape is deliberately generic
+/// (source + sourceId) so FEE_PAYMENT / PAYROLL_PAYMENT rows can be mirrored
+/// in later without a schema change, matching how Lecture/FeeAccount were
+/// both modeled ahead of their own deferred read-layers (§1 at the top of
+/// this file).
+model FinanceEntry {
+  id          String           @id @default(cuid())
+  instituteId String
+  kind        FinanceEntryKind
+  source      String           // "EXPENSE" this pass; "FEE_PAYMENT" / "PAYROLL_PAYMENT" later
+  sourceId    String
+  categoryName String?
+  description String
+  amount      Decimal          @db.Decimal(10, 2)
+  date        DateTime         @db.Date
+  createdAt   DateTime         @default(now())
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  expense   Expense?  @relation(fields: [sourceId], references: [id], map: "finance_entry_expense_fk")
+
+  @@unique([source, sourceId])
+  @@index([instituteId, date])
+  @@map("finance_entries")
+}
+```
+
+`expenses.ts` → mounted `/expenses`, `requireModule("EXPENSE")`, **`OWNER, ADMIN` only** for every
+route (matches the dev plan's `2.10` gating exactly — no `RECEPTION`/`ACCOUNTANT` write access this
+pass; flag as a call-out if accountants are expected to log expenses day-to-day, easy one-line role
+change later).
+
+- `GET /categories`, `POST /categories`, `PATCH /categories/:id` (rename/deactivate).
+- `GET /?from=&to=&categoryId=` — filterable list, matches the Fees Receipts tab's exact
+  search/filter UX pattern just built.
+- `POST /`, `PATCH /:id`, `DELETE /:id` — plain CRUD. Deliberately **not** void-not-delete here
+  (unlike `Payment`/`PayrollPayment`): an expense has no receipt-number sequence and no downstream
+  balance it reconciles against, so a wrongly-entered one can just be corrected or removed outright
+  — flagged as an intentional asymmetry with the financial-record patterns elsewhere, not an
+  oversight. `POST`/`PATCH` both write-through to `FinanceEntry` in the same transaction
+  (upsert on `[source, sourceId]`); `DELETE` removes the mirror row too (`onDelete: Cascade`
+  isn't declared since `FinanceEntry.sourceId` isn't a hard FK to a single polymorphic parent —
+  the handler deletes both rows explicitly in one transaction).
+
+Frontend: new `/expenses` route — "Expenses" tab (searchable/filterable table, "Add expense"
+modal: title, category dropdown, amount, date, notes) + "Categories" tab (simple list +
+add/rename/deactivate, same shape as `Settings` tabs elsewhere). `navigation.ts`/`Sidebar`:
+`EXPENSE`-gated, `OWNER, ADMIN` only.
+
+## 10. What's explicitly out of scope this pass
+
+- **Combined Ledger view + CSV export** — the rest of Phase 7 §2.10/§2.9's remaining half;
+  `FinanceEntry` is seeded (Expenses only) so that pass is additive, not a migration.
+- **Fee `Payment` / `PayrollPayment` → `FinanceEntry` mirroring** — added when the Ledger pass
+  actually consumes them (§9).
+- **Retroactive correction of a `PayrollLineItem` after its lecture is cancelled/edited** — flagged
+  in §3, not solved; manual admin correction only, no automated reversal.
+- **Late/penalty logic, refunds, or any payroll equivalent of Fees' overdue reminders** — nothing
+  in the dev plan asks for it here, not building it speculatively.
+- **Accountant write access to Expenses** — gated `OWNER/ADMIN` only per spec, flagged in §9 as an
+  easy follow-up if wrong.
+
+## Build order
+
+1. Schema: `SalaryType`, `PayrollLineItemKind`, `PayrollRunStatus`, `FinanceEntryKind` enums;
+   `SalaryProfile`, `PayrollLineItem`, `PayrollPayment`, `PayrollPaymentAllocation`, `PayrollRun`,
+   `ExpenseCategory`, `Expense`, `FinanceEntry` models; `Institute` gains the corresponding
+   back-relation arrays; `Lecture` gains `payrollLineItem PayrollLineItem?` for the `@unique
+   lectureId` back-relation. One additive `prisma db push`, no destructive changes.
+2. Extract the waterfall-allocation algorithm out of `fees.ts`'s inline `POST /payments` handler
+   into `backend/src/services/waterfallAllocation.ts` (pure function: sorted targets + amount →
+   allocations + leftover); refactor `fees.ts` to call it, confirm Fees' existing behavior/tests
+   are unchanged before building on top of it.
+3. `services/payrollSync.ts` — `syncLineItems(salaryProfileId, upToPeriod)` (§3) including the
+   advance-reconciliation pass (§4's last paragraph). Build and unit-test this in isolation first —
+   it's the trickiest piece (lazy generation + credit-consumption ordering) and everything else
+   reads through it.
+4. `payroll.ts` router: `staff` CRUD (§1), `GET /staff/:id/ledger` (§7 shape), `POST /pay` +
+   `POST /pay/:id/void` (§4), `runs` preview/create/approve/pay/reopen (§5), `my-payslips` (§6).
+5. `/payroll` frontend: Staff directory + set-up-salary/add-external modals, staff ledger accordion
+   + selection + pay flow, Runs tab, My payslips — §8.
+6. `expenses.ts` router + `FinanceEntry` mirroring (§9), `/expenses` frontend (categories +
+   ledger-style list).
+7. `navigation.ts`/`Sidebar` gating for both `PAYROLL` and `EXPENSE` — wired last, same order as
+   every prior phase.
+8. Type-check + lint pass on both sides after each numbered step.
+9. Smoke-test: create a `FIXED` external staff member → run preview → create draft run → confirm a
+   `SALARY` line item generated → pay it partially → confirm `PARTIAL` status and the remainder
+   still selectable next payment; create a `PER_LECTURE` faculty profile → mark attendance on a
+   couple of their lectures → confirm matching line items appear in their ledger accordion, grouped
+   by month → deselect one lecture, pay the rest → confirm the deselected one stays unpaid and
+   payable later → pay a lump sum exceeding the selected total → confirm a credit balance appears →
+   confirm the next newly-generated line item (new lecture or month rollover) auto-absorbs that
+   credit → void a payment → confirm balances reverse; approve → mark-paid → reopen a run → confirm
+   status transitions and that reopening doesn't touch already-made payments; create an expense →
+   confirm a matching `FinanceEntry` row exists → edit/delete it → confirm the mirror follows;
+   cross-institute isolation checks throughout, same rigor as every prior phase.
+

@@ -16,6 +16,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [exiting, setExiting] = useState(false);
   const [search, setSearch] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const showBackToOrg = user?.role === "OWNER" && !!user.currentInstituteId;
 
@@ -83,7 +84,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" strokeLinecap="round" strokeLinejoin="round" />
             <path d="M13.73 21a2 2 0 01-3.46 0" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-accent" />
+          {unreadCount > 0 && <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-accent" />}
         </button>
         <button
           type="button"
@@ -114,7 +115,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         </div>
       </div>
 
-      <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
+      <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} onUnreadCountChange={setUnreadCount} />
     </header>
   );
 }

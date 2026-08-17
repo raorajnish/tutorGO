@@ -1,85 +1,80 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { apiFetch } from "@/lib/api";
+import type { AppNotification } from "@/lib/types";
 
-interface NotificationItem {
-  id: string;
-  person: string;
-  action: string;
-  detail?: string;
-  time: string;
-  unread: boolean;
+function relativeTime(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins} minute${mins === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days} days ago`;
+  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 }
-
-const INITIAL_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: "1",
-    person: "Nina Fischer",
-    action: "enrolled a new student in",
-    detail: "Grade 10 — Physics",
-    time: "12 minutes ago",
-    unread: true,
-  },
-  {
-    id: "2",
-    person: "Kaito Yamada",
-    action: "marked attendance for",
-    detail: "Batch B — Morning",
-    time: "38 minutes ago",
-    unread: true,
-  },
-  {
-    id: "3",
-    person: "Mila Grey",
-    action: "submitted a fee payment",
-    time: "2 hours ago",
-    unread: true,
-  },
-  {
-    id: "4",
-    person: "TutorGO system",
-    action: "generated the weekly performance report",
-    time: "Yesterday",
-    unread: false,
-  },
-  {
-    id: "5",
-    person: "Owen Castillo",
-    action: "requested access to",
-    detail: "Riverside Institute",
-    time: "2 days ago",
-    unread: false,
-  },
-];
 
 interface NotificationDrawerProps {
   open: boolean;
   onClose: () => void;
+  onUnreadCountChange?: (count: number) => void;
 }
 
-export function NotificationDrawer({ open, onClose }: NotificationDrawerProps) {
-  const [items, setItems] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+export function NotificationDrawer({ open, onClose, onUnreadCountChange }: NotificationDrawerProps) {
+  const [items, setItems] = useState<AppNotification[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  function load() {
+    apiFetch<AppNotification[]>("/notifications")
+      .then((data) => {
+        setItems(data);
+        onUnreadCountChange?.(data.filter((n) => !n.read).length);
+      })
+      .catch(() => {});
+  }
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!open) return;
+    load();
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, onClose]);
 
-  const unreadCount = items.filter((x) => x.unread).length;
+  const unreadCount = items.filter((x) => !x.read).length;
 
-  function markAllRead() {
-    setItems((prev) => prev.map((x) => ({ ...x, unread: false })));
+  async function markAllRead() {
+    setItems((prev) => prev.map((x) => ({ ...x, read: true })));
+    onUnreadCountChange?.(0);
+    await apiFetch("/notifications/read-all", { method: "POST" }).catch(() => {});
   }
 
-  function markRead(id: string) {
-    setItems((prev) => prev.map((x) => (x.id === id ? { ...x, unread: false } : x)));
+  async function markRead(id: string) {
+    setItems((prev) => {
+      const next = prev.map((x) => (x.id === id ? { ...x, read: true } : x));
+      onUnreadCountChange?.(next.filter((n) => !n.read).length);
+      return next;
+    });
+    await apiFetch(`/notifications/${id}/read`, { method: "POST" }).catch(() => {});
   }
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
       {/* Backdrop */}
       <button
@@ -139,24 +134,26 @@ export function NotificationDrawer({ open, onClose }: NotificationDrawerProps) {
               type="button"
               onClick={() => markRead(item.id)}
               className={`flex w-full items-start gap-3 px-5 py-3.5 text-left transition-colors duration-150 hover:bg-secondary ${
-                item.unread ? "bg-accent/5" : ""
+                !item.read ? "bg-accent/5" : ""
               }`}
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
-                {item.person.charAt(0).toUpperCase()}
+                {item.title.charAt(0).toUpperCase()}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm text-foreground">
-                  <b className="font-semibold">{item.person}</b> {item.action}
-                  {item.detail && <> &ldquo;{item.detail}&rdquo;</>}
+                  <b className="font-semibold">{item.title}</b>
                 </span>
-                <span className="mt-0.5 block text-xs text-muted-foreground">{item.time}</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">{item.body}</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">{relativeTime(item.createdAt)}</span>
               </span>
-              {item.unread && <i className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
+              {!item.read && <i className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
             </button>
           ))}
+          {items.length === 0 && <p className="px-5 py-8 text-center text-sm text-muted-foreground">No notifications yet.</p>}
         </div>
       </aside>
-    </div>
+    </div>,
+    document.body
   );
 }

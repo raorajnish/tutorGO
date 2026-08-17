@@ -33,6 +33,7 @@ export function AdmitModal({ open, onClose, onAdmitted, courses, enquiry }: Prop
   const [fingerprintId, setFingerprintId] = useState("");
 
   const [batches, setBatches] = useState<Batch[]>([]);
+  const [batchesLoading, setBatchesLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -56,11 +57,14 @@ export function AdmitModal({ open, onClose, onAdmitted, courses, enquiry }: Prop
   useEffect(() => {
     if (!courseId) {
       setBatches([]);
+      setBatchesLoading(false);
       return;
     }
+    setBatchesLoading(true);
     apiFetch<Batch[]>(`/academics/batches?courseId=${courseId}`)
       .then(setBatches)
-      .catch(() => setBatches([]));
+      .catch(() => setBatches([]))
+      .finally(() => setBatchesLoading(false));
     setBatchId("");
   }, [courseId]);
 
@@ -146,11 +150,19 @@ export function AdmitModal({ open, onClose, onAdmitted, courses, enquiry }: Prop
             value={batchId}
             onChange={setBatchId}
             options={batches.map((b) => ({ value: b.id, label: b.name }))}
-            placeholder={courseId ? (batches.length ? "Select batch…" : "No batches for this course") : "Select a course first"}
-            disabled={!courseId || batches.length === 0}
+            placeholder={
+              !courseId
+                ? "Select a course first"
+                : batchesLoading
+                  ? "Loading batches…"
+                  : batches.length
+                    ? "Select batch…"
+                    : "No batches for this course"
+            }
+            disabled={!courseId || batchesLoading || batches.length === 0}
           />
         </div>
-        {courseId && batches.length === 0 && (
+        {courseId && !batchesLoading && batches.length === 0 && (
           <p className="-mt-2 text-xs text-warning">
             This course has no batches yet. Create one on the Academics page before admitting into it.
           </p>

@@ -5,7 +5,7 @@ import { ApiError } from "../lib/http.js";
 import { authenticate, requireInstitute, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
 import { hashPassword, generateTempPassword } from "../lib/password.js";
-import { sendMail } from "../services/mailer.js";
+import { sendMail, invalidateInstituteEmailConfigCache } from "../services/mailer.js";
 import { inviteEmailHtml } from "../lib/emailTemplates.js";
 import { auditLog } from "../services/audit.js";
 import { assertRoleCapacity, type CappedRole } from "../services/planLimits.js";
@@ -254,13 +254,17 @@ orgRouter.get("/plan", requireRoles("OWNER", "ADMIN"), async (req, res, next) =>
   try {
     const instituteId = req.tenantId!;
 
-    const [institute, roleCounts] = await Promise.all([
+    // Students never get a User row (login is deferred — see changes.md §1),
+    // so their headcount comes from the Student table directly, not the
+    // User role groupBy that covers every other capped role.
+    const [institute, roleCounts, studentCount] = await Promise.all([
       prisma.institute.findUniqueOrThrow({ where: { id: instituteId }, include: { plan: true } }),
       prisma.user.groupBy({
         by: ["role"],
-        where: { instituteId, isActive: true, role: { in: ["ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION", "STUDENT"] } },
+        where: { instituteId, isActive: true, role: { in: ["ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION"] } },
         _count: { _all: true },
       }),
+      prisma.student.count({ where: { instituteId, isActive: true } }),
     ]);
 
     const used = Object.fromEntries(roleCounts.map((r) => [r.role, r._count._all]));
@@ -279,7 +283,7 @@ orgRouter.get("/plan", requireRoles("OWNER", "ADMIN"), async (req, res, next) =>
           ACCOUNTANT: { used: used.ACCOUNTANT ?? 0, max: institute.plan.maxAccountants },
           FACULTY: { used: used.FACULTY ?? 0, max: institute.plan.maxFaculty },
           RECEPTION: { used: used.RECEPTION ?? 0, max: institute.plan.maxReception },
-          STUDENT: { used: used.STUDENT ?? 0, max: institute.plan.maxStudents },
+          STUDENT: { used: studentCount, max: institute.plan.maxStudents },
         },
       },
     });
@@ -351,6 +355,84 @@ orgRouter.delete("/message-templates/:type", requireRoles("OWNER", "ADMIN"), asy
 
     await prisma.messageTemplate.deleteMany({ where: { instituteId, type } });
     res.json({ type, body: DEFAULT_MESSAGE_TEMPLATES[rawType as (typeof MESSAGE_TEMPLATE_TYPES)[number]], isDefault: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Institute's own outbound email (Settings → Email) — falls back to the
+// platform default (services/mailer.ts) when absent or disabled, so this is
+// entirely optional for an institute to ever set up.
+// ---------------------------------------------------------------------------
+
+orgRouter.get("/email-config", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const config = await prisma.instituteEmailConfig.findUnique({ where: { instituteId: req.tenantId! } });
+    if (!config) return res.json(null);
+
+    res.json({
+      host: config.host,
+      port: config.port,
+      secure: config.secure,
+      username: config.username,
+      fromName: config.fromName,
+      fromEmail: config.fromEmail,
+      isEnabled: config.isEnabled,
+      updatedAt: config.updatedAt,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const instituteEmailConfigSchema = z.object({
+  host: z.string().min(1),
+  port: z.number().int().positive(),
+  secure: z.boolean(),
+  username: z.string().min(1),
+  password: z.string().optional(),
+  fromName: z.string().min(1),
+  fromEmail: z.string().email(),
+  isEnabled: z.boolean(),
+});
+
+orgRouter.put("/email-config", requireRoles("OWNER", "ADMIN"), validateBody(instituteEmailConfigSchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof instituteEmailConfigSchema>;
+    const instituteId = req.tenantId!;
+
+    if (!body.password) {
+      const existing = await prisma.instituteEmailConfig.findUnique({ where: { instituteId } });
+      if (!existing) throw ApiError.badRequest("Password is required for first-time setup");
+      body.password = existing.password;
+    }
+
+    const config = await prisma.instituteEmailConfig.upsert({
+      where: { instituteId },
+      update: body as Required<typeof body>,
+      create: { instituteId, ...(body as Required<typeof body>) },
+    });
+
+    invalidateInstituteEmailConfigCache(instituteId);
+
+    await auditLog({
+      action: "INSTITUTE_EMAIL_CONFIG_UPDATED",
+      instituteId,
+      userId: req.user!.id,
+      metadata: { host: body.host, fromEmail: body.fromEmail, isEnabled: body.isEnabled },
+    });
+
+    res.json({
+      host: config.host,
+      port: config.port,
+      secure: config.secure,
+      username: config.username,
+      fromName: config.fromName,
+      fromEmail: config.fromEmail,
+      isEnabled: config.isEnabled,
+      updatedAt: config.updatedAt,
+    });
   } catch (err) {
     next(err);
   }

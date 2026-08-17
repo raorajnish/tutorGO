@@ -57,9 +57,23 @@ export type InstituteModule = Prisma.InstituteModuleModel
 export type User = Prisma.UserModel
 /**
  * Model EmailConfig
- * Singleton row (id = "default") — the platform's outbound SMTP transport.
+ * Singleton row (id = "default") — the platform's outbound SMTP transport,
+ * used as the fallback whenever an institute hasn't configured its own
+ * (see InstituteEmailConfig) — e.g. team invites before an owner has set
+ * anything up, or any institute that never bothers to.
  */
 export type EmailConfig = Prisma.EmailConfigModel
+/**
+ * Model InstituteEmailConfig
+ * An institute's own outbound SMTP transport, set by OWNER/ADMIN in
+ * Settings → Email. When present and `isEnabled`, every email triggered for
+ * that institute (payroll notifications, team invites, ...) goes out from
+ * here instead of the platform's shared EmailConfig — see
+ * services/mailer.ts's fallback order. `isEnabled` is a separate flag from
+ * "has credentials saved" so an owner can pause institute-branded email
+ * without deleting the configuration.
+ */
+export type InstituteEmailConfig = Prisma.InstituteEmailConfigModel
 /**
  * Model MessageLog
  * 
@@ -70,6 +84,15 @@ export type MessageLog = Prisma.MessageLogModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model Notification
+ * A real, persisted in-app notification — what NotificationDrawer.tsx reads
+ * (replacing its earlier hardcoded demo list). Only makes sense for users
+ * with a login; a no-login external staff member can't see this drawer, so
+ * they're reached via email instead (see SalaryProfile.externalEmail) —
+ * there's no in-app channel possible for them by construction.
+ */
+export type Notification = Prisma.NotificationModel
 /**
  * Model Course
  * Doubles as the institute's "class/standard" — e.g. "10th Standard" (code
@@ -154,3 +177,104 @@ export type FacultyAssignment = Prisma.FacultyAssignmentModel
  * get a usable WhatsApp-ready message.
  */
 export type MessageTemplate = Prisma.MessageTemplateModel
+/**
+ * Model FeeStructure
+ * A reusable, course-scoped fee template ("10th Standard — 3 Installments
+ * ₹30,000", "JEE Batch — Monthly ₹5,000"), managed from Academics alongside
+ * Course/Subject/Batch. Attaching one to a student snapshots its values onto
+ * a new FeeAccount below — editing or deactivating a structure never
+ * retroactively reprices students already attached to it.
+ */
+export type FeeStructure = Prisma.FeeStructureModel
+/**
+ * Model FeeAccount
+ * One per student. ONE_TIME accounts use courseFee/discount/finalFee/
+ * installmentCount; RECURRING accounts use monthlyAmount/billingDay instead
+ * (those fields stay null) — see changes.md's Fees addendum. `finalFee` is
+ * stored (not computed on read) so a later change to Course.defaultFee
+ * never silently reprices an existing student's account. Values are
+ * snapshotted from the attached FeeStructure at creation time; `feeStructureId`
+ * is kept only for provenance/display.
+ */
+export type FeeAccount = Prisma.FeeAccountModel
+/**
+ * Model FeeInstallment
+ * Status is *derived*, not stored — this table stores only the facts
+ * (amount owed, amount paid), never a status enum that could drift out of
+ * sync with the payments that are supposed to justify it. `originalDueDate`
+ * is set once, on the first reschedule only. `paidAmount` can never exceed
+ * `amount` — enforced by the waterfall-allocation payment engine in fees.ts,
+ * not by a DB constraint (Decimal comparison isn't expressible as one).
+ */
+export type FeeInstallment = Prisma.FeeInstallmentModel
+/**
+ * Model Payment
+ * One payment transaction (one receipt). A single payment can settle across
+ * several installments — see PaymentAllocation — so it's linked to the
+ * FeeAccount directly, not to one installment. Never hard-deleted — a
+ * wrongly-recorded one is voided (every allocation reversed, row kept with
+ * voidedAt/voidReason for audit) rather than removed, so the receipt-number
+ * sequence and payment history stay trustworthy.
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model PaymentAllocation
+ * One line item within a Payment — how much of that one transaction went
+ * toward one specific installment. sum(allocations.amount) for a payment
+ * always equals payment.amount, enforced transactionally in fees.ts (never
+ * trusted from client input). This is what makes "pay ₹14,000 against a
+ * ₹10,500 installment" correctly close that installment and roll the
+ * ₹3,500 excess into the next one, instead of silently over-crediting a
+ * single installment past its target.
+ */
+export type PaymentAllocation = Prisma.PaymentAllocationModel
+/**
+ * Model ReceiptCounter
+ * Same atomic-upsert pattern as StudentCodeCounter — one gapless sequence
+ * per (institute, year+month), used to generate Payment.receiptNumber
+ * (RCT-YYMM-SEQ).
+ */
+export type ReceiptCounter = Prisma.ReceiptCounterModel
+/**
+ * Model SalaryProfile
+ * A payable person — either a platform User (any staff role) or someone
+ * entirely outside the platform (no login, no User row). PER_LECTURE is
+ * only valid when userId is set and that User's role is FACULTY, since
+ * lecture attribution runs through Lecture.facultyId -> User.id. Rates are
+ * snapshotted onto each generated PayrollLineItem at creation time — the
+ * same FeeStructure->FeeAccount snapshot pattern — so a later rate change
+ * never retroactively reprices an already-generated period.
+ */
+export type SalaryProfile = Prisma.SalaryProfileModel
+/**
+ * Model PayrollLineItem
+ * One earned amount, generated lazily (never all at once). `periodMonth` is
+ * "YYYY-MM". `lectureId` is set only for LECTURE rows; nullable + a plain
+ * unique constraint works because Postgres treats every NULL as distinct,
+ * the same trick already relied on for FacultyAssignment.subjectId.
+ */
+export type PayrollLineItem = Prisma.PayrollLineItemModel
+/**
+ * Model PayrollPayment
+ * One payout transaction. Mirrors Payment: never hard-deleted, corrected via
+ * void. Can span multiple periods/line items in one transaction.
+ */
+export type PayrollPayment = Prisma.PayrollPaymentModel
+/**
+ * Model PayrollPaymentAllocation
+ * lineItemId nullable = the *advance* case: the portion of a payment not yet
+ * matched to a specific line item, because none existed yet at payment time.
+ * sum(allocations.amount) for a payment always equals payment.amount,
+ * enforced in payroll.ts. An advance row's `amount` is mutated down as new
+ * line items are generated and consume it — a running balance, not a
+ * settled fact, until fully absorbed.
+ */
+export type PayrollPaymentAllocation = Prisma.PayrollPaymentAllocationModel
+/**
+ * Model PayrollRun
+ * One per (institute, periodMonth). "In scope" for a run is always derived
+ * (every PayrollLineItem across every active SalaryProfile with that
+ * periodMonth) — a run is a status + approval record, not a second copy of
+ * the data.
+ */
+export type PayrollRun = Prisma.PayrollRunModel

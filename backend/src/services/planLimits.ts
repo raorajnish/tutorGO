@@ -25,7 +25,12 @@ export async function assertRoleCapacity(instituteId: string, role: CappedRole):
     STUDENT: institute.plan.maxStudents,
   }[role];
 
-  const current = await prisma.user.count({ where: { instituteId, role, isActive: true } });
+  // Students never get a User row (login is deferred — see changes.md §1),
+  // so their headcount comes from the Student table, not User.
+  const current =
+    role === "STUDENT"
+      ? await prisma.student.count({ where: { instituteId, isActive: true } })
+      : await prisma.user.count({ where: { instituteId, role, isActive: true } });
 
   if (current >= max) {
     throw new ApiError(

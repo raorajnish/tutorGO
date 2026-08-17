@@ -58,8 +58,10 @@ export const ModelName = {
   InstituteModule: 'InstituteModule',
   User: 'User',
   EmailConfig: 'EmailConfig',
+  InstituteEmailConfig: 'InstituteEmailConfig',
   MessageLog: 'MessageLog',
   AuditLog: 'AuditLog',
+  Notification: 'Notification',
   Course: 'Course',
   Subject: 'Subject',
   CourseSubject: 'CourseSubject',
@@ -72,7 +74,18 @@ export const ModelName = {
   Lecture: 'Lecture',
   AttendanceRecord: 'AttendanceRecord',
   FacultyAssignment: 'FacultyAssignment',
-  MessageTemplate: 'MessageTemplate'
+  MessageTemplate: 'MessageTemplate',
+  FeeStructure: 'FeeStructure',
+  FeeAccount: 'FeeAccount',
+  FeeInstallment: 'FeeInstallment',
+  Payment: 'Payment',
+  PaymentAllocation: 'PaymentAllocation',
+  ReceiptCounter: 'ReceiptCounter',
+  SalaryProfile: 'SalaryProfile',
+  PayrollLineItem: 'PayrollLineItem',
+  PayrollPayment: 'PayrollPayment',
+  PayrollPaymentAllocation: 'PayrollPaymentAllocation',
+  PayrollRun: 'PayrollRun'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -208,6 +221,23 @@ export const EmailConfigScalarFieldEnum = {
 export type EmailConfigScalarFieldEnum = (typeof EmailConfigScalarFieldEnum)[keyof typeof EmailConfigScalarFieldEnum]
 
 
+export const InstituteEmailConfigScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  host: 'host',
+  port: 'port',
+  secure: 'secure',
+  username: 'username',
+  password: 'password',
+  fromName: 'fromName',
+  fromEmail: 'fromEmail',
+  isEnabled: 'isEnabled',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InstituteEmailConfigScalarFieldEnum = (typeof InstituteEmailConfigScalarFieldEnum)[keyof typeof InstituteEmailConfigScalarFieldEnum]
+
+
 export const MessageLogScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -238,6 +268,21 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  body: 'body',
+  metadata: 'metadata',
+  readAt: 'readAt',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
 export const CourseScalarFieldEnum = {
   id: 'id',
   instituteId: 'instituteId',
@@ -247,7 +292,9 @@ export const CourseScalarFieldEnum = {
   description: 'description',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  defaultFee: 'defaultFee',
+  defaultMonthlyFee: 'defaultMonthlyFee'
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
@@ -415,6 +462,177 @@ export const MessageTemplateScalarFieldEnum = {
 } as const
 
 export type MessageTemplateScalarFieldEnum = (typeof MessageTemplateScalarFieldEnum)[keyof typeof MessageTemplateScalarFieldEnum]
+
+
+export const FeeStructureScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  courseId: 'courseId',
+  name: 'name',
+  planType: 'planType',
+  courseFee: 'courseFee',
+  installmentCount: 'installmentCount',
+  monthlyAmount: 'monthlyAmount',
+  billingDay: 'billingDay',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FeeStructureScalarFieldEnum = (typeof FeeStructureScalarFieldEnum)[keyof typeof FeeStructureScalarFieldEnum]
+
+
+export const FeeAccountScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  studentId: 'studentId',
+  feeStructureId: 'feeStructureId',
+  planType: 'planType',
+  status: 'status',
+  courseFee: 'courseFee',
+  discount: 'discount',
+  finalFee: 'finalFee',
+  installmentCount: 'installmentCount',
+  monthlyAmount: 'monthlyAmount',
+  billingDay: 'billingDay',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FeeAccountScalarFieldEnum = (typeof FeeAccountScalarFieldEnum)[keyof typeof FeeAccountScalarFieldEnum]
+
+
+export const FeeInstallmentScalarFieldEnum = {
+  id: 'id',
+  feeAccountId: 'feeAccountId',
+  seq: 'seq',
+  dueDate: 'dueDate',
+  originalDueDate: 'originalDueDate',
+  amount: 'amount',
+  paidAmount: 'paidAmount',
+  waived: 'waived',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FeeInstallmentScalarFieldEnum = (typeof FeeInstallmentScalarFieldEnum)[keyof typeof FeeInstallmentScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  feeAccountId: 'feeAccountId',
+  amount: 'amount',
+  mode: 'mode',
+  paidOn: 'paidOn',
+  receiptNumber: 'receiptNumber',
+  notes: 'notes',
+  createdByUserId: 'createdByUserId',
+  voidedAt: 'voidedAt',
+  voidReason: 'voidReason',
+  voidedByUserId: 'voidedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const PaymentAllocationScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  installmentId: 'installmentId',
+  amount: 'amount'
+} as const
+
+export type PaymentAllocationScalarFieldEnum = (typeof PaymentAllocationScalarFieldEnum)[keyof typeof PaymentAllocationScalarFieldEnum]
+
+
+export const ReceiptCounterScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  yearMonth: 'yearMonth',
+  seq: 'seq'
+} as const
+
+export type ReceiptCounterScalarFieldEnum = (typeof ReceiptCounterScalarFieldEnum)[keyof typeof ReceiptCounterScalarFieldEnum]
+
+
+export const SalaryProfileScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  userId: 'userId',
+  externalName: 'externalName',
+  externalEmail: 'externalEmail',
+  externalPhone: 'externalPhone',
+  title: 'title',
+  salaryType: 'salaryType',
+  monthlyRate: 'monthlyRate',
+  perLectureRate: 'perLectureRate',
+  isActive: 'isActive',
+  deactivatedAt: 'deactivatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SalaryProfileScalarFieldEnum = (typeof SalaryProfileScalarFieldEnum)[keyof typeof SalaryProfileScalarFieldEnum]
+
+
+export const PayrollLineItemScalarFieldEnum = {
+  id: 'id',
+  salaryProfileId: 'salaryProfileId',
+  kind: 'kind',
+  periodMonth: 'periodMonth',
+  lectureId: 'lectureId',
+  label: 'label',
+  amount: 'amount',
+  paidAmount: 'paidAmount',
+  createdAt: 'createdAt'
+} as const
+
+export type PayrollLineItemScalarFieldEnum = (typeof PayrollLineItemScalarFieldEnum)[keyof typeof PayrollLineItemScalarFieldEnum]
+
+
+export const PayrollPaymentScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  salaryProfileId: 'salaryProfileId',
+  amount: 'amount',
+  mode: 'mode',
+  paidOn: 'paidOn',
+  notes: 'notes',
+  createdByUserId: 'createdByUserId',
+  voidedAt: 'voidedAt',
+  voidReason: 'voidReason',
+  voidedByUserId: 'voidedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type PayrollPaymentScalarFieldEnum = (typeof PayrollPaymentScalarFieldEnum)[keyof typeof PayrollPaymentScalarFieldEnum]
+
+
+export const PayrollPaymentAllocationScalarFieldEnum = {
+  id: 'id',
+  paymentId: 'paymentId',
+  lineItemId: 'lineItemId',
+  amount: 'amount'
+} as const
+
+export type PayrollPaymentAllocationScalarFieldEnum = (typeof PayrollPaymentAllocationScalarFieldEnum)[keyof typeof PayrollPaymentAllocationScalarFieldEnum]
+
+
+export const PayrollRunScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  periodMonth: 'periodMonth',
+  status: 'status',
+  approvedAt: 'approvedAt',
+  approvedByUserId: 'approvedByUserId',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PayrollRunScalarFieldEnum = (typeof PayrollRunScalarFieldEnum)[keyof typeof PayrollRunScalarFieldEnum]
 
 
 export const SortOrder = {
