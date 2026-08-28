@@ -21,8 +21,26 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [precreateOpen, setPrecreateOpen] = useState(false);
+  const [enableOpen, setEnableOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [newPin, setNewPin] = useState<{ name: string; pin: string } | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // Single institute-wide link, always the same path — studentCode is
+  // globally unique so the form doesn't need a course/batch in the URL to
+  // know who's filling it in. Computed client-side (not a server call) since
+  // it's just "this origin + /admission-form".
+  const admissionLink = typeof window !== "undefined" ? `${window.location.origin}/admission-form` : "/admission-form";
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(admissionLink);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      setError("Could not copy the link — copy it manually from the box above.");
+    }
+  }
 
   useEffect(() => {
     if (!courseId) {
@@ -120,7 +138,26 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-4 mt-4 rounded-xl border border-border bg-muted p-3.5">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Admission link</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Share this with students — they&apos;ll enter their Student ID + code from the roster below to fill in their own
+          details.
+        </p>
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+          <input
+            readOnly
+            value={admissionLink}
+            onFocus={(e) => e.currentTarget.select()}
+            className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 font-mono text-xs text-foreground"
+          />
+          <Button variant="secondary" onClick={copyLink} className="shrink-0">
+            {linkCopied ? "Copied!" : "Copy link"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-2">
           <div className="w-full max-w-[220px]">
             <Dropdown
@@ -146,6 +183,9 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
           </Button>
           <Button variant="secondary" onClick={openPrintRoster} disabled={!courseId && !batchId}>
             Print roster
+          </Button>
+          <Button variant="secondary" onClick={() => setEnableOpen(true)}>
+            Enable for existing students
           </Button>
           <Button onClick={() => setPrecreateOpen(true)}>Bulk pre-create</Button>
         </div>
@@ -279,6 +319,7 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
         onCreated={load}
         courses={courses}
       />
+      <EnableExistingModal open={enableOpen} onClose={() => setEnableOpen(false)} onEnabled={load} courses={courses} />
     </div>
   );
 }
@@ -388,26 +429,7 @@ function BulkPrecreateModal({
             {result.length} student{result.length === 1 ? "" : "s"} created. Export the roster from the previous screen to print
             their IDs and codes.
           </div>
-          <div className="max-h-64 overflow-auto rounded-xl border border-border">
-            <table className="w-full min-w-[360px] text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="px-3 py-2 font-medium">Name</th>
-                  <th className="px-3 py-2 font-medium">Student ID</th>
-                  <th className="px-3 py-2 font-medium">Code</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.map((r) => (
-                  <tr key={r.id} className="border-b border-border last:border-0">
-                    <td className="px-3 py-2 text-foreground">{r.name}</td>
-                    <td className="px-3 py-2 font-mono text-xs text-foreground">{r.studentCode}</td>
-                    <td className="px-3 py-2 font-mono text-xs text-foreground">{r.selfFillPin}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <PinResultTable rows={result} />
         </div>
       ) : (
         <form id="bulk-precreate-form" onSubmit={handleSubmit} className="space-y-4">
@@ -436,6 +458,172 @@ function BulkPrecreateModal({
             placeholder={"Aditya Sharma\nPriya Patel\nRohan Mehta"}
           />
           {names.length > 0 && <p className="text-xs text-muted-foreground">{names.length} name{names.length === 1 ? "" : "s"} entered</p>}
+          {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
+        </form>
+      )}
+    </Modal>
+  );
+}
+
+function PinResultTable({ rows }: { rows: CreatedRow[] }) {
+  return (
+    <div className="max-h-64 overflow-auto rounded-xl border border-border">
+      <table className="w-full min-w-[360px] text-sm">
+        <thead>
+          <tr className="border-b border-border bg-muted text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <th className="px-3 py-2 font-medium">Name</th>
+            <th className="px-3 py-2 font-medium">Student ID</th>
+            <th className="px-3 py-2 font-medium">Code</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.id} className="border-b border-border last:border-0">
+              <td className="px-3 py-2 text-foreground">{r.name}</td>
+              <td className="px-3 py-2 font-mono text-xs text-foreground">{r.studentCode}</td>
+              <td className="px-3 py-2 font-mono text-xs text-foreground">{r.selfFillPin}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+interface EnableResponse {
+  students: CreatedRow[];
+  alreadyEnabledCount: number;
+}
+
+/** For students who already have a full record (admitted the normal way,
+ * via AdmitModal) but with incomplete details — retrofits self-fill onto
+ * their EXISTING row instead of creating a duplicate. Scoped by course +
+ * batch, same picker as bulk pre-create, but selects from students already
+ * in that batch rather than asking for names. */
+function EnableExistingModal({
+  open,
+  onClose,
+  onEnabled,
+  courses,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onEnabled: () => void;
+  courses: Course[];
+}) {
+  const [courseId, setCourseId] = useState("");
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [batchId, setBatchId] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<EnableResponse | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setCourseId("");
+    setBatchId("");
+    setError(null);
+    setResult(null);
+  }, [open]);
+
+  useEffect(() => {
+    if (!courseId) {
+      setBatches([]);
+      setBatchId("");
+      return;
+    }
+    apiFetch<Batch[]>(`/academics/batches?courseId=${courseId}`)
+      .then(setBatches)
+      .catch(() => setBatches([]));
+  }, [courseId]);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!courseId || !batchId) {
+      setError("Pick a course and batch.");
+      return;
+    }
+    setError(null);
+    setSubmitting(true);
+    try {
+      const res = await apiFetch<EnableResponse>("/students/self-fill/enable", {
+        method: "POST",
+        body: JSON.stringify({ courseId, batchId }),
+      });
+      setResult(res);
+      onEnabled();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not enable self-fill for this batch.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Enable self-fill for existing students"
+      description="For students already admitted with incomplete details — every active student in the batch gets a code, without creating a duplicate record."
+      width="md"
+      footer={
+        result ? (
+          <Button onClick={onClose}>Done</Button>
+        ) : (
+          <>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" form="enable-existing-form" disabled={submitting || !courseId || !batchId}>
+              {submitting ? "Enabling…" : "Enable self-fill"}
+            </Button>
+          </>
+        )
+      }
+    >
+      {result ? (
+        <div className="space-y-3">
+          {result.students.length > 0 ? (
+            <div className="rounded-xl border border-success/30 bg-success-soft px-3.5 py-2.5 text-sm text-success">
+              {result.students.length} student{result.students.length === 1 ? "" : "s"} enabled. Export the roster from the
+              previous screen to print their IDs and codes.
+            </div>
+          ) : (
+            <div className="rounded-xl border border-border bg-muted px-3.5 py-2.5 text-sm text-muted-foreground">
+              Nobody new to enable — every active student in this batch already has self-fill on.
+            </div>
+          )}
+          {result.alreadyEnabledCount > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {result.alreadyEnabledCount} student{result.alreadyEnabledCount === 1 ? " was" : "s were"} already enabled and
+              left untouched — their existing code still works.
+            </p>
+          )}
+          {result.students.length > 0 && <PinResultTable rows={result.students} />}
+        </div>
+      ) : (
+        <form id="enable-existing-form" onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Dropdown
+              label="Course"
+              value={courseId}
+              onChange={setCourseId}
+              options={courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))}
+              placeholder="Select course…"
+            />
+            <Dropdown
+              label="Batch"
+              value={batchId}
+              onChange={setBatchId}
+              options={batches.map((b) => ({ value: b.id, label: b.name }))}
+              placeholder={courseId ? "Select batch…" : "Pick a course first"}
+              disabled={!courseId}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Every currently-active student in this batch who doesn&apos;t already have self-fill on will get a fresh code.
+            Students who&apos;ve already had self-fill enabled (or already filled everything in) are left alone.
+          </p>
           {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
         </form>
       )}

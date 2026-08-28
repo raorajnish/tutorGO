@@ -524,6 +524,79 @@ studentsRouter.post(
   }
 );
 
+const enableSelfFillSchema = z.object({
+  courseId: z.string().min(1, "Course is required"),
+  batchId: z.string().min(1, "Batch is required"),
+});
+
+/** For students admitted the normal way (via AdmitModal) with incomplete
+ * details, rather than the brand-new-student path above — retrofits
+ * self-fill onto their existing row instead of creating a duplicate.
+ * Idempotent: students already selfFillEligible are left untouched so a
+ * re-run over the same batch doesn't burn a fresh PIN on someone who
+ * already has (or already used) one. */
+studentsRouter.post(
+  "/self-fill/enable",
+  requireModule("ADMISSION"),
+  validateBody(enableSelfFillSchema),
+  async (req, res, next) => {
+    try {
+      const body = req.body as z.infer<typeof enableSelfFillSchema>;
+      const instituteId = req.tenantId!;
+
+      const course = await prisma.course.findUnique({ where: { id: body.courseId } });
+      if (!course || course.instituteId !== instituteId) throw ApiError.badRequest("Course not found");
+      const batch = await prisma.batch.findUnique({ where: { id: body.batchId } });
+      if (!batch || batch.instituteId !== instituteId) throw ApiError.badRequest("Batch not found");
+      if (batch.courseId !== body.courseId) throw ApiError.badRequest("Selected batch does not belong to the selected course");
+
+      const batchScope = {
+        instituteId,
+        courseId: body.courseId,
+        isActive: true,
+        batches: { some: { batchId: body.batchId, leftAt: null } },
+      } as const;
+
+      const [candidates, alreadyEnabledCount] = await Promise.all([
+        prisma.student.findMany({
+          where: { ...batchScope, selfFillEligible: false },
+          select: { id: true, name: true, studentCode: true },
+        }),
+        prisma.student.count({ where: { ...batchScope, selfFillEligible: true } }),
+      ]);
+
+      const enabled = await prisma.$transaction(
+        candidates.map((s) =>
+          prisma.student.update({
+            where: { id: s.id },
+            data: { selfFillEligible: true, selfFillPin: generateSelfFillPin(), selfFillAttempts: 0, selfFillLockedAt: null },
+            select: { id: true, name: true, studentCode: true, selfFillPin: true },
+          })
+        )
+      );
+
+      if (enabled.length > 0) {
+        await auditLog({
+          action: "STUDENTS_SELF_FILL_ENABLED",
+          instituteId,
+          organizationId: req.user!.organizationId,
+          userId: req.user!.id,
+          targetType: "Batch",
+          targetId: batch.id,
+          metadata: { courseId: body.courseId, count: enabled.length },
+        });
+      }
+
+      res.status(201).json({
+        students: enabled.map((s) => ({ id: s.id, name: s.name, studentCode: s.studentCode, selfFillPin: s.selfFillPin! })),
+        alreadyEnabledCount,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 /** Lets staff re-open a completed self-fill profile for correction — clears
  * the completion lock so the student can submit again, without touching any
  * of the data they already filled in (that stays until overwritten by the
