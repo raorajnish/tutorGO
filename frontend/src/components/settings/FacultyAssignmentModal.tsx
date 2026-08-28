@@ -91,6 +91,11 @@ export function FacultyAssignmentModal({ faculty, onClose }: Props) {
     }
   }
 
+  // New assignments only offer active courses; one already assigned before
+  // its course was deactivated stays visible (labeled) so it can still be
+  // seen/unassigned. See changes-phase8.md §8b.
+  const pickableCourses = courses.filter((c) => c.isActive || state[c.id]?.assigned);
+
   return (
     <Modal
       open={!!faculty}
@@ -113,15 +118,15 @@ export function FacultyAssignmentModal({ faculty, onClose }: Props) {
 
       {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
 
-      {!loading && courses.length === 0 && (
+      {!loading && pickableCourses.length === 0 && (
         <p className="rounded-xl border border-dashed border-border px-3.5 py-6 text-center text-sm text-muted-foreground">
           No courses set up yet — create one on the Academics page first.
         </p>
       )}
 
-      {!loading && courses.length > 0 && (
+      {!loading && pickableCourses.length > 0 && (
         <div className="space-y-3">
-          {courses.map((c) => {
+          {pickableCourses.map((c) => {
             const courseState = state[c.id];
             return (
               <div key={c.id} className="rounded-xl border border-border">
@@ -134,6 +139,7 @@ export function FacultyAssignmentModal({ faculty, onClose }: Props) {
                   />
                   <span className="font-medium text-foreground">
                     {c.name} <span className="text-muted-foreground">({c.code})</span>
+                    {!c.isActive && <span className="text-xs text-muted-foreground"> — inactive</span>}
                   </span>
                 </label>
 

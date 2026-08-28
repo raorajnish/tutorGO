@@ -8,6 +8,7 @@ interface AuthContextValue {
   user: MeResponse | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<MeResponse>;
+  loginWithToken: (token: string) => Promise<MeResponse>;
   logout: () => void;
   refresh: () => Promise<void>;
   enterInstitute: (instituteId: string) => Promise<void>;
@@ -44,6 +45,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return me;
   }, []);
 
+  const loginWithToken = useCallback(async (token: string) => {
+    setToken(token);
+    const me = await apiFetch<MeResponse>("/auth/me");
+    setUser(me);
+    return me;
+  }, []);
+
   const logout = useCallback(() => {
     clearToken();
     setUser(null);
@@ -67,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refresh, enterInstitute, exitInstitute }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithToken, logout, refresh, enterInstitute, exitInstitute }}>
       {children}
     </AuthContext.Provider>
   );

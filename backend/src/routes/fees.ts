@@ -6,7 +6,6 @@ import { ApiError } from "../lib/http.js";
 import { authenticate, requireInstitute, requireModule, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
 import { nextReceiptNumber } from "../services/receiptNumber.js";
-import { allocateWaterfall } from "../services/waterfallAllocation.js";
 import { money } from "../lib/money.js";
 import { loadUserRefs } from "../lib/userRefs.js";
 
@@ -56,6 +55,7 @@ function serializeInstallment(inst: {
   amount: Prisma.Decimal;
   paidAmount: Prisma.Decimal;
   waived: boolean;
+  adjustedFromPrevious: boolean;
 }) {
   return {
     id: inst.id,
@@ -65,6 +65,7 @@ function serializeInstallment(inst: {
     amount: money(inst.amount),
     paidAmount: money(inst.paidAmount),
     waived: inst.waived,
+    adjustedFromPrevious: inst.adjustedFromPrevious,
     status: installmentStatus(inst, todayDateOnly()),
   };
 }
@@ -558,44 +559,56 @@ const recordPaymentSchema = z.object({
   notes: z.string().max(300).optional(),
 });
 
+interface CarryForwardEntry {
+  installmentId: string;
+  seq: number;
+  dueDate: Date;
+  amount: string;
+  created: boolean;
+  removed: boolean;
+}
+
 feesRouter.post("/payments", requireRoles(...MANAGE_ROLES), validateBody(recordPaymentSchema), async (req, res, next) => {
   try {
     const body = req.body as z.infer<typeof recordPaymentSchema>;
     const instituteId = req.tenantId!;
     const account = await loadFeeAccount(body.studentId, instituteId);
+    const paymentAmount = new Prisma.Decimal(body.amount);
 
     const installments = await prisma.feeInstallment.findMany({
       where: { feeAccountId: account.id, waived: false },
       orderBy: { seq: "asc" },
     });
 
-    // Waterfall: fill the earliest open installment first, roll any excess
-    // into the next one, and so on — this is what lets "pay ₹14,000 against
-    // a ₹10,500 installment" correctly close it and carry ₹3,500 forward
-    // instead of over-crediting a single installment past its target. Fees
-    // rejects any leftover past the last installment (unlike Payroll, which
-    // accepts it as a credit — see services/waterfallAllocation.ts).
-    const { allocations: rawAllocations, leftover } = allocateWaterfall(
-      installments.map((inst) => ({ id: inst.id, outstanding: inst.amount.minus(inst.paidAmount) })),
-      new Prisma.Decimal(body.amount)
-    );
-    const allocations = rawAllocations.map((a) => ({ installmentId: a.id, amount: a.amount }));
+    // A payment always targets exactly ONE installment — the earliest open
+    // one — and closes it at exactly what was paid, whether that's less or
+    // more than its quoted amount. The difference (either direction) shifts
+    // onto the installment(s) after it: a shortfall grows the next one (or
+    // creates one), an overpayment shrinks later ones (removing any that
+    // get fully absorbed). A payment never spans/closes a second installment
+    // on its own — see changes-phase8.md §8a.
+    const target = installments.find((i) => i.paidAmount.lt(i.amount));
+    if (!target) throw ApiError.badRequest("Every installment on this plan is already paid");
 
-    if (allocations.length === 0) throw ApiError.badRequest("Every installment on this plan is already paid");
-    if (leftover.gt(0)) {
-      const applicable = new Prisma.Decimal(body.amount).minus(leftover);
+    const totalOutstanding = installments.reduce((sum, i) => sum.plus(i.amount.minus(i.paidAmount)), new Prisma.Decimal(0));
+    if (paymentAmount.gt(totalOutstanding)) {
       throw ApiError.badRequest(
-        `Amount exceeds the remaining balance on this plan — only ₹${money(applicable)} of ₹${money(body.amount)} could be applied`
+        `Amount exceeds the remaining balance on this plan — only ₹${money(totalOutstanding)} of ₹${money(paymentAmount)} could be applied`
       );
     }
 
-    const paymentId = await prisma.$transaction(async (tx) => {
+    const targetOutstanding = target.amount.minus(target.paidAmount);
+    const diff = paymentAmount.minus(targetOutstanding); // >0 overpay, <0 shortfall, 0 exact
+    const targetNewPaid = target.paidAmount.plus(paymentAmount);
+    const later = installments.filter((i) => i.seq > target.seq);
+
+    const { paymentId, carryForward } = await prisma.$transaction(async (tx) => {
       const receiptNumber = await nextReceiptNumber(tx, instituteId, body.paidOn);
       const created = await tx.payment.create({
         data: {
           instituteId,
           feeAccountId: account.id,
-          amount: new Prisma.Decimal(body.amount),
+          amount: paymentAmount,
           mode: body.mode,
           paidOn: body.paidOn,
           receiptNumber,
@@ -604,17 +617,71 @@ feesRouter.post("/payments", requireRoles(...MANAGE_ROLES), validateBody(recordP
         },
       });
 
-      for (const a of allocations) {
-        await tx.paymentAllocation.create({ data: { paymentId: created.id, installmentId: a.installmentId, amount: a.amount } });
-        await tx.feeInstallment.update({ where: { id: a.installmentId }, data: { paidAmount: { increment: a.amount } } });
+      await tx.paymentAllocation.create({ data: { paymentId: created.id, installmentId: target.id, amount: paymentAmount } });
+      // Always closes: paidAmount === amount from here on, so it reads
+      // "PAID" under the existing derived-status logic, never "PARTIAL".
+      await tx.feeInstallment.update({ where: { id: target.id }, data: { paidAmount: targetNewPaid, amount: targetNewPaid } });
+
+      let carryForward: { direction: "shortfall" | "overpay"; amount: string; entries: CarryForwardEntry[] } | null = null;
+
+      if (diff.lt(0)) {
+        const shortfall = diff.neg();
+        const next = later[0];
+        if (next) {
+          const updated = await tx.feeInstallment.update({
+            where: { id: next.id },
+            data: { amount: { increment: shortfall }, adjustedFromPrevious: true },
+          });
+          carryForward = {
+            direction: "shortfall",
+            amount: money(shortfall)!,
+            entries: [{ installmentId: updated.id, seq: updated.seq, dueDate: updated.dueDate, amount: money(shortfall)!, created: false, removed: false }],
+          };
+        } else {
+          const lastOverall = installments[installments.length - 1]!;
+          const billingDay = account.billingDay ?? lastOverall.dueDate.getUTCDate();
+          const newDueDate = addMonthsCapped(lastOverall.dueDate, 1, billingDay);
+          const createdInst = await tx.feeInstallment.create({
+            data: { feeAccountId: account.id, seq: lastOverall.seq + 1, dueDate: newDueDate, amount: shortfall, adjustedFromPrevious: true },
+          });
+          carryForward = {
+            direction: "shortfall",
+            amount: money(shortfall)!,
+            entries: [{ installmentId: createdInst.id, seq: createdInst.seq, dueDate: createdInst.dueDate, amount: money(shortfall)!, created: true, removed: false }],
+          };
+        }
+      } else if (diff.gt(0)) {
+        // The totalOutstanding guard above guarantees `later` has enough
+        // combined amount to fully absorb `diff` — never rejects mid-cascade.
+        let remaining = diff;
+        const entries: CarryForwardEntry[] = [];
+        for (const l of later) {
+          if (remaining.lte(0)) break;
+          const reducible = Prisma.Decimal.min(remaining, l.amount);
+          if (reducible.gte(l.amount)) {
+            await tx.feeInstallment.delete({ where: { id: l.id } });
+            entries.push({ installmentId: l.id, seq: l.seq, dueDate: l.dueDate, amount: money(reducible)!, created: false, removed: true });
+          } else {
+            const updated = await tx.feeInstallment.update({
+              where: { id: l.id },
+              data: { amount: { decrement: reducible }, adjustedFromPrevious: true },
+            });
+            entries.push({ installmentId: updated.id, seq: updated.seq, dueDate: updated.dueDate, amount: money(reducible)!, created: false, removed: false });
+          }
+          remaining = remaining.minus(reducible);
+        }
+        carryForward = { direction: "overpay", amount: money(diff)!, entries };
       }
 
-      return created.id;
+      return { paymentId: created.id, carryForward };
     });
 
     const fullPayment = await prisma.payment.findUnique({ where: { id: paymentId }, include: paymentInclude });
     const createdBy = await prisma.user.findUnique({ where: { id: req.user!.id }, select: { id: true, fullName: true } });
-    res.status(201).json(serializePayment({ ...fullPayment!, createdBy: createdBy ?? null, voidedBy: null }));
+    res.status(201).json({
+      ...serializePayment({ ...fullPayment!, createdBy: createdBy ?? null, voidedBy: null }),
+      carryForward,
+    });
   } catch (err) {
     next(err);
   }
@@ -711,43 +778,15 @@ feesRouter.get("/payments/:id/receipt", async (req, res, next) => {
 
 const voidPaymentSchema = z.object({ reason: z.string().min(1, "A reason is required").max(300) });
 
-feesRouter.post("/payments/:id/void", requireRoles(...STRICT_ROLES), validateBody(voidPaymentSchema), async (req, res, next) => {
-  try {
-    const instituteId = req.tenantId!;
-    const body = req.body as z.infer<typeof voidPaymentSchema>;
-
-    const payment = await prisma.payment.findUnique({ where: { id: req.params.id as string }, include: { allocations: true } });
-    if (!payment || payment.instituteId !== instituteId) throw ApiError.notFound("Payment not found");
-    if (payment.voidedAt) throw ApiError.badRequest("This payment is already voided");
-
-    const paymentId = await prisma.$transaction(async (tx) => {
-      for (const a of payment.allocations) {
-        const inst = await tx.feeInstallment.findUnique({ where: { id: a.installmentId } });
-        if (inst) {
-          const newPaid = Prisma.Decimal.max(0, inst.paidAmount.minus(a.amount));
-          await tx.feeInstallment.update({ where: { id: inst.id }, data: { paidAmount: newPaid } });
-        }
-      }
-
-      const updated = await tx.payment.update({
-        where: { id: payment.id },
-        data: { voidedAt: new Date(), voidReason: body.reason, voidedByUserId: req.user!.id },
-      });
-      return updated.id;
-    });
-
-    const fullPayment = await prisma.payment.findUnique({ where: { id: paymentId }, include: paymentInclude });
-    const userRefs = await loadUserRefs([fullPayment!.createdByUserId, fullPayment!.voidedByUserId]);
-    res.json(
-      serializePayment({
-        ...fullPayment!,
-        createdBy: fullPayment!.createdByUserId ? (userRefs.get(fullPayment!.createdByUserId) ?? null) : null,
-        voidedBy: fullPayment!.voidedByUserId ? (userRefs.get(fullPayment!.voidedByUserId) ?? null) : null,
-      })
-    );
-  } catch (err) {
-    next(err);
-  }
+// Disabled for now: a payment's carry-forward settlement (§8a) can grow,
+// shrink, create, or delete OTHER installments beyond the one it directly
+// allocates to, and none of that is currently reversible — undoing only
+// paidAmount would leave the plan's amounts corrupted. Re-enable once
+// voiding can cleanly reverse the full settlement, not just the allocation
+// (needs a stored snapshot of what each payment changed). See
+// changes-phase8.md §8a.
+feesRouter.post("/payments/:id/void", requireRoles(...STRICT_ROLES), validateBody(voidPaymentSchema), async (_req, _res, next) => {
+  next(ApiError.badRequest("Voiding a payment is temporarily disabled — contact support if this payment needs correcting."));
 });
 
 // ---------------------------------------------------------------------------

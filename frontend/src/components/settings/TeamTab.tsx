@@ -7,12 +7,17 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FacultyAssignmentModal } from "@/components/settings/FacultyAssignmentModal";
+import { SendReminderModal } from "@/components/settings/SendReminderModal";
+import { useAuth } from "@/lib/auth-context";
 import { TEAM_ROLES, TEAM_ROLE_LABELS, type TeamMember, type TeamRole } from "@/lib/types";
 
 export function TeamTab() {
+  const { user: currentUser } = useAuth();
+  const canManage = currentUser?.role === "OWNER" || currentUser?.role === "ADMIN";
   const [team, setTeam] = useState<TeamMember[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [reminderOpen, setReminderOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [assignFaculty, setAssignFaculty] = useState<TeamMember | null>(null);
 
@@ -42,9 +47,16 @@ export function TeamTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">Admins, accountants, faculty and reception for this institute.</p>
-        <Button onClick={() => setInviteOpen(true)}>Invite team member</Button>
+        {canManage && (
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button variant="secondary" onClick={() => setReminderOpen(true)}>
+              Send announcement
+            </Button>
+            <Button onClick={() => setInviteOpen(true)}>Invite team member</Button>
+          </div>
+        )}
       </div>
 
       {error && <div className="rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{error}</div>}
@@ -74,14 +86,17 @@ export function TeamTab() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
-                    {m.role === "FACULTY" && (
+                    {m.role === "FACULTY" && canManage && (
                       <Button variant="ghost" onClick={() => setAssignFaculty(m)}>
                         Assign courses
                       </Button>
                     )}
-                    <Button variant="ghost" disabled={busyId === m.id} onClick={() => toggleActive(m)}>
-                      {m.isActive ? "Deactivate" : "Activate"}
-                    </Button>
+                    {canManage && m.id !== currentUser?.id && (
+                      <Button variant="ghost" disabled={busyId === m.id} onClick={() => toggleActive(m)}>
+                        {m.isActive ? "Deactivate" : "Activate"}
+                      </Button>
+                    )}
+                    {m.id === currentUser?.id && <span className="self-center text-xs text-muted-foreground">This is you</span>}
                   </div>
                 </td>
               </tr>
@@ -98,6 +113,8 @@ export function TeamTab() {
       </div>
 
       <InviteTeamModal open={inviteOpen} onClose={() => setInviteOpen(false)} onInvited={load} />
+
+      <SendReminderModal open={reminderOpen} onClose={() => setReminderOpen(false)} />
 
       <FacultyAssignmentModal faculty={assignFaculty} onClose={() => setAssignFaculty(null)} />
     </div>

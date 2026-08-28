@@ -9,6 +9,7 @@ import { sendMail, invalidateEmailConfigCache } from "../services/mailer.js";
 import { inviteEmailHtml } from "../lib/emailTemplates.js";
 import { auditLog } from "../services/audit.js";
 import { assertRoleCapacity } from "../services/planLimits.js";
+import { seedDefaultExpenseCategories } from "../lib/expenseDefaults.js";
 import { instituteCodeSchema } from "./organization.js";
 
 export const platformRouter = Router();
@@ -278,6 +279,8 @@ platformRouter.post("/organizations", validateBody(createOrganizationSchema), as
           isActive: selectedModules.has(m.code),
         })),
       });
+
+      await seedDefaultExpenseCategories(tx, institute.id);
 
       if (adminEmail && body.admin) {
         adminTempPassword = generateTempPassword();
@@ -598,6 +601,8 @@ platformRouter.post("/organizations/:id/institutes", validateBody(addInstituteSc
       await tx.instituteModule.createMany({
         data: allModules.map((m) => ({ instituteId: created.id, moduleId: m.id, isActive: selected.has(m.code) })),
       });
+
+      await seedDefaultExpenseCategories(tx, created.id);
 
       return created;
     });
@@ -1017,6 +1022,94 @@ platformRouter.put("/email-config", validateBody(emailConfigSchema), async (req,
       fromEmail: config.fromEmail,
       updatedAt: config.updatedAt,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Subscriptions — one screen for every institute's plan, usage and modules
+// ---------------------------------------------------------------------------
+
+/// Rolls up every institute with its plan, live headcount against each cap,
+/// and active modules, so the platform admin can see who's at their limit
+/// (and who should be upsold) without opening each institute one at a time.
+platformRouter.get("/subscriptions", async (req, res, next) => {
+  try {
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
+    const planCode = typeof req.query.planCode === "string" ? req.query.planCode : undefined;
+
+    const institutes = await prisma.institute.findMany({
+      where: {
+        planId: planCode ? (await prisma.plan.findUnique({ where: { code: planCode } }))?.id ?? "__none__" : undefined,
+        ...(search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { code: { contains: search, mode: "insensitive" } },
+                { organization: { name: { contains: search, mode: "insensitive" } } },
+              ],
+            }
+          : {}),
+      },
+      include: {
+        organization: { select: { id: true, name: true, code: true } },
+        plan: true,
+        modules: { where: { isActive: true }, include: { module: { select: { code: true } } } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const [roleCounts, studentCounts] = await Promise.all([
+      prisma.user.groupBy({
+        by: ["instituteId", "role"],
+        where: { isActive: true, role: { in: ["ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION"] } },
+        _count: { _all: true },
+      }),
+      prisma.student.groupBy({ by: ["instituteId"], where: { isActive: true }, _count: { _all: true } }),
+    ]);
+
+    const usedByInstitute = new Map<string, Record<string, number>>();
+    for (const row of roleCounts) {
+      if (!row.instituteId) continue;
+      const entry = usedByInstitute.get(row.instituteId) ?? {};
+      entry[row.role] = row._count._all;
+      usedByInstitute.set(row.instituteId, entry);
+    }
+    const studentsByInstitute = new Map(studentCounts.map((s) => [s.instituteId, s._count._all]));
+
+    res.json(
+      institutes.map((i) => {
+        const used = usedByInstitute.get(i.id) ?? {};
+        const students = studentsByInstitute.get(i.id) ?? 0;
+        const limits = i.plan
+          ? {
+              ADMIN: { used: used.ADMIN ?? 0, max: i.plan.maxAdmins },
+              ACCOUNTANT: { used: used.ACCOUNTANT ?? 0, max: i.plan.maxAccountants },
+              FACULTY: { used: used.FACULTY ?? 0, max: i.plan.maxFaculty },
+              RECEPTION: { used: used.RECEPTION ?? 0, max: i.plan.maxReception },
+              STUDENT: { used: students, max: i.plan.maxStudents },
+            }
+          : null;
+
+        return {
+          id: i.id,
+          code: i.code,
+          name: i.name,
+          city: i.city,
+          isActive: i.isActive,
+          onboardingDone: i.onboardingDone,
+          createdAt: i.createdAt,
+          organization: i.organization,
+          plan: i.plan ? { id: i.plan.id, code: i.plan.code, name: i.plan.name } : null,
+          limits,
+          // Anyone at or over a cap can't add more of that role — the signal
+          // that they've outgrown their tier.
+          atLimit: limits ? Object.values(limits).some((l) => l.used >= l.max) : false,
+          activeModules: i.modules.map((m) => m.module.code),
+        };
+      })
+    );
   } catch (err) {
     next(err);
   }

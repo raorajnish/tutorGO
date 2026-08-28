@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
 import { ActivityTimeline } from "@/components/enquiries/ActivityTimeline";
 import { ENQUIRY_SOURCES, ENQUIRY_SOURCE_LABELS, MAX_NOTE_LENGTH, type Course, type Enquiry } from "@/lib/types";
+import { courseOptions } from "@/lib/courses";
 
 interface Props {
   open: boolean;
@@ -95,7 +96,7 @@ export function EnquiryModal({ open, onClose, onSaved, editing, courses }: Props
           label="Course interested (optional)"
           value={courseId}
           onChange={setCourseId}
-          options={courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))}
+          options={courseOptions(courses, editing?.course)}
           placeholder="Select course…"
         />
 

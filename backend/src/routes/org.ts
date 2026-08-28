@@ -9,6 +9,8 @@ import { sendMail, invalidateInstituteEmailConfigCache } from "../services/maile
 import { inviteEmailHtml } from "../lib/emailTemplates.js";
 import { auditLog } from "../services/audit.js";
 import { assertRoleCapacity, type CappedRole } from "../services/planLimits.js";
+import { notify } from "../services/notify.js";
+import { sendPush } from "../services/push.js";
 import { DEFAULT_MESSAGE_TEMPLATES, MESSAGE_TEMPLATE_TYPES } from "../lib/messageTemplates.js";
 import type { MessageTemplateType } from "../generated/prisma/enums.js";
 
@@ -234,9 +236,14 @@ orgRouter.patch(
         throw ApiError.notFound("Team member not found in this institute");
       }
 
+      const body = req.body as z.infer<typeof updateTeamMemberSchema>;
+      if (body.isActive === false && member.id === req.user!.id) {
+        throw ApiError.badRequest("You can't deactivate your own account.", "SELF_DEACTIVATION");
+      }
+
       const updated = await prisma.user.update({
         where: { id: member.id },
-        data: req.body as z.infer<typeof updateTeamMemberSchema>,
+        data: body,
       });
 
       res.json({ id: updated.id, isActive: updated.isActive });
@@ -433,6 +440,74 @@ orgRouter.put("/email-config", requireRoles("OWNER", "ADMIN"), validateBody(inst
       isEnabled: config.isEnabled,
       updatedAt: config.updatedAt,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Reminder broadcasts — an ad-hoc in-app notification to staff
+// ---------------------------------------------------------------------------
+
+// Students never get a User row (login is deferred), and Notification.userId
+// is a required FK to User — so students structurally cannot be a broadcast
+// target. TEAM_ROLES is exactly the set of roles that have accounts.
+const reminderSchema = z.object({
+  title: z.string().min(1, "Title is required").max(120),
+  body: z.string().min(1, "Message is required").max(1000),
+  roles: z.array(z.enum(TEAM_ROLES)).min(1, "Pick at least one group to notify"),
+});
+
+orgRouter.post("/reminders", requireRoles("OWNER", "ADMIN"), validateBody(reminderSchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof reminderSchema>;
+    const instituteId = req.tenantId!;
+
+    const recipients = await prisma.user.findMany({
+      where: { instituteId, isActive: true, role: { in: body.roles } },
+      select: { id: true },
+    });
+
+    for (const r of recipients) {
+      await notify({
+        instituteId,
+        userId: r.id,
+        type: "REMINDER",
+        title: body.title,
+        body: body.body,
+        metadata: { sentByName: req.user!.fullName },
+      });
+      // No-op until push is fully wired (see services/push.ts) — the in-app
+      // notification above is already a complete, reliable delivery on its own.
+      await sendPush({ userId: r.id, title: body.title, body: body.body });
+    }
+
+    await auditLog({
+      action: "REMINDER_BROADCAST",
+      instituteId,
+      userId: req.user!.id,
+      targetType: "Institute",
+      targetId: instituteId,
+      metadata: { roles: body.roles, recipients: recipients.length, title: body.title },
+    });
+
+    res.json({ sentCount: recipients.length });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/// Headcount per role, so the compose screen can show "Faculty (12)" before
+/// the admin commits to sending.
+orgRouter.get("/reminders/audience", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const counts = await prisma.user.groupBy({
+      by: ["role"],
+      where: { instituteId: req.tenantId!, isActive: true, role: { in: [...TEAM_ROLES] } },
+      _count: { _all: true },
+    });
+    const byRole = Object.fromEntries(counts.map((c) => [c.role, c._count._all]));
+    res.json(TEAM_ROLES.map((role) => ({ role, count: byRole[role] ?? 0 })));
   } catch (err) {
     next(err);
   }

@@ -5,16 +5,50 @@
 > lives only in the code (see `git log` / the routers themselves for reference). Update this doc
 > as decisions change; it's a working doc, not a permanent record.
 
-## Status: 4a (Attendance) implemented — 5a (Fees) not started
+## Status (verified 2026-08-28): everything below is IMPLEMENTED. What's left lives in separate files.
 
-§2–§3 (Attendance schema + API) and the `/attendance` frontend are built and smoke-tested:
-lecture scheduling (faculty self-resolve + role-scoped `facultyId` checks), roster derivation
-from `StudentBatch` history, mixed-status marking via transactional upsert, "mark all present,"
-and the daily summary endpoint — all verified end-to-end via a real faculty login (schedule →
-roster → mark → re-mark → summary counts recompute correctly), plus the FACULTY-can-only-touch-
-own-lectures restriction confirmed with a second faculty account (403 on mark/delete of another
-faculty's lecture), plus unauthenticated/no-institute-session 401/403 checks. `tsc`/`eslint`/
-`next build` all clean. §4–§6 (Fees) is planned but not started.
+This top status line was stale for a long time (it used to say "5a Fees not started" — wrong, Fees
+has been fully built for a while). Re-verified against the actual code on 2026-08-28:
+
+- **4a Attendance** — implemented. `backend/src/routes/attendance.ts`: lecture scheduling
+  (faculty self-resolve + role-scoped `facultyId` checks), roster derivation from `StudentBatch`
+  history, mixed-status marking via transactional upsert, "mark all present," daily
+  summary/stats. `/attendance` frontend (9 components) built. Smoke-tested end-to-end previously
+  (schedule → roster → mark → re-mark → summary recompute; FACULTY-scoped 403 checks;
+  unauthenticated 401/403 checks).
+- **5a Fees** — implemented. `backend/src/routes/fees.ts`: account setup, installment
+  reschedule/waive/delete, payment recording via waterfall allocation, void, receipts, overdue.
+  `/fees` frontend (10 components) built.
+- **Payroll addendum** — implemented. `backend/src/routes/payroll.ts`: SalaryProfile CRUD +
+  rate history, pay/void, staff ledger, my-payslips, full PayrollRun lifecycle. `/payroll`
+  frontend (8 components) built.
+- **Expenses addendum** — implemented. `backend/src/routes/expenses.ts`: categories, events,
+  expenses, `/ledger` + `/ledger/export.csv`. `/expenses` frontend built.
+- **Two items this doc had flagged as "owed"/"out of scope" are actually done too**:
+  `backend/src/services/waterfallAllocation.ts` exists (the extraction promised in §9/Build-order
+  of the Payroll addendum happened), and the combined Ledger CSV export
+  (`GET /expenses/ledger/export.csv` + `LedgerTab.tsx`'s Export button) exists, contradicting
+  §10's "Combined Ledger view + CSV export... explicitly out of scope this pass" note below —
+  leaving that note as historical record, but it's done now.
+- Academics, Admissions, and Enquiry (pre-date this doc) are present and non-trivial — confirmed
+  still intact, not touched by anything above.
+
+**What's NOT implemented yet** — planned but not built, tracked in separate files so new work and
+its related pieces get built together without re-deriving context each time:
+
+- **`changes-phase8.md`** — installment carry-forward settlement, inactive-course guards
+  everywhere, subject-wise-fees design note (deferred), reminders + scheduler, distribution
+  tracking (books/bags/T-shirts), self-service admission-form links. Recommended order inside
+  that file: 8a → 8b → 8d → 8e → 8f (8c deferred).
+- **`changes-phase9.md`** — gaps found during review, sequenced after Phase 8: WhatsApp/SMS
+  messaging, low-attendance alerts, role/permission audit, document storage, data export/backup,
+  audit trail for money-adjacent edits (flagged to build alongside 8a, not deferred), test-result
+  → parent notification.
+
+When implementing an item from either file, keep its related pieces together in the same pass
+(e.g. 8a's carry-forward logic + 9f's audit trail, per that file's own note) rather than splitting
+them across sessions — update the relevant phase file's status as each piece lands, the same way
+this section now reflects reality instead of the stale line it replaced.
 
 ## 0. Scope & sequencing
 
@@ -1370,4 +1404,5 @@ add/rename/deactivate, same shape as `Settings` tabs elsewhere). `navigation.ts`
    status transitions and that reopening doesn't touch already-made payments; create an expense →
    confirm a matching `FinanceEntry` row exists → edit/delete it → confirm the mirror follows;
    cross-institute isolation checks throughout, same rigor as every prior phase.
+
 

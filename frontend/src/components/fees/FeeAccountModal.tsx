@@ -64,7 +64,11 @@ export function FeeAccountModal({ studentId, onClose }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId]);
 
-  const canVoid = user?.role === "OWNER" || user?.role === "ADMIN";
+  // Voiding is temporarily disabled backend-side (fees.ts POST /payments/:id/void)
+  // — a payment's carry-forward settlement can touch other installments
+  // (grow/shrink/create/delete) that a void can't yet cleanly reverse. Hidden
+  // here rather than left visible to just fail on click. See changes-phase8.md §8a.
+  const canVoid = false;
   const account = data?.account;
 
   return (

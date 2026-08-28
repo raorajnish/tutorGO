@@ -80,7 +80,7 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
     setError(null);
     setScheduled(null);
 
-    apiFetch<Course[]>("/academics/courses").then(setCourses);
+    apiFetch<Course[]>("/academics/courses?active=true").then(setCourses);
     if (!isFaculty) apiFetch<FacultyRef[]>("/attendance/faculty").then(setFaculty);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, defaultDate, isFaculty]);

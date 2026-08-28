@@ -30,8 +30,14 @@ const subjectCodeSchema = z
 
 academicsRouter.get("/courses", async (req, res, next) => {
   try {
+    // ?active=true scopes to courses that can still be picked for new work
+    // (enquiries, admissions, fee structures, subjects, batches, lectures,
+    // tests). Omit it for management/reporting views that need inactive
+    // courses too (Courses tab itself, existing students/records). See
+    // changes-phase8.md §8b.
+    const activeOnly = req.query.active === "true";
     const courses = await prisma.course.findMany({
-      where: { instituteId: req.tenantId! },
+      where: { instituteId: req.tenantId!, isActive: activeOnly ? true : undefined },
       include: {
         _count: { select: { batches: true, students: true, subjects: true } },
       },

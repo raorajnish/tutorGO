@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/Button";
 import type { AdmitStudentPayload, Batch, Course, Enquiry } from "@/lib/types";
+import { courseOptions } from "@/lib/courses";
 
 interface Props {
   open: boolean;
@@ -142,7 +143,7 @@ export function AdmitModal({ open, onClose, onAdmitted, courses, enquiry }: Prop
             label="Course (class/standard)"
             value={courseId}
             onChange={setCourseId}
-            options={courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))}
+            options={courseOptions(courses, enquiry?.course)}
             placeholder="Select course…"
           />
           <Dropdown

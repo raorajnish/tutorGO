@@ -52,6 +52,7 @@ export type FeeInstallmentMinAggregateOutputType = {
   amount: runtime.Decimal | null
   paidAmount: runtime.Decimal | null
   waived: boolean | null
+  adjustedFromPrevious: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -65,6 +66,7 @@ export type FeeInstallmentMaxAggregateOutputType = {
   amount: runtime.Decimal | null
   paidAmount: runtime.Decimal | null
   waived: boolean | null
+  adjustedFromPrevious: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -78,6 +80,7 @@ export type FeeInstallmentCountAggregateOutputType = {
   amount: number
   paidAmount: number
   waived: number
+  adjustedFromPrevious: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -105,6 +108,7 @@ export type FeeInstallmentMinAggregateInputType = {
   amount?: true
   paidAmount?: true
   waived?: true
+  adjustedFromPrevious?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +122,7 @@ export type FeeInstallmentMaxAggregateInputType = {
   amount?: true
   paidAmount?: true
   waived?: true
+  adjustedFromPrevious?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -131,6 +136,7 @@ export type FeeInstallmentCountAggregateInputType = {
   amount?: true
   paidAmount?: true
   waived?: true
+  adjustedFromPrevious?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -231,6 +237,7 @@ export type FeeInstallmentGroupByOutputType = {
   amount: runtime.Decimal
   paidAmount: runtime.Decimal
   waived: boolean
+  adjustedFromPrevious: boolean
   createdAt: Date
   updatedAt: Date
   _count: FeeInstallmentCountAggregateOutputType | null
@@ -267,6 +274,7 @@ export type FeeInstallmentWhereInput = {
   amount?: Prisma.DecimalFilter<"FeeInstallment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFilter<"FeeInstallment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFilter<"FeeInstallment"> | boolean
+  adjustedFromPrevious?: Prisma.BoolFilter<"FeeInstallment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"FeeInstallment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FeeInstallment"> | Date | string
   feeAccount?: Prisma.XOR<Prisma.FeeAccountScalarRelationFilter, Prisma.FeeAccountWhereInput>
@@ -282,6 +290,7 @@ export type FeeInstallmentOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   paidAmount?: Prisma.SortOrder
   waived?: Prisma.SortOrder
+  adjustedFromPrevious?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   feeAccount?: Prisma.FeeAccountOrderByWithRelationInput
@@ -301,6 +310,7 @@ export type FeeInstallmentWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.DecimalFilter<"FeeInstallment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFilter<"FeeInstallment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFilter<"FeeInstallment"> | boolean
+  adjustedFromPrevious?: Prisma.BoolFilter<"FeeInstallment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"FeeInstallment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FeeInstallment"> | Date | string
   feeAccount?: Prisma.XOR<Prisma.FeeAccountScalarRelationFilter, Prisma.FeeAccountWhereInput>
@@ -316,6 +326,7 @@ export type FeeInstallmentOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   paidAmount?: Prisma.SortOrder
   waived?: Prisma.SortOrder
+  adjustedFromPrevious?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FeeInstallmentCountOrderByAggregateInput
@@ -337,6 +348,7 @@ export type FeeInstallmentScalarWhereWithAggregatesInput = {
   amount?: Prisma.DecimalWithAggregatesFilter<"FeeInstallment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalWithAggregatesFilter<"FeeInstallment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolWithAggregatesFilter<"FeeInstallment"> | boolean
+  adjustedFromPrevious?: Prisma.BoolWithAggregatesFilter<"FeeInstallment"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"FeeInstallment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"FeeInstallment"> | Date | string
 }
@@ -349,6 +361,7 @@ export type FeeInstallmentCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   feeAccount: Prisma.FeeAccountCreateNestedOneWithoutInstallmentsInput
@@ -364,6 +377,7 @@ export type FeeInstallmentUncheckedCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutInstallmentInput
@@ -377,6 +391,7 @@ export type FeeInstallmentUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutInstallmentsNestedInput
@@ -392,6 +407,7 @@ export type FeeInstallmentUncheckedUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutInstallmentNestedInput
@@ -406,6 +422,7 @@ export type FeeInstallmentCreateManyInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -418,6 +435,7 @@ export type FeeInstallmentUpdateManyMutationInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -431,6 +449,7 @@ export type FeeInstallmentUncheckedUpdateManyInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -459,6 +478,7 @@ export type FeeInstallmentCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paidAmount?: Prisma.SortOrder
   waived?: Prisma.SortOrder
+  adjustedFromPrevious?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -478,6 +498,7 @@ export type FeeInstallmentMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paidAmount?: Prisma.SortOrder
   waived?: Prisma.SortOrder
+  adjustedFromPrevious?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -491,6 +512,7 @@ export type FeeInstallmentMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   paidAmount?: Prisma.SortOrder
   waived?: Prisma.SortOrder
+  adjustedFromPrevious?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -548,14 +570,6 @@ export type FeeInstallmentUncheckedUpdateManyWithoutFeeAccountNestedInput = {
   deleteMany?: Prisma.FeeInstallmentScalarWhereInput | Prisma.FeeInstallmentScalarWhereInput[]
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type FeeInstallmentCreateNestedOneWithoutAllocationsInput = {
   create?: Prisma.XOR<Prisma.FeeInstallmentCreateWithoutAllocationsInput, Prisma.FeeInstallmentUncheckedCreateWithoutAllocationsInput>
   connectOrCreate?: Prisma.FeeInstallmentCreateOrConnectWithoutAllocationsInput
@@ -578,6 +592,7 @@ export type FeeInstallmentCreateWithoutFeeAccountInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutInstallmentInput
@@ -591,6 +606,7 @@ export type FeeInstallmentUncheckedCreateWithoutFeeAccountInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutInstallmentInput
@@ -634,6 +650,7 @@ export type FeeInstallmentScalarWhereInput = {
   amount?: Prisma.DecimalFilter<"FeeInstallment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFilter<"FeeInstallment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFilter<"FeeInstallment"> | boolean
+  adjustedFromPrevious?: Prisma.BoolFilter<"FeeInstallment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"FeeInstallment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FeeInstallment"> | Date | string
 }
@@ -646,6 +663,7 @@ export type FeeInstallmentCreateWithoutAllocationsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   feeAccount: Prisma.FeeAccountCreateNestedOneWithoutInstallmentsInput
@@ -660,6 +678,7 @@ export type FeeInstallmentUncheckedCreateWithoutAllocationsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -688,6 +707,7 @@ export type FeeInstallmentUpdateWithoutAllocationsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutInstallmentsNestedInput
@@ -702,6 +722,7 @@ export type FeeInstallmentUncheckedUpdateWithoutAllocationsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -714,6 +735,7 @@ export type FeeInstallmentCreateManyFeeAccountInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -726,6 +748,7 @@ export type FeeInstallmentUpdateWithoutFeeAccountInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutInstallmentNestedInput
@@ -739,6 +762,7 @@ export type FeeInstallmentUncheckedUpdateWithoutFeeAccountInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutInstallmentNestedInput
@@ -752,6 +776,7 @@ export type FeeInstallmentUncheckedUpdateManyWithoutFeeAccountInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   paidAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   waived?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  adjustedFromPrevious?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -796,6 +821,7 @@ export type FeeInstallmentSelect<ExtArgs extends runtime.Types.Extensions.Intern
   amount?: boolean
   paidAmount?: boolean
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
@@ -812,6 +838,7 @@ export type FeeInstallmentSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   amount?: boolean
   paidAmount?: boolean
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
@@ -826,6 +853,7 @@ export type FeeInstallmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   amount?: boolean
   paidAmount?: boolean
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
@@ -840,11 +868,12 @@ export type FeeInstallmentSelectScalar = {
   amount?: boolean
   paidAmount?: boolean
   waived?: boolean
+  adjustedFromPrevious?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FeeInstallmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "feeAccountId" | "seq" | "dueDate" | "originalDueDate" | "amount" | "paidAmount" | "waived" | "createdAt" | "updatedAt", ExtArgs["result"]["feeInstallment"]>
+export type FeeInstallmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "feeAccountId" | "seq" | "dueDate" | "originalDueDate" | "amount" | "paidAmount" | "waived" | "adjustedFromPrevious" | "createdAt" | "updatedAt", ExtArgs["result"]["feeInstallment"]>
 export type FeeInstallmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
   allocations?: boolean | Prisma.FeeInstallment$allocationsArgs<ExtArgs>
@@ -872,6 +901,14 @@ export type $FeeInstallmentPayload<ExtArgs extends runtime.Types.Extensions.Inte
     amount: runtime.Decimal
     paidAmount: runtime.Decimal
     waived: boolean
+    /**
+     * True when this installment's `amount` was increased by a shortfall
+     * carried forward from an earlier installment that was settled short
+     * (see fees.ts POST /payments, settleAndCarryForward) — purely a display
+     * hint so staff aren't confused why the amount doesn't match what was
+     * originally quoted; never read for any calculation.
+     */
+    adjustedFromPrevious: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["feeInstallment"]>
@@ -1307,6 +1344,7 @@ export interface FeeInstallmentFieldRefs {
   readonly amount: Prisma.FieldRef<"FeeInstallment", 'Decimal'>
   readonly paidAmount: Prisma.FieldRef<"FeeInstallment", 'Decimal'>
   readonly waived: Prisma.FieldRef<"FeeInstallment", 'Boolean'>
+  readonly adjustedFromPrevious: Prisma.FieldRef<"FeeInstallment", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"FeeInstallment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"FeeInstallment", 'DateTime'>
 }

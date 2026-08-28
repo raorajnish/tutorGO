@@ -101,7 +101,14 @@ export function InstallmentList({ studentId, installments, canWaive, canEditPlan
                     <td className="px-4 py-3 whitespace-nowrap text-foreground">{formatMoney(inst.amount)}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-foreground">{formatMoney(inst.paidAmount)}</td>
                     <td className="px-4 py-3">
-                      <Badge tone={STATUS_TONE[inst.status]}>{inst.waived ? "Waived" : inst.status}</Badge>
+                      <div className="flex flex-wrap items-center gap-1">
+                        <Badge tone={STATUS_TONE[inst.status]}>{inst.waived ? "Waived" : inst.status}</Badge>
+                        {inst.adjustedFromPrevious && (
+                          <span title="Amount changed because a neighboring installment was settled short or over">
+                            <Badge tone="neutral">Adjusted</Badge>
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-0.5">
@@ -141,7 +148,14 @@ export function InstallmentList({ studentId, installments, canWaive, canEditPlan
                     <p className="text-xs text-muted-foreground line-through">was {fmtDate(inst.originalDueDate)}</p>
                   )}
                 </div>
-                <Badge tone={STATUS_TONE[inst.status]}>{inst.waived ? "Waived" : inst.status}</Badge>
+                <div className="flex flex-wrap items-center justify-end gap-1">
+                  <Badge tone={STATUS_TONE[inst.status]}>{inst.waived ? "Waived" : inst.status}</Badge>
+                  {inst.adjustedFromPrevious && (
+                    <span title="Amount changed because a neighboring installment was settled short or over">
+                      <Badge tone="neutral">Adjusted</Badge>
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="mt-2 flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -142,7 +143,14 @@ export function FacultyLecturesView() {
                   <td className="px-4 py-3 text-foreground">
                     {l.batch.name} <span className="text-muted-foreground">· {l.batch.course.code}</span>
                   </td>
-                  <td className="px-4 py-3 text-foreground">{l.subject.name}</td>
+                  <td className="px-4 py-3 text-foreground">
+                    {l.subject.name}
+                    {l.kind === "TEST" && (
+                      <Badge tone="accent" className="ml-1.5">
+                        Test
+                      </Badge>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     {l.cancelled ? (
                       <Badge tone="danger">Cancelled</Badge>
@@ -154,7 +162,11 @@ export function FacultyLecturesView() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      {l.cancelled ? (
+                      {l.kind === "TEST" ? (
+                        <Link href={`/tests/${l.testId}`}>
+                          <Button variant="secondary">{l.testTitle ?? "View test"}</Button>
+                        </Link>
+                      ) : l.cancelled ? (
                         <>
                           <span className="text-xs text-muted-foreground" title={l.cancelReason ?? undefined}>
                             {l.cancelReason}
@@ -211,6 +223,11 @@ export function FacultyLecturesView() {
                 <div>
                   <p className="font-medium text-foreground">
                     {l.subject.name} · {l.batch.name}
+                    {l.kind === "TEST" && (
+                      <Badge tone="accent" className="ml-1.5">
+                        Test
+                      </Badge>
+                    )}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {fmtDate(l.date)} · {fmtTime12(l.startTime)}–{fmtTime12(l.endTime)}
@@ -224,7 +241,13 @@ export function FacultyLecturesView() {
                   <Badge tone="warning">Unmarked</Badge>
                 )}
               </div>
-              {l.cancelled ? (
+              {l.kind === "TEST" ? (
+                <Link href={`/tests/${l.testId}`}>
+                  <Button variant="secondary" className="w-full">
+                    {l.testTitle ?? "View test"}
+                  </Button>
+                </Link>
+              ) : l.cancelled ? (
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs text-muted-foreground">Reason: {l.cancelReason}</p>
                   <CopyLectureButton lecture={l} />

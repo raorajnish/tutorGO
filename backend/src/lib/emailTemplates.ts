@@ -125,6 +125,71 @@ export function inviteEmailHtml(input: InviteEmailInput): string {
   `;
 }
 
+interface OtpEmailInput {
+  recipientName: string;
+  code: string;
+}
+
+export function otpEmailHtml(input: OtpEmailInput): string {
+  const digits = input.code.split("");
+  return `
+  <!doctype html>
+  <html>
+    <body style="margin:0;padding:0;background:${COLORS.background};font-family:${FONT_STACK};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${COLORS.background};padding:40px 16px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:${COLORS.card};border-radius:20px;overflow:hidden;border:1px solid ${COLORS.border};">
+              <tr>
+                <td align="center" style="background:${COLORS.primary};padding:32px 24px;">
+                  <span style="font-size:18px;font-weight:700;color:${COLORS.primaryForeground};">TutorGO</span>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:36px 32px 8px;">
+                  <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:${COLORS.accent};text-transform:uppercase;letter-spacing:0.06em;">
+                    Password reset
+                  </p>
+                  <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:${COLORS.foreground};line-height:1.3;">
+                    Hi ${escapeHtml(input.recipientName)}, here's your code
+                  </h1>
+                  <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:${COLORS.mutedForeground};max-width:360px;">
+                    Enter this code to reset your password. It expires in 10 minutes.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:0 32px 8px;">
+                  <table role="presentation" cellpadding="0" cellspacing="0">
+                    <tr>
+                      ${digits
+                        .map(
+                          (d) => `
+                        <td style="padding:0 4px;">
+                          <div style="width:40px;height:48px;line-height:48px;text-align:center;background:${COLORS.muted};border:1px solid ${COLORS.border};border-radius:10px;font-family:'SF Mono','Consolas',monospace;font-size:22px;font-weight:700;color:${COLORS.foreground};">${escapeHtml(d)}</div>
+                        </td>`
+                        )
+                        .join("")}
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:20px 32px 36px;">
+                  <p style="margin:0;font-size:12px;line-height:1.6;color:${COLORS.mutedForeground};">
+                    If you didn't request this, you can safely ignore this email — your password won't change.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  `;
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")

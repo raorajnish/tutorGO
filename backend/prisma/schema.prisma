@@ -53,6 +53,11 @@ enum EnquiryActivityType {
   LOST
 }
 
+enum LectureKind {
+  LECTURE
+  TEST
+}
+
 enum AttendanceStatus {
   PRESENT
   ABSENT
@@ -182,25 +187,31 @@ model Institute {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  organization     Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  plan             Plan?                 @relation(fields: [planId], references: [id])
-  users            User[]
-  modules          InstituteModule[]
-  courses          Course[]
-  subjects         Subject[]
-  batches          Batch[]
-  enquiries        Enquiry[]
-  students         Student[]
-  lectures         Lecture[]
-  messageTemplates MessageTemplate[]
-  feeStructures    FeeStructure[]
-  feeAccounts      FeeAccount[]
-  payments         Payment[]
-  salaryProfiles   SalaryProfile[]
-  payrollPayments  PayrollPayment[]
-  payrollRuns      PayrollRun[]
-  notifications    Notification[]
-  emailConfig      InstituteEmailConfig?
+  organization      Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan              Plan?                 @relation(fields: [planId], references: [id])
+  users             User[]
+  modules           InstituteModule[]
+  courses           Course[]
+  subjects          Subject[]
+  batches           Batch[]
+  enquiries         Enquiry[]
+  students          Student[]
+  lectures          Lecture[]
+  messageTemplates  MessageTemplate[]
+  feeStructures     FeeStructure[]
+  feeAccounts       FeeAccount[]
+  payments          Payment[]
+  salaryProfiles    SalaryProfile[]
+  payrollPayments   PayrollPayment[]
+  payrollRuns       PayrollRun[]
+  notifications     Notification[]
+  emailConfig       InstituteEmailConfig?
+  expenseCategories ExpenseCategory[]
+  events            Event[]
+  expenses          Expense[]
+  financeEntries    FinanceEntry[]
+  tests             Test[]
+  reminders         ScheduledReminder[]
 
   @@index([organizationId])
   @@map("institutes")
@@ -261,9 +272,49 @@ model User {
   teachingAssignments FacultyAssignment[]
   notifications       Notification[]
   salaryProfile       SalaryProfile?
+  passwordResetOtps   PasswordResetOtp[]
+  expensesRecorded    Expense[]
+  testsAuthored       Test[]              @relation("TestAuthor")
+  testResultsEntered  TestResult[]        @relation("TestResultAuthor")
+  pushSubscriptions   PushSubscription[]
 
   @@index([instituteId])
   @@map("users")
+}
+
+/// One browser/device registration for web push. A user can have several
+/// (phone, laptop, ...); each is pushed to independently, and a subscription
+/// that comes back 410 Gone from the push service (the browser unsubscribed
+/// on its end) is deleted rather than retried.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+/// Short-lived 6-digit OTP for the forgot-password flow. codeHash is a bcrypt
+/// hash — the plaintext code only ever exists in the email sent to the user.
+model PasswordResetOtp {
+  id         String    @id @default(cuid())
+  userId     String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_otps")
 }
 
 // ---------------------------------------------------------------------------
@@ -370,6 +421,97 @@ model Notification {
   @@map("notifications")
 }
 
+/// Open-ended enough to cover the real cases (electricity, rent, AMC,
+/// painting) without pretending to be exhaustive — OTHER + the free-text
+/// `title` carries anything that doesn't fit.
+enum ReminderCategory {
+  UTILITY
+  RENT
+  MAINTENANCE
+  COMPLIANCE
+  SUPPLIES
+  OTHER
+}
+
+enum ReminderRepeat {
+  NONE
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+/// Who hears about it when it fires. PRIVATE is the default deliberately —
+/// a reminder someone sets for themselves must not silently notify their
+/// boss. ADMINS is the opt-in for genuine institute-ops obligations (the
+/// electricity bill, the rent) that the owner also needs to see.
+enum ReminderAudience {
+  PRIVATE
+  ADMINS
+}
+
+/// A dated obligation that notifies its audience `leadDays` before it's due.
+/// Distinct from `POST /org/reminders`, which broadcasts an ad-hoc message
+/// to team roles *immediately* and stores nothing — this one is scheduled,
+/// persistent, and optionally recurring. Fired by services/reminderScheduler.ts
+/// (in-process ticker started in server.ts). See changes-phase8.md §8d.
+model ScheduledReminder {
+  id              String           @id @default(cuid())
+  instituteId     String
+  createdByUserId String
+  title           String
+  category        ReminderCategory @default(OTHER)
+  /// The date the thing is actually due. For a repeating reminder this is
+  /// always the *next* occurrence — the scheduler rolls it forward once the
+  /// date has passed, rather than storing one row per cycle.
+  dueDate         DateTime         @db.Date
+  /// Every lead time this reminder notifies at, in days before `dueDate` —
+  /// e.g. [90, 30, 15, 7, 1] pings four times as a deadline approaches. Plain
+  /// Ints rather than an enum so the common presets and any custom number are
+  /// the same thing. Stored sorted descending (earliest notification first).
+  leadDays        Int[]
+  repeat          ReminderRepeat   @default(NONE)
+  audience        ReminderAudience @default(PRIVATE)
+  notes           String?
+  isActive        Boolean          @default(true)
+  /// Display only — "last notified on".
+  lastFiredAt     DateTime?
+
+  // --- Scheduler cursor -----------------------------------------------------
+  // Together these answer "when does this next need to notify, and for which
+  // lead time?" without the scheduler having to compute anything per row.
+  // Both are derived from dueDate + leadDays and are always rewritten in the
+  // same operation as those (see reminderScheduler.reminderCursor), so they
+  // can't drift from the values that justify them.
+  //
+  // Because lead times fire in descending order (90 → 30 → 7 → 1), the pending
+  // one implies the rest: every larger lead has already fired, every smaller
+  // one hasn't. That's why a single cursor is enough and no per-lead history
+  // needs storing.
+
+  /// Date of the next unfired notification (`dueDate - nextNotifyLead`).
+  /// NULL once every lead time for the current `dueDate` has fired — which
+  /// also drops the row out of the scheduler's index range entirely, so
+  /// finished reminders are never re-read however many accumulate.
+  nextNotifyOn    DateTime?        @db.Date
+  /// The lead time `nextNotifyOn` corresponds to. NULL alongside it.
+  nextNotifyLead  Int?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@index([instituteId, dueDate])
+  /// Serves the scheduler's "what needs notifying?" query end-to-end. Rows
+  /// with a NULL nextNotifyOn (nothing left to fire) fall outside the range
+  /// and are never read.
+  @@index([isActive, nextNotifyOn])
+  /// Serves the scheduler's "what repeating reminder has gone stale?" query.
+  @@index([isActive, repeat, dueDate])
+  @@map("scheduled_reminders")
+}
+
 // ---------------------------------------------------------------------------
 // Academics — Courses / Subjects / Batches (Phase 2)
 // ---------------------------------------------------------------------------
@@ -402,6 +544,7 @@ model Course {
   subjects      CourseSubject[]
   assignments   FacultyAssignment[]
   feeStructures FeeStructure[]
+  tests         Test[]
 
   @@unique([instituteId, code])
   @@index([instituteId])
@@ -421,6 +564,7 @@ model Subject {
   courses     CourseSubject[]
   lectures    Lecture[]
   assignments FacultyAssignment[]
+  tests       Test[]
 
   @@unique([instituteId, shortCode])
   @@index([instituteId])
@@ -541,12 +685,13 @@ model Student {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  institute  Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  enquiry    Enquiry?           @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
-  course     Course             @relation(fields: [courseId], references: [id])
-  batches    StudentBatch[]
-  attendance AttendanceRecord[]
-  feeAccount FeeAccount?
+  institute   Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  enquiry     Enquiry?           @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
+  course      Course             @relation(fields: [courseId], references: [id])
+  batches     StudentBatch[]
+  attendance  AttendanceRecord[]
+  testResults TestResult[]
+  feeAccount  FeeAccount?
 
   @@index([instituteId, isActive])
   @@index([courseId])
@@ -578,31 +723,101 @@ model StudentBatch {
 /// One scheduled class session. Roster is derived at read time from
 /// StudentBatch rows active on `date`, never stored here — so a lecture
 /// never goes stale if a student is later reassigned to a different batch.
+///
+/// A test session is the SAME row with kind = TEST and testId set, rather
+/// than a parallel table: lecture history, the roster/mark endpoints, and
+/// payroll's per-lecture generator then all work on tests unchanged. In
+/// particular `facultyId` doubles as "the invigilator" for TEST rows, which
+/// is what makes payroll correct for free — generateLectureLineItems only
+/// pays PER_LECTURE profiles, so a monthly-salaried invigilator gets nothing
+/// extra and an OWNER (who can't hold a SalaryProfile) never generates pay.
 model Lecture {
-  id           String    @id @default(cuid())
+  id           String      @id @default(cuid())
   instituteId  String
   batchId      String
   subjectId    String
   facultyId    String
-  date         DateTime  @db.Date
-  startTime    DateTime  @db.Time
-  endTime      DateTime  @db.Time
+  kind         LectureKind @default(LECTURE)
+  testId       String?
+  date         DateTime    @db.Date
+  startTime    DateTime    @db.Time
+  endTime      DateTime    @db.Time
   cancelledAt  DateTime?
   cancelReason String?
   note         String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   institute       Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   batch           Batch              @relation(fields: [batchId], references: [id])
   subject         Subject            @relation(fields: [subjectId], references: [id])
   faculty         User               @relation(fields: [facultyId], references: [id])
+  test            Test?              @relation(fields: [testId], references: [id], onDelete: Cascade)
   attendance      AttendanceRecord[]
+  results         TestResult[]
   payrollLineItem PayrollLineItem?
 
   @@index([instituteId, date])
   @@index([batchId, date])
+  @@index([testId])
   @@map("lectures")
+}
+
+/// A test definition — the paper, the marks scheme, the instructions. It is
+/// scheduled into one Lecture row (kind = TEST) per batch it's held for, so
+/// one Test can span several batches on different dates/slots.
+model Test {
+  id              String   @id @default(cuid())
+  instituteId     String
+  courseId        String
+  subjectId       String
+  title           String
+  totalMarks      Int
+  passingMarks    Int?
+  instructions    String?
+  /// Cloudinary URL for the question paper. Optional — a test can be
+  /// scheduled with no paper attached at all.
+  paperAssetUrl   String?
+  paperAssetType  String?
+  paperAssetName  String?
+  createdByUserId String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  institute Institute    @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course    Course       @relation(fields: [courseId], references: [id])
+  subject   Subject      @relation(fields: [subjectId], references: [id])
+  createdBy User         @relation("TestAuthor", fields: [createdByUserId], references: [id])
+  sessions  Lecture[]
+  results   TestResult[]
+
+  @@index([instituteId])
+  @@map("tests")
+}
+
+/// One student's marks for one test session. Only written for students whose
+/// attendance on that session is PRESENT/PRESENT_BIOMETRIC/LATE — enforced in
+/// the route, since "marks for an absentee" is always a data-entry mistake.
+model TestResult {
+  id              String   @id @default(cuid())
+  testId          String
+  lectureId       String
+  studentId       String
+  marksObtained   Decimal  @db.Decimal(6, 2)
+  remarks         String?
+  enteredByUserId String
+  enteredAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  test      Test    @relation(fields: [testId], references: [id], onDelete: Cascade)
+  lecture   Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  enteredBy User    @relation("TestResultAuthor", fields: [enteredByUserId], references: [id])
+
+  @@unique([lectureId, studentId])
+  @@index([testId])
+  @@index([studentId])
+  @@map("test_results")
 }
 
 model AttendanceRecord {
@@ -738,6 +953,12 @@ model FeeInstallment {
   amount          Decimal   @db.Decimal(10, 2)
   paidAmount      Decimal   @default(0) @db.Decimal(10, 2)
   waived          Boolean   @default(false)
+  /// True when this installment's `amount` was increased by a shortfall
+  /// carried forward from an earlier installment that was settled short
+  /// (see fees.ts POST /payments, settleAndCarryForward) — purely a display
+  /// hint so staff aren't confused why the amount doesn't match what was
+  /// originally quoted; never read for any calculation.
+  adjustedFromPrevious Boolean @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -761,7 +982,7 @@ model Payment {
   amount          Decimal     @db.Decimal(10, 2)
   mode            PaymentMode
   paidOn          DateTime    @db.Date
-  receiptNumber   String      @unique
+  receiptNumber   String
   notes           String?
   createdByUserId String?
   voidedAt        DateTime?
@@ -773,6 +994,12 @@ model Payment {
   feeAccount  FeeAccount          @relation(fields: [feeAccountId], references: [id], onDelete: Cascade)
   allocations PaymentAllocation[]
 
+  // Receipt numbers are only meant to be unique per institute (ReceiptCounter
+  // is scoped [instituteId, yearMonth] already) — a bare @unique here was
+  // global, so the first payment of a month collided across DIFFERENT
+  // institutes whenever both happened to land on the same counter value.
+  // Found and fixed alongside §8a. See changes-phase8.md.
+  @@unique([instituteId, receiptNumber])
   @@index([instituteId])
   @@index([feeAccountId])
   @@map("payments")
@@ -946,4 +1173,93 @@ model PayrollRun {
 
   @@unique([instituteId, periodMonth])
   @@map("payroll_runs")
+}
+
+// ---------------------------------------------------------------------------
+// Expenses
+// ---------------------------------------------------------------------------
+
+/// Per-institute, customizable — every institute is auto-seeded with a
+/// standard default set on creation (see expenseDefaults.ts), then
+/// owners/admins can add, rename, or deactivate their own on top.
+model ExpenseCategory {
+  id          String   @id @default(cuid())
+  instituteId String
+  name        String
+  kind        String   @default("EXPENSE") // "EXPENSE" | "INCOME"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+
+  @@unique([instituteId, name])
+  @@index([instituteId])
+  @@map("expense_categories")
+}
+
+/// A named occasion (e.g. "Annual Day 2026") that expenses can be tagged
+/// against, so spend is visible both by category and by event.
+model Event {
+  id          String   @id @default(cuid())
+  instituteId String
+  name        String
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+
+  @@index([instituteId])
+  @@map("events")
+}
+
+model Expense {
+  id              String      @id @default(cuid())
+  instituteId     String
+  categoryId      String
+  eventId         String?
+  title           String
+  amount          Decimal     @db.Decimal(10, 2)
+  date            DateTime
+  mode            PaymentMode
+  referenceNo     String?
+  notes           String?
+  createdByUserId String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  institute    Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  category     ExpenseCategory @relation(fields: [categoryId], references: [id])
+  event        Event?          @relation(fields: [eventId], references: [id])
+  createdBy    User            @relation(fields: [createdByUserId], references: [id])
+  financeEntry FinanceEntry?
+
+  @@index([instituteId, date])
+  @@index([eventId])
+  @@map("expenses")
+}
+
+/// Shared mirror table for the combined Ledger (§2.13): every Expense writes
+/// one row here. Fee Payments and PayrollPayments aren't mirrored yet — the
+/// Ledger query reads those two tables directly and merges them with
+/// FinanceEntry rows at query time (see routes/expenses.ts ledger endpoint).
+model FinanceEntry {
+  id          String   @id @default(cuid())
+  instituteId String
+  kind        String // "INCOME" | "EXPENSE" | "PAYROLL"
+  sourceType  String // "EXPENSE" | "PAYMENT" | "PAYROLL_PAYMENT"
+  sourceId    String
+  amount      Decimal  @db.Decimal(10, 2)
+  date        DateTime
+  description String
+  expenseId   String?  @unique
+  createdAt   DateTime @default(now())
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  expense   Expense?  @relation(fields: [expenseId], references: [id])
+
+  @@index([instituteId, date])
+  @@index([sourceType, sourceId])
+  @@map("finance_entries")
 }

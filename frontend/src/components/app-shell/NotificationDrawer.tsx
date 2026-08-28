@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { apiFetch } from "@/lib/api";
+import { PushToggle } from "./PushToggle";
 import type { AppNotification } from "@/lib/types";
 
 function relativeTime(iso: string): string {
@@ -39,8 +40,13 @@ export function NotificationDrawer({ open, onClose, onUnreadCountChange }: Notif
       .catch(() => {});
   }
 
+  // Polls regardless of whether the drawer is open, so the header badge
+  // stays live for an already-open tab — the closest thing to "instant" this
+  // app has for recipients who haven't opted into push notifications.
   useEffect(() => {
     load();
+    const interval = setInterval(load, 30_000);
+    return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -64,11 +70,9 @@ export function NotificationDrawer({ open, onClose, onUnreadCountChange }: Notif
   }
 
   async function markRead(id: string) {
-    setItems((prev) => {
-      const next = prev.map((x) => (x.id === id ? { ...x, read: true } : x));
-      onUnreadCountChange?.(next.filter((n) => !n.read).length);
-      return next;
-    });
+    const next = items.map((x) => (x.id === id ? { ...x, read: true } : x));
+    setItems(next);
+    onUnreadCountChange?.(next.filter((n) => !n.read).length);
     await apiFetch(`/notifications/${id}/read`, { method: "POST" }).catch(() => {});
   }
 
@@ -112,6 +116,8 @@ export function NotificationDrawer({ open, onClose, onUnreadCountChange }: Notif
             </svg>
           </button>
         </header>
+
+        <PushToggle />
 
         <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
           <span className="text-sm text-muted-foreground">

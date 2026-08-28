@@ -4,6 +4,16 @@ import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../lib/http.js";
 import { authenticate, requireInstitute, requireModule, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
+import {
+  assertCanActOnLecture,
+  deriveRoster,
+  lectureInclude,
+  serializeLecture,
+  timeSchema,
+  toTimeDate,
+  toTimeString,
+  todayDateOnly,
+} from "../lib/lectureShared.js";
 
 export const attendanceRouter = Router();
 
@@ -12,70 +22,14 @@ attendanceRouter.use(authenticate, requireInstitute, requireModule("ATTENDANCE")
 const SCHEDULE_ROLES = ["OWNER", "ADMIN", "RECEPTION", "FACULTY"] as const;
 const STATUS_ENUM = z.enum(["PRESENT", "ABSENT", "LEAVE", "LATE", "HOLIDAY", "PRESENT_BIOMETRIC"]);
 
-const timeSchema = z
-  .string()
-  .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Time must be in HH:mm format");
-
-function toTimeDate(hhmm: string): Date {
-  const [h, m] = hhmm.split(":").map(Number);
-  return new Date(Date.UTC(1970, 0, 1, h, m));
-}
-
-function toTimeString(d: Date): string {
-  return `${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
-}
-
-function todayDateOnly(): Date {
-  const now = new Date();
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-}
-
 function facultyScope(req: { user?: { role: string; id: string } }): string | undefined {
   return req.user!.role === "FACULTY" ? req.user!.id : undefined;
 }
-
-function serializeLecture(l: {
-  id: string;
-  date: Date;
-  startTime: Date;
-  endTime: Date;
-  cancelledAt: Date | null;
-  cancelReason: string | null;
-  note: string | null;
-  batch: { id: string; name: string; course: { id: string; name: string; code: string } };
-  subject: { id: string; name: string; shortCode: string };
-  faculty: { id: string; fullName: string };
-}) {
-  return {
-    id: l.id,
-    date: l.date,
-    startTime: toTimeString(l.startTime),
-    endTime: toTimeString(l.endTime),
-    cancelled: l.cancelledAt !== null,
-    cancelReason: l.cancelReason,
-    note: l.note,
-    batch: { id: l.batch.id, name: l.batch.name, course: l.batch.course },
-    subject: { id: l.subject.id, name: l.subject.name, shortCode: l.subject.shortCode },
-    faculty: l.faculty,
-  };
-}
-
-const lectureInclude = {
-  batch: { include: { course: { select: { id: true, name: true, code: true } } } },
-  subject: { select: { id: true, name: true, shortCode: true } },
-  faculty: { select: { id: true, fullName: true } },
-} as const;
 
 async function loadLecture(id: string, instituteId: string) {
   const lecture = await prisma.lecture.findUnique({ where: { id }, include: lectureInclude });
   if (!lecture || lecture.instituteId !== instituteId) throw ApiError.notFound("Lecture not found");
   return lecture;
-}
-
-function assertCanActOnLecture(req: { user?: { role: string; id: string } }, facultyId: string) {
-  if (req.user!.role === "FACULTY" && facultyId !== req.user!.id) {
-    throw ApiError.forbidden("You can only manage your own lectures");
-  }
 }
 
 /// Faculty scheduling their own lecture may only pick a course/subject they're
@@ -109,6 +63,7 @@ attendanceRouter.get("/faculty", requireRoles(...SCHEDULE_ROLES), async (req, re
     next(err);
   }
 });
+
 
 // ---------------------------------------------------------------------------
 // Faculty teaching assignments (which courses/subjects a faculty can teach)
@@ -446,19 +401,6 @@ attendanceRouter.post(
 // ---------------------------------------------------------------------------
 // Roster + marking
 // ---------------------------------------------------------------------------
-
-async function deriveRoster(batchId: string, date: Date) {
-  const rows = await prisma.studentBatch.findMany({
-    where: {
-      batchId,
-      joinedAt: { lte: date },
-      OR: [{ leftAt: null }, { leftAt: { gte: date } }],
-    },
-    include: { student: { select: { id: true, name: true, studentCode: true } } },
-    orderBy: { student: { name: "asc" } },
-  });
-  return rows.map((r) => r.student);
-}
 
 attendanceRouter.get("/lectures/:id/roster", async (req, res, next) => {
   try {

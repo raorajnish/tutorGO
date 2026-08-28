@@ -25,7 +25,7 @@ export function FeeStructuresTab() {
     try {
       const [s, c] = await Promise.all([
         apiFetch<FeeStructure[]>("/academics/fee-structures"),
-        apiFetch<Course[]>("/academics/courses"),
+        apiFetch<Course[]>("/academics/courses?active=true"),
       ]);
       setStructures(s);
       setCourses(c);

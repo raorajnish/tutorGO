@@ -137,3 +137,30 @@ input[type="password"]::-webkit-strong-password-auto-fill-button {
   background-image: linear-gradient(180deg, transparent 40%, rgba(9, 16, 28, 0.55) 100%);
   pointer-events: none;
 }
+
+/* Printing a report (e.g. a test result sheet) should produce just the sheet —
+   the sidebar, header and page chrome are screen-only furniture. Pages opt in
+   by marking their own non-printable parts with Tailwind's `print:hidden`. */
+@media print {
+  .app-shell > aside,
+  .app-shell header {
+    display: none !important;
+  }
+
+  .app-shell,
+  .app-shell .content-scroll {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .app-shell .content-scroll > div {
+    max-width: none !important;
+    animation: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+}

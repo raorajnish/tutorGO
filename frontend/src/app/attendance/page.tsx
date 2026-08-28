@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/Button";
@@ -196,7 +197,14 @@ function StaffScheduleView() {
                   <td className="px-4 py-3 text-foreground">
                     {l.batch.name} <span className="text-muted-foreground">· {l.batch.course.code}</span>
                   </td>
-                  <td className="px-4 py-3 text-foreground">{l.subject.name}</td>
+                  <td className="px-4 py-3 text-foreground">
+                    {l.subject.name}
+                    {l.kind === "TEST" && (
+                      <Badge tone="accent" className="ml-1.5">
+                        Test
+                      </Badge>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-foreground">{l.faculty.fullName}</td>
                   <td className="px-4 py-3">
                     {l.cancelled ? (
@@ -211,7 +219,11 @@ function StaffScheduleView() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      {l.cancelled ? (
+                      {l.kind === "TEST" ? (
+                        <Link href={`/tests/${l.testId}`}>
+                          <Button variant="secondary">{l.testTitle ?? "View test"}</Button>
+                        </Link>
+                      ) : l.cancelled ? (
                         <>
                           <span className="text-xs text-muted-foreground" title={l.cancelReason ?? undefined}>
                             {l.cancelReason}
@@ -264,6 +276,11 @@ function StaffScheduleView() {
                 <div>
                   <p className="font-medium text-foreground">
                     {l.subject.name} · {l.batch.name}
+                    {l.kind === "TEST" && (
+                      <Badge tone="accent" className="ml-1.5">
+                        Test
+                      </Badge>
+                    )}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {fmtTime12(l.startTime)}–{fmtTime12(l.endTime)} · {l.faculty.fullName}
@@ -279,7 +296,13 @@ function StaffScheduleView() {
                   </Badge>
                 )}
               </div>
-              {l.cancelled ? (
+              {l.kind === "TEST" ? (
+                <Link href={`/tests/${l.testId}`}>
+                  <Button variant="secondary" className="w-full">
+                    {l.testTitle ?? "View test"}
+                  </Button>
+                </Link>
+              ) : l.cancelled ? (
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs text-muted-foreground">Reason: {l.cancelReason}</p>
                   <CopyLectureButton lecture={l} />

@@ -25,5 +25,30 @@ export function signToken(payload: JwtPayload): string {
 }
 
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, SECRET) as unknown as JwtPayload;
+  const payload = jwt.verify(token, SECRET) as Record<string, unknown>;
+  // Reset tokens carry a `purpose` claim and must never authenticate a normal
+  // session — only verifyResetToken() accepts them.
+  if (payload.purpose) throw new jwt.JsonWebTokenError("Not a session token");
+  return payload as unknown as JwtPayload;
+}
+
+export interface ResetTokenPayload {
+  sub: string;
+  purpose: "password_reset";
+}
+
+const RESET_TOKEN_EXPIRES_IN = "10m";
+
+export function signResetToken(userId: string): string {
+  return jwt.sign({ sub: userId, purpose: "password_reset" } satisfies ResetTokenPayload, SECRET, {
+    expiresIn: RESET_TOKEN_EXPIRES_IN,
+  });
+}
+
+export function verifyResetToken(token: string): ResetTokenPayload {
+  const payload = jwt.verify(token, SECRET) as Record<string, unknown>;
+  if (payload.purpose !== "password_reset" || typeof payload.sub !== "string") {
+    throw new jwt.JsonWebTokenError("Not a password-reset token");
+  }
+  return payload as unknown as ResetTokenPayload;
 }

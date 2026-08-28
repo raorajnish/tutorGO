@@ -64,7 +64,7 @@ function AdmissionsContent() {
           return [...newOnes, ...contacted];
         }),
         apiFetch<{ students: StudentListItem[] }>("/students?status=all"),
-        apiFetch<Course[]>("/academics/courses"),
+        apiFetch<Course[]>("/academics/courses?active=true"),
       ]);
       setPipeline(open);
       setAdmitted(students.students);

@@ -14,7 +14,10 @@ export type NavIcon =
   | "students"
   | "attendance"
   | "fees"
-  | "payroll";
+  | "payroll"
+  | "expenses"
+  | "tests"
+  | "subscriptions";
 
 export interface NavItem {
   label: string;
@@ -73,6 +76,20 @@ export const NAV_SECTIONS: NavSection[] = [
         roles: ["OWNER", "ADMIN", "ACCOUNTANT", "FACULTY"],
         module: "PAYROLL",
       },
+      {
+        label: "Expenses",
+        href: "/expenses",
+        icon: "expenses",
+        roles: ["OWNER", "ADMIN"],
+        module: "EXPENSE",
+      },
+      {
+        label: "Tests",
+        href: "/tests",
+        icon: "tests",
+        roles: ["OWNER", "ADMIN", "FACULTY"],
+        module: "ATTENDANCE",
+      },
     ],
   },
   {
@@ -86,6 +103,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { label: "Organizations", href: "/platform/organizations", icon: "organizations", roles: ["SUPERADMIN"] },
       { label: "Institutes", href: "/platform/institutes", icon: "institutes", roles: ["SUPERADMIN"] },
       { label: "Plans", href: "/platform/plans", icon: "plans", roles: ["SUPERADMIN"] },
+      { label: "Subscriptions", href: "/platform/subscriptions", icon: "subscriptions", roles: ["SUPERADMIN"] },
       { label: "Email settings", href: "/platform/email-settings", icon: "mail", roles: ["SUPERADMIN"] },
     ],
   },

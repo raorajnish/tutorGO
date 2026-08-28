@@ -17,6 +17,14 @@ import type * as Prisma from "../internal/prismaNamespace.js"
  * One scheduled class session. Roster is derived at read time from
  * StudentBatch rows active on `date`, never stored here — so a lecture
  * never goes stale if a student is later reassigned to a different batch.
+ * 
+ * A test session is the SAME row with kind = TEST and testId set, rather
+ * than a parallel table: lecture history, the roster/mark endpoints, and
+ * payroll's per-lecture generator then all work on tests unchanged. In
+ * particular `facultyId` doubles as "the invigilator" for TEST rows, which
+ * is what makes payroll correct for free — generateLectureLineItems only
+ * pays PER_LECTURE profiles, so a monthly-salaried invigilator gets nothing
+ * extra and an OWNER (who can't hold a SalaryProfile) never generates pay.
  */
 export type LectureModel = runtime.Types.Result.DefaultSelection<Prisma.$LecturePayload>
 
@@ -32,6 +40,8 @@ export type LectureMinAggregateOutputType = {
   batchId: string | null
   subjectId: string | null
   facultyId: string | null
+  kind: $Enums.LectureKind | null
+  testId: string | null
   date: Date | null
   startTime: Date | null
   endTime: Date | null
@@ -48,6 +58,8 @@ export type LectureMaxAggregateOutputType = {
   batchId: string | null
   subjectId: string | null
   facultyId: string | null
+  kind: $Enums.LectureKind | null
+  testId: string | null
   date: Date | null
   startTime: Date | null
   endTime: Date | null
@@ -64,6 +76,8 @@ export type LectureCountAggregateOutputType = {
   batchId: number
   subjectId: number
   facultyId: number
+  kind: number
+  testId: number
   date: number
   startTime: number
   endTime: number
@@ -82,6 +96,8 @@ export type LectureMinAggregateInputType = {
   batchId?: true
   subjectId?: true
   facultyId?: true
+  kind?: true
+  testId?: true
   date?: true
   startTime?: true
   endTime?: true
@@ -98,6 +114,8 @@ export type LectureMaxAggregateInputType = {
   batchId?: true
   subjectId?: true
   facultyId?: true
+  kind?: true
+  testId?: true
   date?: true
   startTime?: true
   endTime?: true
@@ -114,6 +132,8 @@ export type LectureCountAggregateInputType = {
   batchId?: true
   subjectId?: true
   facultyId?: true
+  kind?: true
+  testId?: true
   date?: true
   startTime?: true
   endTime?: true
@@ -203,6 +223,8 @@ export type LectureGroupByOutputType = {
   batchId: string
   subjectId: string
   facultyId: string
+  kind: $Enums.LectureKind
+  testId: string | null
   date: Date
   startTime: Date
   endTime: Date
@@ -240,6 +262,8 @@ export type LectureWhereInput = {
   batchId?: Prisma.StringFilter<"Lecture"> | string
   subjectId?: Prisma.StringFilter<"Lecture"> | string
   facultyId?: Prisma.StringFilter<"Lecture"> | string
+  kind?: Prisma.EnumLectureKindFilter<"Lecture"> | $Enums.LectureKind
+  testId?: Prisma.StringNullableFilter<"Lecture"> | string | null
   date?: Prisma.DateTimeFilter<"Lecture"> | Date | string
   startTime?: Prisma.DateTimeFilter<"Lecture"> | Date | string
   endTime?: Prisma.DateTimeFilter<"Lecture"> | Date | string
@@ -252,7 +276,9 @@ export type LectureWhereInput = {
   batch?: Prisma.XOR<Prisma.BatchScalarRelationFilter, Prisma.BatchWhereInput>
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
   faculty?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  test?: Prisma.XOR<Prisma.TestNullableScalarRelationFilter, Prisma.TestWhereInput> | null
   attendance?: Prisma.AttendanceRecordListRelationFilter
+  results?: Prisma.TestResultListRelationFilter
   payrollLineItem?: Prisma.XOR<Prisma.PayrollLineItemNullableScalarRelationFilter, Prisma.PayrollLineItemWhereInput> | null
 }
 
@@ -262,6 +288,8 @@ export type LectureOrderByWithRelationInput = {
   batchId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   facultyId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  testId?: Prisma.SortOrderInput | Prisma.SortOrder
   date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -274,7 +302,9 @@ export type LectureOrderByWithRelationInput = {
   batch?: Prisma.BatchOrderByWithRelationInput
   subject?: Prisma.SubjectOrderByWithRelationInput
   faculty?: Prisma.UserOrderByWithRelationInput
+  test?: Prisma.TestOrderByWithRelationInput
   attendance?: Prisma.AttendanceRecordOrderByRelationAggregateInput
+  results?: Prisma.TestResultOrderByRelationAggregateInput
   payrollLineItem?: Prisma.PayrollLineItemOrderByWithRelationInput
 }
 
@@ -287,6 +317,8 @@ export type LectureWhereUniqueInput = Prisma.AtLeast<{
   batchId?: Prisma.StringFilter<"Lecture"> | string
   subjectId?: Prisma.StringFilter<"Lecture"> | string
   facultyId?: Prisma.StringFilter<"Lecture"> | string
+  kind?: Prisma.EnumLectureKindFilter<"Lecture"> | $Enums.LectureKind
+  testId?: Prisma.StringNullableFilter<"Lecture"> | string | null
   date?: Prisma.DateTimeFilter<"Lecture"> | Date | string
   startTime?: Prisma.DateTimeFilter<"Lecture"> | Date | string
   endTime?: Prisma.DateTimeFilter<"Lecture"> | Date | string
@@ -299,7 +331,9 @@ export type LectureWhereUniqueInput = Prisma.AtLeast<{
   batch?: Prisma.XOR<Prisma.BatchScalarRelationFilter, Prisma.BatchWhereInput>
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
   faculty?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  test?: Prisma.XOR<Prisma.TestNullableScalarRelationFilter, Prisma.TestWhereInput> | null
   attendance?: Prisma.AttendanceRecordListRelationFilter
+  results?: Prisma.TestResultListRelationFilter
   payrollLineItem?: Prisma.XOR<Prisma.PayrollLineItemNullableScalarRelationFilter, Prisma.PayrollLineItemWhereInput> | null
 }, "id">
 
@@ -309,6 +343,8 @@ export type LectureOrderByWithAggregationInput = {
   batchId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   facultyId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  testId?: Prisma.SortOrderInput | Prisma.SortOrder
   date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -331,6 +367,8 @@ export type LectureScalarWhereWithAggregatesInput = {
   batchId?: Prisma.StringWithAggregatesFilter<"Lecture"> | string
   subjectId?: Prisma.StringWithAggregatesFilter<"Lecture"> | string
   facultyId?: Prisma.StringWithAggregatesFilter<"Lecture"> | string
+  kind?: Prisma.EnumLectureKindWithAggregatesFilter<"Lecture"> | $Enums.LectureKind
+  testId?: Prisma.StringNullableWithAggregatesFilter<"Lecture"> | string | null
   date?: Prisma.DateTimeWithAggregatesFilter<"Lecture"> | Date | string
   startTime?: Prisma.DateTimeWithAggregatesFilter<"Lecture"> | Date | string
   endTime?: Prisma.DateTimeWithAggregatesFilter<"Lecture"> | Date | string
@@ -343,6 +381,7 @@ export type LectureScalarWhereWithAggregatesInput = {
 
 export type LectureCreateInput = {
   id?: string
+  kind?: $Enums.LectureKind
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -355,7 +394,9 @@ export type LectureCreateInput = {
   batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
   subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
   faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
 }
 
@@ -365,6 +406,8 @@ export type LectureUncheckedCreateInput = {
   batchId: string
   subjectId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -374,11 +417,13 @@ export type LectureUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
 }
 
 export type LectureUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -391,7 +436,9 @@ export type LectureUpdateInput = {
   batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
   faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
 }
 
@@ -401,6 +448,8 @@ export type LectureUncheckedUpdateInput = {
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -410,6 +459,7 @@ export type LectureUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
 }
 
@@ -419,6 +469,8 @@ export type LectureCreateManyInput = {
   batchId: string
   subjectId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -431,6 +483,7 @@ export type LectureCreateManyInput = {
 
 export type LectureUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -447,6 +500,8 @@ export type LectureUncheckedUpdateManyInput = {
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -473,6 +528,8 @@ export type LectureCountOrderByAggregateInput = {
   batchId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   facultyId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  testId?: Prisma.SortOrder
   date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -489,6 +546,8 @@ export type LectureMaxOrderByAggregateInput = {
   batchId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   facultyId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  testId?: Prisma.SortOrder
   date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -505,6 +564,8 @@ export type LectureMinOrderByAggregateInput = {
   batchId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
   facultyId?: Prisma.SortOrder
+  kind?: Prisma.SortOrder
+  testId?: Prisma.SortOrder
   date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
@@ -693,6 +754,66 @@ export type LectureUncheckedUpdateManyWithoutBatchNestedInput = {
   deleteMany?: Prisma.LectureScalarWhereInput | Prisma.LectureScalarWhereInput[]
 }
 
+export type EnumLectureKindFieldUpdateOperationsInput = {
+  set?: $Enums.LectureKind
+}
+
+export type LectureCreateNestedManyWithoutTestInput = {
+  create?: Prisma.XOR<Prisma.LectureCreateWithoutTestInput, Prisma.LectureUncheckedCreateWithoutTestInput> | Prisma.LectureCreateWithoutTestInput[] | Prisma.LectureUncheckedCreateWithoutTestInput[]
+  connectOrCreate?: Prisma.LectureCreateOrConnectWithoutTestInput | Prisma.LectureCreateOrConnectWithoutTestInput[]
+  createMany?: Prisma.LectureCreateManyTestInputEnvelope
+  connect?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+}
+
+export type LectureUncheckedCreateNestedManyWithoutTestInput = {
+  create?: Prisma.XOR<Prisma.LectureCreateWithoutTestInput, Prisma.LectureUncheckedCreateWithoutTestInput> | Prisma.LectureCreateWithoutTestInput[] | Prisma.LectureUncheckedCreateWithoutTestInput[]
+  connectOrCreate?: Prisma.LectureCreateOrConnectWithoutTestInput | Prisma.LectureCreateOrConnectWithoutTestInput[]
+  createMany?: Prisma.LectureCreateManyTestInputEnvelope
+  connect?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+}
+
+export type LectureUpdateManyWithoutTestNestedInput = {
+  create?: Prisma.XOR<Prisma.LectureCreateWithoutTestInput, Prisma.LectureUncheckedCreateWithoutTestInput> | Prisma.LectureCreateWithoutTestInput[] | Prisma.LectureUncheckedCreateWithoutTestInput[]
+  connectOrCreate?: Prisma.LectureCreateOrConnectWithoutTestInput | Prisma.LectureCreateOrConnectWithoutTestInput[]
+  upsert?: Prisma.LectureUpsertWithWhereUniqueWithoutTestInput | Prisma.LectureUpsertWithWhereUniqueWithoutTestInput[]
+  createMany?: Prisma.LectureCreateManyTestInputEnvelope
+  set?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+  disconnect?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+  delete?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+  connect?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+  update?: Prisma.LectureUpdateWithWhereUniqueWithoutTestInput | Prisma.LectureUpdateWithWhereUniqueWithoutTestInput[]
+  updateMany?: Prisma.LectureUpdateManyWithWhereWithoutTestInput | Prisma.LectureUpdateManyWithWhereWithoutTestInput[]
+  deleteMany?: Prisma.LectureScalarWhereInput | Prisma.LectureScalarWhereInput[]
+}
+
+export type LectureUncheckedUpdateManyWithoutTestNestedInput = {
+  create?: Prisma.XOR<Prisma.LectureCreateWithoutTestInput, Prisma.LectureUncheckedCreateWithoutTestInput> | Prisma.LectureCreateWithoutTestInput[] | Prisma.LectureUncheckedCreateWithoutTestInput[]
+  connectOrCreate?: Prisma.LectureCreateOrConnectWithoutTestInput | Prisma.LectureCreateOrConnectWithoutTestInput[]
+  upsert?: Prisma.LectureUpsertWithWhereUniqueWithoutTestInput | Prisma.LectureUpsertWithWhereUniqueWithoutTestInput[]
+  createMany?: Prisma.LectureCreateManyTestInputEnvelope
+  set?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+  disconnect?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+  delete?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+  connect?: Prisma.LectureWhereUniqueInput | Prisma.LectureWhereUniqueInput[]
+  update?: Prisma.LectureUpdateWithWhereUniqueWithoutTestInput | Prisma.LectureUpdateWithWhereUniqueWithoutTestInput[]
+  updateMany?: Prisma.LectureUpdateManyWithWhereWithoutTestInput | Prisma.LectureUpdateManyWithWhereWithoutTestInput[]
+  deleteMany?: Prisma.LectureScalarWhereInput | Prisma.LectureScalarWhereInput[]
+}
+
+export type LectureCreateNestedOneWithoutResultsInput = {
+  create?: Prisma.XOR<Prisma.LectureCreateWithoutResultsInput, Prisma.LectureUncheckedCreateWithoutResultsInput>
+  connectOrCreate?: Prisma.LectureCreateOrConnectWithoutResultsInput
+  connect?: Prisma.LectureWhereUniqueInput
+}
+
+export type LectureUpdateOneRequiredWithoutResultsNestedInput = {
+  create?: Prisma.XOR<Prisma.LectureCreateWithoutResultsInput, Prisma.LectureUncheckedCreateWithoutResultsInput>
+  connectOrCreate?: Prisma.LectureCreateOrConnectWithoutResultsInput
+  upsert?: Prisma.LectureUpsertWithoutResultsInput
+  connect?: Prisma.LectureWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LectureUpdateToOneWithWhereWithoutResultsInput, Prisma.LectureUpdateWithoutResultsInput>, Prisma.LectureUncheckedUpdateWithoutResultsInput>
+}
+
 export type LectureCreateNestedOneWithoutAttendanceInput = {
   create?: Prisma.XOR<Prisma.LectureCreateWithoutAttendanceInput, Prisma.LectureUncheckedCreateWithoutAttendanceInput>
   connectOrCreate?: Prisma.LectureCreateOrConnectWithoutAttendanceInput
@@ -725,6 +846,7 @@ export type LectureUpdateOneWithoutPayrollLineItemNestedInput = {
 
 export type LectureCreateWithoutInstituteInput = {
   id?: string
+  kind?: $Enums.LectureKind
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -736,7 +858,9 @@ export type LectureCreateWithoutInstituteInput = {
   batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
   subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
   faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
 }
 
@@ -745,6 +869,8 @@ export type LectureUncheckedCreateWithoutInstituteInput = {
   batchId: string
   subjectId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -754,6 +880,7 @@ export type LectureUncheckedCreateWithoutInstituteInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
 }
 
@@ -792,6 +919,8 @@ export type LectureScalarWhereInput = {
   batchId?: Prisma.StringFilter<"Lecture"> | string
   subjectId?: Prisma.StringFilter<"Lecture"> | string
   facultyId?: Prisma.StringFilter<"Lecture"> | string
+  kind?: Prisma.EnumLectureKindFilter<"Lecture"> | $Enums.LectureKind
+  testId?: Prisma.StringNullableFilter<"Lecture"> | string | null
   date?: Prisma.DateTimeFilter<"Lecture"> | Date | string
   startTime?: Prisma.DateTimeFilter<"Lecture"> | Date | string
   endTime?: Prisma.DateTimeFilter<"Lecture"> | Date | string
@@ -804,6 +933,7 @@ export type LectureScalarWhereInput = {
 
 export type LectureCreateWithoutFacultyInput = {
   id?: string
+  kind?: $Enums.LectureKind
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -815,7 +945,9 @@ export type LectureCreateWithoutFacultyInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutLecturesInput
   batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
   subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
 }
 
@@ -824,6 +956,8 @@ export type LectureUncheckedCreateWithoutFacultyInput = {
   instituteId: string
   batchId: string
   subjectId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -833,6 +967,7 @@ export type LectureUncheckedCreateWithoutFacultyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
 }
 
@@ -864,6 +999,7 @@ export type LectureUpdateManyWithWhereWithoutFacultyInput = {
 
 export type LectureCreateWithoutSubjectInput = {
   id?: string
+  kind?: $Enums.LectureKind
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -875,7 +1011,9 @@ export type LectureCreateWithoutSubjectInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutLecturesInput
   batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
   faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
 }
 
@@ -884,6 +1022,8 @@ export type LectureUncheckedCreateWithoutSubjectInput = {
   instituteId: string
   batchId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -893,6 +1033,7 @@ export type LectureUncheckedCreateWithoutSubjectInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
 }
 
@@ -924,6 +1065,7 @@ export type LectureUpdateManyWithWhereWithoutSubjectInput = {
 
 export type LectureCreateWithoutBatchInput = {
   id?: string
+  kind?: $Enums.LectureKind
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -935,7 +1077,9 @@ export type LectureCreateWithoutBatchInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutLecturesInput
   subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
   faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
 }
 
@@ -944,6 +1088,8 @@ export type LectureUncheckedCreateWithoutBatchInput = {
   instituteId: string
   subjectId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -953,6 +1099,7 @@ export type LectureUncheckedCreateWithoutBatchInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
 }
 
@@ -982,8 +1129,9 @@ export type LectureUpdateManyWithWhereWithoutBatchInput = {
   data: Prisma.XOR<Prisma.LectureUpdateManyMutationInput, Prisma.LectureUncheckedUpdateManyWithoutBatchInput>
 }
 
-export type LectureCreateWithoutAttendanceInput = {
+export type LectureCreateWithoutTestInput = {
   id?: string
+  kind?: $Enums.LectureKind
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -996,6 +1144,170 @@ export type LectureCreateWithoutAttendanceInput = {
   batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
   subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
   faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
+  payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+}
+
+export type LectureUncheckedCreateWithoutTestInput = {
+  id?: string
+  instituteId: string
+  batchId: string
+  subjectId: string
+  facultyId: string
+  kind?: $Enums.LectureKind
+  date: Date | string
+  startTime: Date | string
+  endTime: Date | string
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
+  payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+}
+
+export type LectureCreateOrConnectWithoutTestInput = {
+  where: Prisma.LectureWhereUniqueInput
+  create: Prisma.XOR<Prisma.LectureCreateWithoutTestInput, Prisma.LectureUncheckedCreateWithoutTestInput>
+}
+
+export type LectureCreateManyTestInputEnvelope = {
+  data: Prisma.LectureCreateManyTestInput | Prisma.LectureCreateManyTestInput[]
+  skipDuplicates?: boolean
+}
+
+export type LectureUpsertWithWhereUniqueWithoutTestInput = {
+  where: Prisma.LectureWhereUniqueInput
+  update: Prisma.XOR<Prisma.LectureUpdateWithoutTestInput, Prisma.LectureUncheckedUpdateWithoutTestInput>
+  create: Prisma.XOR<Prisma.LectureCreateWithoutTestInput, Prisma.LectureUncheckedCreateWithoutTestInput>
+}
+
+export type LectureUpdateWithWhereUniqueWithoutTestInput = {
+  where: Prisma.LectureWhereUniqueInput
+  data: Prisma.XOR<Prisma.LectureUpdateWithoutTestInput, Prisma.LectureUncheckedUpdateWithoutTestInput>
+}
+
+export type LectureUpdateManyWithWhereWithoutTestInput = {
+  where: Prisma.LectureScalarWhereInput
+  data: Prisma.XOR<Prisma.LectureUpdateManyMutationInput, Prisma.LectureUncheckedUpdateManyWithoutTestInput>
+}
+
+export type LectureCreateWithoutResultsInput = {
+  id?: string
+  kind?: $Enums.LectureKind
+  date: Date | string
+  startTime: Date | string
+  endTime: Date | string
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutLecturesInput
+  batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
+  subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
+  faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
+  attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+}
+
+export type LectureUncheckedCreateWithoutResultsInput = {
+  id?: string
+  instituteId: string
+  batchId: string
+  subjectId: string
+  facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
+  date: Date | string
+  startTime: Date | string
+  endTime: Date | string
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+}
+
+export type LectureCreateOrConnectWithoutResultsInput = {
+  where: Prisma.LectureWhereUniqueInput
+  create: Prisma.XOR<Prisma.LectureCreateWithoutResultsInput, Prisma.LectureUncheckedCreateWithoutResultsInput>
+}
+
+export type LectureUpsertWithoutResultsInput = {
+  update: Prisma.XOR<Prisma.LectureUpdateWithoutResultsInput, Prisma.LectureUncheckedUpdateWithoutResultsInput>
+  create: Prisma.XOR<Prisma.LectureCreateWithoutResultsInput, Prisma.LectureUncheckedCreateWithoutResultsInput>
+  where?: Prisma.LectureWhereInput
+}
+
+export type LectureUpdateToOneWithWhereWithoutResultsInput = {
+  where?: Prisma.LectureWhereInput
+  data: Prisma.XOR<Prisma.LectureUpdateWithoutResultsInput, Prisma.LectureUncheckedUpdateWithoutResultsInput>
+}
+
+export type LectureUpdateWithoutResultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutLecturesNestedInput
+  batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
+  subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
+  faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
+  attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+}
+
+export type LectureUncheckedUpdateWithoutResultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  batchId?: Prisma.StringFieldUpdateOperationsInput | string
+  subjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+}
+
+export type LectureCreateWithoutAttendanceInput = {
+  id?: string
+  kind?: $Enums.LectureKind
+  date: Date | string
+  startTime: Date | string
+  endTime: Date | string
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutLecturesInput
+  batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
+  subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
+  faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
 }
 
@@ -1005,6 +1317,8 @@ export type LectureUncheckedCreateWithoutAttendanceInput = {
   batchId: string
   subjectId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -1013,6 +1327,7 @@ export type LectureUncheckedCreateWithoutAttendanceInput = {
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
 }
 
@@ -1034,6 +1349,7 @@ export type LectureUpdateToOneWithWhereWithoutAttendanceInput = {
 
 export type LectureUpdateWithoutAttendanceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1046,6 +1362,8 @@ export type LectureUpdateWithoutAttendanceInput = {
   batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
   faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
 }
 
@@ -1055,6 +1373,8 @@ export type LectureUncheckedUpdateWithoutAttendanceInput = {
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1063,11 +1383,13 @@ export type LectureUncheckedUpdateWithoutAttendanceInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
 }
 
 export type LectureCreateWithoutPayrollLineItemInput = {
   id?: string
+  kind?: $Enums.LectureKind
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -1080,7 +1402,9 @@ export type LectureCreateWithoutPayrollLineItemInput = {
   batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
   subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
   faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutPayrollLineItemInput = {
@@ -1089,6 +1413,8 @@ export type LectureUncheckedCreateWithoutPayrollLineItemInput = {
   batchId: string
   subjectId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -1098,6 +1424,7 @@ export type LectureUncheckedCreateWithoutPayrollLineItemInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutPayrollLineItemInput = {
@@ -1118,6 +1445,7 @@ export type LectureUpdateToOneWithWhereWithoutPayrollLineItemInput = {
 
 export type LectureUpdateWithoutPayrollLineItemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1130,7 +1458,9 @@ export type LectureUpdateWithoutPayrollLineItemInput = {
   batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
   faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutPayrollLineItemInput = {
@@ -1139,6 +1469,8 @@ export type LectureUncheckedUpdateWithoutPayrollLineItemInput = {
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1148,6 +1480,7 @@ export type LectureUncheckedUpdateWithoutPayrollLineItemInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureCreateManyInstituteInput = {
@@ -1155,6 +1488,8 @@ export type LectureCreateManyInstituteInput = {
   batchId: string
   subjectId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -1167,6 +1502,7 @@ export type LectureCreateManyInstituteInput = {
 
 export type LectureUpdateWithoutInstituteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1178,7 +1514,9 @@ export type LectureUpdateWithoutInstituteInput = {
   batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
   faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
 }
 
@@ -1187,6 +1525,8 @@ export type LectureUncheckedUpdateWithoutInstituteInput = {
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1196,6 +1536,7 @@ export type LectureUncheckedUpdateWithoutInstituteInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
 }
 
@@ -1204,6 +1545,8 @@ export type LectureUncheckedUpdateManyWithoutInstituteInput = {
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1219,6 +1562,8 @@ export type LectureCreateManyFacultyInput = {
   instituteId: string
   batchId: string
   subjectId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -1231,6 +1576,7 @@ export type LectureCreateManyFacultyInput = {
 
 export type LectureUpdateWithoutFacultyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1242,7 +1588,9 @@ export type LectureUpdateWithoutFacultyInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutLecturesNestedInput
   batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
 }
 
@@ -1251,6 +1599,8 @@ export type LectureUncheckedUpdateWithoutFacultyInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1260,6 +1610,7 @@ export type LectureUncheckedUpdateWithoutFacultyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
 }
 
@@ -1268,6 +1619,8 @@ export type LectureUncheckedUpdateManyWithoutFacultyInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1283,6 +1636,8 @@ export type LectureCreateManySubjectInput = {
   instituteId: string
   batchId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -1295,6 +1650,7 @@ export type LectureCreateManySubjectInput = {
 
 export type LectureUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1306,7 +1662,9 @@ export type LectureUpdateWithoutSubjectInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutLecturesNestedInput
   batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
   faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
 }
 
@@ -1315,6 +1673,8 @@ export type LectureUncheckedUpdateWithoutSubjectInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1324,6 +1684,7 @@ export type LectureUncheckedUpdateWithoutSubjectInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
 }
 
@@ -1332,6 +1693,8 @@ export type LectureUncheckedUpdateManyWithoutSubjectInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   batchId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1347,6 +1710,8 @@ export type LectureCreateManyBatchInput = {
   instituteId: string
   subjectId: string
   facultyId: string
+  kind?: $Enums.LectureKind
+  testId?: string | null
   date: Date | string
   startTime: Date | string
   endTime: Date | string
@@ -1359,6 +1724,7 @@ export type LectureCreateManyBatchInput = {
 
 export type LectureUpdateWithoutBatchInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1370,7 +1736,9 @@ export type LectureUpdateWithoutBatchInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutLecturesNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
   faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
 }
 
@@ -1379,6 +1747,8 @@ export type LectureUncheckedUpdateWithoutBatchInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1388,6 +1758,7 @@ export type LectureUncheckedUpdateWithoutBatchInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
 }
 
@@ -1396,6 +1767,82 @@ export type LectureUncheckedUpdateManyWithoutBatchInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.StringFieldUpdateOperationsInput | string
   facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type LectureCreateManyTestInput = {
+  id?: string
+  instituteId: string
+  batchId: string
+  subjectId: string
+  facultyId: string
+  kind?: $Enums.LectureKind
+  date: Date | string
+  startTime: Date | string
+  endTime: Date | string
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type LectureUpdateWithoutTestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutLecturesNestedInput
+  batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
+  subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
+  faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
+  payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+}
+
+export type LectureUncheckedUpdateWithoutTestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  batchId?: Prisma.StringFieldUpdateOperationsInput | string
+  subjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
+  payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+}
+
+export type LectureUncheckedUpdateManyWithoutTestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  batchId?: Prisma.StringFieldUpdateOperationsInput | string
+  subjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1413,10 +1860,12 @@ export type LectureUncheckedUpdateManyWithoutBatchInput = {
 
 export type LectureCountOutputType = {
   attendance: number
+  results: number
 }
 
 export type LectureCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attendance?: boolean | LectureCountOutputTypeCountAttendanceArgs
+  results?: boolean | LectureCountOutputTypeCountResultsArgs
 }
 
 /**
@@ -1436,6 +1885,13 @@ export type LectureCountOutputTypeCountAttendanceArgs<ExtArgs extends runtime.Ty
   where?: Prisma.AttendanceRecordWhereInput
 }
 
+/**
+ * LectureCountOutputType without action
+ */
+export type LectureCountOutputTypeCountResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TestResultWhereInput
+}
+
 
 export type LectureSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1443,6 +1899,8 @@ export type LectureSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   batchId?: boolean
   subjectId?: boolean
   facultyId?: boolean
+  kind?: boolean
+  testId?: boolean
   date?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -1455,7 +1913,9 @@ export type LectureSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   batch?: boolean | Prisma.BatchDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   faculty?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  test?: boolean | Prisma.Lecture$testArgs<ExtArgs>
   attendance?: boolean | Prisma.Lecture$attendanceArgs<ExtArgs>
+  results?: boolean | Prisma.Lecture$resultsArgs<ExtArgs>
   payrollLineItem?: boolean | Prisma.Lecture$payrollLineItemArgs<ExtArgs>
   _count?: boolean | Prisma.LectureCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lecture"]>
@@ -1466,6 +1926,8 @@ export type LectureSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   batchId?: boolean
   subjectId?: boolean
   facultyId?: boolean
+  kind?: boolean
+  testId?: boolean
   date?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -1478,6 +1940,7 @@ export type LectureSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   batch?: boolean | Prisma.BatchDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   faculty?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  test?: boolean | Prisma.Lecture$testArgs<ExtArgs>
 }, ExtArgs["result"]["lecture"]>
 
 export type LectureSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1486,6 +1949,8 @@ export type LectureSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   batchId?: boolean
   subjectId?: boolean
   facultyId?: boolean
+  kind?: boolean
+  testId?: boolean
   date?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -1498,6 +1963,7 @@ export type LectureSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   batch?: boolean | Prisma.BatchDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   faculty?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  test?: boolean | Prisma.Lecture$testArgs<ExtArgs>
 }, ExtArgs["result"]["lecture"]>
 
 export type LectureSelectScalar = {
@@ -1506,6 +1972,8 @@ export type LectureSelectScalar = {
   batchId?: boolean
   subjectId?: boolean
   facultyId?: boolean
+  kind?: boolean
+  testId?: boolean
   date?: boolean
   startTime?: boolean
   endTime?: boolean
@@ -1516,13 +1984,15 @@ export type LectureSelectScalar = {
   updatedAt?: boolean
 }
 
-export type LectureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "batchId" | "subjectId" | "facultyId" | "date" | "startTime" | "endTime" | "cancelledAt" | "cancelReason" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["lecture"]>
+export type LectureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "batchId" | "subjectId" | "facultyId" | "kind" | "testId" | "date" | "startTime" | "endTime" | "cancelledAt" | "cancelReason" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["lecture"]>
 export type LectureInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   batch?: boolean | Prisma.BatchDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   faculty?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  test?: boolean | Prisma.Lecture$testArgs<ExtArgs>
   attendance?: boolean | Prisma.Lecture$attendanceArgs<ExtArgs>
+  results?: boolean | Prisma.Lecture$resultsArgs<ExtArgs>
   payrollLineItem?: boolean | Prisma.Lecture$payrollLineItemArgs<ExtArgs>
   _count?: boolean | Prisma.LectureCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1531,12 +2001,14 @@ export type LectureIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   batch?: boolean | Prisma.BatchDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   faculty?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  test?: boolean | Prisma.Lecture$testArgs<ExtArgs>
 }
 export type LectureIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   batch?: boolean | Prisma.BatchDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   faculty?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  test?: boolean | Prisma.Lecture$testArgs<ExtArgs>
 }
 
 export type $LecturePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1546,7 +2018,9 @@ export type $LecturePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     batch: Prisma.$BatchPayload<ExtArgs>
     subject: Prisma.$SubjectPayload<ExtArgs>
     faculty: Prisma.$UserPayload<ExtArgs>
+    test: Prisma.$TestPayload<ExtArgs> | null
     attendance: Prisma.$AttendanceRecordPayload<ExtArgs>[]
+    results: Prisma.$TestResultPayload<ExtArgs>[]
     payrollLineItem: Prisma.$PayrollLineItemPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1555,6 +2029,8 @@ export type $LecturePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     batchId: string
     subjectId: string
     facultyId: string
+    kind: $Enums.LectureKind
+    testId: string | null
     date: Date
     startTime: Date
     endTime: Date
@@ -1961,7 +2437,9 @@ export interface Prisma__LectureClient<T, Null = never, ExtArgs extends runtime.
   batch<T extends Prisma.BatchDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BatchDefaultArgs<ExtArgs>>): Prisma.Prisma__BatchClient<runtime.Types.Result.GetResult<Prisma.$BatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   subject<T extends Prisma.SubjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubjectDefaultArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   faculty<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  test<T extends Prisma.Lecture$testArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lecture$testArgs<ExtArgs>>): Prisma.Prisma__TestClient<runtime.Types.Result.GetResult<Prisma.$TestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   attendance<T extends Prisma.Lecture$attendanceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lecture$attendanceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  results<T extends Prisma.Lecture$resultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lecture$resultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payrollLineItem<T extends Prisma.Lecture$payrollLineItemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lecture$payrollLineItemArgs<ExtArgs>>): Prisma.Prisma__PayrollLineItemClient<runtime.Types.Result.GetResult<Prisma.$PayrollLineItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1997,6 +2475,8 @@ export interface LectureFieldRefs {
   readonly batchId: Prisma.FieldRef<"Lecture", 'String'>
   readonly subjectId: Prisma.FieldRef<"Lecture", 'String'>
   readonly facultyId: Prisma.FieldRef<"Lecture", 'String'>
+  readonly kind: Prisma.FieldRef<"Lecture", 'LectureKind'>
+  readonly testId: Prisma.FieldRef<"Lecture", 'String'>
   readonly date: Prisma.FieldRef<"Lecture", 'DateTime'>
   readonly startTime: Prisma.FieldRef<"Lecture", 'DateTime'>
   readonly endTime: Prisma.FieldRef<"Lecture", 'DateTime'>
@@ -2406,6 +2886,25 @@ export type LectureDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * Lecture.test
+ */
+export type Lecture$testArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Test
+   */
+  select?: Prisma.TestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Test
+   */
+  omit?: Prisma.TestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TestInclude<ExtArgs> | null
+  where?: Prisma.TestWhereInput
+}
+
+/**
  * Lecture.attendance
  */
 export type Lecture$attendanceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2427,6 +2926,30 @@ export type Lecture$attendanceArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.AttendanceRecordScalarFieldEnum | Prisma.AttendanceRecordScalarFieldEnum[]
+}
+
+/**
+ * Lecture.results
+ */
+export type Lecture$resultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TestResult
+   */
+  select?: Prisma.TestResultSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TestResult
+   */
+  omit?: Prisma.TestResultOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TestResultInclude<ExtArgs> | null
+  where?: Prisma.TestResultWhereInput
+  orderBy?: Prisma.TestResultOrderByWithRelationInput | Prisma.TestResultOrderByWithRelationInput[]
+  cursor?: Prisma.TestResultWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TestResultScalarFieldEnum | Prisma.TestResultScalarFieldEnum[]
 }
 
 /**

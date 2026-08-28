@@ -10,10 +10,12 @@ import { TeamTab } from "@/components/settings/TeamTab";
 import { SubscriptionTab } from "@/components/settings/SubscriptionTab";
 import { MessageTemplatesTab } from "@/components/settings/MessageTemplatesTab";
 import { EmailSettingsTab } from "@/components/settings/EmailSettingsTab";
+import { RemindersTab } from "@/components/settings/RemindersTab";
 
 const TABS = [
   { id: "details", label: "Institute details" },
   { id: "team", label: "Team" },
+  { id: "reminders", label: "Reminders" },
   { id: "subscription", label: "Subscription" },
   { id: "messages", label: "Message templates" },
   { id: "email", label: "Email" },
@@ -53,6 +55,7 @@ export default function SettingsPage() {
       <div>
         {tab === "details" && <InstituteDetailsTab />}
         {tab === "team" && <TeamTab />}
+        {tab === "reminders" && <RemindersTab />}
         {tab === "subscription" && <SubscriptionTab />}
         {tab === "messages" && <MessageTemplatesTab />}
         {tab === "email" && <EmailSettingsTab />}

@@ -65,7 +65,7 @@ export default function EnquiriesPage() {
       const qs = search ? `?search=${encodeURIComponent(search)}` : "";
       const [e, c] = await Promise.all([
         apiFetch<Enquiry[]>(`/enquiries${qs}`),
-        apiFetch<Course[]>("/academics/courses"),
+        apiFetch<Course[]>("/academics/courses?active=true"),
       ]);
       setEnquiries(e);
       setCourses(c);

@@ -265,23 +265,30 @@ function SubjectModal({
 
         <div>
           <p className="mb-2 text-sm font-medium text-foreground">Courses</p>
-          {courses.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Create a course first to link subjects to it.</p>
-          ) : (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {courses.map((c) => (
-                <label
-                  key={c.id}
-                  className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors ${
-                    courseIds.has(c.id) ? "border-primary bg-secondary text-secondary-foreground" : "border-border text-muted-foreground hover:bg-secondary"
-                  }`}
-                >
-                  <input type="checkbox" className="accent-primary" checked={courseIds.has(c.id)} onChange={() => toggleCourse(c.id)} />
-                  {c.name}
-                </label>
-              ))}
-            </div>
-          )}
+          {/* Inactive courses aren't offered as NEW links, but one already linked (from
+              before it was deactivated) stays visible so it can still be seen/unchecked
+              — see changes-phase8.md §8b. */}
+          {(() => {
+            const pickable = courses.filter((c) => c.isActive || courseIds.has(c.id));
+            return pickable.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Create a course first to link subjects to it.</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {pickable.map((c) => (
+                  <label
+                    key={c.id}
+                    className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors ${
+                      courseIds.has(c.id) ? "border-primary bg-secondary text-secondary-foreground" : "border-border text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    <input type="checkbox" className="accent-primary" checked={courseIds.has(c.id)} onChange={() => toggleCourse(c.id)} />
+                    {c.name}
+                    {!c.isActive && <span className="text-xs text-muted-foreground">(inactive)</span>}
+                  </label>
+                ))}
+              </div>
+            );
+          })()}
         </div>
 
         {editing && (

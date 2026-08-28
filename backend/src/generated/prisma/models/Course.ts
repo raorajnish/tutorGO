@@ -282,6 +282,7 @@ export type CourseWhereInput = {
   subjects?: Prisma.CourseSubjectListRelationFilter
   assignments?: Prisma.FacultyAssignmentListRelationFilter
   feeStructures?: Prisma.FeeStructureListRelationFilter
+  tests?: Prisma.TestListRelationFilter
 }
 
 export type CourseOrderByWithRelationInput = {
@@ -303,6 +304,7 @@ export type CourseOrderByWithRelationInput = {
   subjects?: Prisma.CourseSubjectOrderByRelationAggregateInput
   assignments?: Prisma.FacultyAssignmentOrderByRelationAggregateInput
   feeStructures?: Prisma.FeeStructureOrderByRelationAggregateInput
+  tests?: Prisma.TestOrderByRelationAggregateInput
 }
 
 export type CourseWhereUniqueInput = Prisma.AtLeast<{
@@ -328,6 +330,7 @@ export type CourseWhereUniqueInput = Prisma.AtLeast<{
   subjects?: Prisma.CourseSubjectListRelationFilter
   assignments?: Prisma.FacultyAssignmentListRelationFilter
   feeStructures?: Prisma.FeeStructureListRelationFilter
+  tests?: Prisma.TestListRelationFilter
 }, "id" | "instituteId_code">
 
 export type CourseOrderByWithAggregationInput = {
@@ -384,6 +387,7 @@ export type CourseCreateInput = {
   subjects?: Prisma.CourseSubjectCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateInput = {
@@ -404,6 +408,7 @@ export type CourseUncheckedCreateInput = {
   subjects?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUpdateInput = {
@@ -424,6 +429,7 @@ export type CourseUpdateInput = {
   subjects?: Prisma.CourseSubjectUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateInput = {
@@ -444,6 +450,7 @@ export type CourseUncheckedUpdateInput = {
   subjects?: Prisma.CourseSubjectUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateManyInput = {
@@ -608,14 +615,6 @@ export type CourseUncheckedUpdateManyWithoutInstituteNestedInput = {
   deleteMany?: Prisma.CourseScalarWhereInput | Prisma.CourseScalarWhereInput[]
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type NullableDecimalFieldUpdateOperationsInput = {
   set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -682,6 +681,20 @@ export type CourseUpdateOneRequiredWithoutStudentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutStudentsInput, Prisma.CourseUpdateWithoutStudentsInput>, Prisma.CourseUncheckedUpdateWithoutStudentsInput>
 }
 
+export type CourseCreateNestedOneWithoutTestsInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutTestsInput, Prisma.CourseUncheckedCreateWithoutTestsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutTestsInput
+  connect?: Prisma.CourseWhereUniqueInput
+}
+
+export type CourseUpdateOneRequiredWithoutTestsNestedInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutTestsInput, Prisma.CourseUncheckedCreateWithoutTestsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutTestsInput
+  upsert?: Prisma.CourseUpsertWithoutTestsInput
+  connect?: Prisma.CourseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutTestsInput, Prisma.CourseUpdateWithoutTestsInput>, Prisma.CourseUncheckedUpdateWithoutTestsInput>
+}
+
 export type CourseCreateNestedOneWithoutAssignmentsInput = {
   create?: Prisma.XOR<Prisma.CourseCreateWithoutAssignmentsInput, Prisma.CourseUncheckedCreateWithoutAssignmentsInput>
   connectOrCreate?: Prisma.CourseCreateOrConnectWithoutAssignmentsInput
@@ -727,6 +740,7 @@ export type CourseCreateWithoutInstituteInput = {
   subjects?: Prisma.CourseSubjectCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutInstituteInput = {
@@ -746,6 +760,7 @@ export type CourseUncheckedCreateWithoutInstituteInput = {
   subjects?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutInstituteInput = {
@@ -808,6 +823,7 @@ export type CourseCreateWithoutSubjectsInput = {
   students?: Prisma.StudentCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutSubjectsInput = {
@@ -827,6 +843,7 @@ export type CourseUncheckedCreateWithoutSubjectsInput = {
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutSubjectsInput = {
@@ -862,6 +879,7 @@ export type CourseUpdateWithoutSubjectsInput = {
   students?: Prisma.StudentUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutSubjectsInput = {
@@ -881,6 +899,7 @@ export type CourseUncheckedUpdateWithoutSubjectsInput = {
   students?: Prisma.StudentUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutBatchesInput = {
@@ -900,6 +919,7 @@ export type CourseCreateWithoutBatchesInput = {
   subjects?: Prisma.CourseSubjectCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutBatchesInput = {
@@ -919,6 +939,7 @@ export type CourseUncheckedCreateWithoutBatchesInput = {
   subjects?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutBatchesInput = {
@@ -954,6 +975,7 @@ export type CourseUpdateWithoutBatchesInput = {
   subjects?: Prisma.CourseSubjectUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutBatchesInput = {
@@ -973,6 +995,7 @@ export type CourseUncheckedUpdateWithoutBatchesInput = {
   subjects?: Prisma.CourseSubjectUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutEnquiriesInput = {
@@ -992,6 +1015,7 @@ export type CourseCreateWithoutEnquiriesInput = {
   subjects?: Prisma.CourseSubjectCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutEnquiriesInput = {
@@ -1011,6 +1035,7 @@ export type CourseUncheckedCreateWithoutEnquiriesInput = {
   subjects?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutEnquiriesInput = {
@@ -1046,6 +1071,7 @@ export type CourseUpdateWithoutEnquiriesInput = {
   subjects?: Prisma.CourseSubjectUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutEnquiriesInput = {
@@ -1065,6 +1091,7 @@ export type CourseUncheckedUpdateWithoutEnquiriesInput = {
   subjects?: Prisma.CourseSubjectUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutStudentsInput = {
@@ -1084,6 +1111,7 @@ export type CourseCreateWithoutStudentsInput = {
   subjects?: Prisma.CourseSubjectCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutStudentsInput = {
@@ -1103,6 +1131,7 @@ export type CourseUncheckedCreateWithoutStudentsInput = {
   subjects?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutStudentsInput = {
@@ -1138,6 +1167,7 @@ export type CourseUpdateWithoutStudentsInput = {
   subjects?: Prisma.CourseSubjectUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutStudentsInput = {
@@ -1154,6 +1184,103 @@ export type CourseUncheckedUpdateWithoutStudentsInput = {
   defaultMonthlyFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   batches?: Prisma.BatchUncheckedUpdateManyWithoutCourseNestedInput
   enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutCourseNestedInput
+  subjects?: Prisma.CourseSubjectUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseCreateWithoutTestsInput = {
+  id?: string
+  name: string
+  code: string
+  durationMonths?: number | null
+  description?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  defaultFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultMonthlyFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institute: Prisma.InstituteCreateNestedOneWithoutCoursesInput
+  batches?: Prisma.BatchCreateNestedManyWithoutCourseInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutCourseInput
+  students?: Prisma.StudentCreateNestedManyWithoutCourseInput
+  subjects?: Prisma.CourseSubjectCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutCourseInput
+  feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutCourseInput
+}
+
+export type CourseUncheckedCreateWithoutTestsInput = {
+  id?: string
+  instituteId: string
+  name: string
+  code: string
+  durationMonths?: number | null
+  description?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  defaultFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultMonthlyFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutCourseInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutCourseInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutCourseInput
+  subjects?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutCourseInput
+  feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutCourseInput
+}
+
+export type CourseCreateOrConnectWithoutTestsInput = {
+  where: Prisma.CourseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CourseCreateWithoutTestsInput, Prisma.CourseUncheckedCreateWithoutTestsInput>
+}
+
+export type CourseUpsertWithoutTestsInput = {
+  update: Prisma.XOR<Prisma.CourseUpdateWithoutTestsInput, Prisma.CourseUncheckedUpdateWithoutTestsInput>
+  create: Prisma.XOR<Prisma.CourseCreateWithoutTestsInput, Prisma.CourseUncheckedCreateWithoutTestsInput>
+  where?: Prisma.CourseWhereInput
+}
+
+export type CourseUpdateToOneWithWhereWithoutTestsInput = {
+  where?: Prisma.CourseWhereInput
+  data: Prisma.XOR<Prisma.CourseUpdateWithoutTestsInput, Prisma.CourseUncheckedUpdateWithoutTestsInput>
+}
+
+export type CourseUpdateWithoutTestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  durationMonths?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  defaultFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultMonthlyFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutCoursesNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutCourseNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutCourseNestedInput
+  students?: Prisma.StudentUpdateManyWithoutCourseNestedInput
+  subjects?: Prisma.CourseSubjectUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.FacultyAssignmentUpdateManyWithoutCourseNestedInput
+  feeStructures?: Prisma.FeeStructureUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseUncheckedUpdateWithoutTestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  durationMonths?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  defaultFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  defaultMonthlyFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutCourseNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutCourseNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutCourseNestedInput
   subjects?: Prisma.CourseSubjectUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutCourseNestedInput
@@ -1176,6 +1303,7 @@ export type CourseCreateWithoutAssignmentsInput = {
   students?: Prisma.StudentCreateNestedManyWithoutCourseInput
   subjects?: Prisma.CourseSubjectCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutAssignmentsInput = {
@@ -1195,6 +1323,7 @@ export type CourseUncheckedCreateWithoutAssignmentsInput = {
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutCourseInput
   subjects?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutCourseInput
   feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutAssignmentsInput = {
@@ -1230,6 +1359,7 @@ export type CourseUpdateWithoutAssignmentsInput = {
   students?: Prisma.StudentUpdateManyWithoutCourseNestedInput
   subjects?: Prisma.CourseSubjectUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutAssignmentsInput = {
@@ -1249,6 +1379,7 @@ export type CourseUncheckedUpdateWithoutAssignmentsInput = {
   students?: Prisma.StudentUncheckedUpdateManyWithoutCourseNestedInput
   subjects?: Prisma.CourseSubjectUncheckedUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutFeeStructuresInput = {
@@ -1268,6 +1399,7 @@ export type CourseCreateWithoutFeeStructuresInput = {
   students?: Prisma.StudentCreateNestedManyWithoutCourseInput
   subjects?: Prisma.CourseSubjectCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutFeeStructuresInput = {
@@ -1287,6 +1419,7 @@ export type CourseUncheckedCreateWithoutFeeStructuresInput = {
   students?: Prisma.StudentUncheckedCreateNestedManyWithoutCourseInput
   subjects?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutCourseInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutFeeStructuresInput = {
@@ -1322,6 +1455,7 @@ export type CourseUpdateWithoutFeeStructuresInput = {
   students?: Prisma.StudentUpdateManyWithoutCourseNestedInput
   subjects?: Prisma.CourseSubjectUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutFeeStructuresInput = {
@@ -1341,6 +1475,7 @@ export type CourseUncheckedUpdateWithoutFeeStructuresInput = {
   students?: Prisma.StudentUncheckedUpdateManyWithoutCourseNestedInput
   subjects?: Prisma.CourseSubjectUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateManyInstituteInput = {
@@ -1373,6 +1508,7 @@ export type CourseUpdateWithoutInstituteInput = {
   subjects?: Prisma.CourseSubjectUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutInstituteInput = {
@@ -1392,6 +1528,7 @@ export type CourseUncheckedUpdateWithoutInstituteInput = {
   subjects?: Prisma.CourseSubjectUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutCourseNestedInput
   feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutCourseNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateManyWithoutInstituteInput = {
@@ -1419,6 +1556,7 @@ export type CourseCountOutputType = {
   subjects: number
   assignments: number
   feeStructures: number
+  tests: number
 }
 
 export type CourseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1428,6 +1566,7 @@ export type CourseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   subjects?: boolean | CourseCountOutputTypeCountSubjectsArgs
   assignments?: boolean | CourseCountOutputTypeCountAssignmentsArgs
   feeStructures?: boolean | CourseCountOutputTypeCountFeeStructuresArgs
+  tests?: boolean | CourseCountOutputTypeCountTestsArgs
 }
 
 /**
@@ -1482,6 +1621,13 @@ export type CourseCountOutputTypeCountFeeStructuresArgs<ExtArgs extends runtime.
   where?: Prisma.FeeStructureWhereInput
 }
 
+/**
+ * CourseCountOutputType without action
+ */
+export type CourseCountOutputTypeCountTestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TestWhereInput
+}
+
 
 export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1502,6 +1648,7 @@ export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   subjects?: boolean | Prisma.Course$subjectsArgs<ExtArgs>
   assignments?: boolean | Prisma.Course$assignmentsArgs<ExtArgs>
   feeStructures?: boolean | Prisma.Course$feeStructuresArgs<ExtArgs>
+  tests?: boolean | Prisma.Course$testsArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["course"]>
 
@@ -1558,6 +1705,7 @@ export type CourseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   subjects?: boolean | Prisma.Course$subjectsArgs<ExtArgs>
   assignments?: boolean | Prisma.Course$assignmentsArgs<ExtArgs>
   feeStructures?: boolean | Prisma.Course$feeStructuresArgs<ExtArgs>
+  tests?: boolean | Prisma.Course$testsArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CourseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1577,6 +1725,7 @@ export type $CoursePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     subjects: Prisma.$CourseSubjectPayload<ExtArgs>[]
     assignments: Prisma.$FacultyAssignmentPayload<ExtArgs>[]
     feeStructures: Prisma.$FeeStructurePayload<ExtArgs>[]
+    tests: Prisma.$TestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1998,6 +2147,7 @@ export interface Prisma__CourseClient<T, Null = never, ExtArgs extends runtime.T
   subjects<T extends Prisma.Course$subjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$subjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignments<T extends Prisma.Course$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FacultyAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   feeStructures<T extends Prisma.Course$feeStructuresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$feeStructuresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeeStructurePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tests<T extends Prisma.Course$testsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$testsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2580,6 +2730,30 @@ export type Course$feeStructuresArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.FeeStructureScalarFieldEnum | Prisma.FeeStructureScalarFieldEnum[]
+}
+
+/**
+ * Course.tests
+ */
+export type Course$testsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Test
+   */
+  select?: Prisma.TestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Test
+   */
+  omit?: Prisma.TestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TestInclude<ExtArgs> | null
+  where?: Prisma.TestWhereInput
+  orderBy?: Prisma.TestOrderByWithRelationInput | Prisma.TestOrderByWithRelationInput[]
+  cursor?: Prisma.TestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TestScalarFieldEnum | Prisma.TestScalarFieldEnum[]
 }
 
 /**

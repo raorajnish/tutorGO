@@ -57,11 +57,14 @@ export const ModelName = {
   Module: 'Module',
   InstituteModule: 'InstituteModule',
   User: 'User',
+  PushSubscription: 'PushSubscription',
+  PasswordResetOtp: 'PasswordResetOtp',
   EmailConfig: 'EmailConfig',
   InstituteEmailConfig: 'InstituteEmailConfig',
   MessageLog: 'MessageLog',
   AuditLog: 'AuditLog',
   Notification: 'Notification',
+  ScheduledReminder: 'ScheduledReminder',
   Course: 'Course',
   Subject: 'Subject',
   CourseSubject: 'CourseSubject',
@@ -72,6 +75,8 @@ export const ModelName = {
   Student: 'Student',
   StudentBatch: 'StudentBatch',
   Lecture: 'Lecture',
+  Test: 'Test',
+  TestResult: 'TestResult',
   AttendanceRecord: 'AttendanceRecord',
   FacultyAssignment: 'FacultyAssignment',
   MessageTemplate: 'MessageTemplate',
@@ -85,7 +90,11 @@ export const ModelName = {
   PayrollLineItem: 'PayrollLineItem',
   PayrollPayment: 'PayrollPayment',
   PayrollPaymentAllocation: 'PayrollPaymentAllocation',
-  PayrollRun: 'PayrollRun'
+  PayrollRun: 'PayrollRun',
+  ExpenseCategory: 'ExpenseCategory',
+  Event: 'Event',
+  Expense: 'Expense',
+  FinanceEntry: 'FinanceEntry'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -205,6 +214,31 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const PushSubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  createdAt: 'createdAt'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+
+
+export const PasswordResetOtpScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  expiresAt: 'expiresAt',
+  attempts: 'attempts',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetOtpScalarFieldEnum = (typeof PasswordResetOtpScalarFieldEnum)[keyof typeof PasswordResetOtpScalarFieldEnum]
+
+
 export const EmailConfigScalarFieldEnum = {
   id: 'id',
   host: 'host',
@@ -281,6 +315,28 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const ScheduledReminderScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  createdByUserId: 'createdByUserId',
+  title: 'title',
+  category: 'category',
+  dueDate: 'dueDate',
+  leadDays: 'leadDays',
+  repeat: 'repeat',
+  audience: 'audience',
+  notes: 'notes',
+  isActive: 'isActive',
+  lastFiredAt: 'lastFiredAt',
+  nextNotifyOn: 'nextNotifyOn',
+  nextNotifyLead: 'nextNotifyLead',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ScheduledReminderScalarFieldEnum = (typeof ScheduledReminderScalarFieldEnum)[keyof typeof ScheduledReminderScalarFieldEnum]
 
 
 export const CourseScalarFieldEnum = {
@@ -419,6 +475,8 @@ export const LectureScalarFieldEnum = {
   batchId: 'batchId',
   subjectId: 'subjectId',
   facultyId: 'facultyId',
+  kind: 'kind',
+  testId: 'testId',
   date: 'date',
   startTime: 'startTime',
   endTime: 'endTime',
@@ -430,6 +488,41 @@ export const LectureScalarFieldEnum = {
 } as const
 
 export type LectureScalarFieldEnum = (typeof LectureScalarFieldEnum)[keyof typeof LectureScalarFieldEnum]
+
+
+export const TestScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  courseId: 'courseId',
+  subjectId: 'subjectId',
+  title: 'title',
+  totalMarks: 'totalMarks',
+  passingMarks: 'passingMarks',
+  instructions: 'instructions',
+  paperAssetUrl: 'paperAssetUrl',
+  paperAssetType: 'paperAssetType',
+  paperAssetName: 'paperAssetName',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TestScalarFieldEnum = (typeof TestScalarFieldEnum)[keyof typeof TestScalarFieldEnum]
+
+
+export const TestResultScalarFieldEnum = {
+  id: 'id',
+  testId: 'testId',
+  lectureId: 'lectureId',
+  studentId: 'studentId',
+  marksObtained: 'marksObtained',
+  remarks: 'remarks',
+  enteredByUserId: 'enteredByUserId',
+  enteredAt: 'enteredAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TestResultScalarFieldEnum = (typeof TestResultScalarFieldEnum)[keyof typeof TestResultScalarFieldEnum]
 
 
 export const AttendanceRecordScalarFieldEnum = {
@@ -511,6 +604,7 @@ export const FeeInstallmentScalarFieldEnum = {
   amount: 'amount',
   paidAmount: 'paidAmount',
   waived: 'waived',
+  adjustedFromPrevious: 'adjustedFromPrevious',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -633,6 +727,64 @@ export const PayrollRunScalarFieldEnum = {
 } as const
 
 export type PayrollRunScalarFieldEnum = (typeof PayrollRunScalarFieldEnum)[keyof typeof PayrollRunScalarFieldEnum]
+
+
+export const ExpenseCategoryScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  name: 'name',
+  kind: 'kind',
+  isActive: 'isActive',
+  createdAt: 'createdAt'
+} as const
+
+export type ExpenseCategoryScalarFieldEnum = (typeof ExpenseCategoryScalarFieldEnum)[keyof typeof ExpenseCategoryScalarFieldEnum]
+
+
+export const EventScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  name: 'name',
+  notes: 'notes',
+  createdAt: 'createdAt'
+} as const
+
+export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum]
+
+
+export const ExpenseScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  categoryId: 'categoryId',
+  eventId: 'eventId',
+  title: 'title',
+  amount: 'amount',
+  date: 'date',
+  mode: 'mode',
+  referenceNo: 'referenceNo',
+  notes: 'notes',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
+
+
+export const FinanceEntryScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  kind: 'kind',
+  sourceType: 'sourceType',
+  sourceId: 'sourceId',
+  amount: 'amount',
+  date: 'date',
+  description: 'description',
+  expenseId: 'expenseId',
+  createdAt: 'createdAt'
+} as const
+
+export type FinanceEntryScalarFieldEnum = (typeof FinanceEntryScalarFieldEnum)[keyof typeof FinanceEntryScalarFieldEnum]
 
 
 export const SortOrder = {

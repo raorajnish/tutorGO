@@ -80,6 +80,20 @@ export type InstituteModule = Prisma.InstituteModuleModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model PushSubscription
+ * One browser/device registration for web push. A user can have several
+ * (phone, laptop, ...); each is pushed to independently, and a subscription
+ * that comes back 410 Gone from the push service (the browser unsubscribed
+ * on its end) is deleted rather than retried.
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel
+/**
+ * Model PasswordResetOtp
+ * Short-lived 6-digit OTP for the forgot-password flow. codeHash is a bcrypt
+ * hash — the plaintext code only ever exists in the email sent to the user.
+ */
+export type PasswordResetOtp = Prisma.PasswordResetOtpModel
+/**
  * Model EmailConfig
  * Singleton row (id = "default") — the platform's outbound SMTP transport,
  * used as the fallback whenever an institute hasn't configured its own
@@ -117,6 +131,15 @@ export type AuditLog = Prisma.AuditLogModel
  * there's no in-app channel possible for them by construction.
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model ScheduledReminder
+ * A dated obligation that notifies its audience `leadDays` before it's due.
+ * Distinct from `POST /org/reminders`, which broadcasts an ad-hoc message
+ * to team roles *immediately* and stores nothing — this one is scheduled,
+ * persistent, and optionally recurring. Fired by services/reminderScheduler.ts
+ * (in-process ticker started in server.ts). See changes-phase8.md §8d.
+ */
+export type ScheduledReminder = Prisma.ScheduledReminderModel
 /**
  * Model Course
  * Doubles as the institute's "class/standard" — e.g. "10th Standard" (code
@@ -177,8 +200,30 @@ export type StudentBatch = Prisma.StudentBatchModel
  * One scheduled class session. Roster is derived at read time from
  * StudentBatch rows active on `date`, never stored here — so a lecture
  * never goes stale if a student is later reassigned to a different batch.
+ * 
+ * A test session is the SAME row with kind = TEST and testId set, rather
+ * than a parallel table: lecture history, the roster/mark endpoints, and
+ * payroll's per-lecture generator then all work on tests unchanged. In
+ * particular `facultyId` doubles as "the invigilator" for TEST rows, which
+ * is what makes payroll correct for free — generateLectureLineItems only
+ * pays PER_LECTURE profiles, so a monthly-salaried invigilator gets nothing
+ * extra and an OWNER (who can't hold a SalaryProfile) never generates pay.
  */
 export type Lecture = Prisma.LectureModel
+/**
+ * Model Test
+ * A test definition — the paper, the marks scheme, the instructions. It is
+ * scheduled into one Lecture row (kind = TEST) per batch it's held for, so
+ * one Test can span several batches on different dates/slots.
+ */
+export type Test = Prisma.TestModel
+/**
+ * Model TestResult
+ * One student's marks for one test session. Only written for students whose
+ * attendance on that session is PRESENT/PRESENT_BIOMETRIC/LATE — enforced in
+ * the route, since "marks for an absentee" is always a data-entry mistake.
+ */
+export type TestResult = Prisma.TestResultModel
 /**
  * Model AttendanceRecord
  * 
@@ -302,3 +347,29 @@ export type PayrollPaymentAllocation = Prisma.PayrollPaymentAllocationModel
  * the data.
  */
 export type PayrollRun = Prisma.PayrollRunModel
+/**
+ * Model ExpenseCategory
+ * Per-institute, customizable — every institute is auto-seeded with a
+ * standard default set on creation (see expenseDefaults.ts), then
+ * owners/admins can add, rename, or deactivate their own on top.
+ */
+export type ExpenseCategory = Prisma.ExpenseCategoryModel
+/**
+ * Model Event
+ * A named occasion (e.g. "Annual Day 2026") that expenses can be tagged
+ * against, so spend is visible both by category and by event.
+ */
+export type Event = Prisma.EventModel
+/**
+ * Model Expense
+ * 
+ */
+export type Expense = Prisma.ExpenseModel
+/**
+ * Model FinanceEntry
+ * Shared mirror table for the combined Ledger (§2.13): every Expense writes
+ * one row here. Fee Payments and PayrollPayments aren't mirrored yet — the
+ * Ledger query reads those two tables directly and merges them with
+ * FinanceEntry rows at query time (see routes/expenses.ts ledger endpoint).
+ */
+export type FinanceEntry = Prisma.FinanceEntryModel

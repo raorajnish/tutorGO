@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
@@ -115,15 +116,22 @@ function LoginForm() {
               placeholder="you@institute.com"
             />
 
-            <PasswordInput
-              id="password"
-              label="Password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
+            <div className="space-y-1.5">
+              <PasswordInput
+                id="password"
+                label="Password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+              <div className="text-right">
+                <Link href="/login/forgot-password" className="text-xs font-medium text-accent hover:opacity-80">
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
 
             {error && (
               <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">

@@ -73,6 +73,72 @@ export interface LoginResponse {
 }
 
 // ---------------------------------------------------------------------------
+// Forgot password (OTP)
+// ---------------------------------------------------------------------------
+
+export interface VerifyOtpResponse {
+  resetToken: string;
+}
+
+export interface ResetPasswordResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    fullName: string;
+    role: Role;
+    instituteId: string | null;
+    organizationId: string | null;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Expenses
+// ---------------------------------------------------------------------------
+
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  kind: "EXPENSE" | "INCOME";
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface ExpenseEvent {
+  id: string;
+  name: string;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface Expense {
+  id: string;
+  title: string;
+  amount: string;
+  date: string;
+  mode: PaymentMode;
+  referenceNo: string | null;
+  notes: string | null;
+  category: { id: string; name: string };
+  event: { id: string; name: string } | null;
+  createdByName: string | null;
+  createdAt: string;
+}
+
+export interface LedgerEntry {
+  id: string;
+  kind: "INCOME" | "EXPENSE" | "PAYROLL";
+  date: string;
+  description: string;
+  amount: string;
+}
+
+export interface LedgerResponse {
+  entries: LedgerEntry[];
+  summary: { income: string; expense: string; payroll: string; net: string };
+}
+
+// ---------------------------------------------------------------------------
 // Platform (SuperAdmin) — Organizations
 // ---------------------------------------------------------------------------
 
@@ -208,6 +274,24 @@ export interface PlatformInstituteDetail {
   plan: { id: string; code: string; name: string; limits: PlanLimits } | null;
 }
 
+/// One row of the platform-wide subscription overview: an institute, its
+/// plan, live usage against every cap, and which modules it's paying for.
+export interface SubscriptionRow {
+  id: string;
+  code: string;
+  name: string;
+  city: string | null;
+  isActive: boolean;
+  onboardingDone: boolean;
+  createdAt: string;
+  organization: { id: string; name: string; code: string };
+  plan: { id: string; code: string; name: string } | null;
+  limits: PlanLimits | null;
+  /// True when any capped role is at or over its limit — they've outgrown the tier.
+  atLimit: boolean;
+  activeModules: ModuleCode[];
+}
+
 // ---------------------------------------------------------------------------
 // Plans — per-institute role headcount limits
 // ---------------------------------------------------------------------------
@@ -319,6 +403,73 @@ export interface InstitutePlanResponse {
 // ---------------------------------------------------------------------------
 // Academics — Courses / Subjects / Batches
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Scheduled reminders (Phase 8d)
+// ---------------------------------------------------------------------------
+
+export const REMINDER_CATEGORIES = ["UTILITY", "RENT", "MAINTENANCE", "COMPLIANCE", "SUPPLIES", "OTHER"] as const;
+export type ReminderCategory = (typeof REMINDER_CATEGORIES)[number];
+
+export const REMINDER_CATEGORY_LABELS: Record<ReminderCategory, string> = {
+  UTILITY: "Utility bill",
+  RENT: "Rent",
+  MAINTENANCE: "Maintenance",
+  COMPLIANCE: "Licence / compliance",
+  SUPPLIES: "Supplies",
+  OTHER: "Other",
+};
+
+export const REMINDER_REPEATS = ["NONE", "WEEKLY", "MONTHLY", "QUARTERLY", "YEARLY"] as const;
+export type ReminderRepeat = (typeof REMINDER_REPEATS)[number];
+
+export const REMINDER_REPEAT_LABELS: Record<ReminderRepeat, string> = {
+  NONE: "Doesn't repeat",
+  WEEKLY: "Every week",
+  MONTHLY: "Every month",
+  QUARTERLY: "Every 3 months",
+  YEARLY: "Every year",
+};
+
+export const REMINDER_AUDIENCES = ["PRIVATE", "ADMINS"] as const;
+export type ReminderAudience = (typeof REMINDER_AUDIENCES)[number];
+
+export const REMINDER_AUDIENCE_LABELS: Record<ReminderAudience, string> = {
+  PRIVATE: "Only me",
+  ADMINS: "Me, the owner & all admins",
+};
+
+/** Presets the UI offers; any other number is still valid server-side. */
+export const REMINDER_LEAD_PRESETS = [90, 30, 15, 7, 1, 0] as const;
+
+export function reminderLeadLabel(days: number): string {
+  if (days === 0) return "On the day";
+  if (days === 1) return "1 day before";
+  if (days === 7) return "1 week before";
+  return `${days} days before`;
+}
+
+export type ReminderStatus = "SCHEDULED" | "NOTIFYING" | "DUE_TODAY" | "OVERDUE";
+
+export interface Reminder {
+  id: string;
+  title: string;
+  category: ReminderCategory;
+  dueDate: string;
+  /** Every lead time it notifies at, largest first. */
+  leadDays: number[];
+  repeat: ReminderRepeat;
+  audience: ReminderAudience;
+  notes: string | null;
+  isActive: boolean;
+  lastFiredAt: string | null;
+  /** Next unfired nudge; null once every lead time for this date has gone out. */
+  nextNotifyOn: string | null;
+  nextNotifyLead: number | null;
+  daysUntilDue: number;
+  status: ReminderStatus;
+  createdByName: string | null;
+}
 
 export interface CourseRef {
   id: string;
@@ -518,8 +669,15 @@ export interface SubjectRef {
   shortCode: string;
 }
 
+export const LECTURE_KINDS = ["LECTURE", "TEST"] as const;
+export type LectureKind = (typeof LECTURE_KINDS)[number];
+
 export interface Lecture {
   id: string;
+  /// A test session is the same row with kind "TEST" — see the Tests section.
+  kind: LectureKind;
+  testId: string | null;
+  testTitle: string | null;
   date: string;
   startTime: string;
   endTime: string;
@@ -599,6 +757,125 @@ export interface ScheduleLecturePayload {
   note?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+export interface Invigilator {
+  id: string;
+  fullName: string;
+  role: Role;
+}
+
+export interface TestPaperAsset {
+  url: string;
+  type: "pdf" | "image";
+  name: string;
+}
+
+export interface Test {
+  id: string;
+  title: string;
+  totalMarks: number;
+  passingMarks: number | null;
+  instructions: string | null;
+  paperAssetUrl: string | null;
+  paperAssetType: "pdf" | "image" | null;
+  paperAssetName: string | null;
+  createdAt: string;
+  course: CourseRef;
+  subject: SubjectRef;
+}
+
+export interface TestListItem extends Test {
+  sessionCount: number;
+  resultCount: number;
+  batches: string[];
+  firstDate: string | null;
+}
+
+/// One batch's sitting of a test — a Lecture row with kind "TEST".
+export interface TestSession extends Omit<Lecture, "markedCount"> {
+  expected: number;
+  markedCount: number;
+  presentCount: number;
+  resultCount: number;
+}
+
+export interface TestDetail extends Test {
+  sessions: TestSession[];
+}
+
+export interface TestSessionPayload {
+  batchId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  invigilatorId: string;
+}
+
+export interface CreateTestPayload {
+  courseId: string;
+  subjectId: string;
+  title: string;
+  totalMarks: number;
+  passingMarks?: number;
+  instructions?: string;
+  paperAssetUrl?: string;
+  paperAssetType?: "pdf" | "image";
+  paperAssetName?: string;
+  sessions: TestSessionPayload[];
+  acceptSplitFor?: string[];
+}
+
+/// Returned as a 409 body when a test lands inside an existing lecture that
+/// can be safely split around it.
+export interface ScheduleConflict {
+  batchId: string;
+  batchName: string;
+  split: {
+    conflictLectureId: string;
+    conflictLabel: string;
+    before: { startTime: string; endTime: string } | null;
+    after: { startTime: string; endTime: string } | null;
+  };
+}
+
+export interface TestReportRow {
+  student: { id: string; name: string; studentCode: string };
+  attendanceStatus: AttendanceStatus | null;
+  present: boolean;
+  marksObtained: string | null;
+  remarks: string | null;
+  passed: boolean | null;
+}
+
+export interface TestReport {
+  test: Test;
+  instituteName: string;
+  session: Omit<Lecture, "markedCount">;
+  rows: TestReportRow[];
+  summary: {
+    total: number;
+    present: number;
+    absent: number;
+    graded: number;
+    highest: string | null;
+    lowest: string | null;
+    average: string | null;
+    passed: number | null;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Reminder broadcasts
+// ---------------------------------------------------------------------------
+
+export interface ReminderAudienceRow {
+  role: TeamRole;
+  count: number;
+}
+
 
 // ---------------------------------------------------------------------------
 // Fees (Phase 5a — staff-facing)
@@ -673,6 +950,10 @@ export interface FeeInstallment {
   amount: string;
   paidAmount: string;
   waived: boolean;
+  /** True when this installment's amount was bumped up by a shortfall
+   * carried forward from an earlier underpaid installment — see fees.ts
+   * POST /payments and changes-phase8.md §8a. Display hint only. */
+  adjustedFromPrevious: boolean;
   status: InstallmentStatus;
 }
 

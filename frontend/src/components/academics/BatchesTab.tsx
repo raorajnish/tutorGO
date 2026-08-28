@@ -194,14 +194,20 @@ function BatchModal({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // A brand-new batch should only ever default to (or offer) an active
+  // course; editing an existing batch keeps its current course visible even
+  // if it's since been deactivated. See changes-phase8.md §8b.
+  const pickableCourses = courses.filter((c) => c.isActive || c.id === editing?.course.id);
+
   useEffect(() => {
     if (!open) return;
     setName(editing?.name ?? "");
-    setCourseId(editing?.course.id ?? courses[0]?.id ?? "");
+    setCourseId(editing?.course.id ?? pickableCourses[0]?.id ?? "");
     setStartDate(editing ? toDateInput(editing.startDate) : "");
     setEndDate(editing?.endDate ? toDateInput(editing.endDate) : "");
     setIsActive(editing?.isActive ?? true);
     setError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editing, courses]);
 
   async function handleSubmit(e: FormEvent) {
@@ -263,7 +269,10 @@ function BatchModal({
           label="Course"
           value={courseId}
           onChange={setCourseId}
-          options={courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))}
+          options={pickableCourses.map((c) => ({
+            value: c.id,
+            label: c.isActive ? `${c.name} (${c.code})` : `${c.name} (${c.code}) — inactive`,
+          }))}
           placeholder="Select course…"
         />
 

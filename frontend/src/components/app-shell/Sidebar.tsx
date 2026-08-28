@@ -107,6 +107,26 @@ const ICONS: Record<NavIcon, React.ReactNode> = {
       <path d="M6 6V5a2 2 0 012-2h8a2 2 0 012 2v1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  expenses: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 7l3-3h12l3 3M3 7v12a1 1 0 001 1h16a1 1 0 001-1V7M3 7h18" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 12a2 2 0 100 4h4v-4h-4z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  tests: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M9 2h6a1 1 0 011 1v2H8V3a1 1 0 011-1z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 4H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 11l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  subscriptions: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="M2 9h20" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 14h4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 };
 
 export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: SidebarProps) {

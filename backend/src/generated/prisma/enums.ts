@@ -64,6 +64,14 @@ export const EnquiryActivityType = {
 export type EnquiryActivityType = (typeof EnquiryActivityType)[keyof typeof EnquiryActivityType]
 
 
+export const LectureKind = {
+  LECTURE: 'LECTURE',
+  TEST: 'TEST'
+} as const
+
+export type LectureKind = (typeof LectureKind)[keyof typeof LectureKind]
+
+
 export const AttendanceStatus = {
   PRESENT: 'PRESENT',
   ABSENT: 'ABSENT',
@@ -137,3 +145,34 @@ export const PayrollRunStatus = {
 } as const
 
 export type PayrollRunStatus = (typeof PayrollRunStatus)[keyof typeof PayrollRunStatus]
+
+
+export const ReminderCategory = {
+  UTILITY: 'UTILITY',
+  RENT: 'RENT',
+  MAINTENANCE: 'MAINTENANCE',
+  COMPLIANCE: 'COMPLIANCE',
+  SUPPLIES: 'SUPPLIES',
+  OTHER: 'OTHER'
+} as const
+
+export type ReminderCategory = (typeof ReminderCategory)[keyof typeof ReminderCategory]
+
+
+export const ReminderRepeat = {
+  NONE: 'NONE',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+  QUARTERLY: 'QUARTERLY',
+  YEARLY: 'YEARLY'
+} as const
+
+export type ReminderRepeat = (typeof ReminderRepeat)[keyof typeof ReminderRepeat]
+
+
+export const ReminderAudience = {
+  PRIVATE: 'PRIVATE',
+  ADMINS: 'ADMINS'
+} as const
+
+export type ReminderAudience = (typeof ReminderAudience)[keyof typeof ReminderAudience]
