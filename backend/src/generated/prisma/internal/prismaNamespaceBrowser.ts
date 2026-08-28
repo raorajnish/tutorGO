@@ -94,7 +94,9 @@ export const ModelName = {
   ExpenseCategory: 'ExpenseCategory',
   Event: 'Event',
   Expense: 'Expense',
-  FinanceEntry: 'FinanceEntry'
+  FinanceEntry: 'FinanceEntry',
+  DistributionItem: 'DistributionItem',
+  DistributionReceipt: 'DistributionReceipt'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -452,7 +454,12 @@ export const StudentScalarFieldEnum = {
   fingerprintId: 'fingerprintId',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  selfFillEligible: 'selfFillEligible',
+  profileCompletedAt: 'profileCompletedAt',
+  selfFillPin: 'selfFillPin',
+  selfFillAttempts: 'selfFillAttempts',
+  selfFillLockedAt: 'selfFillLockedAt'
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
@@ -785,6 +792,33 @@ export const FinanceEntryScalarFieldEnum = {
 } as const
 
 export type FinanceEntryScalarFieldEnum = (typeof FinanceEntryScalarFieldEnum)[keyof typeof FinanceEntryScalarFieldEnum]
+
+
+export const DistributionItemScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  name: 'name',
+  courseId: 'courseId',
+  totalSets: 'totalSets',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DistributionItemScalarFieldEnum = (typeof DistributionItemScalarFieldEnum)[keyof typeof DistributionItemScalarFieldEnum]
+
+
+export const DistributionReceiptScalarFieldEnum = {
+  id: 'id',
+  distributionItemId: 'distributionItemId',
+  studentId: 'studentId',
+  receivedAt: 'receivedAt',
+  notes: 'notes',
+  updatedByUserId: 'updatedByUserId',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DistributionReceiptScalarFieldEnum = (typeof DistributionReceiptScalarFieldEnum)[keyof typeof DistributionReceiptScalarFieldEnum]
 
 
 export const SortOrder = {

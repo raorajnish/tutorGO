@@ -6,6 +6,7 @@ import { authenticate, requireInstitute, requireModule, requireRoles } from "../
 import { validateBody } from "../middleware/validate.js";
 import { auditLog } from "../services/audit.js";
 import { nextStudentCode } from "../services/studentCode.js";
+import { createDistributionReceiptsForNewStudent } from "../services/distributionSync.js";
 
 export const admissionRouter = Router();
 
@@ -80,6 +81,8 @@ admissionRouter.post("/", validateBody(admitSchema), async (req, res, next) => {
           data: { studentId: student.id, batchId: batch.id, joinedAt: body.admissionDate },
         });
       }
+
+      await createDistributionReceiptsForNewStudent(tx, instituteId, student.id, body.courseId);
 
       if (enquiry) {
         await tx.enquiry.update({ where: { id: enquiry.id }, data: { status: "CONVERTED" } });

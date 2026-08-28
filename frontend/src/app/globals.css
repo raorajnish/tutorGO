@@ -5,9 +5,18 @@
   --font-sans: var(--font-manrope);
   --font-display: var(--font-plus-jakarta);
 
-  --shadow-card: 0 1px 2px rgba(19, 34, 56, 0.04);
-  --shadow-card-hover: 0 8px 20px rgba(19, 34, 56, 0.08);
-  --shadow-overlay: 0 24px 60px rgba(19, 34, 56, 0.24);
+  /* Indirection so `.dark` can swap these at runtime — `@theme inline` bakes
+     literal values into the utility, but a var() reference still resolves
+     against the cascade. */
+  --shadow-card: var(--tg-shadow-card);
+  --shadow-card-hover: var(--tg-shadow-card-hover);
+  --shadow-overlay: var(--tg-shadow-overlay);
+}
+
+:root {
+  --tg-shadow-card: 0 1px 2px rgba(19, 34, 56, 0.04);
+  --tg-shadow-card-hover: 0 8px 20px rgba(19, 34, 56, 0.08);
+  --tg-shadow-overlay: 0 24px 60px rgba(19, 34, 56, 0.24);
 }
 
 html {
@@ -16,6 +25,15 @@ html {
 
 html.dark {
   color-scheme: dark;
+}
+
+/* The shadow tokens above are tuned for a light ground; on dark they land
+   near-invisible. Dark mode gets deeper, more opaque shadows plus a faint
+   top highlight ring so cards still separate from the background. */
+.dark {
+  --tg-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --tg-shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --tg-shadow-overlay: 0 24px 60px rgba(0, 0, 0, 0.65);
 }
 
 * {

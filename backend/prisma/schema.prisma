@@ -212,6 +212,7 @@ model Institute {
   financeEntries    FinanceEntry[]
   tests             Test[]
   reminders         ScheduledReminder[]
+  distributionItems DistributionItem[]
 
   @@index([organizationId])
   @@map("institutes")
@@ -537,14 +538,15 @@ model Course {
   /// Same idea for RECURRING plans — pre-fills FeeAccount.monthlyAmount.
   defaultMonthlyFee Decimal? @db.Decimal(10, 2)
 
-  institute     Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  batches       Batch[]
-  enquiries     Enquiry[]
-  students      Student[]
-  subjects      CourseSubject[]
-  assignments   FacultyAssignment[]
-  feeStructures FeeStructure[]
-  tests         Test[]
+  institute         Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  batches           Batch[]
+  enquiries         Enquiry[]
+  students          Student[]
+  subjects          CourseSubject[]
+  assignments       FacultyAssignment[]
+  feeStructures     FeeStructure[]
+  tests             Test[]
+  distributionItems DistributionItem[]
 
   @@unique([instituteId, code])
   @@index([instituteId])
@@ -685,13 +687,39 @@ model Student {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  institute   Institute          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  enquiry     Enquiry?           @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
-  course      Course             @relation(fields: [courseId], references: [id])
-  batches     StudentBatch[]
-  attendance  AttendanceRecord[]
-  testResults TestResult[]
-  feeAccount  FeeAccount?
+  /// True iff this student was created via bulk-precreate. Permanent — unlike
+  /// `selfFillPin`, this is never cleared, because it's the only reliable way
+  /// to answer "did this row ever go through self-fill" once the PIN itself
+  /// is gone after completion. Drives the staff status view (which must show
+  /// filled AND pending rows, not just pending) and distinguishes "no PIN
+  /// because never bulk-precreated" from "no PIN because already completed"
+  /// in routes/public.ts. See changes-phase8.md §8f.
+  selfFillEligible   Boolean   @default(false)
+  /// Null = admitted the normal staff-entered way, or bulk-precreated and
+  /// still awaiting self-fill. Set = the student has submitted the public
+  /// form. Staff can clear this again via reopen to let a student resubmit.
+  profileCompletedAt DateTime?
+  /// The random 4-digit code printed on the roster export alongside the
+  /// student ID — the public form's only identity check beyond the ID
+  /// itself. Cleared once `profileCompletedAt` is set (nothing left to
+  /// protect), and regenerated on reopen (the old one was never re-shown to
+  /// the student after the first export, so it can't be reused — staff must
+  /// hand out the new one, same as at bulk-precreate).
+  selfFillPin        String?
+  /// Failed-PIN counter for the lockout in routes/public.ts. DB-backed
+  /// (unlike the IP-based rate limiter) specifically so it holds even if a
+  /// guesser spreads attempts across many IPs or app instances.
+  selfFillAttempts   Int       @default(0)
+  selfFillLockedAt   DateTime?
+
+  institute            Institute            @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  enquiry              Enquiry?             @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
+  course               Course               @relation(fields: [courseId], references: [id])
+  batches              StudentBatch[]
+  attendance           AttendanceRecord[]
+  testResults          TestResult[]
+  feeAccount           FeeAccount?
+  distributionReceipts DistributionReceipt[]
 
   @@index([instituteId, isActive])
   @@index([courseId])
@@ -1262,4 +1290,60 @@ model FinanceEntry {
   @@index([instituteId, date])
   @@index([sourceType, sourceId])
   @@map("finance_entries")
+}
+
+// ---------------------------------------------------------------------------
+// Distribution tracking (books, bags, T-shirts, digests — any physical item
+// handed out to students). Generic item + per-student receipt, not a bespoke
+// model per item type. See changes-phase8.md §8e.
+// ---------------------------------------------------------------------------
+
+model DistributionItem {
+  id          String   @id @default(cuid())
+  instituteId String
+  name        String
+  /// Null = institute-wide (every active student gets a receipt row).
+  /// Set = scoped to one course (only that course's active students do).
+  courseId    String?
+  /// Optional stock count — display-only, never enforced against the number
+  /// of receipts marked received (a mismatch is a real-world inventory
+  /// question for staff to notice, not something the app should block on).
+  totalSets   Int?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  institute Institute            @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course    Course?              @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  receipts  DistributionReceipt[]
+
+  @@index([instituteId, isActive])
+  @@index([courseId])
+  @@map("distribution_items")
+}
+
+/// One row per (item, student) pair, created eagerly — for every
+/// currently-enrolled matching student when the item is created, and for
+/// every newly-admitted matching student afterward (hooked into
+/// admission.ts). Eager rather than lazy because "who hasn't received it
+/// yet" is the whole point of this feature and needs every student
+/// represented from day one, not just the ones already marked.
+///
+/// `receivedAt: null` = pending — status derived from a fact, not a stored
+/// enum, same principle as FeeInstallment.
+model DistributionReceipt {
+  id                 String    @id @default(cuid())
+  distributionItemId String
+  studentId          String
+  receivedAt         DateTime? @db.Date
+  notes              String?
+  updatedByUserId    String?
+  updatedAt          DateTime  @updatedAt
+
+  item    DistributionItem @relation(fields: [distributionItemId], references: [id], onDelete: Cascade)
+  student Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([distributionItemId, studentId])
+  @@index([studentId])
+  @@map("distribution_receipts")
 }

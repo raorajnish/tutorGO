@@ -5,7 +5,9 @@
 > moving to the next. One item (subject-wise fees, §8c) is explicitly a design note only, not
 > scheduled for a build order — flagged as deferred per the request.
 >
-> **Status: 8a, 8b and 8d are IMPLEMENTED (2026-08-28).** 8c, 8e, 8f are still planning only.
+> **Status: 8a, 8b, 8d, 8e and 8f are IMPLEMENTED (2026-08-28).** 8c has a full design as of
+> 2026-08-28 but is **still deferred, not scheduled to build** — see its section for the reasoning
+> and open questions.
 
 ## Status: 8a — Installment settlement — DONE
 
@@ -396,25 +398,265 @@ second one).
 
 ---
 
-## 8c. Subject-wise fees (e.g. 12th std) — design note only, not building this pass
+## 8c. Subject-wise fees (e.g. 12th std) — full design, still deferred (not building this pass)
 
-Flagged explicitly as **not in this build's scope**, per the request. Recording the shape of the
-problem now so it isn't re-derived from scratch later:
+> **Revised 2026-08-28** at the user's request, into a full design — grounded against the actual
+> schema this time (`FeeStructure`/`FeeAccount`/`CourseSubject`/`Lecture`/`deriveRoster` all read
+> directly, not assumed). **Still not scheduled** — this is planning only, per the user's own
+> "deferred... revisit as its own addendum" framing. Four asks bundled together: (1) per-subject
+> pricing with some subjects complementary, (2) fee-account creation defaults to everything
+> selected, unselecting a paid subject drops its charge, (3) separately-attachable exam-prep
+> add-on plans (MHT-CET, JEE) with their own charges, (4) a student who's opted out of a subject
+> must not appear on *that subject's* lecture roster, while still appearing on every subject
+> they're actually enrolled in.
+>
+> **Correction 2026-08-28** (same day, before any of this was built): pricing was originally
+> sketched as one mutable field on `CourseSubject` — a single institute-wide price per subject
+> that could only ever hold *one* value at a time. The user pointed out this doesn't support
+> different batches/intake years coexisting at different prices (a 2026 cohort and a 2027 cohort
+> both still active, each locked to their own pricing). Correct fix, and the one below: **prices
+> live on `FeeStructure` instead**, the same reusable/versionable template model `FeeAccount`
+> already snapshots from today for flat-fee courses — so "12th Science — Batch 2026-27" and
+> "12th Science — Batch 2027-28" are simply two different `FeeStructure` rows a course can offer
+> side by side, exactly like creating a new named structure already works. `CourseSubject` goes
+> back to being a bare join with no price on it.
 
-- Today `FeeStructure` is course-scoped (one fee template per `Course`). A course like "12th
-  Std — Science" may need per-subject fee lines instead (Physics ₹8,000, Chemistry ₹8,000, Maths
-  ₹6,000) where a student picks a subset of subjects rather than paying one course-wide fee.
-- This intersects with `CourseSubject` (already links subjects to courses for Academics) and would
-  need: a `FeeStructure` variant scoped to `(courseId, subjectId)` instead of just `courseId`, a
-  student's `FeeAccount` generation logic that sums the selected subjects' fee lines instead of
-  reading one flat `defaultFee`, and admission-time UI for picking which subjects a student is
-  enrolling in (which may already partially exist via `CourseSubject` — check `AdmitModal.tsx`
-  before assuming this needs new UI from scratch).
-- Biggest open question: can a course be *either* flat-fee or subject-wise, or does every course
-  need to declare which mode it uses? Recommend adding a `feeMode: FLAT | PER_SUBJECT` enum on
-  `Course` when this is actually built, so both models can coexist without a hard migration of
-  every existing course.
-- Not scheduled — revisit as its own addendum when ready to build.
+### Why this is bigger than "add a field" — it touches three modules at once
+
+Confirmed by reading the code directly:
+
+- **Fees**: `FeeStructure`/`FeeAccount` are both flat, course-scoped — one `courseFee` per
+  course, no concept of a per-subject line (`schema.prisma:912-967`).
+- **Academics**: `CourseSubject` already links subjects to courses (`schema.prisma:578-589`), but
+  it's a bare join row — `{ courseId, subjectId }`, no price on it.
+- **Attendance**: `Lecture` already carries a `subjectId` (`schema.prisma:762-782` — this part
+  isn't new infrastructure). But `deriveRoster(batchId, date)` in `lib/lectureShared.ts:68-79`
+  computes a lecture's roster **purely from `StudentBatch`** — it has no idea what subject the
+  lecture is even for, and none of its four call sites in `attendance.ts` (roster fetch, mark,
+  mark-all-present, daily summary) pass `lecture.subjectId` in. So "exclude a Bio opt-out from
+  the Bio roster" doesn't just need a new opt-out table — it needs `deriveRoster` itself extended
+  and every call site updated to actually use it.
+
+### Data model
+
+Extends what already exists rather than parallel tables where a field would do:
+
+```
+enum CourseFeeMode {
+  FLAT          // today's behavior — Course.defaultFee, one FeeStructure per course
+  SUBJECT_WISE  // finalFee is the sum of the student's selected CourseSubject fees
+}
+```
+
+- `Course.feeMode CourseFeeMode @default(FLAT)` — a course declares its mode once; both models
+  coexist without migrating every existing course (this was the "biggest open question" flagged
+  in the original note — resolved here, not left open).
+- `FeeStructure` (already exists) gains `isDefault Boolean @default(false)` — see "Resolved
+  2026-08-28" below for the full reasoning; the short version: exactly one structure per course
+  can be the default a fresh enrollment pre-selects, and setting a new one flips the old one off.
+  Applies to both `FLAT` and `SUBJECT_WISE` structures, not new to this addendum specifically.
+- `FeeStructure` also gains child pricing rows for `SUBJECT_WISE` mode — a new
+  `FeeStructureSubjectLine` model, **not** a field on `CourseSubject`:
+  ```
+  model FeeStructureSubjectLine {
+    id             String  @id @default(cuid())
+    feeStructureId String
+    subjectId      String
+    /// 0 = complementary (English, IT — "defaultly provided" per the request).
+    amount         Decimal @db.Decimal(10, 2) @default(0)
+    feeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id], onDelete: Cascade)
+    subject        Subject      @relation(fields: [subjectId], references: [id])
+    @@unique([feeStructureId, subjectId])
+  }
+  ```
+  This is what actually supports batch/year-specific pricing: staff creates a new named
+  `FeeStructure` ("12th Science — Batch 2027-28") with its own subject-line prices whenever a
+  cohort needs different rates, and older cohorts stay attached to their original `FeeStructure`
+  unaffected — the same reusable-template pattern flat-fee courses already use, just with
+  subject-line children instead of one `courseFee` number. `CourseSubject` stays a bare join
+  (course ↔ subject only, no price) — it answers "which subjects does this course offer," not
+  "what do they cost," and now only `FeeStructure` answers the pricing question, for both modes.
+- `StudentSubject` — **new model**, the one genuinely new table, doing double duty as both "what
+  this student is paying for" and "what this student should appear on the roster for":
+  ```
+  model StudentSubject {
+    id         String    @id @default(cuid())
+    studentId  String
+    subjectId  String
+    /// Snapshotted from the CHOSEN FeeStructure's FeeStructureSubjectLine at
+    /// enrollment time — same principle as FeeAccount.finalFee: a later price
+    /// change (even on a still-active FeeStructure) must never silently
+    /// reprice a student already paying the old rate. 0 for a complementary
+    /// subject.
+    amount     Decimal   @db.Decimal(10, 2)
+    isActive   Boolean   @default(true)
+    joinedAt   DateTime  @db.Date
+    leftAt     DateTime? @db.Date
+    student    Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+    subject    Subject   @relation(fields: [subjectId], references: [id])
+    @@unique([studentId, subjectId])
+  }
+  ```
+  One row per (student, subject) — paid or complementary, doesn't matter, both live here so
+  roster filtering (below) has one uniform source of truth rather than treating free and paid
+  subjects as two different kinds of enrollment.
+- `CourseAddOnPlan` — **new model**, for MHT-CET/JEE-style programs attachable to a course
+  independent of subject selection:
+  ```
+  model CourseAddOnPlan {
+    id       String   @id @default(cuid())
+    courseId String
+    name     String   // "MHT-CET Crash Course", "JEE Foundation Batch"
+    amount   Decimal  @db.Decimal(10, 2)
+    isActive Boolean  @default(true)
+    course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  }
+  ```
+- `FeeAccountAddOn` — snapshot of which add-ons a specific student's account has attached, same
+  snapshotting principle as everywhere else in Fees:
+  ```
+  model FeeAccountAddOn {
+    id           String     @id @default(cuid())
+    feeAccountId String
+    name         String     // copied from CourseAddOnPlan.name at attach time
+    amount       Decimal    @db.Decimal(10, 2)
+    attachedAt   DateTime   @default(now())
+    feeAccount   FeeAccount @relation(fields: [feeAccountId], references: [id], onDelete: Cascade)
+  }
+  ```
+
+### Fee-account creation flow for a `SUBJECT_WISE` course
+
+1. Staff picks the course **and which `FeeStructure`** to attach at `POST /accounts` time — same
+   as today's flat-fee flow already requires picking a structure, just now the structure carries
+   subject lines instead of one `courseFee`. This is the step that resolves batch/year pricing:
+   picking "12th Science — Batch 2026-27" vs "...2027-28" picks the whole price list at once.
+   The create-account form switches from "enter a course fee" to a **checklist of that
+   structure's subjects** (from its `FeeStructureSubjectLine` rows), **every subject checked by
+   default — paid and complementary alike** (matches "by default all will be set + the subjects
+   without charge," verbatim).
+2. Unchecking a *paid* subject removes it from the sum; unchecking a complementary one is
+   possible too (a student who, say, doesn't want to attend Hindi at all) but changes nothing
+   about the total since it was already ₹0 — this is really an enrollment decision wearing a fee
+   UI, which is exactly why `StudentSubject` needs `isActive` independent of `amount`.
+3. On submit: create one `StudentSubject` row per checked subject (`amount` snapshotted from that
+   `FeeStructureSubjectLine`, `isActive: true`), sum the paid ones into `finalFee`, generate the
+   installment schedule from that sum exactly as `generateOneTimeInstallments` already does today
+   — no new installment logic needed, subject-wise fees only change *how `finalFee` is computed*,
+   not what happens after.
+4. Add-on plans, if the course has any active `CourseAddOnPlan` rows, are offered as separate
+   optional checkboxes in the same modal ("Also attach: MHT-CET Crash Course — ₹15,000"). Each
+   one checked creates a `FeeAccountAddOn` row and is added as its own extra installment (or
+   folded into the first installment — a call to make at build time) rather than blended
+   invisibly into `finalFee`, so a receipt/statement can still show "MHT-CET: ₹15,000" as a
+   distinct line the parent recognizes.
+
+### Dropping a subject mid-course — flagged as a policy question, not solved here
+
+If a student stops taking Biology in November, two things need to happen and they are **not**
+the same decision:
+
+- **Roster impact** (mechanical, safe to automate): set that `StudentSubject.isActive = false`
+  (`leftAt` = today) → they stop appearing on Biology's lecture roster from that date forward,
+  automatically, via the `deriveRoster` change below.
+- **Fee impact** (a business decision, not a mechanical one): does the family get a refund for
+  the dropped subject? A discount on remaining installments? Nothing at all (fee was for the
+  whole term regardless of attendance)? This varies by institute policy and even by family
+  negotiation — **recommend NOT auto-adjusting any installment when a subject is dropped**.
+  Deactivating a `StudentSubject` only ever touches the roster. If the fee should change, staff
+  does that explicitly via the *already-existing* `EditAmountControl`/reschedule tools on the fee
+  account — same manual, deliberate action as any other fee correction today, not a new
+  automated side-effect that could silently under- or over-charge a family.
+
+### Roster/attendance integration — the concrete code change
+
+- `deriveRoster(batchId, date)` → `deriveRoster(batchId, date, subjectId?)`. When `subjectId` is
+  given and that lecture's course is `SUBJECT_WISE`, add a filter: only students with an active
+  `StudentSubject` row for that `(studentId, subjectId)` pair (joined on `leftAt: null` or
+  `leftAt >= date`, same "active on this date" pattern `StudentBatch` filtering already uses).
+  For a `FLAT`-mode course, behavior is byte-for-byte unchanged — every batch member stays on
+  every roster, exactly as today.
+- All four call sites in `attendance.ts` (roster fetch, mark, mark-all-present, daily summary)
+  already have the `Lecture` row in hand, so passing `lecture.subjectId` through is a one-line
+  change each — the function signature is the only real surface change.
+- Confirm before building: a lecture's roster for a `SUBJECT_WISE` course, when a student was
+  never enrolled in *any* subject of that course (shouldn't happen if step 3 above always runs at
+  account creation, but worth a defensive check) — should such a student show on *no* roster for
+  that course, or fall back to "show everyone" as a safety net? Recommend the former (empty is
+  correct, not a bug) but flagging since a silent wrong-roster bug here is worse than most.
+
+### What's explicitly NOT solved here (open questions for whoever builds this)
+
+- **Changing a course's `feeMode` after students already have accounts** — not addressed; existing
+  `FLAT` accounts keep working unchanged (nothing about them reads `feeMode`), but there's no
+  migration path offered for converting an existing flat-fee course to subject-wise mid-year.
+- **Add-on plans with their own installment schedules** (e.g. MHT-CET billed in 2 installments
+  while the base course is billed in 6) — the sketch above assumes one lump-sum installment per
+  add-on; a full independent schedule per add-on is a bigger change to the installment generator
+  than sketched here.
+Resolved by the batch/year-pricing correction above, no longer open: pricing that differs by
+cohort (create a new `FeeStructure`) and retroactively pricing a subject that was previously
+complementary (create a new `FeeStructure` with that subject's line priced — existing students
+stay on their original structure's `StudentSubject` snapshot, at whatever they were actually
+paying, unaffected).
+
+### Resolved 2026-08-28: which `FeeStructure` is "the current one"
+
+With several structures potentially active on the same course at once (this year's and next
+year's, side by side during an admission-cycle transition), something needs to mark which one a
+fresh enrollment defaults to — otherwise staff can silently pick the wrong year's pricing.
+Considered two shapes and picked the cheaper, more explicit one:
+
+- **Chosen: `FeeStructure.isDefault Boolean @default(false)`**, with "at most one default per
+  course" enforced in the app layer rather than a DB constraint (a partial unique index on
+  `(courseId, isDefault) WHERE isDefault` is the Postgres-native way, but a plain transactional
+  flip — unset the course's current default, set the new one — is simpler and just as correct
+  for something staff does once per admission cycle, not a hot path). The fee-account creation
+  form pre-selects whichever structure has `isDefault: true` for the chosen course, while still
+  letting staff explicitly pick a different one — needed during the transition window itself,
+  e.g. re-admitting a repeat student onto last year's plan on purpose. Applies to **both**
+  `FLAT` and `SUBJECT_WISE` structures — `FeeStructuresTab.tsx` doesn't have this concept today
+  either, so it's one general fix, not something special-cased to subject-wise mode.
+- **Rejected: `effectiveFrom`/`effectiveTo` date ranges that auto-resolve "current."** More
+  automatic, but not worth the added complexity for a low-frequency, staff-driven decision —
+  overlap validation, "what if nothing matches today," and timezone edge cases, all to save one
+  click a few times a year.
+- API surface: `PATCH /academics/fee-structures/:id` gains `isDefault: boolean`; setting it true
+  flips every sibling structure on the same `courseId` to false in the same transaction. `GET
+  /academics/fee-structures?courseId=` response includes `isDefault` per row so the frontend can
+  visually mark it (a small "Default" badge, same pattern as `Badge` usage elsewhere) and
+  pre-select it in the create-account flow.
+
+### Build order (for whenever this is actually scheduled)
+
+1. Schema: `Course.feeMode`, `FeeStructure.isDefault`, `FeeStructureSubjectLine`,
+   `StudentSubject`, `CourseAddOnPlan`, `FeeAccountAddOn`. Additive migration — every existing
+   course defaults to `FLAT`, so nothing about today's Fees behavior changes until a course is
+   explicitly switched.
+2. `academics.ts`/`fees.ts`: `FeeStructure` create/edit gains subject-line pricing when the
+   parent course is `SUBJECT_WISE` (a list of `{subjectId, amount}` instead of one `courseFee`),
+   the `isDefault` toggle (flip-old-off-set-new-on in one transaction), and add-on plan CRUD
+   scoped to a course. Do the `isDefault` piece first and ship it as its own small independent
+   fix if convenient — it stands alone, doesn't need `SUBJECT_WISE` mode to be useful, and
+   improves the existing flat-fee flow today.
+3. `fees.ts` `POST /accounts`: branch on `course.feeMode` — `SUBJECT_WISE` path builds
+   `StudentSubject` rows + sums `finalFee` instead of reading a flat `courseFee` input; add-on
+   attachment as its own step in the same transaction.
+4. `lib/lectureShared.ts`: extend `deriveRoster` with the optional `subjectId` filter; update
+   `attendance.ts`'s four call sites to pass `lecture.subjectId`.
+5. Frontend: `SetupFeeAccountModal.tsx` gains the subject-checklist mode for `SUBJECT_WISE`
+   courses (all checked by default); `CoursesTab.tsx` gains the feeMode toggle + per-subject
+   pricing + add-on plan management; receipts/statements show add-ons as distinct line items.
+6. Test: create a `SUBJECT_WISE` 12th-Science course with Physics/Chem/Maths/Bio priced and
+   Hindi/English/IT complementary → set up a fee account → confirm `finalFee` sums only the paid
+   subjects and every subject (paid + free) has a `StudentSubject` row → uncheck Biology at setup
+   → confirm it's excluded from both the fee sum and gets no `StudentSubject` row → attach an
+   MHT-CET add-on → confirm it appears as a separate installment/line, not blended into the base
+   fee → schedule one lecture per subject on the same batch/date → confirm a student who opted
+   out of Biology is absent from *only* the Biology roster, present on every other subject's →
+   drop a subject mid-course via deactivating its `StudentSubject` → confirm the roster reflects
+   it going forward with zero automatic change to any installment → confirm a `FLAT`-mode
+   course's rosters and fee flow are completely unaffected by all of the above (regression pass).
 
 ---
 
@@ -523,6 +765,14 @@ teaching-staff one — confirm against who actually asked for this, "class admin
 
 ## 8e. Distribution tracking (books, bags, T-shirts, digests, any item)
 
+> **Status: IMPLEMENTED (2026-08-28).** Built per the plan below, with one decision made before
+> building: who can access it. Discussed with the user — role-gated `OWNER/ADMIN/RECEPTION`,
+> matching Fees' exact gating, **Faculty deliberately excluded** (this is an ops/logistics task,
+> not a teaching one — same reasoning as why Faculty can't touch Fees). Not module-gated (no
+> `requireModule`, no new `ModuleCode`) — this is a small always-on utility available to every
+> institute, not a billable subscription tier; adding a new module would have meant touching the
+module catalog, seed data, and the platform's module-management UI for no real benefit here.
+
 ### The problem
 
 No inventory/distribution concept exists at all (confirmed). Need a generic "we hand out N kinds
@@ -623,9 +873,215 @@ New `/distribution` module (or a tab under an existing "Academics"/"Students" ar
    realistically use while physically standing in a room handing out books, so it needs to work
    one-handed on a phone).
 
+### What was actually built
+
+Matches the plan above, with received-count added to the items list (not in the original spec,
+but needed for a useful "42/58 received" summary without an extra round-trip per item):
+
+- Schema: `DistributionItem`, `DistributionReceipt` exactly as designed, plus back-relations on
+  `Institute`/`Course`/`Student`. Additive migration.
+- `backend/services/distributionSync.ts` — `createDistributionReceiptsForNewStudent()`, one
+  shared function so "who gets a receipt row on admission" is defined once, not duplicated.
+  Called from **both** admission paths: the normal `admission.ts` admit flow, and §8f's
+  `students.ts` bulk-precreate — both create real `Student` rows, so both needed the hook, not
+  just one (caught this while implementing, not left as a gap).
+- `distribution.ts` router: `GET/POST /items`, `PATCH /items/:id`, `GET /items/:id/receipts`
+  (optional `?batchId=` filter), `PATCH /items/:id/receipts/:studentId` (single toggle),
+  `POST /items/:id/receipts/bulk` (idempotent — already-received students in the list are simply
+  skipped, matching Attendance's mark-all-present precedent exactly). Items list includes a
+  per-item `receivedCount` via one small count query per item (kept off Prisma's filtered
+  relation-count to avoid a preview-feature dependency — the item list itself is always small).
+- Frontend: `/distribution` page (items list, "New item" modal, active/inactive toggle) +
+  `DistributionRosterModal.tsx` (search, batch-derived context, individual toggle, "select all
+  pending" + bulk-mark, table on desktop / large-touch-target cards on mobile — the one screen
+  staff use one-handed while physically handing out books). New sidebar entry + icon, gated
+  `OWNER/ADMIN/RECEPTION` with no `module:` key.
+
+**Testing**: verified end-to-end against a running server — admitted students *before* creating
+an item (confirmed they're on the roster immediately), created the item, then admitted a further
+student *after* (confirmed the admission hook gave them a pending receipt automatically);
+individual toggle both directions; bulk-mark with idempotency confirmed (re-running it over
+already-received students updates only the genuinely-still-pending ones); items-list counts
+verified against roster reality; deactivation confirmed to hide from the default list while
+preserving roster history; institute-wide items (no course scope) confirmed to cover students
+from any course. **Role gating verified with a real request, not just code inspection** — created
+a temporary FACULTY user, logged in, hit `GET /distribution/items`, confirmed a live 403, then
+deleted the test account. `tsc --noEmit`, ESLint, and `next build` all clean on both sides.
+
 ---
 
 ## 8f. Self-service admission form via shareable link + student ID lookup
+
+> **Status: IMPLEMENTED (2026-08-28).** Built as revised below (4-digit PIN, not phone).
+> Full backend + frontend, end-to-end tested against a running server, two real bugs found and
+> fixed during that testing (not in the original design) — see "Bugs found during testing" near
+> the end of this section. `tsc --noEmit`, ESLint, and `next build` all clean on both sides.
+
+> **Revised before build (2026-08-28).** The original plan below was written before the codebase
+> was examined in detail. Five things it left as "confirm before assuming" were checked, and one
+> of them turned out to break the design as written. Corrections in this block take precedence
+> over the original text that follows; the original is kept because the reasoning is still useful.
+
+### ⚠️ Correction 1 — the second factor doesn't exist yet (breaks the original design)
+
+The original plan says the student proves who they are with "`studentCode` + a second factor like
+DOB or phone last-4". **That's circular.** The entire point of bulk pre-create is that we only
+have a name and a course — `dob` is null, `phone` is null (`Student.phone`/`dob` are both
+optional, `schema.prisma:676-678`). There is nothing on file to check the student against. The
+form is what *collects* those fields.
+
+Options considered:
+
+- **(a) Capture phone during bulk pre-create, use it as the second factor.** A class that's
+  already running has its students' phone numbers — that's how they were contacted in the first
+  place. Costs nothing extra to distribute (the student already knows their own number) and it's
+  *not printed on the shared roster*, so it stays secret from classmates.
+- **(b) Generate a per-student access code, print it on the roster.** Unguessable, needs no
+  pre-existing data — but it lands on the same sheet that gets posted in the class WhatsApp
+  group, so every classmate can read every other student's code. It defends against outsiders
+  and not at all against the people most likely to actually misuse it.
+- **(c) Per-student tokenised links.** Frictionless, but the user explicitly asked for *one*
+  link plus a typed ID, and per-student links pasted into a group chat are worse than (b).
+
+**Decision, superseded 2026-08-28 — see "Decisions confirmed with the user" below.** (a) was the
+initial call, then reconsidered against (b) once its exact shape was pinned down: a *separate*
+random PIN (not the phone, not derived from anything on file) generated at bulk-precreate time,
+printed on the roster next to the student ID, needing zero pre-existing data. The "printed
+alongside the ID" objection to (b) is real but bounded by making the PIN short and backing it
+with a hard per-student lockout rather than rate-limiting alone — see the PIN section below.
+
+### ⚠️ Correction 2 — enumeration risk is worse than assumed
+
+`studentCode` is `{INSTITUTE}-{YY}-{COURSE}-{SEQ}` — e.g. `SP20-25-10-0007`
+(`services/studentCode.ts`). The sequence is **plain incrementing** (`0001`, `0002`, …), so
+anyone holding a single classmate's code can trivially generate every other code in that course
+and year. The original plan called the code "low-entropy and sequential/guessable" — confirmed
+exactly, which makes a real second factor (not just rate limiting) non-optional.
+
+**`studentCode`'s generator is explicitly left untouched.** Alternatives considered and rejected
+for *this* feature: randomizing the counter's last 4 digits (adds collision-retry logic to a
+generator every admission already depends on, for a guarantee the new PIN below already
+provides at the point that actually needs it); a keyed 4-digit Feistel permutation over the
+counter (bijective, no retries, but adds a per-institute secret to manage and a crypto-shaped
+piece of code to get right, for the same marginal gain) — **skipped for now**, on the user's
+call. `studentCode` keeps its current shape everywhere it's already used (receipts, staff UI,
+biometric IDs); the new PIN carries 100% of this feature's identity-guessing defence instead, so
+nothing about the existing generator needs to be correct for 8f to be secure.
+
+### ✅ Confirmation 3 — one link is enough (simplification)
+
+`Student.studentCode` is `@unique` **globally**, not per-institute (`schema.prisma:671`), and it
+embeds the institute code anyway. So the code alone resolves the institute — no slug in the URL,
+no per-course/per-batch links needed for correctness. Since a student can only ever reach their
+*own* record regardless of which link they clicked, scoped links add no security and no
+function. **Recommend shipping a single institute-wide link**; per-batch variants can still be
+handed out as a cosmetic convenience later, but shouldn't be built as though they gate anything.
+
+### ✅ Confirmation 4 — export needs no new dependency
+
+No PDF/XLSX library exists in `backend/package.json`, but `expenses.ts:457` already hand-rolls
+CSV (`csvEscape` + `Content-Type: text/csv`). Reuse that for the Excel-openable export. For the
+"PDF print" half, render a print-styled HTML roster page on the frontend and let the browser's
+own Print-to-PDF do it — matching the user's "excel or pdf print generated" without adding a
+PDF toolchain.
+
+### ✅ Confirmation 5 — the shell-free public page is free
+
+`app/layout.tsx` carries no sidebar; each module adds its own `layout.tsx`. `login/` has none,
+which is why it renders bare. A new `app/admission-form/page.tsx` with **no** `layout.tsx`
+therefore gets the shell-free treatment automatically — nothing to opt out of.
+
+### Rate limiting + the lookup PIN — the two pieces of genuinely new infrastructure
+
+Confirmed: **no rate limiting exists anywhere in the app** (nothing in `middleware/`, nothing in
+`app.ts`). This is the blocking prerequisite the build order already calls out.
+
+**Final design (superseding Correction 1's phone-based decision, 2026-08-28)**: a standalone
+`selfFillPin` — a random 4-digit numeric code, generated once at bulk-precreate time, unrelated
+to `studentCode`, unrelated to any pre-existing field. It's the *only* thing standing between an
+outsider and a student's record, so the defence is layered rather than relying on the PIN's
+raw entropy alone:
+
+- **Hard per-student lockout is the primary defence, not rate limiting.** `selfFillAttempts`
+  increments on every wrong PIN for a given `studentCode`; at 5 failed attempts the record locks
+  (`selfFillLockedAt` set) and the public endpoint refuses it outright — "contact reception" —
+  regardless of which IP or device is asking next. This is what actually makes a 4-digit space
+  workable: an unlimited attacker gets nowhere without staff intervention, the same trust model
+  as an ATM PIN. DB-backed, so it holds even if Render runs multiple instances.
+- **Per-IP sliding window** on every `/api/public/*` route, in-memory, as a second, independent
+  layer — slows a burst against *many* different `studentCode`s at once, which the per-student
+  lock alone doesn't cover. Honest limitation: in-memory means per-instance, so running two
+  instances roughly doubles the effective burst allowance — acceptable for this role, noted
+  rather than hidden.
+- Errors stay generic ("that ID and code don't match") until the lockout threshold — never
+  revealing which of the two values was wrong, or the lookup becomes an oracle regardless of how
+  good the PIN itself is.
+- Staff can reset `selfFillAttempts`/`selfFillLockedAt` for a genuinely locked-out student from
+  the authenticated side (a parent mistyping 5 times is the expected failure mode, not an
+  attack).
+
+### Revised data model delta
+
+- `Student.profileCompletedAt DateTime?` — null = awaiting self-fill (as originally planned).
+- `Student.selfFillPin String?` — the 4-digit code, set at bulk-precreate, cleared once
+  `profileCompletedAt` is set (nothing left to protect after that — the public endpoints refuse
+  any request for an already-completed profile regardless).
+- `Student.selfFillAttempts Int @default(0)`, `Student.selfFillLockedAt DateTime?` — the lockout
+  state described above.
+- `studentCode`'s generator (`services/studentCode.ts`) is **untouched** — see Correction 2.
+- Bulk pre-create reuses `nextStudentCode()` and the existing `${studentCode}@tutorgo.in` email
+  fallback from `admission.ts:54`, so pre-created students are ordinary `Student` rows —
+  nothing downstream (fees, attendance, payroll) needs to know they arrived differently. `phone`
+  is *not* required by this endpoint (dropped along with the phone-based design).
+- Student-editable on the public form: `email`, `phone`, `parentPhone`, `dob`, `fatherName`,
+  `motherName`, `school`. **Never** `courseId`, `batchId`, `admissionDate`, `studentCode` or
+  `fingerprintId` — those are staff-controlled, and accepting them from an unauthenticated form
+  would let a student move themselves into another course.
+
+### Decisions confirmed with the user (2026-08-28)
+
+- **Separate 4-digit PIN, not phone.** Printed on the roster next to the student ID; needs no
+  pre-existing student data, so it works uniformly for every bulk-precreated student regardless
+  of whether a phone number was on file. Security rests on the hard lockout described above, not
+  on the PIN's raw entropy.
+- **`studentCode`'s generator stays exactly as-is** — no randomized suffix, no keyed permutation.
+  Both alternatives were considered and explicitly skipped; the new PIN carries the feature's
+  entire identity-guessing defence, so nothing about the existing generator needed to change.
+- **Auto-complete on submit.** Submitting sets `profileCompletedAt` and locks further self-edits;
+  staff open only the records that need correcting, and can reopen one to let a student resubmit.
+  No per-student approval step — it'd mean clicking through every student to gain nothing the
+  edit-in-place view doesn't already give.
+
+### Revised build order
+
+1. **Rate-limiting middleware** (`middleware/rateLimit.ts`) — per-IP sliding window, applied to
+   `/api/public/*`. Blocking prerequisite; nothing public ships before it. Built generic so it's
+   reusable on `/auth/login` and the OTP routes later (both are currently unprotected — noted,
+   not fixed in this pass, to keep the change surface honest).
+2. **Schema**: `Student.profileCompletedAt`, `selfFillPin`, `selfFillAttempts`,
+   `selfFillLockedAt`. One additive migration.
+3. **`POST /students/bulk-precreate`** (authenticated, OWNER/ADMIN/RECEPTION) — name rows against
+   one course/batch, transactional, reusing `nextStudentCode()`, generating a random 4-digit
+   `selfFillPin` per row.
+4. **Roster export** — `GET /students/roster.csv` (reusing `expenses.ts`'s `csvEscape`) and a
+   print-styled roster page for browser Print-to-PDF. Name + student ID + PIN — the one export
+   where the PIN is deliberately included, since printing it is the whole distribution
+   mechanism; every other student-facing surface must never expose it.
+5. **`routes/public.ts`** — mounted `/api/public`, explicitly *outside* `authenticate`, holding
+   only `POST /students/lookup` and `POST /students/complete-profile`. Both re-verify
+   code+PIN every call (no trusting a client-held id between requests), both increment/check the
+   lockout counter, both return the same generic failure, both behind the IP-level limiter too.
+6. **`/admission-form` page** — no `layout.tsx`, two-step (identify → fill), mobile-first. This
+   is the one screen to test on a real phone, not a resized browser window.
+7. **Staff view** — self-fill status per course/batch (filled vs pending counts), edit-in-place
+   via the existing student edit modal, reopen action, a "reset lock" action for a genuinely
+   locked-out student, plus the bulk-precreate entry form.
+8. **Test**: pre-create → export → look up with correct code+PIN → wrong PIN rejected generically
+   → 5th wrong PIN locks the record → locked record refuses even the correct PIN until staff
+   reset → submit → confirm locked-for-editing on second attempt → staff reopen → resubmit works
+   → cross-institute isolation (institute A's code unusable against institute B) → IP rate-limit
+   trips on rapid sequential guessing across many codes → confirm the roster CSV/PDF is the only
+   place the PIN ever appears → mobile pass on a real device.
 
 ### The problem
 
@@ -758,6 +1214,24 @@ Authenticated additions:
    looked up in a link scoped to institute B, if the URL scoping ends up being permissive) →
    rate-limit check (rapid sequential lookups from one IP get throttled) → mobile pass on an actual
    phone browser for the public form specifically.
+
+### What was actually built
+
+Matches the revised design above (4-digit PIN, not phone; `studentCode` generator untouched):
+
+- `backend/middleware/rateLimit.ts` — generic per-IP sliding-window limiter, `ApiError.tooManyRequests()` (429) added to `lib/http.ts`. Applied to both public routes; written reusable for `/auth/login` and the OTP routes later (both still unprotected — noted, not fixed here).
+- `backend/lib/csv.ts` — `toCsv`/`csvEscape` pulled out of `expenses.ts` so the roster export doesn't duplicate it.
+- Schema: `Student.selfFillEligible` (permanent — see "Bugs found" below), `profileCompletedAt`, `selfFillPin`, `selfFillAttempts`, `selfFillLockedAt`.
+- `students.ts`: `POST /bulk-precreate` (name-only rows, 4-digit PIN generated per row, returned once in the response — never re-servable except via reopen), `GET /roster.csv` + `GET /roster` (pending-only, name+ID+PIN, the one place the PIN is ever exposed again), `GET /self-fill-status` (filled + pending together), `POST /:id/self-fill/reopen`, `POST /:id/self-fill/reset-lock`. The three new GET routes are registered *before* `GET /:id` — Express matches by registration order, and `/roster.csv` etc. would otherwise be swallowed as an `:id` value.
+- `routes/public.ts`, mounted outside `authenticate` at `/api/public`: `POST /students/lookup`, `POST /students/complete-profile`. Both re-verify code+PIN from scratch every call, both return the identical generic failure message regardless of *why* (no code, wrong PIN, already completed), both behind the IP limiter, plus the DB-backed per-student lockout (5 wrong attempts).
+- Frontend: `app/admission-form/page.tsx` (no `layout.tsx` → no sidebar, two-step, mobile-first), `app/students-roster-print/page.tsx` (also shell-free, print-to-PDF via the browser, deliberately kept *outside* `students/` so it doesn't inherit that route's sidebar), `components/admissions/SelfFillTab.tsx` (status table + bulk-precreate modal + CSV/print export), wired into Admissions as a third tab.
+
+### Bugs found during testing (real, not in the original plan — fixed before calling this done)
+
+1. **Completed profiles vanished from the staff status view.** `self-fill-status` originally filtered on `selfFillPin: { not: null }` — but completing a profile clears the PIN (correct, security-wise), so the row disappeared entirely and staff could never see "who filled it in" or reopen it. Fix: added `Student.selfFillEligible Boolean`, set once at precreate and **never cleared** — a permanent "this row went through self-fill" marker independent of the security-sensitive PIN. `self-fill-status` now filters on this instead and shows filled + pending together; the roster export still filters on `selfFillEligible && profileCompletedAt: null` (pending only, as intended).
+2. **Reopen didn't actually let the student back in.** It cleared `profileCompletedAt` but the PIN was already gone (cleared on completion) — so a "reopened" student had no way to authenticate again, making reopen silently mean "permanently locked out" instead of "try again". Fix: reopen now generates a **fresh** 4-digit PIN and returns it in the response; the frontend surfaces it in a dismissible banner ("share this with them") since that's the only moment staff can see it to relay to the student.
+
+Both were caught by end-to-end testing against a running server (not unit-level), then verified fixed with the same test run: bulk-precreate → lock via 5 wrong attempts → staff unlock → complete profile → confirm it still shows in status → confirm PIN cleared → reopen → confirm old PIN rejected, new PIN works → resubmit → confirm status reflects it again. Also verified: wrong-PIN and nonexistent-code return byte-identical error bodies (no oracle), roster CSV never includes a completed student or extra fields, mismatched course/batch on bulk-precreate rejected, IP rate limiter trips under rapid sequential guessing.
 
 ---
 

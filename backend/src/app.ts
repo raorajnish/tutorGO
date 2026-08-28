@@ -15,6 +15,8 @@ import { expensesRouter } from "./routes/expenses.js";
 import { testsRouter } from "./routes/tests.js";
 import { notificationsRouter } from "./routes/notifications.js";
 import { remindersRouter } from "./routes/reminders.js";
+import { publicRouter } from "./routes/public.js";
+import { distributionRouter } from "./routes/distribution.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 
 export const app = express();
@@ -41,6 +43,10 @@ app.use("/api/expenses", expensesRouter);
 app.use("/api/tests", testsRouter);
 app.use("/api/notifications", notificationsRouter);
 app.use("/api/reminders", remindersRouter);
+app.use("/api/distribution", distributionRouter);
+// Deliberately outside authenticate/requireInstitute — the one unauthenticated
+// public surface in the app. See routes/public.ts's header comment.
+app.use("/api/public", publicRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

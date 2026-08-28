@@ -373,3 +373,21 @@ export type Expense = Prisma.ExpenseModel
  * FinanceEntry rows at query time (see routes/expenses.ts ledger endpoint).
  */
 export type FinanceEntry = Prisma.FinanceEntryModel
+/**
+ * Model DistributionItem
+ * 
+ */
+export type DistributionItem = Prisma.DistributionItemModel
+/**
+ * Model DistributionReceipt
+ * One row per (item, student) pair, created eagerly — for every
+ * currently-enrolled matching student when the item is created, and for
+ * every newly-admitted matching student afterward (hooked into
+ * admission.ts). Eager rather than lazy because "who hasn't received it
+ * yet" is the whole point of this feature and needs every student
+ * represented from day one, not just the ones already marked.
+ * 
+ * `receivedAt: null` = pending — status derived from a fact, not a stored
+ * enum, same principle as FeeInstallment.
+ */
+export type DistributionReceipt = Prisma.DistributionReceiptModel

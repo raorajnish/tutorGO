@@ -581,6 +581,18 @@ export interface StudentListItem {
   admissionDate: string;
   isActive: boolean;
   hasFeeAccount: boolean;
+  selfFillPending: boolean;
+  profileCompletedAt: string | null;
+}
+
+/// One row from GET /students/self-fill-status — see changes-phase8.md §8f.
+export interface SelfFillStatusRow {
+  id: string;
+  name: string;
+  studentCode: string;
+  course: CourseRef;
+  profileCompletedAt: string | null;
+  selfFillLocked: boolean;
 }
 
 export interface StudentsResponse {
@@ -1265,4 +1277,34 @@ export interface AppNotification {
   metadata: Record<string, unknown> | null;
   read: boolean;
   createdAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Distribution tracking (books, bags, T-shirts, digests) — see changes-phase8.md §8e
+// ---------------------------------------------------------------------------
+
+export interface DistributionItem {
+  id: string;
+  name: string;
+  course: CourseRef | null;
+  totalSets: number | null;
+  isActive: boolean;
+  createdAt: string;
+  studentCount: number;
+  receivedCount: number;
+}
+
+export interface DistributionReceiptRow {
+  id: string;
+  student: { id: string; name: string; studentCode: string };
+  batch: { id: string; name: string } | null;
+  receivedAt: string | null;
+  notes: string | null;
+}
+
+export interface DistributionRosterResponse {
+  item: { id: string; name: string; totalSets: number | null };
+  receipts: DistributionReceiptRow[];
+  receivedCount: number;
+  totalCount: number;
 }

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { AdmitModal } from "@/components/admissions/AdmitModal";
+import { SelfFillTab } from "@/components/admissions/SelfFillTab";
 import { ENQUIRY_SOURCE_LABELS, type Course, type Enquiry, type StudentListItem } from "@/lib/types";
 
 function fmtDate(d: string) {
@@ -44,7 +45,7 @@ export default function AdmissionsPage() {
 function AdmissionsContent() {
   const searchParams = useSearchParams();
 
-  const [tab, setTab] = useState<"pipeline" | "admitted">("admitted");
+  const [tab, setTab] = useState<"pipeline" | "admitted" | "selfFill">("admitted");
   const [pipeline, setPipeline] = useState<Enquiry[]>([]);
   const [admitted, setAdmitted] = useState<StudentListItem[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -117,8 +118,8 @@ function AdmissionsContent() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="flex items-center justify-between gap-3 border-b border-border p-2">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-col gap-2 border-b border-border p-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-1.5">
             <button
               type="button"
               onClick={() => setTab("admitted")}
@@ -146,6 +147,15 @@ function AdmissionsContent() {
                 </span>
               )}
             </button>
+            <button
+              type="button"
+              onClick={() => setTab("selfFill")}
+              className={`rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
+                tab === "selfFill" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"
+              }`}
+            >
+              Self-fill
+            </button>
           </div>
           <Link
             href="/students"
@@ -159,7 +169,9 @@ function AdmissionsContent() {
 
         {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
 
-        {tab === "pipeline" ? (
+        {tab === "selfFill" ? (
+          <SelfFillTab courses={courses} />
+        ) : tab === "pipeline" ? (
           <>
             <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-sm">

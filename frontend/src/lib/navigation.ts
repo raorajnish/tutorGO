@@ -17,7 +17,8 @@ export type NavIcon =
   | "payroll"
   | "expenses"
   | "tests"
-  | "subscriptions";
+  | "subscriptions"
+  | "distribution";
 
 export interface NavItem {
   label: string;
@@ -82,6 +83,15 @@ export const NAV_SECTIONS: NavSection[] = [
         icon: "expenses",
         roles: ["OWNER", "ADMIN"],
         module: "EXPENSE",
+      },
+      {
+        label: "Distribution",
+        href: "/distribution",
+        icon: "distribution",
+        // Faculty deliberately left out — ops/logistics task, same reasoning
+        // as Fees. Not module-gated (no `module:` key): a small always-on
+        // utility, not a billable subscription tier.
+        roles: ["OWNER", "ADMIN", "RECEPTION"],
       },
       {
         label: "Tests",

@@ -28,31 +28,38 @@
   --danger-soft: #f8e9e7;
 }
 
+/* Dark mode is built as a layered surface stack rather than a single flat
+   navy: background (deepest) < card < secondary < muted, each one step
+   lighter, so panels and hover states read without needing extra borders.
+   Foreground is a soft off-white — pure #fff on a dark ground vibrates and
+   is fatiguing over a long working session. Coral is lifted and slightly
+   desaturated (#ff7f4d) because the light-mode #f26a36 is too heavy against
+   a dark ground; status hues get the same treatment. */
 .dark {
-  --background: #132238;
-  --foreground: #ffffff;
-  --card: #1b2b43;
-  --card-foreground: #ffffff;
-  --primary: #f26a36;
-  --primary-foreground: #ffffff;
-  --secondary: #243550;
-  --secondary-foreground: #ffffff;
-  --muted: #2a3b55;
-  --muted-foreground: #b9c3d0;
-  --accent: #f26a36;
-  --accent-foreground: #ffffff;
-  --border: #3c4d64;
-  --ring: #f26a36;
+  --background: #0e1826;
+  --foreground: #e7edf5;
+  --card: #162234;
+  --card-foreground: #e7edf5;
+  --primary: #ff7f4d;
+  --primary-foreground: #24160e;
+  --secondary: #1e2c41;
+  --secondary-foreground: #e7edf5;
+  --muted: #26364e;
+  --muted-foreground: #9aa8bc;
+  --accent: #ff7f4d;
+  --accent-foreground: #24160e;
+  --border: #2c3b52;
+  --ring: #ff8f63;
 
-  --success: #4fb488;
-  --success-foreground: #0c1f17;
-  --success-soft: #1d3a2d;
-  --warning: #e0a539;
-  --warning-foreground: #241a02;
-  --warning-soft: #3a2f14;
-  --danger: #e2685e;
-  --danger-foreground: #250908;
-  --danger-soft: #3d211e;
+  --success: #56c797;
+  --success-foreground: #06231a;
+  --success-soft: #16332a;
+  --warning: #e8b657;
+  --warning-foreground: #241a05;
+  --warning-soft: #352b16;
+  --danger: #f0776c;
+  --danger-foreground: #2a0d0b;
+  --danger-soft: #3a1f1e;
 }
 
 @theme inline {

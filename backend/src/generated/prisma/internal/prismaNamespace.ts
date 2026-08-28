@@ -440,7 +440,9 @@ export const ModelName = {
   ExpenseCategory: 'ExpenseCategory',
   Event: 'Event',
   Expense: 'Expense',
-  FinanceEntry: 'FinanceEntry'
+  FinanceEntry: 'FinanceEntry',
+  DistributionItem: 'DistributionItem',
+  DistributionReceipt: 'DistributionReceipt'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -456,7 +458,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry"
+    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3716,6 +3718,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DistributionItem: {
+      payload: Prisma.$DistributionItemPayload<ExtArgs>
+      fields: Prisma.DistributionItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DistributionItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DistributionItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>
+        }
+        findFirst: {
+          args: Prisma.DistributionItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DistributionItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>
+        }
+        findMany: {
+          args: Prisma.DistributionItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>[]
+        }
+        create: {
+          args: Prisma.DistributionItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>
+        }
+        createMany: {
+          args: Prisma.DistributionItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DistributionItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>[]
+        }
+        delete: {
+          args: Prisma.DistributionItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>
+        }
+        update: {
+          args: Prisma.DistributionItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.DistributionItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DistributionItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DistributionItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.DistributionItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionItemPayload>
+        }
+        aggregate: {
+          args: Prisma.DistributionItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDistributionItem>
+        }
+        groupBy: {
+          args: Prisma.DistributionItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DistributionItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DistributionItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DistributionItemCountAggregateOutputType> | number
+        }
+      }
+    }
+    DistributionReceipt: {
+      payload: Prisma.$DistributionReceiptPayload<ExtArgs>
+      fields: Prisma.DistributionReceiptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DistributionReceiptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DistributionReceiptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>
+        }
+        findFirst: {
+          args: Prisma.DistributionReceiptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DistributionReceiptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>
+        }
+        findMany: {
+          args: Prisma.DistributionReceiptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>[]
+        }
+        create: {
+          args: Prisma.DistributionReceiptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>
+        }
+        createMany: {
+          args: Prisma.DistributionReceiptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DistributionReceiptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>[]
+        }
+        delete: {
+          args: Prisma.DistributionReceiptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>
+        }
+        update: {
+          args: Prisma.DistributionReceiptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>
+        }
+        deleteMany: {
+          args: Prisma.DistributionReceiptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DistributionReceiptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DistributionReceiptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>[]
+        }
+        upsert: {
+          args: Prisma.DistributionReceiptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DistributionReceiptPayload>
+        }
+        aggregate: {
+          args: Prisma.DistributionReceiptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDistributionReceipt>
+        }
+        groupBy: {
+          args: Prisma.DistributionReceiptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DistributionReceiptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DistributionReceiptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DistributionReceiptCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4094,7 +4244,12 @@ export const StudentScalarFieldEnum = {
   fingerprintId: 'fingerprintId',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  selfFillEligible: 'selfFillEligible',
+  profileCompletedAt: 'profileCompletedAt',
+  selfFillPin: 'selfFillPin',
+  selfFillAttempts: 'selfFillAttempts',
+  selfFillLockedAt: 'selfFillLockedAt'
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
@@ -4427,6 +4582,33 @@ export const FinanceEntryScalarFieldEnum = {
 } as const
 
 export type FinanceEntryScalarFieldEnum = (typeof FinanceEntryScalarFieldEnum)[keyof typeof FinanceEntryScalarFieldEnum]
+
+
+export const DistributionItemScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  name: 'name',
+  courseId: 'courseId',
+  totalSets: 'totalSets',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DistributionItemScalarFieldEnum = (typeof DistributionItemScalarFieldEnum)[keyof typeof DistributionItemScalarFieldEnum]
+
+
+export const DistributionReceiptScalarFieldEnum = {
+  id: 'id',
+  distributionItemId: 'distributionItemId',
+  studentId: 'studentId',
+  receivedAt: 'receivedAt',
+  notes: 'notes',
+  updatedByUserId: 'updatedByUserId',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DistributionReceiptScalarFieldEnum = (typeof DistributionReceiptScalarFieldEnum)[keyof typeof DistributionReceiptScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -4999,6 +5181,8 @@ export type GlobalOmitConfig = {
   event?: Prisma.EventOmit
   expense?: Prisma.ExpenseOmit
   financeEntry?: Prisma.FinanceEntryOmit
+  distributionItem?: Prisma.DistributionItemOmit
+  distributionReceipt?: Prisma.DistributionReceiptOmit
 }
 
 /* Types for Logging */
