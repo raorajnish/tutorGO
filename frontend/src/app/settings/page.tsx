@@ -10,6 +10,7 @@ import { TeamTab } from "@/components/settings/TeamTab";
 import { SubscriptionTab } from "@/components/settings/SubscriptionTab";
 import { MessageTemplatesTab } from "@/components/settings/MessageTemplatesTab";
 import { EmailSettingsTab } from "@/components/settings/EmailSettingsTab";
+import { WhatsAppSettingsTab } from "@/components/settings/WhatsAppSettingsTab";
 import { RemindersTab } from "@/components/settings/RemindersTab";
 
 const TABS = [
@@ -19,6 +20,7 @@ const TABS = [
   { id: "subscription", label: "Subscription" },
   { id: "messages", label: "Message templates" },
   { id: "email", label: "Email" },
+  { id: "whatsapp", label: "WhatsApp" },
 ];
 
 export default function SettingsPage() {
@@ -59,6 +61,7 @@ export default function SettingsPage() {
         {tab === "subscription" && <SubscriptionTab />}
         {tab === "messages" && <MessageTemplatesTab />}
         {tab === "email" && <EmailSettingsTab />}
+        {tab === "whatsapp" && <WhatsAppSettingsTab />}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
-import { Router } from "express";
+import { Router, type Request } from "express";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../lib/http.js";
@@ -167,5 +168,72 @@ publicRouter.post("/students/complete-profile", completeLimiter, validateBody(co
     res.json({ ok: true });
   } catch (err) {
     next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// WhatsApp webhook — Meta calls this, not a browser. Groundwork only: this
+// currently just verifies the handshake and logs delivery-status callbacks
+// against OutboundMessage; no feature sends a message yet to generate them.
+// See changes-phase9.md §9a and services/whatsapp.ts.
+// ---------------------------------------------------------------------------
+
+const webhookLimiter = rateLimit({ max: 120, windowMs: 60_000, keyPrefix: "whatsapp-webhook" });
+
+/** Meta's one-time subscription handshake — GET with hub.mode=subscribe,
+ * hub.verify_token, hub.challenge. Must echo hub.challenge back verbatim iff
+ * the token matches WHATSAPP_WEBHOOK_VERIFY_TOKEN (app-level, see app.ts). */
+publicRouter.get("/whatsapp/webhook", webhookLimiter, (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  if (mode === "subscribe" && token === process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN) {
+    res.status(200).send(challenge);
+    return;
+  }
+  res.sendStatus(403);
+});
+
+function verifySignature(req: Request): boolean {
+  const signature = req.headers["x-hub-signature-256"];
+  const rawBody = (req as Request & { rawBody?: Buffer }).rawBody;
+  const secret = process.env.WHATSAPP_APP_SECRET;
+  if (typeof signature !== "string" || !rawBody || !secret) return false;
+
+  const expected = "sha256=" + createHmac("sha256", secret).update(rawBody).digest("hex");
+  const a = Buffer.from(signature);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+interface WhatsAppStatusValue {
+  statuses?: { id: string; status: string }[];
+}
+
+/** Delivery-status callbacks (sent/delivered/read/failed) for messages this
+ * app sent — matched back to OutboundMessage via providerMessageId. Meta
+ * expects a 200 quickly regardless of what's inside; a malformed or
+ * unrecognized payload is logged and still acknowledged, not retried. */
+publicRouter.post("/whatsapp/webhook", webhookLimiter, async (req, res) => {
+  if (!verifySignature(req)) return res.sendStatus(401);
+  res.sendStatus(200); // ack first — Meta retries aggressively on anything else
+
+  try {
+    const entries = (req.body?.entry ?? []) as { changes?: { value?: WhatsAppStatusValue }[] }[];
+    for (const entry of entries) {
+      for (const change of entry.changes ?? []) {
+        for (const status of change.value?.statuses ?? []) {
+          if (status.status !== "failed" && status.status !== "delivered" && status.status !== "sent" && status.status !== "read") continue;
+          await prisma.outboundMessage.updateMany({
+            where: { providerMessageId: status.id },
+            data: status.status === "failed" ? { status: "FAILED", error: "Delivery failed (Meta callback)" } : {},
+          });
+        }
+      }
+    }
+  } catch {
+    // Best-effort — the 200 is already sent; a malformed payload here must
+    // never surface as a 5xx to Meta.
   }
 });

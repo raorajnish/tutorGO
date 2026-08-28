@@ -61,6 +61,9 @@ export const ModelName = {
   PasswordResetOtp: 'PasswordResetOtp',
   EmailConfig: 'EmailConfig',
   InstituteEmailConfig: 'InstituteEmailConfig',
+  InstituteWhatsAppConfig: 'InstituteWhatsAppConfig',
+  WhatsAppTemplate: 'WhatsAppTemplate',
+  OutboundMessage: 'OutboundMessage',
   MessageLog: 'MessageLog',
   AuditLog: 'AuditLog',
   Notification: 'Notification',
@@ -272,6 +275,57 @@ export const InstituteEmailConfigScalarFieldEnum = {
 } as const
 
 export type InstituteEmailConfigScalarFieldEnum = (typeof InstituteEmailConfigScalarFieldEnum)[keyof typeof InstituteEmailConfigScalarFieldEnum]
+
+
+export const InstituteWhatsAppConfigScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  accessToken: 'accessToken',
+  phoneNumberId: 'phoneNumberId',
+  wabaId: 'wabaId',
+  businessAccountId: 'businessAccountId',
+  isEnabled: 'isEnabled',
+  connectedAt: 'connectedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InstituteWhatsAppConfigScalarFieldEnum = (typeof InstituteWhatsAppConfigScalarFieldEnum)[keyof typeof InstituteWhatsAppConfigScalarFieldEnum]
+
+
+export const WhatsAppTemplateScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  metaTemplateId: 'metaTemplateId',
+  name: 'name',
+  language: 'language',
+  category: 'category',
+  status: 'status',
+  bodyText: 'bodyText',
+  mappedType: 'mappedType',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WhatsAppTemplateScalarFieldEnum = (typeof WhatsAppTemplateScalarFieldEnum)[keyof typeof WhatsAppTemplateScalarFieldEnum]
+
+
+export const OutboundMessageScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  studentId: 'studentId',
+  channel: 'channel',
+  toPhone: 'toPhone',
+  templateName: 'templateName',
+  payload: 'payload',
+  status: 'status',
+  providerMessageId: 'providerMessageId',
+  error: 'error',
+  sentAt: 'sentAt',
+  createdAt: 'createdAt'
+} as const
+
+export type OutboundMessageScalarFieldEnum = (typeof OutboundMessageScalarFieldEnum)[keyof typeof OutboundMessageScalarFieldEnum]
 
 
 export const MessageLogScalarFieldEnum = {
@@ -575,6 +629,7 @@ export const FeeStructureScalarFieldEnum = {
   monthlyAmount: 'monthlyAmount',
   billingDay: 'billingDay',
   isActive: 'isActive',
+  isDefault: 'isDefault',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -827,6 +882,13 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const NullableJsonNullValueInput = {

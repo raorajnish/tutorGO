@@ -55,6 +55,7 @@ export type FeeStructureMinAggregateOutputType = {
   monthlyAmount: runtime.Decimal | null
   billingDay: number | null
   isActive: boolean | null
+  isDefault: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -70,6 +71,7 @@ export type FeeStructureMaxAggregateOutputType = {
   monthlyAmount: runtime.Decimal | null
   billingDay: number | null
   isActive: boolean | null
+  isDefault: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -85,6 +87,7 @@ export type FeeStructureCountAggregateOutputType = {
   monthlyAmount: number
   billingDay: number
   isActive: number
+  isDefault: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -116,6 +119,7 @@ export type FeeStructureMinAggregateInputType = {
   monthlyAmount?: true
   billingDay?: true
   isActive?: true
+  isDefault?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -131,6 +135,7 @@ export type FeeStructureMaxAggregateInputType = {
   monthlyAmount?: true
   billingDay?: true
   isActive?: true
+  isDefault?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -146,6 +151,7 @@ export type FeeStructureCountAggregateInputType = {
   monthlyAmount?: true
   billingDay?: true
   isActive?: true
+  isDefault?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -248,6 +254,7 @@ export type FeeStructureGroupByOutputType = {
   monthlyAmount: runtime.Decimal | null
   billingDay: number | null
   isActive: boolean
+  isDefault: boolean
   createdAt: Date
   updatedAt: Date
   _count: FeeStructureCountAggregateOutputType | null
@@ -286,6 +293,7 @@ export type FeeStructureWhereInput = {
   monthlyAmount?: Prisma.DecimalNullableFilter<"FeeStructure"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.IntNullableFilter<"FeeStructure"> | number | null
   isActive?: Prisma.BoolFilter<"FeeStructure"> | boolean
+  isDefault?: Prisma.BoolFilter<"FeeStructure"> | boolean
   createdAt?: Prisma.DateTimeFilter<"FeeStructure"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FeeStructure"> | Date | string
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
@@ -304,6 +312,7 @@ export type FeeStructureOrderByWithRelationInput = {
   monthlyAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   billingDay?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   institute?: Prisma.InstituteOrderByWithRelationInput
@@ -325,6 +334,7 @@ export type FeeStructureWhereUniqueInput = Prisma.AtLeast<{
   monthlyAmount?: Prisma.DecimalNullableFilter<"FeeStructure"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.IntNullableFilter<"FeeStructure"> | number | null
   isActive?: Prisma.BoolFilter<"FeeStructure"> | boolean
+  isDefault?: Prisma.BoolFilter<"FeeStructure"> | boolean
   createdAt?: Prisma.DateTimeFilter<"FeeStructure"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FeeStructure"> | Date | string
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
@@ -343,6 +353,7 @@ export type FeeStructureOrderByWithAggregationInput = {
   monthlyAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   billingDay?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FeeStructureCountOrderByAggregateInput
@@ -366,6 +377,7 @@ export type FeeStructureScalarWhereWithAggregatesInput = {
   monthlyAmount?: Prisma.DecimalNullableWithAggregatesFilter<"FeeStructure"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.IntNullableWithAggregatesFilter<"FeeStructure"> | number | null
   isActive?: Prisma.BoolWithAggregatesFilter<"FeeStructure"> | boolean
+  isDefault?: Prisma.BoolWithAggregatesFilter<"FeeStructure"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"FeeStructure"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"FeeStructure"> | Date | string
 }
@@ -379,6 +391,7 @@ export type FeeStructureCreateInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutFeeStructuresInput
@@ -397,6 +410,7 @@ export type FeeStructureUncheckedCreateInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutFeeStructureInput
@@ -411,6 +425,7 @@ export type FeeStructureUpdateInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutFeeStructuresNestedInput
@@ -429,6 +444,7 @@ export type FeeStructureUncheckedUpdateInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutFeeStructureNestedInput
@@ -445,6 +461,7 @@ export type FeeStructureCreateManyInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -458,6 +475,7 @@ export type FeeStructureUpdateManyMutationInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -473,6 +491,7 @@ export type FeeStructureUncheckedUpdateManyInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -498,6 +517,7 @@ export type FeeStructureCountOrderByAggregateInput = {
   monthlyAmount?: Prisma.SortOrder
   billingDay?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -520,6 +540,7 @@ export type FeeStructureMaxOrderByAggregateInput = {
   monthlyAmount?: Prisma.SortOrder
   billingDay?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -535,6 +556,7 @@ export type FeeStructureMinOrderByAggregateInput = {
   monthlyAmount?: Prisma.SortOrder
   billingDay?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -664,6 +686,7 @@ export type FeeStructureCreateWithoutInstituteInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   course: Prisma.CourseCreateNestedOneWithoutFeeStructuresInput
@@ -680,6 +703,7 @@ export type FeeStructureUncheckedCreateWithoutInstituteInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutFeeStructureInput
@@ -725,6 +749,7 @@ export type FeeStructureScalarWhereInput = {
   monthlyAmount?: Prisma.DecimalNullableFilter<"FeeStructure"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.IntNullableFilter<"FeeStructure"> | number | null
   isActive?: Prisma.BoolFilter<"FeeStructure"> | boolean
+  isDefault?: Prisma.BoolFilter<"FeeStructure"> | boolean
   createdAt?: Prisma.DateTimeFilter<"FeeStructure"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FeeStructure"> | Date | string
 }
@@ -738,6 +763,7 @@ export type FeeStructureCreateWithoutCourseInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutFeeStructuresInput
@@ -754,6 +780,7 @@ export type FeeStructureUncheckedCreateWithoutCourseInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutFeeStructureInput
@@ -794,6 +821,7 @@ export type FeeStructureCreateWithoutFeeAccountsInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutFeeStructuresInput
@@ -811,6 +839,7 @@ export type FeeStructureUncheckedCreateWithoutFeeAccountsInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -840,6 +869,7 @@ export type FeeStructureUpdateWithoutFeeAccountsInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutFeeStructuresNestedInput
@@ -857,6 +887,7 @@ export type FeeStructureUncheckedUpdateWithoutFeeAccountsInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -871,6 +902,7 @@ export type FeeStructureCreateManyInstituteInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -884,6 +916,7 @@ export type FeeStructureUpdateWithoutInstituteInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   course?: Prisma.CourseUpdateOneRequiredWithoutFeeStructuresNestedInput
@@ -900,6 +933,7 @@ export type FeeStructureUncheckedUpdateWithoutInstituteInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutFeeStructureNestedInput
@@ -915,6 +949,7 @@ export type FeeStructureUncheckedUpdateManyWithoutInstituteInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -929,6 +964,7 @@ export type FeeStructureCreateManyCourseInput = {
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: number | null
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -942,6 +978,7 @@ export type FeeStructureUpdateWithoutCourseInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutFeeStructuresNestedInput
@@ -958,6 +995,7 @@ export type FeeStructureUncheckedUpdateWithoutCourseInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutFeeStructureNestedInput
@@ -973,6 +1011,7 @@ export type FeeStructureUncheckedUpdateManyWithoutCourseInput = {
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1019,6 +1058,7 @@ export type FeeStructureSelect<ExtArgs extends runtime.Types.Extensions.Internal
   monthlyAmount?: boolean
   billingDay?: boolean
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
@@ -1038,6 +1078,7 @@ export type FeeStructureSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   monthlyAmount?: boolean
   billingDay?: boolean
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
@@ -1055,6 +1096,7 @@ export type FeeStructureSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   monthlyAmount?: boolean
   billingDay?: boolean
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
@@ -1072,11 +1114,12 @@ export type FeeStructureSelectScalar = {
   monthlyAmount?: boolean
   billingDay?: boolean
   isActive?: boolean
+  isDefault?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FeeStructureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "courseId" | "name" | "planType" | "courseFee" | "installmentCount" | "monthlyAmount" | "billingDay" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["feeStructure"]>
+export type FeeStructureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "courseId" | "name" | "planType" | "courseFee" | "installmentCount" | "monthlyAmount" | "billingDay" | "isActive" | "isDefault" | "createdAt" | "updatedAt", ExtArgs["result"]["feeStructure"]>
 export type FeeStructureInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
@@ -1110,6 +1153,13 @@ export type $FeeStructurePayload<ExtArgs extends runtime.Types.Extensions.Intern
     monthlyAmount: runtime.Decimal | null
     billingDay: number | null
     isActive: boolean
+    /**
+     * The structure SetupFeeAccountModal pre-selects for this course. At most
+     * one per course, enforced by clearOtherDefaults() in academics.ts (not a
+     * DB constraint, since Postgres partial-unique-per-course needs a raw
+     * index Prisma push won't manage cleanly).
+     */
+    isDefault: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["feeStructure"]>
@@ -1548,6 +1598,7 @@ export interface FeeStructureFieldRefs {
   readonly monthlyAmount: Prisma.FieldRef<"FeeStructure", 'Decimal'>
   readonly billingDay: Prisma.FieldRef<"FeeStructure", 'Int'>
   readonly isActive: Prisma.FieldRef<"FeeStructure", 'Boolean'>
+  readonly isDefault: Prisma.FieldRef<"FeeStructure", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"FeeStructure", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"FeeStructure", 'DateTime'>
 }

@@ -147,6 +147,32 @@ export const PayrollRunStatus = {
 export type PayrollRunStatus = (typeof PayrollRunStatus)[keyof typeof PayrollRunStatus]
 
 
+export const WhatsAppTemplateStatus = {
+  DRAFT: 'DRAFT',
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type WhatsAppTemplateStatus = (typeof WhatsAppTemplateStatus)[keyof typeof WhatsAppTemplateStatus]
+
+
+export const OutboundMessageChannel = {
+  WHATSAPP: 'WHATSAPP'
+} as const
+
+export type OutboundMessageChannel = (typeof OutboundMessageChannel)[keyof typeof OutboundMessageChannel]
+
+
+export const OutboundMessageStatus = {
+  QUEUED: 'QUEUED',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+} as const
+
+export type OutboundMessageStatus = (typeof OutboundMessageStatus)[keyof typeof OutboundMessageStatus]
+
+
 export const ReminderCategory = {
   UTILITY: 'UTILITY',
   RENT: 'RENT',

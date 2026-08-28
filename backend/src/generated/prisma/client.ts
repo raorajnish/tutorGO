@@ -113,6 +113,28 @@ export type EmailConfig = Prisma.EmailConfigModel
  */
 export type InstituteEmailConfig = Prisma.InstituteEmailConfigModel
 /**
+ * Model InstituteWhatsAppConfig
+ * Meta WhatsApp Business Cloud API credentials, one per institute. First
+ * genuinely encrypted secret in this schema (accessToken) — unlike
+ * InstituteEmailConfig.password, this token grants broad send access on the
+ * institute's WABA, not just one mailbox. See changes-phase9.md §9a.
+ */
+export type InstituteWhatsAppConfig = Prisma.InstituteWhatsAppConfigModel
+/**
+ * Model WhatsAppTemplate
+ * Local cache of an institute's Meta message templates — both ones synced
+ * down from the WABA (APPROVED/PENDING/REJECTED) and drafts we suggest
+ * on-device (DRAFT, metaTemplateId null) before the owner submits them.
+ */
+export type WhatsAppTemplate = Prisma.WhatsAppTemplateModel
+/**
+ * Model OutboundMessage
+ * Delivery log for every WhatsApp send attempt — nothing fire-and-forget,
+ * so a failure is visible and the webhook (routes/whatsapp.ts) has a row to
+ * update via providerMessageId. See changes-phase9.md §9a.
+ */
+export type OutboundMessage = Prisma.OutboundMessageModel
+/**
  * Model MessageLog
  * 
  */

@@ -17,12 +17,23 @@ import { notificationsRouter } from "./routes/notifications.js";
 import { remindersRouter } from "./routes/reminders.js";
 import { publicRouter } from "./routes/public.js";
 import { distributionRouter } from "./routes/distribution.js";
+import { whatsappRouter } from "./routes/whatsapp.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 
 export const app = express();
 
 app.use(cors());
-app.use(express.json());
+// `verify` stashes the raw bytes on req.rawBody alongside the parsed body —
+// needed only by the WhatsApp webhook's X-Hub-Signature-256 check
+// (routes/public.ts), which HMACs the exact bytes Meta sent, not a
+// re-serialization of the parsed JSON. No effect on any other route.
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      (req as express.Request & { rawBody?: Buffer }).rawBody = buf;
+    },
+  })
+);
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "tutorgo-backend" });
@@ -44,8 +55,10 @@ app.use("/api/tests", testsRouter);
 app.use("/api/notifications", notificationsRouter);
 app.use("/api/reminders", remindersRouter);
 app.use("/api/distribution", distributionRouter);
+app.use("/api/org/whatsapp", whatsappRouter);
 // Deliberately outside authenticate/requireInstitute — the one unauthenticated
-// public surface in the app. See routes/public.ts's header comment.
+// public surface in the app (now also the WhatsApp webhook — see
+// routes/public.ts's header comment).
 app.use("/api/public", publicRouter);
 
 app.use(notFoundHandler);

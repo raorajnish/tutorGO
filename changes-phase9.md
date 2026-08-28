@@ -4,56 +4,83 @@
 > Planning only. These weren't part of the original five requests — they're gaps identified while
 > reviewing the app against what a coaching-class management system typically needs. Sequenced
 > **after 8a–8f** (see revised overall order at the end of this addendum), since none of them are
-> blocking today, but two (§9f audit trail, and WhatsApp/SMS for the 8f admission link + 8a fee
+> blocking today, but two (§9f audit trail, and WhatsApp for the 8f admission link + 8a fee
 > reminders) are flagged as worth pulling forward if 8a/8d/8f are being built soon — noted inline.
 
 ---
 
-## 9a. Parent/student communication via WhatsApp/SMS
+## 9a. Parent/student communication via WhatsApp (+ existing email)
 
 ### The problem
 
-Notifications today are in-app only (`Notification` model + push subscriptions). Fee-overdue
-reminders, the Phase 8d reminders, low-attendance alerts (§9b), and the Phase 8f admission-link
-circulation all lose most of their value if the parent never opens the app to see them — most
-coaching classes run communication through WhatsApp/SMS, not an app inbox.
+Notifications today are in-app only (`Notification` model + push subscriptions), plus the existing
+`InstituteEmailConfig`/`mailer.ts` path. Fee-overdue reminders, the Phase 8d reminders, low-attendance
+alerts (§9b), and the Phase 8f admission-link circulation all lose most of their value if the parent
+never opens the app to see them — most coaching classes run communication through WhatsApp, not an
+app inbox. **Scope decision: WhatsApp + email only, no SMS** — SMS aggregator dropped from this plan.
 
-### Design
+### What this builds on
 
-Don't build a bespoke WhatsApp integration from scratch — use a provider API (WhatsApp Business
-Cloud API directly, or an aggregator like Gupshup/MSG91/Twilio that also covers SMS fallback in one
-integration). Recommend starting with **SMS-only** via a single aggregator (cheaper to get
-approved, no WhatsApp Business verification lag) and adding WhatsApp templates once the SMS path
-is proven, rather than blocking this phase on WhatsApp Business approval timelines.
+An in-app template system already exists (`backend/src/lib/messageTemplates.ts`) — 5 typed triggers
+(`LECTURE_SCHEDULED`, `LECTURE_CANCELLED`, `ATTENDANCE_MARKED`, `FEE_OVERDUE_REMINDER`,
+`PAYROLL_PAYMENT_RECORDED`), each with an institute-editable `{{var}}`-style body, currently used for
+in-app notifications/email. WhatsApp's Cloud API can't send freeform text for business-initiated
+messages — it requires pre-approved HSM templates (numbered placeholders `{{1}}`, `{{2}}`, fixed
+wording, async Meta review). So this is one message concept with two representations (in-app
+freeform vs Meta HSM), not a second content system — WhatsApp "dummy templates for approval" are
+Meta-shaped drafts *derived from* the same 5 triggers.
 
-- New model `OutboundMessage` — `id, instituteId, studentId?, channel (SMS|WHATSAPP), toPhone,
-  templateKey, payload Json, status (QUEUED|SENT|FAILED), providerMessageId, sentAt, error,
-  createdAt` — every message sent is logged, not fire-and-forget, so a failed delivery is visible
-  and retryable rather than silently lost.
-- A single `services/messaging.ts` (`sendMessage(instituteId, studentId, templateKey, payload)`)
-  that every feature calls through — fee-overdue, 8d reminders (institute-facing, not
-  student-facing — those go to staff, not parents, so likely stay in-app only, confirm), the
-  admission-link circulation (§8f, "share in the class group" is more about the export/PDF than an
-  automated send, but a "send this student's link via SMS" per-row action is a natural add-on),
-  and §9b's low-attendance alerts. One integration point, not five copies of provider-specific code.
-- Cost/consent matter here — SMS/WhatsApp cost money per message and touch a parent's phone
-  directly. Needs an institute-level on/off toggle per message type (owner decides whether
-  fee-reminders go out by SMS or stay in-app-only), not a blanket "send everything" default.
+`InstituteEmailConfig` is the precedent for a per-institute 3rd-party credential (stored plaintext,
+never echoed back in GET). A WhatsApp long-lived access token is more sensitive — first genuinely
+**encrypted** secret in the codebase.
+
+### Design — this pass is backend groundwork only
+
+Credential storage, template sync from Meta, dummy templates ready to submit for approval, and a
+send primitive. **Not** in this pass: wiring into fee-overdue/8f links/9b alerts — that's a distinct
+follow-up once this groundwork exists and real WABA credentials are available to test against.
+
+- `InstituteWhatsAppConfig` (1:1 with Institute): `accessToken` (encrypted), `phoneNumberId`,
+  `wabaId`, `businessAccountId?`, `webhookVerifyToken`, `isEnabled`, `connectedAt`, `updatedAt`.
+- `WhatsAppTemplate` — local cache of Meta-side templates: `instituteId`, `metaTemplateId?`, `name`,
+  `language`, `category`, `status` (`APPROVED|PENDING|REJECTED|DRAFT`), `bodyText`, `mappedType?`
+  (links an approved template to one of the 5 internal trigger types), `lastSyncedAt`.
+- `OutboundMessage` — delivery log: `instituteId`, `studentId?`, `channel` (`WHATSAPP` only — no
+  SMS), `toPhone`, `templateName`, `payload Json`, `status` (`QUEUED|SENT|FAILED`),
+  `providerMessageId`, `error`, `sentAt`, `createdAt`. Every send logged, not fire-and-forget.
+- `backend/src/lib/crypto.ts` — AES-256-GCM encrypt/decrypt using a new `ENCRYPTION_KEY` env var.
+- `backend/src/lib/whatsappTemplateSuggestions.ts` — static defs converting the 5 existing template
+  bodies into Meta HSM shape (numbered placeholders + sample values + suggested category), mirroring
+  `messageTemplates.ts`.
+- `backend/src/services/whatsapp.ts` — thin Graph API client: `testConnection`, `syncTemplates`
+  (pulls approval status from Meta), `submitTemplate` (POSTs a draft for review),
+  `sendTemplateMessage`.
+- `backend/src/routes/whatsapp.ts`, `OWNER/ADMIN`-only (per §9c precedent):
+  - `GET/PUT/DELETE /whatsapp/config`, `POST /whatsapp/config/test`
+  - `GET /whatsapp/templates`, `POST /whatsapp/templates/sync`, `POST /whatsapp/templates/:id/submit`,
+    `POST /whatsapp/templates/:id/map`
+  - `POST /whatsapp/webhook` (public, outside `authenticate` — Meta's delivery-status callbacks; GET
+    for the verify handshake, POST with `X-Hub-Signature-256` check, rate-limited)
+- Cost/consent matter — WhatsApp messages cost money and touch a parent's phone directly. The
+  eventual per-trigger-type send toggle (owner decides whether fee-reminders go out by WhatsApp or
+  stay in-app-only) is part of the later wiring step, not this groundwork pass.
 
 ### Build order
 
-1. Pick and integrate one provider (SMS first) behind `services/messaging.ts`; `OutboundMessage`
-   model, additive migration.
-2. Per-institute settings: which message types are SMS-enabled (new `Settings` tab section or
-   extend whatever institute-config screen exists).
-3. Wire the fee-overdue path first (`GET /overdue` in `fees.ts` already identifies the target
-   list — reuse it rather than re-deriving overdue logic) as the first real consumer.
-4. Wire 8f's admission-link circulation (send link/studentCode by SMS per student instead of only
-   PDF export) and 9b's low-attendance alerts once those phases exist.
-5. Test: trigger a fee-overdue SMS → confirm `OutboundMessage` row created and status transitions
-   correctly (mock the provider in tests, don't hit the real API); provider failure → confirm
-   `FAILED` status + error surfaced somewhere staff can see (not silently swallowed); institute
-   toggles a message type off → confirm no send attempted, no orphan `QUEUED` rows.
+1. Schema: `InstituteWhatsAppConfig`, `WhatsAppTemplate`, `OutboundMessage`, additive migration.
+2. `crypto.ts` + `ENCRYPTION_KEY` env var.
+3. `services/whatsapp.ts` (Graph API calls — test connection, sync templates, submit template, send
+   template message).
+4. `routes/whatsapp.ts` (config CRUD/test, template sync/list/submit/map, public webhook receiver).
+5. `whatsappTemplateSuggestions.ts` seed data derived from the 5 existing triggers.
+6. Frontend: new "WhatsApp" tab in Settings (same slot pattern as the existing `email` tab) — connect
+   form, connection-test button, template list with status badges + "submit for approval" per draft.
+7. Test against a real (or sandboxed) WABA: save creds → test connection succeeds/fails correctly;
+   sync templates → cache reflects Meta's actual approval states; submit a draft → status becomes
+   `PENDING`; webhook status callback → matching `OutboundMessage` row updates.
+
+The unifying `sendMessage()` dispatcher and wiring fee-overdue/8f/9b through it stays a separate
+follow-up, once this groundwork exists.
 
 ---
 
@@ -78,7 +105,7 @@ mechanism — build 9b *after* 8d for exactly this reason.
   signal, not a lifetime average that dilutes slowly) and creates a `Notification` (staff-facing)
   once a student crosses below threshold — with a cooldown (don't re-fire daily once already
   below; re-fire only if it drops further or after N days) to avoid alert fatigue.
-- Parent-facing version rides on 9a once that exists — an SMS "your ward's attendance is at 62%,
+- Parent-facing version rides on 9a once that exists — a WhatsApp "your ward's attendance is at 62%,
   below the required X%" — explicitly deferred until 9a lands, not built as a separate channel.
 
 ### Build order
@@ -87,7 +114,7 @@ mechanism — build 9b *after* 8d for exactly this reason.
 2. Extend the 8d scheduler with a second daily query (attendance rollup + threshold check),
    reusing its transaction-per-item/idempotency pattern.
 3. Staff-facing `Notification` on crossing threshold, with cooldown logic.
-4. Once 9a exists: parent SMS variant, gated by the institute's message-type toggle.
+4. Once 9a exists: parent WhatsApp variant, gated by the institute's message-type toggle.
 5. Test: mark a student below threshold → confirm one alert fires, not one per day; attendance
    recovers above threshold then drops again → confirm it re-fires; course with alerts disabled →
    confirm no alerts ever generated for its students.
@@ -279,7 +306,7 @@ to actually push out rather than leave behind a login parents won't use.
 5. **8e** (distribution tracking).
 6. **9c** (role/permission audit) — cheap, do it before 8f adds more write surfaces to get wrong.
 7. **8f** (self-service admission links) — without document upload.
-8. **9a** (WhatsApp/SMS messaging) — wire into 8a's overdue reminders, 8f's link circulation, and
+8. **9a** (WhatsApp messaging) — wire into 8a's overdue reminders, 8f's link circulation, and
    9b's alerts once it exists.
 9. **9d** (document storage) — staff-side first; public self-fill upload only after 8f is stable.
 10. **9e** (data export/backup).

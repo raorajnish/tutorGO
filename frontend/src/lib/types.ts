@@ -1266,6 +1266,44 @@ export interface UpdateInstituteEmailConfigPayload {
 }
 
 // ---------------------------------------------------------------------------
+// WhatsApp Business (Settings → WhatsApp) — see changes-phase9.md §9a
+// ---------------------------------------------------------------------------
+
+export interface InstituteWhatsAppConfig {
+  phoneNumberId: string;
+  wabaId: string;
+  businessAccountId: string | null;
+  isEnabled: boolean;
+  connectedAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateWhatsAppConfigPayload {
+  accessToken?: string;
+  phoneNumberId: string;
+  wabaId: string;
+  businessAccountId?: string;
+  isEnabled: boolean;
+}
+
+export type WhatsAppTemplateStatus = "DRAFT" | "PENDING" | "APPROVED" | "REJECTED";
+
+export interface WhatsAppTemplate {
+  id: string;
+  instituteId: string;
+  metaTemplateId: string | null;
+  name: string;
+  language: string;
+  category: string;
+  status: WhatsAppTemplateStatus;
+  bodyText: string;
+  mappedType: string | null;
+  lastSyncedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ---------------------------------------------------------------------------
 // In-app notifications
 // ---------------------------------------------------------------------------
 

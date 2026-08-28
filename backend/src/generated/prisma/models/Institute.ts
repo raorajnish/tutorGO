@@ -325,6 +325,9 @@ export type InstituteWhereInput = {
   payrollRuns?: Prisma.PayrollRunListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   emailConfig?: Prisma.XOR<Prisma.InstituteEmailConfigNullableScalarRelationFilter, Prisma.InstituteEmailConfigWhereInput> | null
+  whatsAppConfig?: Prisma.XOR<Prisma.InstituteWhatsAppConfigNullableScalarRelationFilter, Prisma.InstituteWhatsAppConfigWhereInput> | null
+  whatsAppTemplates?: Prisma.WhatsAppTemplateListRelationFilter
+  outboundMessages?: Prisma.OutboundMessageListRelationFilter
   expenseCategories?: Prisma.ExpenseCategoryListRelationFilter
   events?: Prisma.EventListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
@@ -370,6 +373,9 @@ export type InstituteOrderByWithRelationInput = {
   payrollRuns?: Prisma.PayrollRunOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   emailConfig?: Prisma.InstituteEmailConfigOrderByWithRelationInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigOrderByWithRelationInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateOrderByRelationAggregateInput
+  outboundMessages?: Prisma.OutboundMessageOrderByRelationAggregateInput
   expenseCategories?: Prisma.ExpenseCategoryOrderByRelationAggregateInput
   events?: Prisma.EventOrderByRelationAggregateInput
   expenses?: Prisma.ExpenseOrderByRelationAggregateInput
@@ -418,6 +424,9 @@ export type InstituteWhereUniqueInput = Prisma.AtLeast<{
   payrollRuns?: Prisma.PayrollRunListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   emailConfig?: Prisma.XOR<Prisma.InstituteEmailConfigNullableScalarRelationFilter, Prisma.InstituteEmailConfigWhereInput> | null
+  whatsAppConfig?: Prisma.XOR<Prisma.InstituteWhatsAppConfigNullableScalarRelationFilter, Prisma.InstituteWhatsAppConfigWhereInput> | null
+  whatsAppTemplates?: Prisma.WhatsAppTemplateListRelationFilter
+  outboundMessages?: Prisma.OutboundMessageListRelationFilter
   expenseCategories?: Prisma.ExpenseCategoryListRelationFilter
   events?: Prisma.EventListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
@@ -507,6 +516,9 @@ export type InstituteCreateInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -550,6 +562,9 @@ export type InstituteUncheckedCreateInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -593,6 +608,9 @@ export type InstituteUpdateInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -636,6 +654,9 @@ export type InstituteUncheckedUpdateInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -911,6 +932,48 @@ export type InstituteUpdateOneRequiredWithoutEmailConfigNestedInput = {
   upsert?: Prisma.InstituteUpsertWithoutEmailConfigInput
   connect?: Prisma.InstituteWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutEmailConfigInput, Prisma.InstituteUpdateWithoutEmailConfigInput>, Prisma.InstituteUncheckedUpdateWithoutEmailConfigInput>
+}
+
+export type InstituteCreateNestedOneWithoutWhatsAppConfigInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutWhatsAppConfigInput, Prisma.InstituteUncheckedCreateWithoutWhatsAppConfigInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutWhatsAppConfigInput
+  connect?: Prisma.InstituteWhereUniqueInput
+}
+
+export type InstituteUpdateOneRequiredWithoutWhatsAppConfigNestedInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutWhatsAppConfigInput, Prisma.InstituteUncheckedCreateWithoutWhatsAppConfigInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutWhatsAppConfigInput
+  upsert?: Prisma.InstituteUpsertWithoutWhatsAppConfigInput
+  connect?: Prisma.InstituteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutWhatsAppConfigInput, Prisma.InstituteUpdateWithoutWhatsAppConfigInput>, Prisma.InstituteUncheckedUpdateWithoutWhatsAppConfigInput>
+}
+
+export type InstituteCreateNestedOneWithoutWhatsAppTemplatesInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutWhatsAppTemplatesInput, Prisma.InstituteUncheckedCreateWithoutWhatsAppTemplatesInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutWhatsAppTemplatesInput
+  connect?: Prisma.InstituteWhereUniqueInput
+}
+
+export type InstituteUpdateOneRequiredWithoutWhatsAppTemplatesNestedInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutWhatsAppTemplatesInput, Prisma.InstituteUncheckedCreateWithoutWhatsAppTemplatesInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutWhatsAppTemplatesInput
+  upsert?: Prisma.InstituteUpsertWithoutWhatsAppTemplatesInput
+  connect?: Prisma.InstituteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutWhatsAppTemplatesInput, Prisma.InstituteUpdateWithoutWhatsAppTemplatesInput>, Prisma.InstituteUncheckedUpdateWithoutWhatsAppTemplatesInput>
+}
+
+export type InstituteCreateNestedOneWithoutOutboundMessagesInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutOutboundMessagesInput, Prisma.InstituteUncheckedCreateWithoutOutboundMessagesInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutOutboundMessagesInput
+  connect?: Prisma.InstituteWhereUniqueInput
+}
+
+export type InstituteUpdateOneRequiredWithoutOutboundMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutOutboundMessagesInput, Prisma.InstituteUncheckedCreateWithoutOutboundMessagesInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutOutboundMessagesInput
+  upsert?: Prisma.InstituteUpsertWithoutOutboundMessagesInput
+  connect?: Prisma.InstituteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutOutboundMessagesInput, Prisma.InstituteUpdateWithoutOutboundMessagesInput>, Prisma.InstituteUncheckedUpdateWithoutOutboundMessagesInput>
 }
 
 export type InstituteCreateNestedOneWithoutNotificationsInput = {
@@ -1240,6 +1303,9 @@ export type InstituteCreateWithoutPlanInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -1282,6 +1348,9 @@ export type InstituteUncheckedCreateWithoutPlanInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -1372,6 +1441,9 @@ export type InstituteCreateWithoutOrganizationInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -1414,6 +1486,9 @@ export type InstituteUncheckedCreateWithoutOrganizationInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -1482,6 +1557,9 @@ export type InstituteCreateWithoutModulesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -1524,6 +1602,9 @@ export type InstituteUncheckedCreateWithoutModulesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -1582,6 +1663,9 @@ export type InstituteUpdateWithoutModulesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -1624,6 +1708,9 @@ export type InstituteUncheckedUpdateWithoutModulesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -1666,6 +1753,9 @@ export type InstituteCreateWithoutUsersInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -1708,6 +1798,9 @@ export type InstituteUncheckedCreateWithoutUsersInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -1766,6 +1859,9 @@ export type InstituteUpdateWithoutUsersInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -1808,6 +1904,9 @@ export type InstituteUncheckedUpdateWithoutUsersInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -1850,6 +1949,9 @@ export type InstituteCreateWithoutEmailConfigInput = {
   payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -1892,6 +1994,9 @@ export type InstituteUncheckedCreateWithoutEmailConfigInput = {
   payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -1950,6 +2055,9 @@ export type InstituteUpdateWithoutEmailConfigInput = {
   payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -1992,6 +2100,597 @@ export type InstituteUncheckedUpdateWithoutEmailConfigInput = {
   payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteCreateWithoutWhatsAppConfigInput = {
+  id?: string
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
+  plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
+  users?: Prisma.UserCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteUncheckedCreateWithoutWhatsAppConfigInput = {
+  id?: string
+  organizationId: string
+  planId?: string | null
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteCreateOrConnectWithoutWhatsAppConfigInput = {
+  where: Prisma.InstituteWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutWhatsAppConfigInput, Prisma.InstituteUncheckedCreateWithoutWhatsAppConfigInput>
+}
+
+export type InstituteUpsertWithoutWhatsAppConfigInput = {
+  update: Prisma.XOR<Prisma.InstituteUpdateWithoutWhatsAppConfigInput, Prisma.InstituteUncheckedUpdateWithoutWhatsAppConfigInput>
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutWhatsAppConfigInput, Prisma.InstituteUncheckedCreateWithoutWhatsAppConfigInput>
+  where?: Prisma.InstituteWhereInput
+}
+
+export type InstituteUpdateToOneWithWhereWithoutWhatsAppConfigInput = {
+  where?: Prisma.InstituteWhereInput
+  data: Prisma.XOR<Prisma.InstituteUpdateWithoutWhatsAppConfigInput, Prisma.InstituteUncheckedUpdateWithoutWhatsAppConfigInput>
+}
+
+export type InstituteUpdateWithoutWhatsAppConfigInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
+  plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
+  users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteUncheckedUpdateWithoutWhatsAppConfigInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteCreateWithoutWhatsAppTemplatesInput = {
+  id?: string
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
+  plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
+  users?: Prisma.UserCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteUncheckedCreateWithoutWhatsAppTemplatesInput = {
+  id?: string
+  organizationId: string
+  planId?: string | null
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteCreateOrConnectWithoutWhatsAppTemplatesInput = {
+  where: Prisma.InstituteWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutWhatsAppTemplatesInput, Prisma.InstituteUncheckedCreateWithoutWhatsAppTemplatesInput>
+}
+
+export type InstituteUpsertWithoutWhatsAppTemplatesInput = {
+  update: Prisma.XOR<Prisma.InstituteUpdateWithoutWhatsAppTemplatesInput, Prisma.InstituteUncheckedUpdateWithoutWhatsAppTemplatesInput>
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutWhatsAppTemplatesInput, Prisma.InstituteUncheckedCreateWithoutWhatsAppTemplatesInput>
+  where?: Prisma.InstituteWhereInput
+}
+
+export type InstituteUpdateToOneWithWhereWithoutWhatsAppTemplatesInput = {
+  where?: Prisma.InstituteWhereInput
+  data: Prisma.XOR<Prisma.InstituteUpdateWithoutWhatsAppTemplatesInput, Prisma.InstituteUncheckedUpdateWithoutWhatsAppTemplatesInput>
+}
+
+export type InstituteUpdateWithoutWhatsAppTemplatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
+  plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
+  users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteUncheckedUpdateWithoutWhatsAppTemplatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteCreateWithoutOutboundMessagesInput = {
+  id?: string
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
+  plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
+  users?: Prisma.UserCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteUncheckedCreateWithoutOutboundMessagesInput = {
+  id?: string
+  organizationId: string
+  planId?: string | null
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteCreateOrConnectWithoutOutboundMessagesInput = {
+  where: Prisma.InstituteWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutOutboundMessagesInput, Prisma.InstituteUncheckedCreateWithoutOutboundMessagesInput>
+}
+
+export type InstituteUpsertWithoutOutboundMessagesInput = {
+  update: Prisma.XOR<Prisma.InstituteUpdateWithoutOutboundMessagesInput, Prisma.InstituteUncheckedUpdateWithoutOutboundMessagesInput>
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutOutboundMessagesInput, Prisma.InstituteUncheckedCreateWithoutOutboundMessagesInput>
+  where?: Prisma.InstituteWhereInput
+}
+
+export type InstituteUpdateToOneWithWhereWithoutOutboundMessagesInput = {
+  where?: Prisma.InstituteWhereInput
+  data: Prisma.XOR<Prisma.InstituteUpdateWithoutOutboundMessagesInput, Prisma.InstituteUncheckedUpdateWithoutOutboundMessagesInput>
+}
+
+export type InstituteUpdateWithoutOutboundMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
+  plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
+  users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteUncheckedUpdateWithoutOutboundMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2034,6 +2733,9 @@ export type InstituteCreateWithoutNotificationsInput = {
   payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -2076,6 +2778,9 @@ export type InstituteUncheckedCreateWithoutNotificationsInput = {
   payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2134,6 +2839,9 @@ export type InstituteUpdateWithoutNotificationsInput = {
   payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -2176,6 +2884,9 @@ export type InstituteUncheckedUpdateWithoutNotificationsInput = {
   payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2219,6 +2930,9 @@ export type InstituteCreateWithoutRemindersInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -2261,6 +2975,9 @@ export type InstituteUncheckedCreateWithoutRemindersInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2319,6 +3036,9 @@ export type InstituteUpdateWithoutRemindersInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -2361,6 +3081,9 @@ export type InstituteUncheckedUpdateWithoutRemindersInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2402,6 +3125,9 @@ export type InstituteCreateWithoutCoursesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -2444,6 +3170,9 @@ export type InstituteUncheckedCreateWithoutCoursesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2502,6 +3231,9 @@ export type InstituteUpdateWithoutCoursesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -2544,6 +3276,9 @@ export type InstituteUncheckedUpdateWithoutCoursesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2586,6 +3321,9 @@ export type InstituteCreateWithoutSubjectsInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -2628,6 +3366,9 @@ export type InstituteUncheckedCreateWithoutSubjectsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2686,6 +3427,9 @@ export type InstituteUpdateWithoutSubjectsInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -2728,6 +3472,9 @@ export type InstituteUncheckedUpdateWithoutSubjectsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2770,6 +3517,9 @@ export type InstituteCreateWithoutBatchesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -2812,6 +3562,9 @@ export type InstituteUncheckedCreateWithoutBatchesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2870,6 +3623,9 @@ export type InstituteUpdateWithoutBatchesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -2912,6 +3668,9 @@ export type InstituteUncheckedUpdateWithoutBatchesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2954,6 +3713,9 @@ export type InstituteCreateWithoutEnquiriesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -2996,6 +3758,9 @@ export type InstituteUncheckedCreateWithoutEnquiriesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3054,6 +3819,9 @@ export type InstituteUpdateWithoutEnquiriesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -3096,6 +3864,9 @@ export type InstituteUncheckedUpdateWithoutEnquiriesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3138,6 +3909,9 @@ export type InstituteCreateWithoutStudentsInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -3180,6 +3954,9 @@ export type InstituteUncheckedCreateWithoutStudentsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3238,6 +4015,9 @@ export type InstituteUpdateWithoutStudentsInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -3280,6 +4060,9 @@ export type InstituteUncheckedUpdateWithoutStudentsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3322,6 +4105,9 @@ export type InstituteCreateWithoutLecturesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -3364,6 +4150,9 @@ export type InstituteUncheckedCreateWithoutLecturesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3422,6 +4211,9 @@ export type InstituteUpdateWithoutLecturesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -3464,6 +4256,9 @@ export type InstituteUncheckedUpdateWithoutLecturesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3507,6 +4302,9 @@ export type InstituteCreateWithoutTestsInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -3549,6 +4347,9 @@ export type InstituteUncheckedCreateWithoutTestsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3607,6 +4408,9 @@ export type InstituteUpdateWithoutTestsInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -3649,6 +4453,9 @@ export type InstituteUncheckedUpdateWithoutTestsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3690,6 +4497,9 @@ export type InstituteCreateWithoutMessageTemplatesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -3732,6 +4542,9 @@ export type InstituteUncheckedCreateWithoutMessageTemplatesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3790,6 +4603,9 @@ export type InstituteUpdateWithoutMessageTemplatesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -3832,6 +4648,9 @@ export type InstituteUncheckedUpdateWithoutMessageTemplatesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3874,6 +4693,9 @@ export type InstituteCreateWithoutFeeStructuresInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -3916,6 +4738,9 @@ export type InstituteUncheckedCreateWithoutFeeStructuresInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3974,6 +4799,9 @@ export type InstituteUpdateWithoutFeeStructuresInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -4016,6 +4844,9 @@ export type InstituteUncheckedUpdateWithoutFeeStructuresInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4058,6 +4889,9 @@ export type InstituteCreateWithoutFeeAccountsInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -4100,6 +4934,9 @@ export type InstituteUncheckedCreateWithoutFeeAccountsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4158,6 +4995,9 @@ export type InstituteUpdateWithoutFeeAccountsInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -4200,6 +5040,9 @@ export type InstituteUncheckedUpdateWithoutFeeAccountsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4242,6 +5085,9 @@ export type InstituteCreateWithoutPaymentsInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -4284,6 +5130,9 @@ export type InstituteUncheckedCreateWithoutPaymentsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4342,6 +5191,9 @@ export type InstituteUpdateWithoutPaymentsInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -4384,6 +5236,9 @@ export type InstituteUncheckedUpdateWithoutPaymentsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4426,6 +5281,9 @@ export type InstituteCreateWithoutSalaryProfilesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -4468,6 +5326,9 @@ export type InstituteUncheckedCreateWithoutSalaryProfilesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4526,6 +5387,9 @@ export type InstituteUpdateWithoutSalaryProfilesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -4568,6 +5432,9 @@ export type InstituteUncheckedUpdateWithoutSalaryProfilesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4610,6 +5477,9 @@ export type InstituteCreateWithoutPayrollPaymentsInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -4652,6 +5522,9 @@ export type InstituteUncheckedCreateWithoutPayrollPaymentsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4710,6 +5583,9 @@ export type InstituteUpdateWithoutPayrollPaymentsInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -4752,6 +5628,9 @@ export type InstituteUncheckedUpdateWithoutPayrollPaymentsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4794,6 +5673,9 @@ export type InstituteCreateWithoutPayrollRunsInput = {
   payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -4836,6 +5718,9 @@ export type InstituteUncheckedCreateWithoutPayrollRunsInput = {
   payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4894,6 +5779,9 @@ export type InstituteUpdateWithoutPayrollRunsInput = {
   payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -4936,6 +5824,9 @@ export type InstituteUncheckedUpdateWithoutPayrollRunsInput = {
   payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4979,6 +5870,9 @@ export type InstituteCreateWithoutExpenseCategoriesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
   financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
@@ -5021,6 +5915,9 @@ export type InstituteUncheckedCreateWithoutExpenseCategoriesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
   financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
@@ -5079,6 +5976,9 @@ export type InstituteUpdateWithoutExpenseCategoriesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
   financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
@@ -5121,6 +6021,9 @@ export type InstituteUncheckedUpdateWithoutExpenseCategoriesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
   financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5163,6 +6066,9 @@ export type InstituteCreateWithoutEventsInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
   financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
@@ -5205,6 +6111,9 @@ export type InstituteUncheckedCreateWithoutEventsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
   financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
@@ -5263,6 +6172,9 @@ export type InstituteUpdateWithoutEventsInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
   financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
@@ -5305,6 +6217,9 @@ export type InstituteUncheckedUpdateWithoutEventsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
   financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5347,6 +6262,9 @@ export type InstituteCreateWithoutExpensesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
@@ -5389,6 +6307,9 @@ export type InstituteUncheckedCreateWithoutExpensesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
@@ -5447,6 +6368,9 @@ export type InstituteUpdateWithoutExpensesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
@@ -5489,6 +6413,9 @@ export type InstituteUncheckedUpdateWithoutExpensesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5531,6 +6458,9 @@ export type InstituteCreateWithoutFinanceEntriesInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -5573,6 +6503,9 @@ export type InstituteUncheckedCreateWithoutFinanceEntriesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -5631,6 +6564,9 @@ export type InstituteUpdateWithoutFinanceEntriesInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -5673,6 +6609,9 @@ export type InstituteUncheckedUpdateWithoutFinanceEntriesInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5715,6 +6654,9 @@ export type InstituteCreateWithoutDistributionItemsInput = {
   payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
@@ -5757,6 +6699,9 @@ export type InstituteUncheckedCreateWithoutDistributionItemsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
@@ -5815,6 +6760,9 @@ export type InstituteUpdateWithoutDistributionItemsInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -5857,6 +6805,9 @@ export type InstituteUncheckedUpdateWithoutDistributionItemsInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5916,6 +6867,9 @@ export type InstituteUpdateWithoutPlanInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -5958,6 +6912,9 @@ export type InstituteUncheckedUpdateWithoutPlanInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6036,6 +6993,9 @@ export type InstituteUpdateWithoutOrganizationInput = {
   payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
@@ -6078,6 +7038,9 @@ export type InstituteUncheckedUpdateWithoutOrganizationInput = {
   payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
   emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
   expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6127,6 +7090,8 @@ export type InstituteCountOutputType = {
   payrollPayments: number
   payrollRuns: number
   notifications: number
+  whatsAppTemplates: number
+  outboundMessages: number
   expenseCategories: number
   events: number
   expenses: number
@@ -6153,6 +7118,8 @@ export type InstituteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   payrollPayments?: boolean | InstituteCountOutputTypeCountPayrollPaymentsArgs
   payrollRuns?: boolean | InstituteCountOutputTypeCountPayrollRunsArgs
   notifications?: boolean | InstituteCountOutputTypeCountNotificationsArgs
+  whatsAppTemplates?: boolean | InstituteCountOutputTypeCountWhatsAppTemplatesArgs
+  outboundMessages?: boolean | InstituteCountOutputTypeCountOutboundMessagesArgs
   expenseCategories?: boolean | InstituteCountOutputTypeCountExpenseCategoriesArgs
   events?: boolean | InstituteCountOutputTypeCountEventsArgs
   expenses?: boolean | InstituteCountOutputTypeCountExpensesArgs
@@ -6287,6 +7254,20 @@ export type InstituteCountOutputTypeCountNotificationsArgs<ExtArgs extends runti
 /**
  * InstituteCountOutputType without action
  */
+export type InstituteCountOutputTypeCountWhatsAppTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WhatsAppTemplateWhereInput
+}
+
+/**
+ * InstituteCountOutputType without action
+ */
+export type InstituteCountOutputTypeCountOutboundMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OutboundMessageWhereInput
+}
+
+/**
+ * InstituteCountOutputType without action
+ */
 export type InstituteCountOutputTypeCountExpenseCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ExpenseCategoryWhereInput
 }
@@ -6370,6 +7351,9 @@ export type InstituteSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   payrollRuns?: boolean | Prisma.Institute$payrollRunsArgs<ExtArgs>
   notifications?: boolean | Prisma.Institute$notificationsArgs<ExtArgs>
   emailConfig?: boolean | Prisma.Institute$emailConfigArgs<ExtArgs>
+  whatsAppConfig?: boolean | Prisma.Institute$whatsAppConfigArgs<ExtArgs>
+  whatsAppTemplates?: boolean | Prisma.Institute$whatsAppTemplatesArgs<ExtArgs>
+  outboundMessages?: boolean | Prisma.Institute$outboundMessagesArgs<ExtArgs>
   expenseCategories?: boolean | Prisma.Institute$expenseCategoriesArgs<ExtArgs>
   events?: boolean | Prisma.Institute$eventsArgs<ExtArgs>
   expenses?: boolean | Prisma.Institute$expensesArgs<ExtArgs>
@@ -6462,6 +7446,9 @@ export type InstituteInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   payrollRuns?: boolean | Prisma.Institute$payrollRunsArgs<ExtArgs>
   notifications?: boolean | Prisma.Institute$notificationsArgs<ExtArgs>
   emailConfig?: boolean | Prisma.Institute$emailConfigArgs<ExtArgs>
+  whatsAppConfig?: boolean | Prisma.Institute$whatsAppConfigArgs<ExtArgs>
+  whatsAppTemplates?: boolean | Prisma.Institute$whatsAppTemplatesArgs<ExtArgs>
+  outboundMessages?: boolean | Prisma.Institute$outboundMessagesArgs<ExtArgs>
   expenseCategories?: boolean | Prisma.Institute$expenseCategoriesArgs<ExtArgs>
   events?: boolean | Prisma.Institute$eventsArgs<ExtArgs>
   expenses?: boolean | Prisma.Institute$expensesArgs<ExtArgs>
@@ -6502,6 +7489,9 @@ export type $InstitutePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     payrollRuns: Prisma.$PayrollRunPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     emailConfig: Prisma.$InstituteEmailConfigPayload<ExtArgs> | null
+    whatsAppConfig: Prisma.$InstituteWhatsAppConfigPayload<ExtArgs> | null
+    whatsAppTemplates: Prisma.$WhatsAppTemplatePayload<ExtArgs>[]
+    outboundMessages: Prisma.$OutboundMessagePayload<ExtArgs>[]
     expenseCategories: Prisma.$ExpenseCategoryPayload<ExtArgs>[]
     events: Prisma.$EventPayload<ExtArgs>[]
     expenses: Prisma.$ExpensePayload<ExtArgs>[]
@@ -6940,6 +7930,9 @@ export interface Prisma__InstituteClient<T, Null = never, ExtArgs extends runtim
   payrollRuns<T extends Prisma.Institute$payrollRunsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$payrollRunsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PayrollRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Institute$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emailConfig<T extends Prisma.Institute$emailConfigArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$emailConfigArgs<ExtArgs>>): Prisma.Prisma__InstituteEmailConfigClient<runtime.Types.Result.GetResult<Prisma.$InstituteEmailConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  whatsAppConfig<T extends Prisma.Institute$whatsAppConfigArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$whatsAppConfigArgs<ExtArgs>>): Prisma.Prisma__InstituteWhatsAppConfigClient<runtime.Types.Result.GetResult<Prisma.$InstituteWhatsAppConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  whatsAppTemplates<T extends Prisma.Institute$whatsAppTemplatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$whatsAppTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WhatsAppTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  outboundMessages<T extends Prisma.Institute$outboundMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$outboundMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OutboundMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   expenseCategories<T extends Prisma.Institute$expenseCategoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$expenseCategoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpenseCategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   events<T extends Prisma.Institute$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   expenses<T extends Prisma.Institute$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7812,6 +8805,73 @@ export type Institute$emailConfigArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   include?: Prisma.InstituteEmailConfigInclude<ExtArgs> | null
   where?: Prisma.InstituteEmailConfigWhereInput
+}
+
+/**
+ * Institute.whatsAppConfig
+ */
+export type Institute$whatsAppConfigArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InstituteWhatsAppConfig
+   */
+  select?: Prisma.InstituteWhatsAppConfigSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InstituteWhatsAppConfig
+   */
+  omit?: Prisma.InstituteWhatsAppConfigOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InstituteWhatsAppConfigInclude<ExtArgs> | null
+  where?: Prisma.InstituteWhatsAppConfigWhereInput
+}
+
+/**
+ * Institute.whatsAppTemplates
+ */
+export type Institute$whatsAppTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WhatsAppTemplate
+   */
+  select?: Prisma.WhatsAppTemplateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WhatsAppTemplate
+   */
+  omit?: Prisma.WhatsAppTemplateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WhatsAppTemplateInclude<ExtArgs> | null
+  where?: Prisma.WhatsAppTemplateWhereInput
+  orderBy?: Prisma.WhatsAppTemplateOrderByWithRelationInput | Prisma.WhatsAppTemplateOrderByWithRelationInput[]
+  cursor?: Prisma.WhatsAppTemplateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WhatsAppTemplateScalarFieldEnum | Prisma.WhatsAppTemplateScalarFieldEnum[]
+}
+
+/**
+ * Institute.outboundMessages
+ */
+export type Institute$outboundMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OutboundMessage
+   */
+  select?: Prisma.OutboundMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OutboundMessage
+   */
+  omit?: Prisma.OutboundMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OutboundMessageInclude<ExtArgs> | null
+  where?: Prisma.OutboundMessageWhereInput
+  orderBy?: Prisma.OutboundMessageOrderByWithRelationInput | Prisma.OutboundMessageOrderByWithRelationInput[]
+  cursor?: Prisma.OutboundMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OutboundMessageScalarFieldEnum | Prisma.OutboundMessageScalarFieldEnum[]
 }
 
 /**
