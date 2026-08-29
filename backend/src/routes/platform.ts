@@ -8,9 +8,17 @@ import { hashPassword, generateTempPassword } from "../lib/password.js";
 import { sendMail, invalidateEmailConfigCache } from "../services/mailer.js";
 import { inviteEmailHtml } from "../lib/emailTemplates.js";
 import { auditLog } from "../services/audit.js";
-import { assertRoleCapacity } from "../services/planLimits.js";
+import { assertRoleCapacity, countUsage } from "../services/planLimits.js";
+import {
+  CAPPED_ROLES,
+  effectiveLimits,
+  isCustomised,
+  planLimits,
+  type CappedRole,
+} from "../lib/instituteLimits.js";
 import { seedDefaultExpenseCategories } from "../lib/expenseDefaults.js";
 import { instituteCodeSchema } from "./organization.js";
+import type { Role } from "../generated/prisma/enums.js";
 
 export const platformRouter = Router();
 
@@ -262,6 +270,15 @@ platformRouter.post("/organizations", validateBody(createOrganizationSchema), as
         data: {
           organizationId: org.id,
           planId: plan?.id,
+          // Snapshot the plan's limits onto the institute at creation — from
+          // here the institute owns them and later Plan edits don't reach it.
+          // See lib/instituteLimits.ts.
+          maxAdmins: plan?.maxAdmins ?? null,
+          maxAccountants: plan?.maxAccountants ?? null,
+          maxFaculty: plan?.maxFaculty ?? null,
+          maxReception: plan?.maxReception ?? null,
+          maxStudents: plan?.maxStudents ?? null,
+          planLimitsSetAt: plan ? new Date() : null,
           name: body.institute.name,
           code: instituteCode,
           address: body.institute.address,
@@ -588,6 +605,15 @@ platformRouter.post("/organizations/:id/institutes", validateBody(addInstituteSc
         data: {
           organizationId: org.id,
           planId: plan?.id,
+          // Snapshot the plan's limits onto the institute at creation — from
+          // here the institute owns them and later Plan edits don't reach it.
+          // See lib/instituteLimits.ts.
+          maxAdmins: plan?.maxAdmins ?? null,
+          maxAccountants: plan?.maxAccountants ?? null,
+          maxFaculty: plan?.maxFaculty ?? null,
+          maxReception: plan?.maxReception ?? null,
+          maxStudents: plan?.maxStudents ?? null,
+          planLimitsSetAt: plan ? new Date() : null,
           name: body.name,
           code,
           address: body.address,
@@ -645,20 +671,16 @@ platformRouter.get("/organizations/:orgId/institutes/:instituteId", async (req, 
   try {
     const institute = await loadInstituteInOrg(req.params.orgId as string, req.params.instituteId as string);
 
-    const [modules, admins, accountants, plans, plan, roleCounts] = await Promise.all([
+    const [modules, admins, accountants, plans, plan, used] = await Promise.all([
       prisma.instituteModule.findMany({ where: { instituteId: institute.id }, include: { module: true } }),
       prisma.user.findMany({ where: { instituteId: institute.id, role: "ADMIN" }, select: STAFF_SELECT, orderBy: { createdAt: "asc" } }),
       prisma.user.findMany({ where: { instituteId: institute.id, role: "ACCOUNTANT" }, select: STAFF_SELECT, orderBy: { createdAt: "asc" } }),
       prisma.plan.findMany({ where: { isActive: true }, orderBy: { maxStudents: "asc" } }),
       institute.planId ? prisma.plan.findUnique({ where: { id: institute.planId } }) : null,
-      prisma.user.groupBy({
-        by: ["role"],
-        where: { instituteId: institute.id, isActive: true, role: { in: ["ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION", "STUDENT"] } },
-        _count: { _all: true },
-      }),
+      countUsage(institute.id),
     ]);
 
-    const used = Object.fromEntries(roleCounts.map((r) => [r.role, r._count._all]));
+    const limits = effectiveLimits({ ...institute, plan });
 
     res.json({
       id: institute.id,
@@ -675,20 +697,31 @@ platformRouter.get("/organizations/:orgId/institutes/:instituteId", async (req, 
       modules: modules.map((m) => ({ code: m.module.code, label: m.module.label, isActive: m.isActive })),
       admins,
       accountants,
-      availablePlans: plans.map((p) => ({ id: p.id, code: p.code, name: p.name })),
-      plan: plan
-        ? {
-            id: plan.id,
-            code: plan.code,
-            name: plan.name,
-            limits: {
-              ADMIN: { used: used.ADMIN ?? 0, max: plan.maxAdmins },
-              ACCOUNTANT: { used: used.ACCOUNTANT ?? 0, max: plan.maxAccountants },
-              FACULTY: { used: used.FACULTY ?? 0, max: plan.maxFaculty },
-              RECEPTION: { used: used.RECEPTION ?? 0, max: plan.maxReception },
-              STUDENT: { used: used.STUDENT ?? 0, max: plan.maxStudents },
+      availablePlans: plans.map((p) => ({
+        id: p.id,
+        code: p.code,
+        name: p.name,
+        // The plan's headline numbers, so the UI can show what re-assigning
+        // this plan would snapshot onto the institute.
+        limits: planLimits(p),
+      })),
+      // `limits` is what is actually ENFORCED — the institute's own snapshot.
+      // `plan` is only where those numbers originally came from; the two drift
+      // apart the moment either the plan or the institute is edited, and
+      // `customised` is what says so.
+      limits: limits
+        ? CAPPED_ROLES.reduce(
+            (acc, role) => {
+              acc[role] = { used: used[role], max: limits[role] };
+              return acc;
             },
-          }
+            {} as Record<CappedRole, { used: number; max: number }>
+          )
+        : null,
+      customised: isCustomised({ ...institute, plan }),
+      planLimitsSetAt: institute.planLimitsSetAt,
+      plan: plan
+        ? { id: plan.id, code: plan.code, name: plan.name, limits: planLimits(plan) }
         : null,
     });
   } catch (err) {
@@ -696,16 +729,50 @@ platformRouter.get("/organizations/:orgId/institutes/:instituteId", async (req, 
   }
 });
 
-platformRouter.patch("/organizations/:orgId/institutes/:instituteId", async (req, res, next) => {
-  try {
-    const institute = await loadInstituteInOrg(req.params.orgId as string, req.params.instituteId as string);
-    const body = req.body as { name?: string; address?: string; city?: string; state?: string; phone?: string; email?: string; isActive?: boolean };
-    const updated = await prisma.institute.update({ where: { id: institute.id }, data: body });
-    res.json(updated);
-  } catch (err) {
-    next(err);
-  }
+/** Suspension is the only way an institute is ever taken out of service —
+ * there is deliberately no delete endpoint, here or anywhere else. An institute
+ * owns fee ledgers, receipts, payroll and attendance history that must remain
+ * auditable, so `isActive: false` is the terminal state. Flipping it off is
+ * enforced immediately: middleware/auth.ts rejects existing tokens bound to a
+ * suspended institute, and /auth/enter-institute refuses to issue new ones. */
+const updateInstituteSchema = z.object({
+  name: z.string().min(1).optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().email().optional(),
+  isActive: z.boolean().optional(),
 });
+
+platformRouter.patch(
+  "/organizations/:orgId/institutes/:instituteId",
+  validateBody(updateInstituteSchema),
+  async (req, res, next) => {
+    try {
+      const institute = await loadInstituteInOrg(req.params.orgId as string, req.params.instituteId as string);
+      // Explicit field list rather than spreading the body into Prisma —
+      // otherwise any column on Institute (organizationId, code, planId) would
+      // be settable through this endpoint.
+      const body = req.body as z.infer<typeof updateInstituteSchema>;
+      const updated = await prisma.institute.update({
+        where: { id: institute.id },
+        data: {
+          name: body.name,
+          address: body.address,
+          city: body.city,
+          state: body.state,
+          phone: body.phone,
+          email: body.email,
+          isActive: body.isActive,
+        },
+      });
+      res.json(updated);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 platformRouter.post(
   "/organizations/:orgId/institutes/:instituteId/admins",
@@ -830,12 +897,31 @@ platformRouter.patch("/institutes/:instituteId/plan", validateBody(assignPlanSch
     const institute = await prisma.institute.findUnique({ where: { id: req.params.instituteId as string } });
     if (!institute) throw ApiError.notFound("Institute not found");
 
+    let plan = null;
     if (planId) {
-      const plan = await prisma.plan.findUnique({ where: { id: planId } });
+      plan = await prisma.plan.findUnique({ where: { id: planId } });
       if (!plan) throw ApiError.notFound("Plan not found");
     }
 
-    const updated = await prisma.institute.update({ where: { id: institute.id }, data: { planId } });
+    // Assigning a plan SNAPSHOTS its limits onto the institute. From here the
+    // institute owns those numbers: later edits to the Plan row change what
+    // new assignments copy, and nothing else. Re-assigning the same plan is
+    // therefore also the way to deliberately pull an institute back onto the
+    // plan's current numbers, discarding any per-institute override.
+    // Clearing the plan (planId: null) clears the snapshot with it, which
+    // makes the institute unlimited — matching the previous no-plan behaviour.
+    const updated = await prisma.institute.update({
+      where: { id: institute.id },
+      data: {
+        planId,
+        maxAdmins: plan?.maxAdmins ?? null,
+        maxAccountants: plan?.maxAccountants ?? null,
+        maxFaculty: plan?.maxFaculty ?? null,
+        maxReception: plan?.maxReception ?? null,
+        maxStudents: plan?.maxStudents ?? null,
+        planLimitsSetAt: plan ? new Date() : null,
+      },
+    });
 
     await auditLog({
       action: "INSTITUTE_PLAN_CHANGED",
@@ -844,14 +930,176 @@ platformRouter.patch("/institutes/:instituteId/plan", validateBody(assignPlanSch
       userId: req.user!.id,
       targetType: "Institute",
       targetId: institute.id,
-      metadata: { planId },
+      metadata: { planId, snapshot: plan ? planLimits(plan) : null },
     });
 
-    res.json({ id: updated.id, planId: updated.planId });
+    res.json({ id: updated.id, planId: updated.planId, limits: effectiveLimits({ ...updated, plan }) });
   } catch (err) {
     next(err);
   }
 });
+
+/** Platform-wide user directory: name, email and role for every account, with
+ * the organization/institute each belongs to so a support request ("who is
+ * bob@… and what can he do?") is answerable from one screen. Deliberately
+ * returns no password or token material — identity and role only. */
+platformRouter.get("/users", async (req, res, next) => {
+  try {
+    const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+    const role = typeof req.query.role === "string" ? req.query.role : undefined;
+    const instituteId = typeof req.query.instituteId === "string" ? req.query.instituteId : undefined;
+    const organizationId = typeof req.query.organizationId === "string" ? req.query.organizationId : undefined;
+    // Defaults to active-only — the directory is for "who has access right
+    // now"; deactivated accounts are opt-in via ?includeInactive=true.
+    const includeInactive = req.query.includeInactive === "true";
+    const take = Math.min(Number(req.query.limit) || 100, 500);
+
+    const users = await prisma.user.findMany({
+      // Collected as AND clauses rather than merged into one object: the org
+      // filter and the search filter each need their own OR, and two `OR` keys
+      // on the same object would silently overwrite each other.
+      where: {
+        AND: [
+          ...(includeInactive ? [] : [{ isActive: true }]),
+          ...(role ? [{ role: role as Role }] : []),
+          ...(instituteId ? [{ instituteId }] : []),
+          // An OWNER has no instituteId — they hang off the Organization they
+          // own — so filtering by organization has to reach through both
+          // relations, or an org's own owner is missing from its user list.
+          ...(organizationId
+            ? [{ OR: [{ institute: { organizationId } }, { ownedOrganization: { id: organizationId } }] }]
+            : []),
+          ...(q
+            ? [
+                {
+                  OR: [
+                    { fullName: { contains: q, mode: "insensitive" as const } },
+                    { email: { contains: q, mode: "insensitive" as const } },
+                  ],
+                },
+              ]
+            : []),
+        ],
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+        isActive: true,
+        lastLoginAt: true,
+        institute: { select: { id: true, name: true, code: true, organization: { select: { id: true, name: true } } } },
+        ownedOrganization: { select: { id: true, name: true } },
+      },
+      orderBy: [{ role: "asc" }, { fullName: "asc" }],
+      take,
+    });
+
+    res.json(
+      users.map((u) => ({
+        id: u.id,
+        fullName: u.fullName,
+        email: u.email,
+        role: u.role,
+        isActive: u.isActive,
+        lastLoginAt: u.lastLoginAt,
+        instituteId: u.institute?.id ?? null,
+        instituteName: u.institute?.name ?? null,
+        instituteCode: u.institute?.code ?? null,
+        // For an OWNER the organization comes from the one they own, not from
+        // an institute — they belong to no single institute.
+        organizationName: u.institute?.organization.name ?? u.ownedOrganization?.name ?? null,
+      }))
+    );
+  } catch (err) {
+    next(err);
+  }
+});
+
+const instituteLimitsSchema = z
+  .object({
+    maxAdmins: z.number().int().min(0).max(100_000).optional(),
+    maxAccountants: z.number().int().min(0).max(100_000).optional(),
+    maxFaculty: z.number().int().min(0).max(100_000).optional(),
+    maxReception: z.number().int().min(0).max(100_000).optional(),
+    maxStudents: z.number().int().min(0).max(1_000_000).optional(),
+  })
+  .refine((v) => Object.values(v).some((n) => n !== undefined), {
+    message: "Provide at least one limit to change",
+  });
+
+/** Raises (or lowers) one institute's headcount limits without touching the
+ * Plan every other institute shares — the usual case being "this one customer
+ * needs 40 faculty, everyone else on Standard stays at 5". Lowering below
+ * current usage is allowed on purpose: it stops further additions rather than
+ * deactivating anyone, and the response reports the overage so the platform
+ * admin can see what they've done. */
+platformRouter.patch(
+  "/institutes/:instituteId/limits",
+  validateBody(instituteLimitsSchema),
+  async (req, res, next) => {
+    try {
+      const body = req.body as z.infer<typeof instituteLimitsSchema>;
+      const institute = await prisma.institute.findUnique({
+        where: { id: req.params.instituteId as string },
+        include: { plan: true },
+      });
+      if (!institute) throw ApiError.notFound("Institute not found");
+
+      // Merge onto the current effective limits rather than writing only the
+      // supplied fields: an institute that was never snapshotted would
+      // otherwise end up half-null and silently unlimited on the rest.
+      const current = effectiveLimits(institute) ?? {
+        ADMIN: 0,
+        ACCOUNTANT: 0,
+        FACULTY: 0,
+        RECEPTION: 0,
+        STUDENT: 0,
+      };
+
+      const updated = await prisma.institute.update({
+        where: { id: institute.id },
+        data: {
+          maxAdmins: body.maxAdmins ?? current.ADMIN,
+          maxAccountants: body.maxAccountants ?? current.ACCOUNTANT,
+          maxFaculty: body.maxFaculty ?? current.FACULTY,
+          maxReception: body.maxReception ?? current.RECEPTION,
+          maxStudents: body.maxStudents ?? current.STUDENT,
+          planLimitsSetAt: new Date(),
+        },
+        include: { plan: true },
+      });
+
+      await auditLog({
+        action: "INSTITUTE_LIMITS_OVERRIDDEN",
+        organizationId: institute.organizationId,
+        instituteId: institute.id,
+        userId: req.user!.id,
+        targetType: "Institute",
+        targetId: institute.id,
+        metadata: { before: current, after: effectiveLimits(updated) },
+      });
+
+      const used = await countUsage(institute.id);
+      const limits = effectiveLimits(updated)!;
+
+      res.json({
+        id: updated.id,
+        planLimitsSetAt: updated.planLimitsSetAt,
+        customised: isCustomised(updated),
+        limits: CAPPED_ROLES.reduce(
+          (acc, role) => {
+            acc[role] = { used: used[role] ?? 0, max: limits[role] };
+            return acc;
+          },
+          {} as Record<CappedRole, { used: number; max: number }>
+        ),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 // ---------------------------------------------------------------------------
 // Plans — role headcount limits, assigned per institute
@@ -1082,14 +1330,20 @@ platformRouter.get("/subscriptions", async (req, res, next) => {
       institutes.map((i) => {
         const used = usedByInstitute.get(i.id) ?? {};
         const students = studentsByInstitute.get(i.id) ?? 0;
-        const limits = i.plan
-          ? {
-              ADMIN: { used: used.ADMIN ?? 0, max: i.plan.maxAdmins },
-              ACCOUNTANT: { used: used.ACCOUNTANT ?? 0, max: i.plan.maxAccountants },
-              FACULTY: { used: used.FACULTY ?? 0, max: i.plan.maxFaculty },
-              RECEPTION: { used: used.RECEPTION ?? 0, max: i.plan.maxReception },
-              STUDENT: { used: students, max: i.plan.maxStudents },
-            }
+        // The institute's OWN limits, not the plan's — those two drift apart
+        // as soon as a plan is edited or an institute is given a bespoke cap,
+        // and this column is what a platform admin reads to decide whether
+        // someone has outgrown their tier. See lib/instituteLimits.ts.
+        const effective = effectiveLimits(i);
+        const usedByRole = { ...used, STUDENT: students } as Record<CappedRole, number | undefined>;
+        const limits = effective
+          ? CAPPED_ROLES.reduce(
+              (acc, role) => {
+                acc[role] = { used: usedByRole[role] ?? 0, max: effective[role] };
+                return acc;
+              },
+              {} as Record<CappedRole, { used: number; max: number }>
+            )
           : null;
 
         return {
@@ -1103,6 +1357,7 @@ platformRouter.get("/subscriptions", async (req, res, next) => {
           organization: i.organization,
           plan: i.plan ? { id: i.plan.id, code: i.plan.code, name: i.plan.name } : null,
           limits,
+          customised: isCustomised(i),
           // Anyone at or over a cap can't add more of that role — the signal
           // that they've outgrown their tier.
           atLimit: limits ? Object.values(limits).some((l) => l.used >= l.max) : false,

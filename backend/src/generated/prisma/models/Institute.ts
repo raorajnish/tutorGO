@@ -30,10 +30,20 @@ export type AggregateInstitute = {
 
 export type InstituteAvgAggregateOutputType = {
   onboardingStep: number | null
+  maxAdmins: number | null
+  maxAccountants: number | null
+  maxFaculty: number | null
+  maxReception: number | null
+  maxStudents: number | null
 }
 
 export type InstituteSumAggregateOutputType = {
   onboardingStep: number | null
+  maxAdmins: number | null
+  maxAccountants: number | null
+  maxFaculty: number | null
+  maxReception: number | null
+  maxStudents: number | null
 }
 
 export type InstituteMinAggregateOutputType = {
@@ -53,6 +63,12 @@ export type InstituteMinAggregateOutputType = {
   onboardingDone: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  maxAdmins: number | null
+  maxAccountants: number | null
+  maxFaculty: number | null
+  maxReception: number | null
+  maxStudents: number | null
+  planLimitsSetAt: Date | null
 }
 
 export type InstituteMaxAggregateOutputType = {
@@ -72,6 +88,12 @@ export type InstituteMaxAggregateOutputType = {
   onboardingDone: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  maxAdmins: number | null
+  maxAccountants: number | null
+  maxFaculty: number | null
+  maxReception: number | null
+  maxStudents: number | null
+  planLimitsSetAt: Date | null
 }
 
 export type InstituteCountAggregateOutputType = {
@@ -91,16 +113,32 @@ export type InstituteCountAggregateOutputType = {
   onboardingDone: number
   createdAt: number
   updatedAt: number
+  maxAdmins: number
+  maxAccountants: number
+  maxFaculty: number
+  maxReception: number
+  maxStudents: number
+  planLimitsSetAt: number
   _all: number
 }
 
 
 export type InstituteAvgAggregateInputType = {
   onboardingStep?: true
+  maxAdmins?: true
+  maxAccountants?: true
+  maxFaculty?: true
+  maxReception?: true
+  maxStudents?: true
 }
 
 export type InstituteSumAggregateInputType = {
   onboardingStep?: true
+  maxAdmins?: true
+  maxAccountants?: true
+  maxFaculty?: true
+  maxReception?: true
+  maxStudents?: true
 }
 
 export type InstituteMinAggregateInputType = {
@@ -120,6 +158,12 @@ export type InstituteMinAggregateInputType = {
   onboardingDone?: true
   createdAt?: true
   updatedAt?: true
+  maxAdmins?: true
+  maxAccountants?: true
+  maxFaculty?: true
+  maxReception?: true
+  maxStudents?: true
+  planLimitsSetAt?: true
 }
 
 export type InstituteMaxAggregateInputType = {
@@ -139,6 +183,12 @@ export type InstituteMaxAggregateInputType = {
   onboardingDone?: true
   createdAt?: true
   updatedAt?: true
+  maxAdmins?: true
+  maxAccountants?: true
+  maxFaculty?: true
+  maxReception?: true
+  maxStudents?: true
+  planLimitsSetAt?: true
 }
 
 export type InstituteCountAggregateInputType = {
@@ -158,6 +208,12 @@ export type InstituteCountAggregateInputType = {
   onboardingDone?: true
   createdAt?: true
   updatedAt?: true
+  maxAdmins?: true
+  maxAccountants?: true
+  maxFaculty?: true
+  maxReception?: true
+  maxStudents?: true
+  planLimitsSetAt?: true
   _all?: true
 }
 
@@ -264,6 +320,12 @@ export type InstituteGroupByOutputType = {
   onboardingDone: boolean
   createdAt: Date
   updatedAt: Date
+  maxAdmins: number | null
+  maxAccountants: number | null
+  maxFaculty: number | null
+  maxReception: number | null
+  maxStudents: number | null
+  planLimitsSetAt: Date | null
   _count: InstituteCountAggregateOutputType | null
   _avg: InstituteAvgAggregateOutputType | null
   _sum: InstituteSumAggregateOutputType | null
@@ -306,6 +368,12 @@ export type InstituteWhereInput = {
   onboardingDone?: Prisma.BoolFilter<"Institute"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Institute"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Institute"> | Date | string
+  maxAdmins?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxAccountants?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxFaculty?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxReception?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxStudents?: Prisma.IntNullableFilter<"Institute"> | number | null
+  planLimitsSetAt?: Prisma.DateTimeNullableFilter<"Institute"> | Date | string | null
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   plan?: Prisma.XOR<Prisma.PlanNullableScalarRelationFilter, Prisma.PlanWhereInput> | null
   users?: Prisma.UserListRelationFilter
@@ -354,6 +422,12 @@ export type InstituteOrderByWithRelationInput = {
   onboardingDone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  maxAdmins?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxAccountants?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxFaculty?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxReception?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxStudents?: Prisma.SortOrderInput | Prisma.SortOrder
+  planLimitsSetAt?: Prisma.SortOrderInput | Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
   plan?: Prisma.PlanOrderByWithRelationInput
   users?: Prisma.UserOrderByRelationAggregateInput
@@ -405,6 +479,12 @@ export type InstituteWhereUniqueInput = Prisma.AtLeast<{
   onboardingDone?: Prisma.BoolFilter<"Institute"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Institute"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Institute"> | Date | string
+  maxAdmins?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxAccountants?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxFaculty?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxReception?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxStudents?: Prisma.IntNullableFilter<"Institute"> | number | null
+  planLimitsSetAt?: Prisma.DateTimeNullableFilter<"Institute"> | Date | string | null
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   plan?: Prisma.XOR<Prisma.PlanNullableScalarRelationFilter, Prisma.PlanWhereInput> | null
   users?: Prisma.UserListRelationFilter
@@ -453,6 +533,12 @@ export type InstituteOrderByWithAggregationInput = {
   onboardingDone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  maxAdmins?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxAccountants?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxFaculty?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxReception?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxStudents?: Prisma.SortOrderInput | Prisma.SortOrder
+  planLimitsSetAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InstituteCountOrderByAggregateInput
   _avg?: Prisma.InstituteAvgOrderByAggregateInput
   _max?: Prisma.InstituteMaxOrderByAggregateInput
@@ -480,6 +566,12 @@ export type InstituteScalarWhereWithAggregatesInput = {
   onboardingDone?: Prisma.BoolWithAggregatesFilter<"Institute"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Institute"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Institute"> | Date | string
+  maxAdmins?: Prisma.IntNullableWithAggregatesFilter<"Institute"> | number | null
+  maxAccountants?: Prisma.IntNullableWithAggregatesFilter<"Institute"> | number | null
+  maxFaculty?: Prisma.IntNullableWithAggregatesFilter<"Institute"> | number | null
+  maxReception?: Prisma.IntNullableWithAggregatesFilter<"Institute"> | number | null
+  maxStudents?: Prisma.IntNullableWithAggregatesFilter<"Institute"> | number | null
+  planLimitsSetAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Institute"> | Date | string | null
 }
 
 export type InstituteCreateInput = {
@@ -497,6 +589,12 @@ export type InstituteCreateInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -545,6 +643,12 @@ export type InstituteUncheckedCreateInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -589,6 +693,12 @@ export type InstituteUpdateInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -637,6 +747,12 @@ export type InstituteUncheckedUpdateInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -683,6 +799,12 @@ export type InstituteCreateManyInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
 }
 
 export type InstituteUpdateManyMutationInput = {
@@ -700,6 +822,12 @@ export type InstituteUpdateManyMutationInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type InstituteUncheckedUpdateManyInput = {
@@ -719,6 +847,12 @@ export type InstituteUncheckedUpdateManyInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type InstituteListRelationFilter = {
@@ -748,10 +882,21 @@ export type InstituteCountOrderByAggregateInput = {
   onboardingDone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  maxAdmins?: Prisma.SortOrder
+  maxAccountants?: Prisma.SortOrder
+  maxFaculty?: Prisma.SortOrder
+  maxReception?: Prisma.SortOrder
+  maxStudents?: Prisma.SortOrder
+  planLimitsSetAt?: Prisma.SortOrder
 }
 
 export type InstituteAvgOrderByAggregateInput = {
   onboardingStep?: Prisma.SortOrder
+  maxAdmins?: Prisma.SortOrder
+  maxAccountants?: Prisma.SortOrder
+  maxFaculty?: Prisma.SortOrder
+  maxReception?: Prisma.SortOrder
+  maxStudents?: Prisma.SortOrder
 }
 
 export type InstituteMaxOrderByAggregateInput = {
@@ -771,6 +916,12 @@ export type InstituteMaxOrderByAggregateInput = {
   onboardingDone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  maxAdmins?: Prisma.SortOrder
+  maxAccountants?: Prisma.SortOrder
+  maxFaculty?: Prisma.SortOrder
+  maxReception?: Prisma.SortOrder
+  maxStudents?: Prisma.SortOrder
+  planLimitsSetAt?: Prisma.SortOrder
 }
 
 export type InstituteMinOrderByAggregateInput = {
@@ -790,10 +941,21 @@ export type InstituteMinOrderByAggregateInput = {
   onboardingDone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  maxAdmins?: Prisma.SortOrder
+  maxAccountants?: Prisma.SortOrder
+  maxFaculty?: Prisma.SortOrder
+  maxReception?: Prisma.SortOrder
+  maxStudents?: Prisma.SortOrder
+  planLimitsSetAt?: Prisma.SortOrder
 }
 
 export type InstituteSumOrderByAggregateInput = {
   onboardingStep?: Prisma.SortOrder
+  maxAdmins?: Prisma.SortOrder
+  maxAccountants?: Prisma.SortOrder
+  maxFaculty?: Prisma.SortOrder
+  maxReception?: Prisma.SortOrder
+  maxStudents?: Prisma.SortOrder
 }
 
 export type InstituteScalarRelationFilter = {
@@ -888,6 +1050,18 @@ export type InstituteUncheckedUpdateManyWithoutOrganizationNestedInput = {
   update?: Prisma.InstituteUpdateWithWhereUniqueWithoutOrganizationInput | Prisma.InstituteUpdateWithWhereUniqueWithoutOrganizationInput[]
   updateMany?: Prisma.InstituteUpdateManyWithWhereWithoutOrganizationInput | Prisma.InstituteUpdateManyWithWhereWithoutOrganizationInput[]
   deleteMany?: Prisma.InstituteScalarWhereInput | Prisma.InstituteScalarWhereInput[]
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type InstituteCreateNestedOneWithoutModulesInput = {
@@ -1285,6 +1459,12 @@ export type InstituteCreateWithoutPlanInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
@@ -1331,6 +1511,12 @@ export type InstituteUncheckedCreateWithoutPlanInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -1406,6 +1592,12 @@ export type InstituteScalarWhereInput = {
   onboardingDone?: Prisma.BoolFilter<"Institute"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Institute"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Institute"> | Date | string
+  maxAdmins?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxAccountants?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxFaculty?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxReception?: Prisma.IntNullableFilter<"Institute"> | number | null
+  maxStudents?: Prisma.IntNullableFilter<"Institute"> | number | null
+  planLimitsSetAt?: Prisma.DateTimeNullableFilter<"Institute"> | Date | string | null
 }
 
 export type InstituteCreateWithoutOrganizationInput = {
@@ -1423,6 +1615,12 @@ export type InstituteCreateWithoutOrganizationInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
@@ -1469,6 +1667,12 @@ export type InstituteUncheckedCreateWithoutOrganizationInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -1539,6 +1743,12 @@ export type InstituteCreateWithoutModulesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -1586,6 +1796,12 @@ export type InstituteUncheckedCreateWithoutModulesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
@@ -1645,6 +1861,12 @@ export type InstituteUpdateWithoutModulesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -1692,6 +1914,12 @@ export type InstituteUncheckedUpdateWithoutModulesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
@@ -1735,6 +1963,12 @@ export type InstituteCreateWithoutUsersInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
@@ -1782,6 +2016,12 @@ export type InstituteUncheckedCreateWithoutUsersInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
@@ -1841,6 +2081,12 @@ export type InstituteUpdateWithoutUsersInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
@@ -1888,6 +2134,12 @@ export type InstituteUncheckedUpdateWithoutUsersInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
@@ -1931,6 +2183,12 @@ export type InstituteCreateWithoutEmailConfigInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -1978,6 +2236,12 @@ export type InstituteUncheckedCreateWithoutEmailConfigInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2037,6 +2301,12 @@ export type InstituteUpdateWithoutEmailConfigInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -2084,6 +2354,12 @@ export type InstituteUncheckedUpdateWithoutEmailConfigInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2127,6 +2403,12 @@ export type InstituteCreateWithoutWhatsAppConfigInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -2174,6 +2456,12 @@ export type InstituteUncheckedCreateWithoutWhatsAppConfigInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2233,6 +2521,12 @@ export type InstituteUpdateWithoutWhatsAppConfigInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -2280,6 +2574,12 @@ export type InstituteUncheckedUpdateWithoutWhatsAppConfigInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2323,6 +2623,12 @@ export type InstituteCreateWithoutWhatsAppTemplatesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -2370,6 +2676,12 @@ export type InstituteUncheckedCreateWithoutWhatsAppTemplatesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2429,6 +2741,12 @@ export type InstituteUpdateWithoutWhatsAppTemplatesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -2476,6 +2794,12 @@ export type InstituteUncheckedUpdateWithoutWhatsAppTemplatesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2519,6 +2843,12 @@ export type InstituteCreateWithoutOutboundMessagesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -2566,6 +2896,12 @@ export type InstituteUncheckedCreateWithoutOutboundMessagesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2625,6 +2961,12 @@ export type InstituteUpdateWithoutOutboundMessagesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -2672,6 +3014,12 @@ export type InstituteUncheckedUpdateWithoutOutboundMessagesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2715,6 +3063,12 @@ export type InstituteCreateWithoutNotificationsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -2762,6 +3116,12 @@ export type InstituteUncheckedCreateWithoutNotificationsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -2821,6 +3181,12 @@ export type InstituteUpdateWithoutNotificationsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -2868,6 +3234,12 @@ export type InstituteUncheckedUpdateWithoutNotificationsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2911,6 +3283,12 @@ export type InstituteCreateWithoutRemindersInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -2958,6 +3336,12 @@ export type InstituteUncheckedCreateWithoutRemindersInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3017,6 +3401,12 @@ export type InstituteUpdateWithoutRemindersInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -3064,6 +3454,12 @@ export type InstituteUncheckedUpdateWithoutRemindersInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3107,6 +3503,12 @@ export type InstituteCreateWithoutCoursesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -3154,6 +3556,12 @@ export type InstituteUncheckedCreateWithoutCoursesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
@@ -3213,6 +3621,12 @@ export type InstituteUpdateWithoutCoursesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -3260,6 +3674,12 @@ export type InstituteUncheckedUpdateWithoutCoursesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3303,6 +3723,12 @@ export type InstituteCreateWithoutSubjectsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -3350,6 +3776,12 @@ export type InstituteUncheckedCreateWithoutSubjectsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3409,6 +3841,12 @@ export type InstituteUpdateWithoutSubjectsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -3456,6 +3894,12 @@ export type InstituteUncheckedUpdateWithoutSubjectsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3499,6 +3943,12 @@ export type InstituteCreateWithoutBatchesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -3546,6 +3996,12 @@ export type InstituteUncheckedCreateWithoutBatchesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3605,6 +4061,12 @@ export type InstituteUpdateWithoutBatchesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -3652,6 +4114,12 @@ export type InstituteUncheckedUpdateWithoutBatchesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3695,6 +4163,12 @@ export type InstituteCreateWithoutEnquiriesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -3742,6 +4216,12 @@ export type InstituteUncheckedCreateWithoutEnquiriesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3801,6 +4281,12 @@ export type InstituteUpdateWithoutEnquiriesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -3848,6 +4334,12 @@ export type InstituteUncheckedUpdateWithoutEnquiriesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3891,6 +4383,12 @@ export type InstituteCreateWithoutStudentsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -3938,6 +4436,12 @@ export type InstituteUncheckedCreateWithoutStudentsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -3997,6 +4501,12 @@ export type InstituteUpdateWithoutStudentsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -4044,6 +4554,12 @@ export type InstituteUncheckedUpdateWithoutStudentsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4087,6 +4603,12 @@ export type InstituteCreateWithoutLecturesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -4134,6 +4656,12 @@ export type InstituteUncheckedCreateWithoutLecturesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4193,6 +4721,12 @@ export type InstituteUpdateWithoutLecturesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -4240,6 +4774,12 @@ export type InstituteUncheckedUpdateWithoutLecturesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4283,6 +4823,12 @@ export type InstituteCreateWithoutTestsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -4330,6 +4876,12 @@ export type InstituteUncheckedCreateWithoutTestsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4389,6 +4941,12 @@ export type InstituteUpdateWithoutTestsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -4436,6 +4994,12 @@ export type InstituteUncheckedUpdateWithoutTestsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4479,6 +5043,12 @@ export type InstituteCreateWithoutMessageTemplatesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -4526,6 +5096,12 @@ export type InstituteUncheckedCreateWithoutMessageTemplatesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4585,6 +5161,12 @@ export type InstituteUpdateWithoutMessageTemplatesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -4632,6 +5214,12 @@ export type InstituteUncheckedUpdateWithoutMessageTemplatesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4675,6 +5263,12 @@ export type InstituteCreateWithoutFeeStructuresInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -4722,6 +5316,12 @@ export type InstituteUncheckedCreateWithoutFeeStructuresInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4781,6 +5381,12 @@ export type InstituteUpdateWithoutFeeStructuresInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -4828,6 +5434,12 @@ export type InstituteUncheckedUpdateWithoutFeeStructuresInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4871,6 +5483,12 @@ export type InstituteCreateWithoutFeeAccountsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -4918,6 +5536,12 @@ export type InstituteUncheckedCreateWithoutFeeAccountsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -4977,6 +5601,12 @@ export type InstituteUpdateWithoutFeeAccountsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -5024,6 +5654,12 @@ export type InstituteUncheckedUpdateWithoutFeeAccountsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5067,6 +5703,12 @@ export type InstituteCreateWithoutPaymentsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -5114,6 +5756,12 @@ export type InstituteUncheckedCreateWithoutPaymentsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -5173,6 +5821,12 @@ export type InstituteUpdateWithoutPaymentsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -5220,6 +5874,12 @@ export type InstituteUncheckedUpdateWithoutPaymentsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5263,6 +5923,12 @@ export type InstituteCreateWithoutSalaryProfilesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -5310,6 +5976,12 @@ export type InstituteUncheckedCreateWithoutSalaryProfilesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -5369,6 +6041,12 @@ export type InstituteUpdateWithoutSalaryProfilesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -5416,6 +6094,12 @@ export type InstituteUncheckedUpdateWithoutSalaryProfilesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5459,6 +6143,12 @@ export type InstituteCreateWithoutPayrollPaymentsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -5506,6 +6196,12 @@ export type InstituteUncheckedCreateWithoutPayrollPaymentsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -5565,6 +6261,12 @@ export type InstituteUpdateWithoutPayrollPaymentsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -5612,6 +6314,12 @@ export type InstituteUncheckedUpdateWithoutPayrollPaymentsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5655,6 +6363,12 @@ export type InstituteCreateWithoutPayrollRunsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -5702,6 +6416,12 @@ export type InstituteUncheckedCreateWithoutPayrollRunsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -5761,6 +6481,12 @@ export type InstituteUpdateWithoutPayrollRunsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -5808,6 +6534,12 @@ export type InstituteUncheckedUpdateWithoutPayrollRunsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5851,6 +6583,12 @@ export type InstituteCreateWithoutExpenseCategoriesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -5898,6 +6636,12 @@ export type InstituteUncheckedCreateWithoutExpenseCategoriesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -5957,6 +6701,12 @@ export type InstituteUpdateWithoutExpenseCategoriesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -6004,6 +6754,12 @@ export type InstituteUncheckedUpdateWithoutExpenseCategoriesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6047,6 +6803,12 @@ export type InstituteCreateWithoutEventsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -6094,6 +6856,12 @@ export type InstituteUncheckedCreateWithoutEventsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -6153,6 +6921,12 @@ export type InstituteUpdateWithoutEventsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -6200,6 +6974,12 @@ export type InstituteUncheckedUpdateWithoutEventsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6243,6 +7023,12 @@ export type InstituteCreateWithoutExpensesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -6290,6 +7076,12 @@ export type InstituteUncheckedCreateWithoutExpensesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -6349,6 +7141,12 @@ export type InstituteUpdateWithoutExpensesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -6396,6 +7194,12 @@ export type InstituteUncheckedUpdateWithoutExpensesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6439,6 +7243,12 @@ export type InstituteCreateWithoutFinanceEntriesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -6486,6 +7296,12 @@ export type InstituteUncheckedCreateWithoutFinanceEntriesInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -6545,6 +7361,12 @@ export type InstituteUpdateWithoutFinanceEntriesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -6592,6 +7414,12 @@ export type InstituteUncheckedUpdateWithoutFinanceEntriesInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6635,6 +7463,12 @@ export type InstituteCreateWithoutDistributionItemsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
   plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
   users?: Prisma.UserCreateNestedManyWithoutInstituteInput
@@ -6682,6 +7516,12 @@ export type InstituteUncheckedCreateWithoutDistributionItemsInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
   modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
@@ -6741,6 +7581,12 @@ export type InstituteUpdateWithoutDistributionItemsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
@@ -6788,6 +7634,12 @@ export type InstituteUncheckedUpdateWithoutDistributionItemsInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6832,6 +7684,12 @@ export type InstituteCreateManyPlanInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
 }
 
 export type InstituteUpdateWithoutPlanInput = {
@@ -6849,6 +7707,12 @@ export type InstituteUpdateWithoutPlanInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
@@ -6895,6 +7759,12 @@ export type InstituteUncheckedUpdateWithoutPlanInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6940,6 +7810,12 @@ export type InstituteUncheckedUpdateManyWithoutPlanInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type InstituteCreateManyOrganizationInput = {
@@ -6958,6 +7834,12 @@ export type InstituteCreateManyOrganizationInput = {
   onboardingDone?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
 }
 
 export type InstituteUpdateWithoutOrganizationInput = {
@@ -6975,6 +7857,12 @@ export type InstituteUpdateWithoutOrganizationInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
   users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
@@ -7021,6 +7909,12 @@ export type InstituteUncheckedUpdateWithoutOrganizationInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
   modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
@@ -7066,6 +7960,12 @@ export type InstituteUncheckedUpdateManyWithoutOrganizationInput = {
   onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -7332,6 +8232,12 @@ export type InstituteSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   onboardingDone?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  maxAdmins?: boolean
+  maxAccountants?: boolean
+  maxFaculty?: boolean
+  maxReception?: boolean
+  maxStudents?: boolean
+  planLimitsSetAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   plan?: boolean | Prisma.Institute$planArgs<ExtArgs>
   users?: boolean | Prisma.Institute$usersArgs<ExtArgs>
@@ -7381,6 +8287,12 @@ export type InstituteSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   onboardingDone?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  maxAdmins?: boolean
+  maxAccountants?: boolean
+  maxFaculty?: boolean
+  maxReception?: boolean
+  maxStudents?: boolean
+  planLimitsSetAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   plan?: boolean | Prisma.Institute$planArgs<ExtArgs>
 }, ExtArgs["result"]["institute"]>
@@ -7402,6 +8314,12 @@ export type InstituteSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   onboardingDone?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  maxAdmins?: boolean
+  maxAccountants?: boolean
+  maxFaculty?: boolean
+  maxReception?: boolean
+  maxStudents?: boolean
+  planLimitsSetAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   plan?: boolean | Prisma.Institute$planArgs<ExtArgs>
 }, ExtArgs["result"]["institute"]>
@@ -7423,9 +8341,15 @@ export type InstituteSelectScalar = {
   onboardingDone?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  maxAdmins?: boolean
+  maxAccountants?: boolean
+  maxFaculty?: boolean
+  maxReception?: boolean
+  maxStudents?: boolean
+  planLimitsSetAt?: boolean
 }
 
-export type InstituteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "planId" | "code" | "name" | "email" | "phone" | "address" | "city" | "state" | "isActive" | "biometricEnabled" | "onboardingStep" | "onboardingDone" | "createdAt" | "updatedAt", ExtArgs["result"]["institute"]>
+export type InstituteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "planId" | "code" | "name" | "email" | "phone" | "address" | "city" | "state" | "isActive" | "biometricEnabled" | "onboardingStep" | "onboardingDone" | "createdAt" | "updatedAt" | "maxAdmins" | "maxAccountants" | "maxFaculty" | "maxReception" | "maxStudents" | "planLimitsSetAt", ExtArgs["result"]["institute"]>
 export type InstituteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   plan?: boolean | Prisma.Institute$planArgs<ExtArgs>
@@ -7517,6 +8441,29 @@ export type $InstitutePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     onboardingDone: boolean
     createdAt: Date
     updatedAt: Date
+    /**
+     * This institute's OWN headcount limits. Copied from the Plan at the moment
+     * the plan is assigned, then owned by the institute — editing the Plan row
+     * afterwards never moves an existing institute's ceiling, so a superadmin
+     * raising the "Standard" plan for new signups can't silently re-price or
+     * re-provision every institute already on it. A superadmin can also raise
+     * or lower any of these for one institute alone (PATCH
+     * /platform/institutes/:id/limits) without inventing a bespoke plan.
+     * 
+     * Null means "never snapshotted" — only institutes that predate this
+     * column — and falls back to the live Plan values (lib/instituteLimits.ts)
+     * so nothing breaks before the backfill runs.
+     */
+    maxAdmins: number | null
+    maxAccountants: number | null
+    maxFaculty: number | null
+    maxReception: number | null
+    maxStudents: number | null
+    /**
+     * When the limits above were last snapshotted from a plan or hand-edited —
+     * shown in the platform UI so it's clear they're a point-in-time copy.
+     */
+    planLimitsSetAt: Date | null
   }, ExtArgs["result"]["institute"]>
   composites: {}
 }
@@ -7985,6 +8932,12 @@ export interface InstituteFieldRefs {
   readonly onboardingDone: Prisma.FieldRef<"Institute", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Institute", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Institute", 'DateTime'>
+  readonly maxAdmins: Prisma.FieldRef<"Institute", 'Int'>
+  readonly maxAccountants: Prisma.FieldRef<"Institute", 'Int'>
+  readonly maxFaculty: Prisma.FieldRef<"Institute", 'Int'>
+  readonly maxReception: Prisma.FieldRef<"Institute", 'Int'>
+  readonly maxStudents: Prisma.FieldRef<"Institute", 'Int'>
+  readonly planLimitsSetAt: Prisma.FieldRef<"Institute", 'DateTime'>
 }
     
 

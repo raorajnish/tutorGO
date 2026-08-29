@@ -678,14 +678,6 @@ export type EnumReminderAudienceFieldUpdateOperationsInput = {
   set?: $Enums.ReminderAudience
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type ScheduledReminderCreateWithoutInstituteInput = {
   id?: string
   createdByUserId: string

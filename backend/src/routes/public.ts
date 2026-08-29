@@ -224,10 +224,13 @@ publicRouter.post("/whatsapp/webhook", webhookLimiter, async (req, res) => {
     for (const entry of entries) {
       for (const change of entry.changes ?? []) {
         for (const status of change.value?.statuses ?? []) {
-          if (status.status !== "failed" && status.status !== "delivered" && status.status !== "sent" && status.status !== "read") continue;
+          // Only `failed` changes anything we store — sent/delivered/read
+          // would be a DB round trip that writes nothing, at Meta's callback
+          // volume. Revisit if OutboundMessage ever gains a deliveredAt.
+          if (status.status !== "failed") continue;
           await prisma.outboundMessage.updateMany({
             where: { providerMessageId: status.id },
-            data: status.status === "failed" ? { status: "FAILED", error: "Delivery failed (Meta callback)" } : {},
+            data: { status: "FAILED", error: "Delivery failed (Meta callback)" },
           });
         }
       }

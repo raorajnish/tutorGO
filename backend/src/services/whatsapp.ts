@@ -1,6 +1,8 @@
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../lib/http.js";
-import { encrypt, decrypt } from "../lib/crypto.js";
+import { decrypt } from "../lib/crypto.js";
+import { WHATSAPP_TEMPLATE_SUGGESTIONS } from "../lib/whatsappTemplateSuggestions.js";
+import type { WhatsAppTemplateStatus } from "../generated/prisma/enums.js";
 
 /** Thin Meta WhatsApp Business Cloud API client. Nothing here queues or
  * dispatches on a schedule — every function is a direct Graph API call for
@@ -29,15 +31,18 @@ async function graphRequest<T>(path: string, accessToken: string, init?: Request
 }
 
 /** Loads and decrypts an institute's saved config — throws if never
- * connected, since every caller here only runs after a successful setup. */
-async function loadConfig(instituteId: string) {
+ * connected, since every caller here only runs after a successful setup.
+ * `requireEnabled` is the single chokepoint for the Settings on/off switch:
+ * anything that actually messages a student passes it, so the kill switch
+ * can't be missed by a future caller. Template admin (sync/submit) is
+ * deliberately allowed while switched off — that's setup work, not sending. */
+async function loadConfig(instituteId: string, requireEnabled = false) {
   const config = await prisma.instituteWhatsAppConfig.findUnique({ where: { instituteId } });
   if (!config) throw ApiError.badRequest("WhatsApp is not connected for this institute yet.");
+  if (requireEnabled && !config.isEnabled) {
+    throw ApiError.badRequest("WhatsApp messaging is switched off for this institute.", "WHATSAPP_DISABLED");
+  }
   return { ...config, accessToken: decrypt(config.accessToken) };
-}
-
-export function encryptToken(plaintext: string): string {
-  return encrypt(plaintext);
 }
 
 /** Verifies phoneNumberId + accessToken actually work together before we
@@ -69,6 +74,39 @@ function bodyTextOf(components: MetaTemplateComponent[]): string {
   return components.find((c) => c.type === "BODY")?.text ?? "";
 }
 
+/** Meta's status vocabulary is wider than ours (PAUSED, DISABLED, IN_APPEAL,
+ * PENDING_DELETION, ...). Folding the unknowns onto a local equivalent keeps
+ * one odd template from throwing mid-loop and aborting the whole sync. */
+function localStatus(metaStatus: string): WhatsAppTemplateStatus {
+  switch (metaStatus?.toUpperCase()) {
+    case "APPROVED":
+      return "APPROVED";
+    case "REJECTED":
+    case "DISABLED":
+    case "PAUSED":
+      return "REJECTED";
+    case "PENDING":
+    case "IN_APPEAL":
+    case "PENDING_DELETION":
+      return "PENDING";
+    default:
+      return "PENDING";
+  }
+}
+
+/** Meta requires an `example` for any template containing {{n}} placeholders
+ * — a submission without one is rejected outright. Sample values come from
+ * our own suggestion catalogue (matched on name), since a synced-down or
+ * hand-made row has none of its own. */
+function bodyComponent(name: string, bodyText: string) {
+  const placeholderCount = new Set(bodyText.match(/\{\{\d+\}\}/g) ?? []).size;
+  if (placeholderCount === 0) return { type: "BODY", text: bodyText };
+
+  const suggestion = Object.values(WHATSAPP_TEMPLATE_SUGGESTIONS).find((s) => s.name === name);
+  const samples = Array.from({ length: placeholderCount }, (_, i) => suggestion?.sampleValues[i] ?? `Sample ${i + 1}`);
+  return { type: "BODY", text: bodyText, example: { body_text: [samples] } };
+}
+
 /** Pulls the institute's current WABA templates and upserts them into the
  * local cache (WhatsAppTemplate), preserving any mappedType a staff member
  * already set — a re-sync must never silently unmap a trigger. */
@@ -85,7 +123,7 @@ export async function syncTemplates(instituteId: string): Promise<number> {
       update: {
         metaTemplateId: t.id,
         category: t.category,
-        status: t.status as "APPROVED" | "PENDING" | "REJECTED" | "DRAFT",
+        status: localStatus(t.status),
         bodyText: bodyTextOf(t.components),
         lastSyncedAt: new Date(),
       },
@@ -95,7 +133,7 @@ export async function syncTemplates(instituteId: string): Promise<number> {
         name: t.name,
         language: t.language,
         category: t.category,
-        status: t.status as "APPROVED" | "PENDING" | "REJECTED" | "DRAFT",
+        status: localStatus(t.status),
         bodyText: bodyTextOf(t.components),
         lastSyncedAt: new Date(),
       },
@@ -120,13 +158,13 @@ export async function submitTemplate(instituteId: string, templateId: string): P
       name: template.name,
       language: template.language,
       category: template.category,
-      components: [{ type: "BODY", text: template.bodyText }],
+      components: [bodyComponent(template.name, template.bodyText)],
     }),
   });
 
   await prisma.whatsAppTemplate.update({
     where: { id: templateId },
-    data: { metaTemplateId: data.id, status: (data.status as "PENDING") ?? "PENDING", lastSyncedAt: new Date() },
+    data: { metaTemplateId: data.id, status: localStatus(data.status), lastSyncedAt: new Date() },
   });
 }
 
@@ -149,7 +187,7 @@ export async function sendTemplateMessage(params: {
   });
 
   try {
-    const config = await loadConfig(instituteId);
+    const config = await loadConfig(instituteId, true);
     const data = await graphRequest<{ messages: { id: string }[] }>(`/${config.phoneNumberId}/messages`, config.accessToken, {
       method: "POST",
       body: JSON.stringify({

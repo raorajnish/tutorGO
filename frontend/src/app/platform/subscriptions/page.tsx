@@ -8,7 +8,15 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Modal } from "@/components/ui/Modal";
-import { CAPPED_ROLES, CAPPED_ROLE_LABELS, MODULE_LABELS, type Plan, type SubscriptionRow } from "@/lib/types";
+import { Toggle } from "@/components/ui/Toggle";
+import {
+  CAPPED_ROLES,
+  CAPPED_ROLE_LABELS,
+  MODULE_LABELS,
+  type Plan,
+  type PlatformUser,
+  type SubscriptionRow,
+} from "@/lib/types";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -21,6 +29,7 @@ export default function SubscriptionsPage() {
   const [planFilter, setPlanFilter] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [changingPlanFor, setChangingPlanFor] = useState<SubscriptionRow | null>(null);
+  const [viewingUsersFor, setViewingUsersFor] = useState<SubscriptionRow | null>(null);
 
   function load() {
     const params = new URLSearchParams();
@@ -108,11 +117,16 @@ export default function SubscriptionsPage() {
                     </p>
                   </td>
                   <td className="px-4 py-3">
-                    {row.plan ? (
-                      <Badge tone={row.atLimit ? "warning" : "primary"}>{row.plan.name}</Badge>
-                    ) : (
-                      <Badge tone="danger">No plan</Badge>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {row.plan ? (
+                        <Badge tone={row.atLimit ? "warning" : "primary"}>{row.plan.name}</Badge>
+                      ) : (
+                        <Badge tone="danger">No plan</Badge>
+                      )}
+                      {/* The plan name alone would imply the plan's numbers
+                          are what's enforced; once customised they aren't. */}
+                      {row.customised && <Badge tone="neutral">Customised</Badge>}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     {row.limits ? (
@@ -136,7 +150,10 @@ export default function SubscriptionsPage() {
                     <Badge tone={row.isActive ? "success" : "danger"}>{row.isActive ? "Active" : "Inactive"}</Badge>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{formatDate(row.createdAt)}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="whitespace-nowrap px-4 py-3 text-right">
+                    <Button variant="ghost" onClick={() => setViewingUsersFor(row)}>
+                      Users
+                    </Button>
                     <Button variant="ghost" onClick={() => setChangingPlanFor(row)}>
                       Change plan
                     </Button>
@@ -174,6 +191,7 @@ export default function SubscriptionsPage() {
                 ) : (
                   <Badge tone="danger">No plan</Badge>
                 )}
+                {row.customised && <Badge tone="neutral">Customised</Badge>}
                 <span className="text-xs text-muted-foreground">{row.activeModules.length} modules active</span>
               </div>
 
@@ -191,9 +209,14 @@ export default function SubscriptionsPage() {
                 </div>
               )}
 
-              <Button variant="secondary" onClick={() => setChangingPlanFor(row)} className="w-full">
-                Change plan
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={() => setViewingUsersFor(row)} className="flex-1">
+                  Users
+                </Button>
+                <Button variant="secondary" onClick={() => setChangingPlanFor(row)} className="flex-1">
+                  Change plan
+                </Button>
+              </div>
             </div>
           ))}
           {rows && rows.length === 0 && (
@@ -213,7 +236,92 @@ export default function SubscriptionsPage() {
           }}
         />
       )}
+
+      {viewingUsersFor && (
+        <InstituteUsersModal row={viewingUsersFor} onClose={() => setViewingUsersFor(null)} />
+      )}
     </div>
+  );
+}
+
+const ROLE_TONE: Record<string, "primary" | "accent" | "success" | "neutral"> = {
+  OWNER: "primary",
+  ADMIN: "primary",
+  ACCOUNTANT: "success",
+  FACULTY: "neutral",
+  RECEPTION: "neutral",
+  STUDENT: "neutral",
+};
+
+function roleLabel(role: string): string {
+  return role.charAt(0) + role.slice(1).toLowerCase();
+}
+
+/** Who actually has access at this institute, right beside the seat counts
+ * that cap them — the usage column says "Faculty: 4/5", this says which four.
+ * Read-only: accounts are managed from the institute's own team screen. */
+function InstituteUsersModal({ row, onClose }: { row: SubscriptionRow; onClose: () => void }) {
+  const [users, setUsers] = useState<PlatformUser[] | null>(null);
+  const [includeInactive, setIncludeInactive] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUsers(null);
+    setError(null);
+    const qs = new URLSearchParams({ instituteId: row.id });
+    if (includeInactive) qs.set("includeInactive", "true");
+    apiFetch<PlatformUser[]>(`/platform/users?${qs.toString()}`)
+      .then(setUsers)
+      .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load users."));
+  }, [row.id, includeInactive]);
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title={`Users — ${row.name}`}
+      description={`${row.code} · ${row.organization.name}`}
+      width="lg"
+      footer={
+        <Button variant="ghost" onClick={onClose}>
+          Close
+        </Button>
+      }
+    >
+      <label className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+        <Toggle checked={includeInactive} onChange={setIncludeInactive} label="Include deactivated" />
+        Include deactivated
+      </label>
+
+      {error && (
+        <div className="rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{error}</div>
+      )}
+
+      {!users && !error && <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>}
+
+      {users && users.length === 0 && (
+        <p className="py-6 text-center text-sm text-muted-foreground">
+          Nobody has an account at this institute yet.
+        </p>
+      )}
+
+      {users && users.length > 0 && (
+        <ul className="divide-y divide-border rounded-xl border border-border">
+          {users.map((u) => (
+            <li key={u.id} className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{u.fullName}</p>
+                <p className="truncate text-xs text-muted-foreground">{u.email}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {!u.isActive && <Badge tone="danger">Deactivated</Badge>}
+                <Badge tone={ROLE_TONE[u.role] ?? "neutral"}>{roleLabel(u.role)}</Badge>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Modal>
   );
 }
 

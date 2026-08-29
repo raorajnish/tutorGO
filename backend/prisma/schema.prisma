@@ -187,6 +187,26 @@ model Institute {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
+  /// This institute's OWN headcount limits. Copied from the Plan at the moment
+  /// the plan is assigned, then owned by the institute — editing the Plan row
+  /// afterwards never moves an existing institute's ceiling, so a superadmin
+  /// raising the "Standard" plan for new signups can't silently re-price or
+  /// re-provision every institute already on it. A superadmin can also raise
+  /// or lower any of these for one institute alone (PATCH
+  /// /platform/institutes/:id/limits) without inventing a bespoke plan.
+  ///
+  /// Null means "never snapshotted" — only institutes that predate this
+  /// column — and falls back to the live Plan values (lib/instituteLimits.ts)
+  /// so nothing breaks before the backfill runs.
+  maxAdmins       Int?
+  maxAccountants  Int?
+  maxFaculty      Int?
+  maxReception    Int?
+  maxStudents     Int?
+  /// When the limits above were last snapshotted from a plan or hand-edited —
+  /// shown in the platform UI so it's clear they're a point-in-time copy.
+  planLimitsSetAt DateTime?
+
   organization      Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   plan              Plan?                    @relation(fields: [planId], references: [id])
   users             User[]

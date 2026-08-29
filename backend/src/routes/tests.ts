@@ -550,7 +550,7 @@ testsRouter.get("/:id/sessions/:lectureId/report", requireRoles(...MANAGE_ROLES)
 });
 
 // ---------------------------------------------------------------------------
-// Question-paper upload (Cloudinary) — entirely optional per test
+// Question-paper upload (local disk, services/uploads.ts) — optional per test
 // ---------------------------------------------------------------------------
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_UPLOAD_BYTES } });

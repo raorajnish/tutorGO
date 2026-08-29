@@ -18,6 +18,11 @@ feesRouter.use(authenticate, requireInstitute, requireModule("FEES"));
 // waiving, voiding) is a financial correction — OWNER/ADMIN only.
 const MANAGE_ROLES = ["OWNER", "ADMIN", "RECEPTION"] as const;
 const STRICT_ROLES = ["OWNER", "ADMIN"] as const;
+// Reads are money data too — plans, balances, receipts, and the defaulter list
+// (which carries every student's phone and parentPhone). ACCOUNTANT is added
+// on top of MANAGE_ROLES because reporting is exactly their job; FACULTY has
+// no business seeing any of it, and previously could see all of it.
+const READ_ROLES = ["OWNER", "ADMIN", "RECEPTION", "ACCOUNTANT"] as const;
 
 // ---------------------------------------------------------------------------
 // Money + date helpers
@@ -112,6 +117,34 @@ async function loadFeeAccount(studentId: string, instituteId: string) {
   });
   if (!account || account.instituteId !== instituteId) throw ApiError.notFound("This student has no fee account");
   return account;
+}
+
+/**
+ * Runs `fn` in a transaction holding an exclusive lock on ONE fee account.
+ *
+ * Every write in this file is a read-modify-write: read the installments,
+ * decide something from what they currently say, then write. Doing the read
+ * outside the transaction made all of them racy — two staff acting on the same
+ * student at the same moment each decided against a snapshot the other had
+ * already invalidated, and the second write silently won.
+ *
+ * The lock is a single ROW in fee_accounts, so it only ever makes concurrent
+ * work on the SAME student wait. Two people recording payments for two
+ * students — same batch, same course, same second — never touch the same row
+ * and never block each other.
+ *
+ * Under Read Committed the reads inside `fn` see a fresh snapshot once the
+ * lock is held, which is what makes the re-checks meaningful rather than
+ * decorative.
+ */
+async function withFeeAccountLock<T>(
+  accountId: string,
+  fn: (tx: Prisma.TransactionClient) => Promise<T>
+): Promise<T> {
+  return prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM fee_accounts WHERE id = ${accountId} FOR UPDATE`;
+    return fn(tx);
+  });
 }
 
 function accountTotals(installments: { amount: Prisma.Decimal; paidAmount: Prisma.Decimal; waived: boolean }[]) {
@@ -322,7 +355,7 @@ feesRouter.post("/accounts", requireRoles(...MANAGE_ROLES), validateBody(createA
   }
 });
 
-feesRouter.get("/accounts/:studentId", async (req, res, next) => {
+feesRouter.get("/accounts/:studentId", requireRoles(...READ_ROLES), async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;
     const studentId = req.params.studentId as string;
@@ -421,16 +454,18 @@ feesRouter.patch(
       const body = req.body as z.infer<typeof rescheduleSchema>;
       const account = await loadFeeAccount(req.params.studentId as string, instituteId);
 
-      const inst = await prisma.feeInstallment.findUnique({ where: { id: req.params.id as string } });
-      if (!inst || inst.feeAccountId !== account.id) throw ApiError.notFound("Installment not found");
-      if (inst.waived || inst.paidAmount.gte(inst.amount)) {
-        throw ApiError.badRequest("A paid or waived installment can't be rescheduled");
-      }
+      const updated = await withFeeAccountLock(account.id, async (tx) => {
+        const inst = await tx.feeInstallment.findUnique({ where: { id: req.params.id as string } });
+        if (!inst || inst.feeAccountId !== account.id) throw ApiError.notFound("Installment not found");
+        if (inst.waived || inst.paidAmount.gte(inst.amount)) {
+          throw ApiError.badRequest("A paid or waived installment can't be rescheduled");
+        }
 
-      const deltaMs = body.dueDate.getTime() - inst.dueDate.getTime();
+        const deltaMs = body.dueDate.getTime() - inst.dueDate.getTime();
 
-      await prisma.$transaction(async (tx) => {
-        await tx.feeInstallment.update({
+        // Returned straight from the update — re-reading the row this
+        // transaction just wrote would be a needless round trip.
+        const moved = await tx.feeInstallment.update({
           where: { id: inst.id },
           data: { dueDate: body.dueDate, originalDueDate: inst.originalDueDate ?? inst.dueDate },
         });
@@ -447,10 +482,11 @@ feesRouter.patch(
             });
           }
         }
+
+        return moved;
       });
 
-      const updated = await prisma.feeInstallment.findUnique({ where: { id: inst.id } });
-      res.json(serializeInstallment(updated!));
+      res.json(serializeInstallment(updated));
     } catch (err) {
       next(err);
     }
@@ -469,17 +505,20 @@ feesRouter.patch(
       const body = req.body as z.infer<typeof editAmountSchema>;
       const account = await loadFeeAccount(req.params.studentId as string, instituteId);
 
-      const inst = await prisma.feeInstallment.findUnique({ where: { id: req.params.id as string } });
-      if (!inst || inst.feeAccountId !== account.id) throw ApiError.notFound("Installment not found");
-      if (inst.waived) throw ApiError.badRequest("A waived installment's amount can't be edited");
-      if (inst.paidAmount.gte(inst.amount)) throw ApiError.badRequest("A fully paid installment's amount can't be edited");
+      const updated = await withFeeAccountLock(account.id, async (tx) => {
+        const inst = await tx.feeInstallment.findUnique({ where: { id: req.params.id as string } });
+        if (!inst || inst.feeAccountId !== account.id) throw ApiError.notFound("Installment not found");
+        if (inst.waived) throw ApiError.badRequest("A waived installment's amount can't be edited");
+        if (inst.paidAmount.gte(inst.amount)) throw ApiError.badRequest("A fully paid installment's amount can't be edited");
 
-      const newAmount = new Prisma.Decimal(body.amount);
-      if (newAmount.lt(inst.paidAmount)) {
-        throw ApiError.badRequest(`Amount can't be less than what's already been paid on it (₹${money(inst.paidAmount)})`);
-      }
+        const newAmount = new Prisma.Decimal(body.amount);
+        if (newAmount.lt(inst.paidAmount)) {
+          throw ApiError.badRequest(`Amount can't be less than what's already been paid on it (₹${money(inst.paidAmount)})`);
+        }
 
-      const updated = await prisma.feeInstallment.update({ where: { id: inst.id }, data: { amount: newAmount } });
+        return tx.feeInstallment.update({ where: { id: inst.id }, data: { amount: newAmount } });
+      });
+
       res.json(serializeInstallment(updated));
     } catch (err) {
       next(err);
@@ -499,11 +538,16 @@ feesRouter.post(
       const body = req.body as z.infer<typeof addInstallmentSchema>;
       const account = await loadFeeAccount(req.params.studentId as string, instituteId);
 
-      const last = await prisma.feeInstallment.findFirst({ where: { feeAccountId: account.id }, orderBy: { seq: "desc" } });
-      const seq = (last?.seq ?? 0) + 1;
+      // Locked because `seq` is derived from the current maximum: two adds at
+      // once would both read the same last row and collide on the
+      // (feeAccountId, seq) unique index.
+      const created = await withFeeAccountLock(account.id, async (tx) => {
+        const last = await tx.feeInstallment.findFirst({ where: { feeAccountId: account.id }, orderBy: { seq: "desc" } });
+        const seq = (last?.seq ?? 0) + 1;
 
-      const created = await prisma.feeInstallment.create({
-        data: { feeAccountId: account.id, seq, dueDate: body.dueDate, amount: new Prisma.Decimal(body.amount) },
+        return tx.feeInstallment.create({
+          data: { feeAccountId: account.id, seq, dueDate: body.dueDate, amount: new Prisma.Decimal(body.amount) },
+        });
       });
 
       res.status(201).json(serializeInstallment(created));
@@ -518,14 +562,20 @@ feesRouter.delete("/accounts/:studentId/installments/:id", requireRoles(...STRIC
     const instituteId = req.tenantId!;
     const account = await loadFeeAccount(req.params.studentId as string, instituteId);
 
-    const inst = await prisma.feeInstallment.findUnique({ where: { id: req.params.id as string } });
-    if (!inst || inst.feeAccountId !== account.id) throw ApiError.notFound("Installment not found");
-    if (inst.paidAmount.gt(0) || inst.waived) throw ApiError.badRequest("Only an unpaid, non-waived installment can be removed");
+    await withFeeAccountLock(account.id, async (tx) => {
+      const inst = await tx.feeInstallment.findUnique({ where: { id: req.params.id as string } });
+      if (!inst || inst.feeAccountId !== account.id) throw ApiError.notFound("Installment not found");
+      if (inst.paidAmount.gt(0) || inst.waived) throw ApiError.badRequest("Only an unpaid, non-waived installment can be removed");
 
-    const last = await prisma.feeInstallment.findFirst({ where: { feeAccountId: account.id }, orderBy: { seq: "desc" } });
-    if (!last || last.id !== inst.id) throw ApiError.badRequest("Only the last installment in the plan can be removed");
+      // Both checks have to hold at the moment of the delete, not merely when
+      // the page was loaded: a payment landing in between could have put money
+      // on this row, and another add could have made it no longer the last.
+      const last = await tx.feeInstallment.findFirst({ where: { feeAccountId: account.id }, orderBy: { seq: "desc" } });
+      if (!last || last.id !== inst.id) throw ApiError.badRequest("Only the last installment in the plan can be removed");
 
-    await prisma.feeInstallment.delete({ where: { id: inst.id } });
+      await tx.feeInstallment.delete({ where: { id: inst.id } });
+    });
+
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -537,10 +587,13 @@ feesRouter.post("/accounts/:studentId/installments/:id/waive", requireRoles(...S
     const instituteId = req.tenantId!;
     const account = await loadFeeAccount(req.params.studentId as string, instituteId);
 
-    const inst = await prisma.feeInstallment.findUnique({ where: { id: req.params.id as string } });
-    if (!inst || inst.feeAccountId !== account.id) throw ApiError.notFound("Installment not found");
+    const updated = await withFeeAccountLock(account.id, async (tx) => {
+      const inst = await tx.feeInstallment.findUnique({ where: { id: req.params.id as string } });
+      if (!inst || inst.feeAccountId !== account.id) throw ApiError.notFound("Installment not found");
 
-    const updated = await prisma.feeInstallment.update({ where: { id: inst.id }, data: { waived: true } });
+      return tx.feeInstallment.update({ where: { id: inst.id }, data: { waived: true } });
+    });
+
     res.json(serializeInstallment(updated));
   } catch (err) {
     next(err);
@@ -575,34 +628,38 @@ feesRouter.post("/payments", requireRoles(...MANAGE_ROLES), validateBody(recordP
     const account = await loadFeeAccount(body.studentId, instituteId);
     const paymentAmount = new Prisma.Decimal(body.amount);
 
-    const installments = await prisma.feeInstallment.findMany({
-      where: { feeAccountId: account.id, waived: false },
-      orderBy: { seq: "asc" },
-    });
+    // The sharpest case the lock exists for: two clerks saving at the same
+    // moment both saw the same open installment, both passed the balance
+    // check, and the second `update` overwrote the first — one payment's money
+    // vanished from the plan while its Payment row and receipt still existed.
+    const { paymentId, carryForward } = await withFeeAccountLock(account.id, async (tx) => {
+      const installments = await tx.feeInstallment.findMany({
+        where: { feeAccountId: account.id, waived: false },
+        orderBy: { seq: "asc" },
+      });
 
-    // A payment always targets exactly ONE installment — the earliest open
-    // one — and closes it at exactly what was paid, whether that's less or
-    // more than its quoted amount. The difference (either direction) shifts
-    // onto the installment(s) after it: a shortfall grows the next one (or
-    // creates one), an overpayment shrinks later ones (removing any that
-    // get fully absorbed). A payment never spans/closes a second installment
-    // on its own — see changes-phase8.md §8a.
-    const target = installments.find((i) => i.paidAmount.lt(i.amount));
-    if (!target) throw ApiError.badRequest("Every installment on this plan is already paid");
+      // A payment always targets exactly ONE installment — the earliest open
+      // one — and closes it at exactly what was paid, whether that's less or
+      // more than its quoted amount. The difference (either direction) shifts
+      // onto the installment(s) after it: a shortfall grows the next one (or
+      // creates one), an overpayment shrinks later ones (removing any that
+      // get fully absorbed). A payment never spans/closes a second installment
+      // on its own — see changes-phase8.md §8a.
+      const target = installments.find((i) => i.paidAmount.lt(i.amount));
+      if (!target) throw ApiError.badRequest("Every installment on this plan is already paid");
 
-    const totalOutstanding = installments.reduce((sum, i) => sum.plus(i.amount.minus(i.paidAmount)), new Prisma.Decimal(0));
-    if (paymentAmount.gt(totalOutstanding)) {
-      throw ApiError.badRequest(
-        `Amount exceeds the remaining balance on this plan — only ₹${money(totalOutstanding)} of ₹${money(paymentAmount)} could be applied`
-      );
-    }
+      const totalOutstanding = installments.reduce((sum, i) => sum.plus(i.amount.minus(i.paidAmount)), new Prisma.Decimal(0));
+      if (paymentAmount.gt(totalOutstanding)) {
+        throw ApiError.badRequest(
+          `Amount exceeds the remaining balance on this plan — only ₹${money(totalOutstanding)} of ₹${money(paymentAmount)} could be applied`
+        );
+      }
 
-    const targetOutstanding = target.amount.minus(target.paidAmount);
-    const diff = paymentAmount.minus(targetOutstanding); // >0 overpay, <0 shortfall, 0 exact
-    const targetNewPaid = target.paidAmount.plus(paymentAmount);
-    const later = installments.filter((i) => i.seq > target.seq);
+      const targetOutstanding = target.amount.minus(target.paidAmount);
+      const diff = paymentAmount.minus(targetOutstanding); // >0 overpay, <0 shortfall, 0 exact
+      const targetNewPaid = target.paidAmount.plus(paymentAmount);
+      const later = installments.filter((i) => i.seq > target.seq);
 
-    const { paymentId, carryForward } = await prisma.$transaction(async (tx) => {
       const receiptNumber = await nextReceiptNumber(tx, instituteId, body.paidOn);
       const created = await tx.payment.create({
         data: {
@@ -657,8 +714,19 @@ feesRouter.post("/payments", requireRoles(...MANAGE_ROLES), validateBody(recordP
         const entries: CarryForwardEntry[] = [];
         for (const l of later) {
           if (remaining.lte(0)) break;
-          const reducible = Prisma.Decimal.min(remaining, l.amount);
-          if (reducible.gte(l.amount)) {
+          // Only the UNPAID part of a later installment can be absorbed — its
+          // paidAmount is money already received and must survive untouched.
+          // (totalOutstanding above is computed the same way, so the two
+          // agree and the cascade still can't run out of room mid-loop.)
+          const outstanding = l.amount.minus(l.paidAmount);
+          if (outstanding.lte(0)) continue;
+          const reducible = Prisma.Decimal.min(remaining, outstanding);
+          // Deleting the row would cascade to its PaymentAllocation history
+          // (schema.prisma: onDelete: Cascade) and silently break the
+          // reconciliation between Payment.amount and its allocations. Only a
+          // row that never received money is safe to remove; anything else is
+          // decremented to exactly what was already paid.
+          if (reducible.gte(outstanding) && l.paidAmount.lte(0)) {
             await tx.feeInstallment.delete({ where: { id: l.id } });
             entries.push({ installmentId: l.id, seq: l.seq, dueDate: l.dueDate, amount: money(reducible)!, created: false, removed: true });
           } else {
@@ -687,7 +755,7 @@ feesRouter.post("/payments", requireRoles(...MANAGE_ROLES), validateBody(recordP
   }
 });
 
-feesRouter.get("/payments", async (req, res, next) => {
+feesRouter.get("/payments", requireRoles(...READ_ROLES), async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;
     const studentId = typeof req.query.studentId === "string" ? req.query.studentId : undefined;
@@ -742,7 +810,7 @@ feesRouter.get("/payments", async (req, res, next) => {
   }
 });
 
-feesRouter.get("/payments/:id/receipt", async (req, res, next) => {
+feesRouter.get("/payments/:id/receipt", requireRoles(...READ_ROLES), async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;
     const payment = await prisma.payment.findUnique({
@@ -776,8 +844,6 @@ feesRouter.get("/payments/:id/receipt", async (req, res, next) => {
   }
 });
 
-const voidPaymentSchema = z.object({ reason: z.string().min(1, "A reason is required").max(300) });
-
 // Disabled for now: a payment's carry-forward settlement (§8a) can grow,
 // shrink, create, or delete OTHER installments beyond the one it directly
 // allocates to, and none of that is currently reversible — undoing only
@@ -785,7 +851,10 @@ const voidPaymentSchema = z.object({ reason: z.string().min(1, "A reason is requ
 // voiding can cleanly reverse the full settlement, not just the allocation
 // (needs a stored snapshot of what each payment changed). See
 // changes-phase8.md §8a.
-feesRouter.post("/payments/:id/void", requireRoles(...STRICT_ROLES), validateBody(voidPaymentSchema), async (_req, _res, next) => {
+// No validateBody here on purpose: the handler rejects unconditionally, so
+// validating first would answer a caller who omitted `reason` with a confusing
+// field error instead of the real reason this endpoint is unavailable.
+feesRouter.post("/payments/:id/void", requireRoles(...STRICT_ROLES), async (_req, _res, next) => {
   next(ApiError.badRequest("Voiding a payment is temporarily disabled — contact support if this payment needs correcting."));
 });
 
@@ -793,7 +862,7 @@ feesRouter.post("/payments/:id/void", requireRoles(...STRICT_ROLES), validateBod
 // Overdue / defaulters
 // ---------------------------------------------------------------------------
 
-feesRouter.get("/overdue", async (req, res, next) => {
+feesRouter.get("/overdue", requireRoles(...READ_ROLES), async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;
     const today = todayDateOnly();

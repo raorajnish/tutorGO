@@ -19,8 +19,17 @@ import { publicRouter } from "./routes/public.js";
 import { distributionRouter } from "./routes/distribution.js";
 import { whatsappRouter } from "./routes/whatsapp.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
+import { UPLOAD_ROOT, UPLOAD_URL_PREFIX } from "./services/uploads.js";
 
 export const app = express();
+
+// Render (and any single nginx/ALB in front) terminates TLS and appends the
+// real client IP to X-Forwarded-For. Without this, Express hands `req.ip` the
+// proxy's address and middleware/rateLimit.ts would have to read the header
+// itself — which an attacker can forge freely, making every limiter useless.
+// `1` = trust exactly one proxy hop; raise it only if a second real proxy is
+// ever added, never set it to `true`.
+app.set("trust proxy", 1);
 
 app.use(cors());
 // `verify` stashes the raw bytes on req.rawBody alongside the parsed body —
@@ -31,6 +40,24 @@ app.use(
   express.json({
     verify: (req, _res, buf) => {
       (req as express.Request & { rawBody?: Buffer }).rawBody = buf;
+    },
+  })
+);
+
+// Uploaded test papers, served straight off local disk (services/uploads.ts).
+// Hardened deliberately: `nosniff` + a forced attachment disposition mean a
+// file crafted to look like HTML can never execute as script on the API's own
+// origin, and no directory index is exposed. When these move to an object
+// store this mount goes away with them.
+app.use(
+  UPLOAD_URL_PREFIX,
+  express.static(UPLOAD_ROOT, {
+    index: false,
+    dotfiles: "deny",
+    fallthrough: false,
+    setHeaders: (res) => {
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Content-Disposition", "attachment");
     },
   })
 );

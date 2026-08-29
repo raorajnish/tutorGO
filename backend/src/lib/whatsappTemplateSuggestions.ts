@@ -1,4 +1,4 @@
-import { MESSAGE_TEMPLATE_TYPES, type MessageTemplateType } from "./messageTemplates.js";
+import type { MessageTemplateType } from "./messageTemplates.js";
 
 /** Meta HSM-shaped drafts derived from the same 5 in-app triggers as
  * messageTemplates.ts — not a second content system. Meta requires fixed
@@ -57,7 +57,3 @@ export const WHATSAPP_TEMPLATE_SUGGESTIONS: Record<MessageTemplateType, WhatsApp
     sampleValues: ["Mr. Sharma", "25,000", "Bank Transfer", "1 Mar", "0"],
   },
 };
-
-export function allSuggestions(): WhatsAppTemplateSuggestion[] {
-  return MESSAGE_TEMPLATE_TYPES.map((type) => WHATSAPP_TEMPLATE_SUGGESTIONS[type]);
-}

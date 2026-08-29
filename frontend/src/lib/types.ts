@@ -270,8 +270,35 @@ export interface PlatformInstituteDetail {
   modules: { code: ModuleCode; label: string; isActive: boolean }[];
   admins: StaffMember[];
   accountants: StaffMember[];
-  availablePlans: { id: string; code: string; name: string }[];
-  plan: { id: string; code: string; name: string; limits: PlanLimits } | null;
+  availablePlans: { id: string; code: string; name: string; limits: RoleLimitValues }[];
+  /// What is actually ENFORCED for this institute — its own snapshot of the
+  /// plan's numbers, taken when the plan was assigned and editable per
+  /// institute since. Null only when no plan and no snapshot (unlimited).
+  limits: PlanLimits | null;
+  /// True when `limits` has drifted from `plan.limits` — either the plan was
+  /// edited afterwards, or this institute was given a bespoke ceiling.
+  customised: boolean;
+  planLimitsSetAt: string | null;
+  /// Where the snapshot originally came from. `plan.limits` are the plan's
+  /// CURRENT headline numbers, i.e. what re-assigning it would copy over.
+  plan: { id: string; code: string; name: string; limits: RoleLimitValues } | null;
+}
+
+/// A bare max-per-role map (no usage counts) — a plan's headline numbers.
+export type RoleLimitValues = Record<CappedRole, number>;
+
+/// One row of the platform-wide user directory (SUPERADMIN only).
+export interface PlatformUser {
+  id: string;
+  fullName: string;
+  email: string;
+  role: Role;
+  isActive: boolean;
+  lastLoginAt: string | null;
+  instituteId: string | null;
+  instituteName: string | null;
+  instituteCode: string | null;
+  organizationName: string | null;
 }
 
 /// One row of the platform-wide subscription overview: an institute, its
@@ -287,6 +314,9 @@ export interface SubscriptionRow {
   organization: { id: string; name: string; code: string };
   plan: { id: string; code: string; name: string } | null;
   limits: PlanLimits | null;
+  /// True when this institute's enforced limits differ from its plan's
+  /// headline numbers — see PlatformInstituteDetail.customised.
+  customised: boolean;
   /// True when any capped role is at or over its limit — they've outgrown the tier.
   atLimit: boolean;
   activeModules: ModuleCode[];
@@ -1276,14 +1306,6 @@ export interface InstituteWhatsAppConfig {
   isEnabled: boolean;
   connectedAt: string;
   updatedAt: string;
-}
-
-export interface UpdateWhatsAppConfigPayload {
-  accessToken?: string;
-  phoneNumberId: string;
-  wabaId: string;
-  businessAccountId?: string;
-  isEnabled: boolean;
 }
 
 export type WhatsAppTemplateStatus = "DRAFT" | "PENDING" | "APPROVED" | "REJECTED";

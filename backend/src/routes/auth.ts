@@ -7,17 +7,28 @@ import { signToken, signResetToken, verifyResetToken } from "../lib/jwt.js";
 import { ApiError } from "../lib/http.js";
 import { validateBody } from "../middleware/validate.js";
 import { authenticate, requireRoles } from "../middleware/auth.js";
+import { rateLimit } from "../middleware/rateLimit.js";
 import { sendMail } from "../services/mailer.js";
 import { otpEmailHtml } from "../lib/emailTemplates.js";
 
 export const authRouter = Router();
+
+/** Burst guards on the unauthenticated surface. Deliberately loose enough
+ * that a whole staff room behind one office NAT never trips them, tight
+ * enough to make online password guessing and mail-flooding impractical.
+ * The per-record limits (OTP attempt cap, resend cooldown) are the layer
+ * that has to hold under a distributed attempt — see middleware/rateLimit.ts. */
+const loginLimiter = rateLimit({ max: 20, windowMs: 5 * 60_000, keyPrefix: "auth-login" });
+const forgotLimiter = rateLimit({ max: 5, windowMs: 15 * 60_000, keyPrefix: "auth-forgot" });
+const otpLimiter = rateLimit({ max: 15, windowMs: 5 * 60_000, keyPrefix: "auth-verify-otp" });
+const resetLimiter = rateLimit({ max: 10, windowMs: 15 * 60_000, keyPrefix: "auth-reset" });
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 });
 
-authRouter.post("/login", validateBody(loginSchema), async (req, res, next) => {
+authRouter.post("/login", loginLimiter, validateBody(loginSchema), async (req, res, next) => {
   try {
     const { email, password } = req.body as z.infer<typeof loginSchema>;
 
@@ -167,6 +178,12 @@ authRouter.post("/enter-institute", authenticate, requireRoles("OWNER"), async (
     if (!institute || institute.organizationId !== authUser.organizationId) {
       throw ApiError.notFound("Institute not found in your organization");
     }
+    // Suspension (platform.ts sets isActive:false) is the only way an institute
+    // is ever taken out of service — there is no delete — so it has to actually
+    // close the door here, not just hide the institute from listings.
+    if (!institute.isActive) {
+      throw ApiError.forbidden("This institute is suspended. Contact platform support.", "INSTITUTE_SUSPENDED");
+    }
 
     const token = signToken({
       sub: authUser.id,
@@ -251,7 +268,7 @@ const OTP_MAX_ATTEMPTS = 5;
 
 const forgotPasswordSchema = z.object({ email: z.string().email() });
 
-authRouter.post("/forgot-password", validateBody(forgotPasswordSchema), async (req, res, next) => {
+authRouter.post("/forgot-password", forgotLimiter, validateBody(forgotPasswordSchema), async (req, res, next) => {
   try {
     const { email } = req.body as z.infer<typeof forgotPasswordSchema>;
     const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
@@ -295,7 +312,7 @@ authRouter.post("/forgot-password", validateBody(forgotPasswordSchema), async (r
 
 const verifyOtpSchema = z.object({ email: z.string().email(), code: z.string().length(6) });
 
-authRouter.post("/verify-otp", validateBody(verifyOtpSchema), async (req, res, next) => {
+authRouter.post("/verify-otp", otpLimiter, validateBody(verifyOtpSchema), async (req, res, next) => {
   try {
     const { email, code } = req.body as z.infer<typeof verifyOtpSchema>;
     const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
@@ -332,7 +349,7 @@ const resetPasswordSchema = z
   })
   .refine((v) => v.newPassword === v.confirmPassword, { message: "Passwords do not match", path: ["confirmPassword"] });
 
-authRouter.post("/reset-password", validateBody(resetPasswordSchema), async (req, res, next) => {
+authRouter.post("/reset-password", resetLimiter, validateBody(resetPasswordSchema), async (req, res, next) => {
   try {
     const { resetToken, newPassword } = req.body as z.infer<typeof resetPasswordSchema>;
 

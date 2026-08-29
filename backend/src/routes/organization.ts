@@ -115,6 +115,15 @@ organizationRouter.post("/institutes", validateBody(createInstituteSchema), asyn
         data: {
           organizationId: req.organizationId!,
           planId: plan?.id,
+          // Snapshot the plan's limits onto the institute at creation — from
+          // here the institute owns them and later Plan edits don't reach it.
+          // See lib/instituteLimits.ts.
+          maxAdmins: plan?.maxAdmins ?? null,
+          maxAccountants: plan?.maxAccountants ?? null,
+          maxFaculty: plan?.maxFaculty ?? null,
+          maxReception: plan?.maxReception ?? null,
+          maxStudents: plan?.maxStudents ?? null,
+          planLimitsSetAt: plan ? new Date() : null,
           name: body.name,
           code,
           address: body.address,

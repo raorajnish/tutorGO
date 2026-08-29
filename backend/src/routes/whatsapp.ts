@@ -5,10 +5,12 @@ import { ApiError } from "../lib/http.js";
 import { authenticate, requireInstitute, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
 import { auditLog } from "../services/audit.js";
-import { decrypt } from "../lib/crypto.js";
-import { encryptToken, testConnection, syncTemplates, submitTemplate } from "../services/whatsapp.js";
-import { allSuggestions } from "../lib/whatsappTemplateSuggestions.js";
+import { encrypt, decrypt } from "../lib/crypto.js";
+import { testConnection, syncTemplates, submitTemplate } from "../services/whatsapp.js";
+import { WHATSAPP_TEMPLATE_SUGGESTIONS } from "../lib/whatsappTemplateSuggestions.js";
 import { MESSAGE_TEMPLATE_TYPES, type MessageTemplateType } from "../lib/messageTemplates.js";
+
+type WhatsAppConfigRow = Awaited<ReturnType<typeof prisma.instituteWhatsAppConfig.findUniqueOrThrow>>;
 
 /** Settings → WhatsApp: credential setup, template sync/submit/map. Backend
  * groundwork only — no route here sends a message to a student; that's the
@@ -17,19 +19,25 @@ export const whatsappRouter = Router();
 
 whatsappRouter.use(authenticate, requireInstitute);
 
+/** The one shape every config route returns — deliberately omits accessToken,
+ * which no GET may ever expose. */
+function serializeConfig(config: WhatsAppConfigRow) {
+  return {
+    phoneNumberId: config.phoneNumberId,
+    wabaId: config.wabaId,
+    businessAccountId: config.businessAccountId,
+    isEnabled: config.isEnabled,
+    connectedAt: config.connectedAt,
+    updatedAt: config.updatedAt,
+  };
+}
+
 whatsappRouter.get("/config", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
   try {
     const config = await prisma.instituteWhatsAppConfig.findUnique({ where: { instituteId: req.tenantId! } });
     if (!config) return res.json(null);
 
-    res.json({
-      phoneNumberId: config.phoneNumberId,
-      wabaId: config.wabaId,
-      businessAccountId: config.businessAccountId,
-      isEnabled: config.isEnabled,
-      connectedAt: config.connectedAt,
-      updatedAt: config.updatedAt,
-    });
+    res.json(serializeConfig(config));
   } catch (err) {
     next(err);
   }
@@ -65,11 +73,11 @@ whatsappRouter.put("/config", requireRoles("OWNER", "ADMIN"), validateBody(whats
         wabaId: body.wabaId,
         businessAccountId: body.businessAccountId,
         isEnabled: body.isEnabled,
-        ...(body.accessToken ? { accessToken: encryptToken(body.accessToken) } : {}),
+        ...(body.accessToken ? { accessToken: encrypt(body.accessToken) } : {}),
       },
       create: {
         instituteId,
-        accessToken: encryptToken(plainToken),
+        accessToken: encrypt(plainToken),
         phoneNumberId: body.phoneNumberId,
         wabaId: body.wabaId,
         businessAccountId: body.businessAccountId,
@@ -84,14 +92,7 @@ whatsappRouter.put("/config", requireRoles("OWNER", "ADMIN"), validateBody(whats
       metadata: { phoneNumberId: body.phoneNumberId, isEnabled: body.isEnabled },
     });
 
-    res.json({
-      phoneNumberId: config.phoneNumberId,
-      wabaId: config.wabaId,
-      businessAccountId: config.businessAccountId,
-      isEnabled: config.isEnabled,
-      connectedAt: config.connectedAt,
-      updatedAt: config.updatedAt,
-    });
+    res.json(serializeConfig(config));
   } catch (err) {
     next(err);
   }
@@ -131,14 +132,7 @@ whatsappRouter.patch("/config/toggle", requireRoles("OWNER", "ADMIN"), validateB
       userId: req.user!.id,
     });
 
-    res.json({
-      phoneNumberId: config.phoneNumberId,
-      wabaId: config.wabaId,
-      businessAccountId: config.businessAccountId,
-      isEnabled: config.isEnabled,
-      connectedAt: config.connectedAt,
-      updatedAt: config.updatedAt,
-    });
+    res.json(serializeConfig(config));
   } catch (err) {
     next(err);
   }
@@ -178,12 +172,22 @@ whatsappRouter.get("/templates", requireRoles("OWNER", "ADMIN"), async (req, res
 whatsappRouter.post("/templates/suggest", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;
-    const existing = await prisma.whatsAppTemplate.findMany({ where: { instituteId }, select: { mappedType: true } });
+    const existing = await prisma.whatsAppTemplate.findMany({
+      where: { instituteId },
+      select: { mappedType: true, name: true, language: true },
+    });
     const covered = new Set(existing.map((t) => t.mappedType).filter(Boolean) as MessageTemplateType[]);
+    // A template synced down from Meta occupies (name, language) with no
+    // mappedType, so skipping on mappedType alone would still collide with
+    // the unique index. Both guards, plus skipDuplicates as a backstop.
+    const taken = new Set(existing.map((t) => `${t.name}:${t.language}`));
 
-    const toCreate = allSuggestions().filter((s) => !covered.has(s.mappedType));
+    const toCreate = MESSAGE_TEMPLATE_TYPES.map((type) => WHATSAPP_TEMPLATE_SUGGESTIONS[type]).filter(
+      (s) => !covered.has(s.mappedType) && !taken.has(`${s.name}:${s.language}`)
+    );
     if (toCreate.length > 0) {
       await prisma.whatsAppTemplate.createMany({
+        skipDuplicates: true,
         data: toCreate.map((s) => ({
           instituteId,
           name: s.name,
@@ -191,7 +195,7 @@ whatsappRouter.post("/templates/suggest", requireRoles("OWNER", "ADMIN"), async 
           category: s.category,
           bodyText: s.bodyText,
           mappedType: s.mappedType,
-          status: "DRAFT",
+          status: "DRAFT" as const,
         })),
       });
     }

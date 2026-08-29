@@ -8,7 +8,8 @@ import { hashPassword, generateTempPassword } from "../lib/password.js";
 import { sendMail, invalidateInstituteEmailConfigCache } from "../services/mailer.js";
 import { inviteEmailHtml } from "../lib/emailTemplates.js";
 import { auditLog } from "../services/audit.js";
-import { assertRoleCapacity, type CappedRole } from "../services/planLimits.js";
+import { assertRoleCapacity, countUsage, type CappedRole } from "../services/planLimits.js";
+import { CAPPED_ROLES, effectiveLimits } from "../lib/instituteLimits.js";
 import { notify } from "../services/notify.js";
 import { sendPush } from "../services/push.js";
 import { DEFAULT_MESSAGE_TEMPLATES, MESSAGE_TEMPLATE_TYPES } from "../lib/messageTemplates.js";
@@ -261,37 +262,33 @@ orgRouter.get("/plan", requireRoles("OWNER", "ADMIN"), async (req, res, next) =>
   try {
     const instituteId = req.tenantId!;
 
-    // Students never get a User row (login is deferred — see changes.md §1),
-    // so their headcount comes from the Student table directly, not the
-    // User role groupBy that covers every other capped role.
-    const [institute, roleCounts, studentCount] = await Promise.all([
+    const [institute, used] = await Promise.all([
       prisma.institute.findUniqueOrThrow({ where: { id: instituteId }, include: { plan: true } }),
-      prisma.user.groupBy({
-        by: ["role"],
-        where: { instituteId, isActive: true, role: { in: ["ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION"] } },
-        _count: { _all: true },
-      }),
-      prisma.student.count({ where: { instituteId, isActive: true } }),
+      countUsage(instituteId),
     ]);
-
-    const used = Object.fromEntries(roleCounts.map((r) => [r.role, r._count._all]));
 
     if (!institute.plan) {
       return res.json({ plan: null });
     }
+
+    // Shows what's actually enforced for THIS institute — its own snapshot,
+    // which may sit above the plan's headline numbers if the platform raised
+    // it (lib/instituteLimits.ts). Showing the plan's numbers here would tell
+    // an owner they're out of room when they aren't, and vice versa.
+    const limits = effectiveLimits(institute)!;
 
     res.json({
       plan: {
         code: institute.plan.code,
         name: institute.plan.name,
         description: institute.plan.description,
-        limits: {
-          ADMIN: { used: used.ADMIN ?? 0, max: institute.plan.maxAdmins },
-          ACCOUNTANT: { used: used.ACCOUNTANT ?? 0, max: institute.plan.maxAccountants },
-          FACULTY: { used: used.FACULTY ?? 0, max: institute.plan.maxFaculty },
-          RECEPTION: { used: used.RECEPTION ?? 0, max: institute.plan.maxReception },
-          STUDENT: { used: studentCount, max: institute.plan.maxStudents },
-        },
+        limits: CAPPED_ROLES.reduce(
+          (acc, role) => {
+            acc[role] = { used: used[role], max: limits[role] };
+            return acc;
+          },
+          {} as Record<CappedRole, { used: number; max: number }>
+        ),
       },
     });
   } catch (err) {

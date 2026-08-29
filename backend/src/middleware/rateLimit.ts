@@ -3,9 +3,8 @@ import { ApiError } from "../lib/http.js";
 
 /** Per-IP sliding-window limiter, in-memory. Generic on purpose — nothing in
  * this app has ever needed rate limiting before the public admission-form
- * surface (§8f), but this is written to also cover /auth/login and the OTP
- * routes whenever that gets picked up (both are currently unprotected —
- * flagged in changes-phase8.md §8f, not fixed in this pass).
+ * surface (§8f). Now also covers /auth/login, /auth/forgot-password and
+ * /auth/verify-otp (routes/auth.ts).
  *
  * Honest limitation: in-memory means per-process. Running more than one
  * instance (Render can) roughly multiplies the effective allowance by the
@@ -35,13 +34,10 @@ function sweep(windowMs: number) {
 }
 
 function clientIp(req: Request): string {
-  // Trusts X-Forwarded-For's first hop — fine behind a single reverse proxy
-  // (Render, most VPS nginx setups); would need `app.set("trust proxy", ...)`
-  // plus a real proxy-chain policy if that assumption ever stops holding.
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string" && forwarded.length > 0) {
-    return forwarded.split(",")[0]!.trim();
-  }
+  // `req.ip` only, never the raw X-Forwarded-For header. Express resolves it
+  // against the `trust proxy` hop count set in app.ts, so a forged XFF from
+  // an untrusted client is ignored. Reading the header directly would let
+  // anyone mint a fresh bucket per request and bypass every limiter here.
   return req.ip ?? req.socket.remoteAddress ?? "unknown";
 }
 

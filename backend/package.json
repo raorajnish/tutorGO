@@ -18,6 +18,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:backfill-limits": "tsx prisma/backfillInstituteLimits.ts",
     "db:seed:demo": "tsx prisma/seedDemo.ts",
     "db:reset-dev-data": "tsx scripts/reset-dev-data.ts"
   },
@@ -25,7 +26,6 @@
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.10.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",

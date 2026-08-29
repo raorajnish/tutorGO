@@ -9,13 +9,17 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { Toggle } from "@/components/ui/Toggle";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import {
   CAPPED_ROLES,
   CAPPED_ROLE_LABELS,
   MODULE_CODES,
   MODULE_LABELS,
+  type CappedRole,
   type ModuleCode,
+  type PlanLimits,
   type PlatformInstituteDetail,
+  type RoleLimitValues,
 } from "@/lib/types";
 
 interface PageProps {
@@ -30,6 +34,9 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
   const [busyModule, setBusyModule] = useState<ModuleCode | null>(null);
   const [savingPlan, setSavingPlan] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [limitsOpen, setLimitsOpen] = useState(false);
+  const [suspendOpen, setSuspendOpen] = useState(false);
+  const [suspending, setSuspending] = useState(false);
 
   function load() {
     apiFetch<PlatformInstituteDetail>(`/platform/organizations/${orgId}/institutes/${instituteId}`)
@@ -68,6 +75,23 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
       setError(err instanceof ApiClientError ? err.message : "Could not update the plan.");
     } finally {
       setSavingPlan(false);
+    }
+  }
+
+  async function setSuspended(isActive: boolean) {
+    setSuspending(true);
+    setError(null);
+    try {
+      await apiFetch(`/platform/organizations/${orgId}/institutes/${instituteId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ isActive }),
+      });
+      setSuspendOpen(false);
+      load();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not update this institute.");
+    } finally {
+      setSuspending(false);
     }
   }
 
@@ -128,7 +152,11 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
 
           <div className="space-y-6">
             <div className="rounded-3xl border border-border bg-card p-6">
-              <p className="mb-3 font-display text-base font-semibold text-foreground">Plan</p>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <p className="font-display text-base font-semibold text-foreground">Plan</p>
+                {detail.customised && <Badge tone="warning">Customised</Badge>}
+              </div>
+
               <Dropdown
                 value={detail.plan?.id ?? ""}
                 onChange={changePlan}
@@ -140,22 +168,73 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
                 ]}
               />
 
-              {detail.plan && (
-                <ul className="mt-4 space-y-2">
-                  {CAPPED_ROLES.map((role) => {
-                    const limit = detail.plan!.limits[role];
-                    const atLimit = limit.used >= limit.max;
-                    return (
-                      <li key={role} className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">{CAPPED_ROLE_LABELS[role]}</span>
-                        <span className={atLimit ? "font-medium text-warning" : "text-foreground"}>
-                          {limit.used} / {limit.max}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
+              {/* The single most important thing to say on this screen: the
+                  numbers below belong to THIS institute, not to the plan. */}
+              <p className="mt-2 text-xs text-muted-foreground">
+                Choosing a plan copies its limits here. Editing the plan later won&apos;t change this institute.
+              </p>
+
+              {detail.limits ? (
+                <>
+                  <ul className="mt-4 space-y-2">
+                    {CAPPED_ROLES.map((role) => {
+                      const limit = detail.limits![role];
+                      const atLimit = limit.used >= limit.max;
+                      const planMax = detail.plan?.limits[role];
+                      const raised = planMax !== undefined && limit.max !== planMax;
+                      return (
+                        <li key={role} className="flex items-center justify-between gap-2 text-sm">
+                          <span className="text-muted-foreground">{CAPPED_ROLE_LABELS[role]}</span>
+                          <span className="flex items-baseline gap-1.5">
+                            {raised && (
+                              <span className="text-xs text-muted-foreground line-through">{planMax}</span>
+                            )}
+                            <span className={atLimit ? "font-medium text-warning" : "text-foreground"}>
+                              {limit.used} / {limit.max}
+                            </span>
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+
+                  <Button variant="secondary" className="mt-4 w-full" onClick={() => setLimitsOpen(true)}>
+                    Edit limits for this institute
+                  </Button>
+
+                  {detail.planLimitsSetAt && (
+                    <p className="mt-2 text-center text-xs text-muted-foreground">
+                      Set {new Date(detail.planLimitsSetAt).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="mt-4 text-sm text-muted-foreground">No plan assigned — headcount is unlimited.</p>
               )}
+            </div>
+
+            {/* Suspension is the only way to take an institute out of service:
+                its fee, payroll and attendance history has to stay auditable,
+                so there is no delete anywhere in the platform. */}
+            <div className="rounded-3xl border border-border bg-card p-6">
+              <p className="font-display text-base font-semibold text-foreground">Access</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {detail.isActive
+                  ? "Everyone at this institute can sign in and work normally."
+                  : "Suspended — nobody at this institute can sign in, and existing sessions are rejected. All data is retained."}
+              </p>
+              <Button
+                variant={detail.isActive ? "destructive" : "primary"}
+                className="mt-4 w-full"
+                disabled={suspending}
+                onClick={() => (detail.isActive ? setSuspendOpen(true) : setSuspended(true))}
+              >
+                {detail.isActive ? "Suspend institute" : "Reactivate institute"}
+              </Button>
             </div>
           </div>
         </div>
@@ -169,7 +248,148 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
         instituteId={instituteId}
         instituteName={detail?.name ?? ""}
       />
+
+      {detail?.limits && (
+        <EditLimitsModal
+          open={limitsOpen}
+          onClose={() => setLimitsOpen(false)}
+          onSaved={load}
+          instituteId={instituteId}
+          instituteName={detail.name}
+          limits={detail.limits}
+          planName={detail.plan?.name ?? null}
+          planLimits={detail.plan?.limits ?? null}
+        />
+      )}
+
+      <ConfirmModal
+        open={suspendOpen}
+        onClose={() => setSuspendOpen(false)}
+        onConfirm={() => setSuspended(false)}
+        title={`Suspend ${detail?.name ?? "this institute"}?`}
+        confirmLabel={suspending ? "Suspending…" : "Suspend"}
+        destructive
+        description="Everyone at this institute is signed out immediately and cannot sign back in. Fees, payroll, attendance and every other record are kept intact, and you can reactivate at any time."
+      />
     </div>
+  );
+}
+
+/** Raises or lowers one institute's caps without touching the shared plan —
+ * the "this one customer needs 40 faculty" case. Pre-filled with what's
+ * currently enforced, with the plan's own numbers shown alongside so it's
+ * obvious what's being departed from. */
+function EditLimitsModal({
+  open,
+  onClose,
+  onSaved,
+  instituteId,
+  instituteName,
+  limits,
+  planName,
+  planLimits,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSaved: () => void;
+  instituteId: string;
+  instituteName: string;
+  limits: PlanLimits;
+  planName: string | null;
+  planLimits: RoleLimitValues | null;
+}) {
+  const [values, setValues] = useState<Record<CappedRole, string>>(() =>
+    Object.fromEntries(CAPPED_ROLES.map((r) => [r, String(limits[r].max)])) as Record<CappedRole, string>
+  );
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Re-seed whenever the modal is reopened, so a cancelled edit doesn't linger.
+  useEffect(() => {
+    if (open) {
+      setValues(
+        Object.fromEntries(CAPPED_ROLES.map((r) => [r, String(limits[r].max)])) as Record<CappedRole, string>
+      );
+      setError(null);
+    }
+  }, [open, limits]);
+
+  async function save() {
+    setSaving(true);
+    setError(null);
+    try {
+      await apiFetch(`/platform/institutes/${instituteId}/limits`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          maxAdmins: Number(values.ADMIN),
+          maxAccountants: Number(values.ACCOUNTANT),
+          maxFaculty: Number(values.FACULTY),
+          maxReception: Number(values.RECEPTION),
+          maxStudents: Number(values.STUDENT),
+        }),
+      });
+      onSaved();
+      onClose();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not update the limits.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const invalid = CAPPED_ROLES.some((r) => {
+    const n = Number(values[r]);
+    return values[r].trim() === "" || !Number.isInteger(n) || n < 0;
+  });
+
+  return (
+    <Modal open={open} onClose={onClose} title={`Limits — ${instituteName}`}>
+      <p className="text-sm text-muted-foreground">
+        Applies to this institute only. {planName ? `The ${planName} plan and every other institute on it stay unchanged.` : ""}
+      </p>
+
+      <div className="mt-4 space-y-3">
+        {CAPPED_ROLES.map((role) => {
+          const used = limits[role].used;
+          const planMax = planLimits?.[role];
+          const next = Number(values[role]);
+          const belowUsage = Number.isFinite(next) && values[role].trim() !== "" && next < used;
+          return (
+            <div key={role}>
+              <Input
+                label={CAPPED_ROLE_LABELS[role]}
+                type="number"
+                min={0}
+                value={values[role]}
+                onChange={(e) => setValues((prev) => ({ ...prev, [role]: e.target.value }))}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {used} in use{planMax !== undefined ? ` · plan allows ${planMax}` : ""}
+                {belowUsage && (
+                  <span className="text-warning">
+                    {" "}
+                    — below current usage; existing accounts keep working, no new ones can be added.
+                  </span>
+                )}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      {error && (
+        <div className="mt-4 rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{error}</div>
+      )}
+
+      <div className="mt-6 flex justify-end gap-2">
+        <Button variant="secondary" onClick={onClose} disabled={saving}>
+          Cancel
+        </Button>
+        <Button onClick={save} disabled={saving || invalid}>
+          {saving ? "Saving…" : "Save limits"}
+        </Button>
+      </div>
+    </Modal>
   );
 }
 

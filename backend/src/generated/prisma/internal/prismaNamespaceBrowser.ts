@@ -171,7 +171,13 @@ export const InstituteScalarFieldEnum = {
   onboardingStep: 'onboardingStep',
   onboardingDone: 'onboardingDone',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  maxAdmins: 'maxAdmins',
+  maxAccountants: 'maxAccountants',
+  maxFaculty: 'maxFaculty',
+  maxReception: 'maxReception',
+  maxStudents: 'maxStudents',
+  planLimitsSetAt: 'planLimitsSetAt'
 } as const
 
 export type InstituteScalarFieldEnum = (typeof InstituteScalarFieldEnum)[keyof typeof InstituteScalarFieldEnum]

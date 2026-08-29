@@ -116,6 +116,26 @@ async function loadProfile(id: string, instituteId: string) {
   return profile;
 }
 
+/**
+ * Runs `fn` in a transaction holding an exclusive lock on ONE staff member's
+ * salary profile — the payroll twin of fees.ts's withFeeAccountLock, and the
+ * same reasoning: paying and voiding are both read-modify-write over that
+ * person's line items, so the reads have to happen under the lock to mean
+ * anything.
+ *
+ * A single row in salary_profiles, so paying two different staff members at
+ * the same moment never blocks.
+ */
+async function withSalaryProfileLock<T>(
+  salaryProfileId: string,
+  fn: (tx: Prisma.TransactionClient) => Promise<T>
+): Promise<T> {
+  return prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM salary_profiles WHERE id = ${salaryProfileId} FOR UPDATE`;
+    return fn(tx);
+  });
+}
+
 async function pendingAmountFor(salaryProfileId: string): Promise<Prisma.Decimal> {
   const items = await prisma.payrollLineItem.findMany({ where: { salaryProfileId } });
   const outstanding = items.reduce((sum, i) => sum.plus(i.amount.minus(i.paidAmount)), new Prisma.Decimal(0));
@@ -589,29 +609,35 @@ payrollRouter.post("/pay", requireRoles(...PAY_ROLES), validateBody(recordPaymen
     const instituteId = req.tenantId!;
     const profile = await loadProfile(body.salaryProfileId, instituteId);
 
-    const selected = await prisma.payrollLineItem.findMany({
-      where: { id: { in: body.lineItemIds }, salaryProfileId: profile.id },
-      orderBy: [{ periodMonth: "asc" }, { createdAt: "asc" }],
-    });
-    const outstanding = selected.filter((i) => i.amount.gt(i.paidAmount));
+    // The waterfall below is decided from what the line items currently owe,
+    // so reading them outside the transaction let two concurrent payments
+    // allocate against the same outstanding balance. Less destructive than in
+    // Fees — the writes are `increment`, so nothing is overwritten — but an
+    // item could still end up paid beyond its amount, and `leftover` (the
+    // advance credit) computed from a stale snapshot would be wrong either way.
+    const paymentId = await withSalaryProfileLock(profile.id, async (tx) => {
+      const selected = await tx.payrollLineItem.findMany({
+        where: { id: { in: body.lineItemIds }, salaryProfileId: profile.id },
+        orderBy: [{ periodMonth: "asc" }, { createdAt: "asc" }],
+      });
+      const outstanding = selected.filter((i) => i.amount.gt(i.paidAmount));
 
-    // Unlike Fees, an amount exceeding the selected items' total is accepted
-    // as a credit (the "advance" allocation, lineItemId: null) by default —
-    // see changes.md's Payroll addendum §0/§4 — unless the caller turned
-    // autoApplyCredit off, in which case it's rejected just like Fees.
-    const { allocations, leftover } = allocateWaterfall(
-      outstanding.map((i) => ({ id: i.id, outstanding: i.amount.minus(i.paidAmount) })),
-      new Prisma.Decimal(body.amount)
-    );
-
-    if (leftover.gt(0) && !body.autoApplyCredit) {
-      const applicable = new Prisma.Decimal(body.amount).minus(leftover);
-      throw ApiError.badRequest(
-        `Amount exceeds the selected items' total — only ₹${money(applicable)} of ₹${money(body.amount)} could be applied. Turn on "Auto-apply excess as credit" to carry the rest forward instead.`
+      // Unlike Fees, an amount exceeding the selected items' total is accepted
+      // as a credit (the "advance" allocation, lineItemId: null) by default —
+      // see changes.md's Payroll addendum §0/§4 — unless the caller turned
+      // autoApplyCredit off, in which case it's rejected just like Fees.
+      const { allocations, leftover } = allocateWaterfall(
+        outstanding.map((i) => ({ id: i.id, outstanding: i.amount.minus(i.paidAmount) })),
+        new Prisma.Decimal(body.amount)
       );
-    }
 
-    const paymentId = await prisma.$transaction(async (tx) => {
+      if (leftover.gt(0) && !body.autoApplyCredit) {
+        const applicable = new Prisma.Decimal(body.amount).minus(leftover);
+        throw ApiError.badRequest(
+          `Amount exceeds the selected items' total — only ₹${money(applicable)} of ₹${money(body.amount)} could be applied. Turn on "Auto-apply excess as credit" to carry the rest forward instead.`
+        );
+      }
+
       const created = await tx.payrollPayment.create({
         data: {
           instituteId,
@@ -677,11 +703,21 @@ payrollRouter.post("/pay/:id/void", requireRoles(...MANAGE_ROLES), validateBody(
     const instituteId = req.tenantId!;
     const body = req.body as z.infer<typeof voidPaymentSchema>;
 
-    const payment = await prisma.payrollPayment.findUnique({ where: { id: req.params.id as string }, include: { allocations: true } });
-    if (!payment || payment.instituteId !== instituteId) throw ApiError.notFound("Payment not found");
-    if (payment.voidedAt) throw ApiError.badRequest("This payment is already voided");
+    const existing = await prisma.payrollPayment.findUnique({ where: { id: req.params.id as string } });
+    if (!existing || existing.instituteId !== instituteId) throw ApiError.notFound("Payment not found");
 
-    const paymentId = await prisma.$transaction(async (tx) => {
+    // The same lock POST /pay takes, so a void and a payment can't interleave
+    // on the same line items, and two voids of the same payment can't both
+    // pass the already-voided check and decrement paidAmount twice.
+    const paymentId = await withSalaryProfileLock(existing.salaryProfileId, async (tx) => {
+      // Re-read INSIDE the lock: the check below is only meaningful against
+      // state nobody else can be changing.
+      const payment = await tx.payrollPayment.findUniqueOrThrow({
+        where: { id: existing.id },
+        include: { allocations: true },
+      });
+      if (payment.voidedAt) throw ApiError.badRequest("This payment is already voided");
+
       for (const a of payment.allocations) {
         if (!a.lineItemId) continue; // advance allocations aren't reflected on any line item's paidAmount
         const item = await tx.payrollLineItem.findUnique({ where: { id: a.lineItemId } });
