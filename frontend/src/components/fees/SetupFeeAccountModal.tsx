@@ -79,8 +79,14 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
         setStructures(active);
         // Only one plan defined for this course — no real choice to make,
         // so skip straight to it instead of making staff pick from a
-        // dropdown with a single option.
+        // dropdown with a single option. With more than one, pre-select
+        // whichever the course has marked default rather than leaving the
+        // dropdown empty.
         if (active.length === 1) setStructureId(active[0]!.id);
+        else {
+          const def = active.find((s) => s.isDefault);
+          if (def) setStructureId(def.id);
+        }
       })
       .catch(() => setStructures([]));
   }, [open, student.course?.id]);

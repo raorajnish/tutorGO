@@ -5,9 +5,9 @@
 > moving to the next. One item (subject-wise fees, §8c) is explicitly a design note only, not
 > scheduled for a build order — flagged as deferred per the request.
 >
-> **Status: 8a, 8b, 8d, 8e and 8f are IMPLEMENTED (2026-08-28).** 8c has a full design as of
-> 2026-08-28 but is **still deferred, not scheduled to build** — see its section for the reasoning
-> and open questions.
+> **Status: 8a, 8b, 8d, 8e and 8f are IMPLEMENTED (2026-08-28).** 8c was **approved for build on
+> 2026-08-29** with add-on plans cut from scope and all open questions decided — see the status
+> block at the top of its section, which supersedes the older prose beneath it.
 
 ## Status: 8a — Installment settlement — DONE
 
@@ -398,7 +398,75 @@ second one).
 
 ---
 
-## 8c. Subject-wise fees (e.g. 12th std) — full design, still deferred (not building this pass)
+## 8c. Subject-wise fees (e.g. 12th std) — APPROVED FOR BUILD (revised 2026-08-29)
+
+> **Status 2026-08-29: scheduled, scope reduced, approved to build.** The 2026-08-28 design below
+> was reviewed against the code a second time and three errors were found in it (see "Corrections"
+> immediately below). Add-on plans are **cut from scope**. All previously-open questions are now
+> decided. Where this block and the older prose below disagree, **this block wins.**
+>
+> ### Corrections to the 2026-08-28 design
+>
+> 1. **`deriveRoster` has six call sites, not four.** The old text says "all four call sites in
+>    `attendance.ts`". There are four there (`attendance.ts:410, 448, 477, 515`) **and two in
+>    `tests.ts` (`356`, `505`)** that were missed entirely. Test sessions are `Lecture` rows with a
+>    `subjectId`, so subject opt-outs must apply to them too — and `tests.ts:358` feeds
+>    `expected: roster.length`, so skipping it shows a wrong expected-count on every test session.
+> 2. **An all-complementary selection would be rejected.** `fees.ts:270` throws when
+>    `finalFee.lte(0)`, so a student taking only ₹0 subjects can't get an account. Resolved by the
+>    "at least one paid subject" rule below rather than by relaxing that check.
+> 3. **Add-on installments would have disagreed with `seq` ordering.** Moot now that add-ons are cut.
+>
+> ### Decisions locked 2026-08-29
+>
+> | Decision | Resolution |
+> |---|---|
+> | Staging | `FeeStructure.isDefault` ships **standalone first**, subject-wise built on top |
+> | Add-on plans (MHT-CET/JEE) | **CUT.** Modeled instead as a priced `Subject` on the course — gives checkbox selection, a `StudentSubject` row, roster filtering for its sessions, and a receipt line, all for free. `CourseAddOnPlan`/`FeeAccountAddOn` are **not** being built. |
+> | Fee computation | `courseFee` = **sum of the student's selected subject amounts**, into the existing column. `FeeAccount` does not change shape. |
+> | `courseFee` as input | **Rejected** in the request body for a `SUBJECT_WISE` course — the sum is authoritative, or the receipt itemization could contradict the total. Deviations go through `discount`. |
+> | Zero-fee accounts | **Blocked** — at least one selected subject must have `amount > 0`. Complementary subjects are riders on a paid enrollment, not standalone products. |
+> | Full waiver | Legitimate, and expressed via `discount` (courseFee ₹25,000 − discount ₹25,000), **not** by unchecking every paid subject. Different field, real audit trail. |
+> | `RECURRING` + `SUBJECT_WISE` | **Rejected at structure creation.** A sum of subject prices is a term total, so it belongs to `ONE_TIME`. Otherwise `FeeStructureSubjectLine.amount` would mean "total" on one plan type and "per month" on the other — one column, two meanings. |
+> | Pricing corrections | New `PATCH /accounts/:studentId/pricing` taking `{ subjectIds?, discount? }`, `STRICT_ROLES`, **rejected once any payment exists** (same idiom as the existing `paidAmount` guards), wrapped in `withFeeAccountLock`. Warn in the UI when it would discard a hand-modified schedule. |
+> | Correct vs. drop | **Two separate actions, never one control.** Correct (pre-payment) = the enrollment was always wrong → reprice + regenerate. Drop (any time) = a real mid-term event → `isActive: false`, roster only, fees untouched. Sharing one button would eventually erase a family's outstanding balance. |
+> | Drop UI | Subjects section in `StudentProfileModal.tsx` |
+> | `feeMode` switch | Blocked once the course has **enrolled students OR fee accounts** — see guard A |
+> | `StudentSubject.joinedAt` | **Inherits `StudentBatch.joinedAt`**, never "today" — see guard B |
+> | Structure completeness | A `SUBJECT_WISE` structure must carry a line for **every** `CourseSubject` (₹0 allowed) — see guard C |
+> | Empty-roster fallback | A student with no `StudentSubject` appears on **no** roster for that course. No "show everyone" safety net. |
+>
+> ### The three guards — all three have the same failure mode
+>
+> Each produces **a silently empty roster**, which does not look like a bug. It looks like "nobody
+> is enrolled yet": nothing errors, nothing logs, and a teacher just sees a blank list. That shared
+> invisibility is why they matter more than their size suggests.
+>
+> - **Guard A — the `feeMode` flip.** `StudentSubject` rows are written *only* at fee-account
+>   creation. A course running as `FLAT` with 40 enrolled students and daily attendance but no fee
+>   accounts yet passes a guard that only checks fee accounts — flip it to `SUBJECT_WISE` and every
+>   roster for that course empties at once, because nobody has a `StudentSubject` row. The guard
+>   must therefore check **enrolled students as well as fee accounts**.
+> - **Guard B — `joinedAt`.** `deriveRoster` filters `joinedAt <= date`. A student who joined the
+>   batch in June but whose fee account is created in September would, if `joinedAt` were stamped
+>   "today", vanish from every June–August roster **while their `AttendanceRecord` rows survive** —
+>   attendance records for a student the roster says was never there, corrupting percentages and
+>   expected-counts retroactively. `joinedAt` must copy `StudentBatch.joinedAt`.
+> - **Guard C — an omitted subject line.** If staff build a structure and forget IT, IT stays linked
+>   via `CourseSubject` and IT lectures still schedule — but no student ever gets a `StudentSubject`
+>   for it, so **every IT lecture derives an empty roster, forever**, from one omission on a form.
+>   Validate at structure save that every `CourseSubject` has a line.
+>
+> ### Still to settle during the build (not blocking)
+>
+> - `onDelete` policy on the new `Subject` foreign keys (`StudentSubject.subject`,
+>   `FeeStructureSubjectLine.subject`) — they'd default to restrict, so deleting a subject any
+>   student ever enrolled in would fail. Also: removing a subject from a course leaves both tables
+>   dangling.
+> - What happens to `StudentSubject` rows when `Student.courseId` changes (a course transfer leaves
+>   rows pointing at the old course's subjects).
+
+### Original 2026-08-28 design (superseded in part — read the block above first)
 
 > **Revised 2026-08-28** at the user's request, into a full design — grounded against the actual
 > schema this time (`FeeStructure`/`FeeAccount`/`CourseSubject`/`Lecture`/`deriveRoster` all read
@@ -500,30 +568,22 @@ enum CourseFeeMode {
   One row per (student, subject) — paid or complementary, doesn't matter, both live here so
   roster filtering (below) has one uniform source of truth rather than treating free and paid
   subjects as two different kinds of enrollment.
-- `CourseAddOnPlan` — **new model**, for MHT-CET/JEE-style programs attachable to a course
-  independent of subject selection:
-  ```
-  model CourseAddOnPlan {
-    id       String   @id @default(cuid())
-    courseId String
-    name     String   // "MHT-CET Crash Course", "JEE Foundation Batch"
-    amount   Decimal  @db.Decimal(10, 2)
-    isActive Boolean  @default(true)
-    course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  }
-  ```
-- `FeeAccountAddOn` — snapshot of which add-ons a specific student's account has attached, same
-  snapshotting principle as everywhere else in Fees:
-  ```
-  model FeeAccountAddOn {
-    id           String     @id @default(cuid())
-    feeAccountId String
-    name         String     // copied from CourseAddOnPlan.name at attach time
-    amount       Decimal    @db.Decimal(10, 2)
-    attachedAt   DateTime   @default(now())
-    feeAccount   FeeAccount @relation(fields: [feeAccountId], references: [id], onDelete: Cascade)
-  }
-  ```
+- ~~`CourseAddOnPlan`~~ and ~~`FeeAccountAddOn`~~ — **CUT 2026-08-29, not being built.** Both models
+  are dropped from scope. An MHT-CET/JEE program is instead modeled as an ordinary `Subject` linked
+  to the course via `CourseSubject` and priced as a `FeeStructureSubjectLine` like any other.
+  Rationale: the add-on model carried three of the design's riskiest edge cases (attach/detach after
+  creation, `seq`-vs-`dueDate` ordering in the schedule, and overdue reminders firing per add-on),
+  all of which touch the installment generator and payment waterfall — the most money-critical code
+  in the app. Subject-wise pricing on its own never goes near them. Worse, `FeeAccountAddOn` is
+  money only, with no enrollment row behind it, so an add-on had **no roster story at all** — there
+  would be no way to filter a crash-course lecture to the students who paid for it. As a priced
+  subject it gets selection, pricing, a `StudentSubject` row, roster filtering and a receipt line
+  for free. The one thing given up is an add-on with its own independent installment schedule
+  (e.g. MHT-CET over 2 payments while the base runs 6) — already declared out of scope below, and a
+  clean separate addendum if it ever becomes real.
+
+  Net: this section defines **four** additions, not six — the `CourseFeeMode` enum,
+  `FeeStructure.isDefault`, `FeeStructureSubjectLine` and `StudentSubject`.
 
 ### Fee-account creation flow for a `SUBJECT_WISE` course
 
@@ -544,12 +604,19 @@ enum CourseFeeMode {
    installment schedule from that sum exactly as `generateOneTimeInstallments` already does today
    — no new installment logic needed, subject-wise fees only change *how `finalFee` is computed*,
    not what happens after.
-4. Add-on plans, if the course has any active `CourseAddOnPlan` rows, are offered as separate
-   optional checkboxes in the same modal ("Also attach: MHT-CET Crash Course — ₹15,000"). Each
-   one checked creates a `FeeAccountAddOn` row and is added as its own extra installment (or
-   folded into the first installment — a call to make at build time) rather than blended
-   invisibly into `finalFee`, so a receipt/statement can still show "MHT-CET: ₹15,000" as a
-   distinct line the parent recognizes.
+4. ~~Add-on plans...~~ **CUT 2026-08-29** — see the data-model note above. MHT-CET appears in the
+   same checklist as an ordinary priced subject.
+
+**Worked example (2026-08-29).** Structure prices Physics/Chemistry/Maths at ₹12,000 each, Biology
+at ₹10,000, English and IT at ₹0. Riya takes everything except Biology:
+`courseFee` = 12,000 + 12,000 + 12,000 = **₹36,000** → `discount` ₹1,000 → `finalFee` **₹35,000** →
+6 installments from the existing generator, untouched. She gets **five** `StudentSubject` rows,
+English and IT included at ₹0 — those drive her rosters exactly as much as the paid ones. Only
+Biology is absent, so she is off the Biology roster and on every other subject's.
+
+**Validation at submit:** at least one selected subject must have `amount > 0` (a selection of only
+complementary subjects is rejected — see the locked decisions). `courseFee` supplied in the request
+body is rejected for a `SUBJECT_WISE` course; the sum is authoritative.
 
 ### Dropping a subject mid-course — flagged as a policy question, not solved here
 
@@ -576,9 +643,14 @@ the same decision:
   `leftAt >= date`, same "active on this date" pattern `StudentBatch` filtering already uses).
   For a `FLAT`-mode course, behavior is byte-for-byte unchanged — every batch member stays on
   every roster, exactly as today.
-- All four call sites in `attendance.ts` (roster fetch, mark, mark-all-present, daily summary)
-  already have the `Lecture` row in hand, so passing `lecture.subjectId` through is a one-line
-  change each — the function signature is the only real surface change.
+- **Corrected 2026-08-29: there are six call sites, not four.** Four in `attendance.ts` (roster
+  fetch `:410`, mark `:448`, mark-all-present `:477`, daily summary `:515`) **and two in `tests.ts`
+  (session list `:356`, result entry `:505`)** — the original text missed `tests.ts` entirely. Test
+  sessions are `Lecture` rows carrying a `subjectId`, so a subject opt-out must exclude a student
+  from that subject's *test sessions* too; `tests.ts:358` feeds `expected: roster.length`, so
+  missing it would show a wrong expected-count on every test session. All six already have the
+  `Lecture` row in hand, so passing `lecture.subjectId` through is a one-line change each — the
+  function signature is the only real surface change.
 - Confirm before building: a lecture's roster for a `SUBJECT_WISE` course, when a student was
   never enrolled in *any* subject of that course (shouldn't happen if step 3 above always runs at
   account creation, but worth a defensive check) — should such a student show on *no* roster for
@@ -627,21 +699,34 @@ Considered two shapes and picked the cheaper, more explicit one:
   visually mark it (a small "Default" badge, same pattern as `Badge` usage elsewhere) and
   pre-select it in the create-account flow.
 
-### Build order (for whenever this is actually scheduled)
+### Build order — REVISED 2026-08-29 (this supersedes the list that was here)
 
-1. Schema: `Course.feeMode`, `FeeStructure.isDefault`, `FeeStructureSubjectLine`,
-   `StudentSubject`, `CourseAddOnPlan`, `FeeAccountAddOn`. Additive migration — every existing
-   course defaults to `FLAT`, so nothing about today's Fees behavior changes until a course is
-   explicitly switched.
-2. `academics.ts`/`fees.ts`: `FeeStructure` create/edit gains subject-line pricing when the
-   parent course is `SUBJECT_WISE` (a list of `{subjectId, amount}` instead of one `courseFee`),
-   the `isDefault` toggle (flip-old-off-set-new-on in one transaction), and add-on plan CRUD
-   scoped to a course. Do the `isDefault` piece first and ship it as its own small independent
-   fix if convenient — it stands alone, doesn't need `SUBJECT_WISE` mode to be useful, and
-   improves the existing flat-fee flow today.
-3. `fees.ts` `POST /accounts`: branch on `course.feeMode` — `SUBJECT_WISE` path builds
-   `StudentSubject` rows + sums `finalFee` instead of reading a flat `courseFee` input; add-on
-   attachment as its own step in the same transaction.
+**Stage 1 — `FeeStructure.isDefault`, shipped standalone and verified before anything else.**
+Schema + migration; `PATCH /academics/fee-structures/:id` flipping every sibling on the same
+`courseId` to false in one transaction; `isDefault` in list responses; a "Default" badge and
+set-default action in `FeeStructuresTab.tsx`; pre-selection in `SetupFeeAccountModal.tsx`. Stands
+alone, needs nothing from `SUBJECT_WISE`, and improves today's flat-fee flow. **Stop and verify
+here.**
+
+**Stage 2 — remaining schema, one migration.** `CourseFeeMode` enum + `Course.feeMode` (default
+`FLAT`), `FeeStructureSubjectLine`, `StudentSubject`. Additive — every existing course stays
+`FLAT`, so nothing in today's Fees or Attendance behavior changes until a course is explicitly
+switched.
+
+**Stage 3 — `academics.ts`.** Subject-line pricing on structure create/edit when the parent course
+is `SUBJECT_WISE`; **guard C** (reject a structure that omits any `CourseSubject`); reject
+`SUBJECT_WISE` + `RECURRING`; **guard A** (`feeMode` toggle blocked once the course has enrolled
+students *or* fee accounts, disabled in the UI with the reason stated).
+
+**Stage 4 — `fees.ts`.** `POST /accounts` branches on `course.feeMode`: the `SUBJECT_WISE` path
+builds one `StudentSubject` per checked subject with **guard B** (`joinedAt` copied from that
+student's `StudentBatch.joinedAt`), sums the paid subjects into `courseFee`, rejects a selection
+with no paid subject, rejects a client-supplied `courseFee`, then hands off to the existing
+installment generator unchanged. Plus the new `PATCH /accounts/:studentId/pricing` behind the
+no-payments gate.
+
+**Stage 5 — roster filtering.** `deriveRoster(batchId, date, subjectId?)`, filtering only when the
+lecture's course is `SUBJECT_WISE`; update **all six** call sites (see the correction above).
 4. `lib/lectureShared.ts`: extend `deriveRoster` with the optional `subjectId` filter; update
    `attendance.ts`'s four call sites to pass `lecture.subjectId`.
 5. Frontend: `SetupFeeAccountModal.tsx` gains the subject-checklist mode for `SUBJECT_WISE`
@@ -1247,7 +1332,9 @@ Both were caught by end-to-end testing against a running server (not unit-level)
 5. **8f** (self-service admission links) — last, since it's the highest-risk item (the only new
    unauthenticated public surface) and benefits from the rate-limiting groundwork being a settled
    pattern rather than invented under time pressure.
-6. **8c** (subject-wise fees) — deferred, design note only, revisit as its own addendum later.
+6. **8c** (subject-wise fees) — **approved for build 2026-08-29**, add-ons cut from scope. Its own
+   revised build order (stages 1–5 + frontend + test pass) lives in its section above; stage 1
+   (`FeeStructure.isDefault`) ships standalone and is verified before the rest begins.
 
 Each phase: schema migration → backend routes → frontend → mobile pass at 360px/390px → smoke test
 per that phase's own "Build order" test checklist above, before starting the next phase — same

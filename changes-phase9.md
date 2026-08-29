@@ -311,7 +311,8 @@ to actually push out rather than leave behind a login parents won't use.
 9. **9d** (document storage) — staff-side first; public self-fill upload only after 8f is stable.
 10. **9e** (data export/backup).
 11. **9g** (test results → parent notification) — depends on 9a.
-12. **8c** (subject-wise fees) — still deferred, design note only.
+12. **8c** (subject-wise fees) — **approved for build 2026-08-29** (add-on plans cut from scope);
+    see `changes-phase8.md` §8c for the locked decisions and revised build order.
 
 Same discipline as before: schema → backend → frontend → mobile pass → that phase's test checklist,
 before moving to the next.

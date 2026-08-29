@@ -138,7 +138,7 @@ const ICONS: Record<NavIcon, React.ReactNode> = {
 
 export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
   const activeModules = user?.institute?.activeModules ?? [];
   const sections = navForRole(role, activeModules);
 
@@ -216,10 +216,10 @@ export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: 
           ))}
         </nav>
 
-        <div className="space-y-2 p-4 pt-0">
-          {(instituteName || workspaceLabel) && (
-            <div className="flex items-center gap-2.5 rounded-xl border border-border bg-muted px-3.5 py-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-sm font-bold text-accent-foreground">
+        {(instituteName || workspaceLabel) && (
+          <div className="border-t border-border bg-linear-to-t from-accent/10 to-transparent p-3">
+            <div className="flex items-center gap-2.5 px-1 py-1">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent text-xs font-bold text-accent-foreground">
                 {(instituteName ?? workspaceLabel ?? "?").charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
@@ -229,19 +229,8 @@ export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: 
                 )}
               </div>
             </div>
-          )}
-
-          <button
-            type="button"
-            onClick={logout}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Log out
-          </button>
-        </div>
+          </div>
+        )}
       </aside>
     </>
   );

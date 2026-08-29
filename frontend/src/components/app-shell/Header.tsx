@@ -5,13 +5,14 @@ import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { Button } from "@/components/ui/Button";
 import { NotificationDrawer } from "@/components/app-shell/NotificationDrawer";
+import { ProfileMenu } from "@/components/app-shell/ProfileMenu";
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const { user, exitInstitute } = useAuth();
+  const { user, exitInstitute, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [exiting, setExiting] = useState(false);
   const [search, setSearch] = useState("");
@@ -104,15 +105,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           )}
         </button>
 
-        {user && (
-          <div className="hidden text-right sm:block">
-            <p className="text-sm font-medium text-foreground">{user.fullName}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user.role.toLowerCase()}</p>
-          </div>
-        )}
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
-          {user?.fullName?.charAt(0).toUpperCase() ?? "?"}
-        </div>
+        {user && <ProfileMenu user={user} onLogout={logout} />}
       </div>
 
       <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} onUnreadCountChange={setUnreadCount} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
 import type { Course, Subject } from "@/lib/types";
+import type { AcademicsTabHandle } from "./tabHandle";
 
-export function SubjectsTab() {
+export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_props, ref) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +46,8 @@ export function SubjectsTab() {
     setModalOpen(true);
   }
 
+  useImperativeHandle(ref, () => ({ openCreate }));
+
   function openEdit(subject: Subject) {
     setEditing(subject);
     setModalOpen(true);
@@ -66,7 +69,7 @@ export function SubjectsTab() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-b border-border p-4">
           <div className="w-full max-w-xs">
             <Dropdown
               value={courseFilter}
@@ -74,12 +77,6 @@ export function SubjectsTab() {
               options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
               placeholder="All courses"
             />
-          </div>
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={load}>
-              Refresh
-            </Button>
-            <Button onClick={openCreate}>New subject</Button>
           </div>
         </div>
 
@@ -165,7 +162,7 @@ export function SubjectsTab() {
       <SubjectModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />
     </div>
   );
-}
+});
 
 function SubjectModal({
   open,

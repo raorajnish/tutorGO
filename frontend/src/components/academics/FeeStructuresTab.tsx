@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -10,8 +10,9 @@ import { Modal } from "@/components/ui/Modal";
 import { formatMoney } from "@/lib/money";
 import type { Course, FeeStructure, FeePlanType } from "@/lib/types";
 import { FEE_PLAN_TYPE_LABELS } from "@/lib/types";
+import type { AcademicsTabHandle } from "./tabHandle";
 
-export function FeeStructuresTab() {
+export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStructuresTab(_props, ref) {
   const [structures, setStructures] = useState<FeeStructure[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,21 +46,29 @@ export function FeeStructuresTab() {
     setModalOpen(true);
   }
 
+  useImperativeHandle(ref, () => ({ openCreate }));
+
   function openEdit(s: FeeStructure) {
     setEditing(s);
     setModalOpen(true);
   }
 
+  async function handleSetDefault(s: FeeStructure) {
+    try {
+      await apiFetch(`/academics/fee-structures/${s.id}`, { method: "PATCH", body: JSON.stringify({ isDefault: true }) });
+      await load();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not set this as the default structure.");
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-b border-border p-4">
           <p className="text-sm text-muted-foreground">
             Reusable fee plans per course — attach one to a student instead of typing amounts each time.
           </p>
-          <Button onClick={openCreate} className="shrink-0 self-start sm:self-auto">
-            New fee structure
-          </Button>
         </div>
 
         {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
@@ -91,12 +100,22 @@ export function FeeStructuresTab() {
                       : `${formatMoney(s.monthlyAmount)}/mo · day ${s.billingDay}`}
                   </td>
                   <td className="px-4 py-3">
-                    <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
+                      {s.isDefault && <Badge tone="accent">Default</Badge>}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
-                    <Button variant="ghost" onClick={() => openEdit(s)}>
-                      Edit
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" onClick={() => openEdit(s)}>
+                        Edit
+                      </Button>
+                      {!s.isDefault && (
+                        <Button variant="ghost" onClick={() => handleSetDefault(s)}>
+                          Set default
+                        </Button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -122,7 +141,10 @@ export function FeeStructuresTab() {
                     {s.course.name} ({s.course.code})
                   </p>
                 </div>
-                <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
+                <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                  <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
+                  {s.isDefault && <Badge tone="accent">Default</Badge>}
+                </div>
               </div>
 
               <p className="mt-2 text-xs text-muted-foreground">
@@ -132,10 +154,15 @@ export function FeeStructuresTab() {
                   : `${formatMoney(s.monthlyAmount)}/mo · day ${s.billingDay}`}
               </p>
 
-              <div className="mt-2.5 border-t border-border pt-2.5">
+              <div className="mt-2.5 flex gap-4 border-t border-border pt-2.5">
                 <button type="button" onClick={() => openEdit(s)} className="text-xs font-medium text-accent underline underline-offset-2">
                   Edit
                 </button>
+                {!s.isDefault && (
+                  <button type="button" onClick={() => handleSetDefault(s)} className="text-xs font-medium text-accent underline underline-offset-2">
+                    Set default
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -148,7 +175,7 @@ export function FeeStructuresTab() {
       <FeeStructureModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />
     </div>
   );
-}
+});
 
 function FeeStructureModal({
   open,

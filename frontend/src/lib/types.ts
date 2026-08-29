@@ -972,6 +972,7 @@ export interface FeeStructure {
   monthlyAmount: string | null;
   billingDay: number | null;
   isActive: boolean;
+  isDefault: boolean;
 }
 
 export interface CreateFeeStructurePayload {

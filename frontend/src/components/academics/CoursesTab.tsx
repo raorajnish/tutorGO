@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -8,8 +8,9 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
 import type { Course } from "@/lib/types";
+import type { AcademicsTabHandle } from "./tabHandle";
 
-export function CoursesTab() {
+export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_props, ref) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +38,8 @@ export function CoursesTab() {
     setModalOpen(true);
   }
 
+  useImperativeHandle(ref, () => ({ openCreate }));
+
   function openEdit(course: Course) {
     setEditing(course);
     setModalOpen(true);
@@ -56,12 +59,6 @@ export function CoursesTab() {
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="flex items-center justify-between gap-3 border-b border-border p-4">
           <p className="text-sm font-medium text-foreground">All courses</p>
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={load}>
-              Refresh
-            </Button>
-            <Button onClick={openCreate}>New course</Button>
-          </div>
         </div>
 
         {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
@@ -137,7 +134,7 @@ export function CoursesTab() {
       <CourseModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} />
     </div>
   );
-}
+});
 
 function CourseModal({
   open,

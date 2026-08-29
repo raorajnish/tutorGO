@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -9,12 +9,13 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
 import type { Batch, Course } from "@/lib/types";
+import type { AcademicsTabHandle } from "./tabHandle";
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
-export function BatchesTab() {
+export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_props, ref) {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,9 +46,16 @@ export function BatchesTab() {
   }, []);
 
   function openCreate() {
+    // No header-level disabled state to fall back on now that the button
+    // lives in the page's shared header — the existing "Create a course
+    // first" banner below already covers this case, so a no-course click
+    // just does nothing rather than opening a modal with no course to pick.
+    if (courses.length === 0) return;
     setEditing(null);
     setModalOpen(true);
   }
+
+  useImperativeHandle(ref, () => ({ openCreate }));
 
   function openEdit(batch: Batch) {
     setEditing(batch);
@@ -68,7 +76,7 @@ export function BatchesTab() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-b border-border p-4">
           <div className="w-full max-w-xs">
             <Dropdown
               value={courseFilter}
@@ -76,14 +84,6 @@ export function BatchesTab() {
               options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
               placeholder="All courses"
             />
-          </div>
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={load}>
-              Refresh
-            </Button>
-            <Button onClick={openCreate} disabled={courses.length === 0}>
-              New batch
-            </Button>
           </div>
         </div>
 
@@ -167,7 +167,7 @@ export function BatchesTab() {
       <BatchModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />
     </div>
   );
-}
+});
 
 function toDateInput(iso: string) {
   return iso.slice(0, 10);

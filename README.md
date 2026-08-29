@@ -17,7 +17,7 @@ npm install
 cp .env.example .env          # then edit — see "Environment" below
                               # at minimum: DATABASE_URL, JWT_SECRET, SUPERADMIN_*
 npm run prisma:generate
-npm run prisma:migrate
+npx prisma db push
 npm run db:seed               # creates the SUPERADMIN from your .env
 npm run dev                   # http://127.0.0.1:4000
 
@@ -90,8 +90,7 @@ This signs and identifies the sender; it does **not** encrypt the message. Paylo
 | `npm run build` / `start` | Compile to `dist/`, then run it |
 | `npm run typecheck` | `tsc --noEmit` — run before every commit |
 | `npm run prisma:generate` | Regenerate the client into `src/generated/prisma` |
-| `npm run prisma:migrate` | `prisma migrate dev` |
-| `npm run prisma:deploy` | `prisma migrate deploy` (production) |
+| `npx prisma db push` | Sync the database to `schema.prisma`. **This project has no `prisma/migrations` folder** — schema changes are applied with `db push`, not tracked migrations. `npm run prisma:migrate` / `prisma:deploy` exist in `package.json` but assume migration history that doesn't exist here; don't use them until that changes (see `PRODUCTION_READINESS.md`). |
 | `npm run db:seed` | Modules, plans, superadmin |
 | `npm run db:seed:demo` | Demo institute with sample data |
 | `npm run db:backfill-limits` | **One-time.** Freezes existing institutes at their current plan limits — see below |
@@ -112,7 +111,7 @@ Three one-time steps. **The backfill matters** — until it runs, editing a plan
 ```bash
 cd backend
 npm install                 # cloudinary was removed from dependencies
-npm run prisma:migrate      # adds the per-institute limit columns
+npx prisma db push          # adds the per-institute limit columns
 npm run db:backfill-limits  # freezes existing institutes at current plan values
 ```
 

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
+import type { Prisma } from "../generated/prisma/client.js";
 import { ApiError } from "../lib/http.js";
 import { authenticate, requireInstitute, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
@@ -385,6 +386,7 @@ function serializeFeeStructure(s: {
   monthlyAmount: unknown;
   billingDay: number | null;
   isActive: boolean;
+  isDefault: boolean;
   course: { id: string; name: string; code: string };
 }) {
   return {
@@ -397,7 +399,18 @@ function serializeFeeStructure(s: {
     monthlyAmount: s.monthlyAmount !== null ? String(s.monthlyAmount) : null,
     billingDay: s.billingDay,
     isActive: s.isActive,
+    isDefault: s.isDefault,
   };
+}
+
+/** At most one default per course — flips every other structure in the
+ * course off before the caller sets the new one on, inside the same
+ * transaction as that write so the invariant never gets a chance to break. */
+async function clearOtherDefaults(tx: Prisma.TransactionClient, courseId: string, keepId?: string) {
+  await tx.feeStructure.updateMany({
+    where: { courseId, isDefault: true, ...(keepId ? { id: { not: keepId } } : {}) },
+    data: { isDefault: false },
+  });
 }
 
 const feeStructureInclude = { course: { select: { id: true, name: true, code: true } } } as const;
@@ -425,6 +438,7 @@ const feeStructureSchema = z
     installmentCount: z.number().int().positive().optional(),
     monthlyAmount: z.number().nonnegative().optional(),
     billingDay: z.number().int().min(1).max(28).optional(),
+    isDefault: z.boolean().optional(),
   })
   .superRefine((body, ctx) => {
     if (body.planType === "ONE_TIME" && !body.installmentCount) {
@@ -443,18 +457,28 @@ academicsRouter.post("/fee-structures", requireRoles(...MANAGE_ROLES), validateB
     const course = await prisma.course.findUnique({ where: { id: body.courseId } });
     if (!course || course.instituteId !== instituteId) throw ApiError.badRequest("Course not found");
 
-    const structure = await prisma.feeStructure.create({
-      data: {
-        instituteId,
-        courseId: body.courseId,
-        name: body.name,
-        planType: body.planType,
-        courseFee: body.planType === "ONE_TIME" ? body.courseFee : undefined,
-        installmentCount: body.planType === "ONE_TIME" ? body.installmentCount : undefined,
-        monthlyAmount: body.planType === "RECURRING" ? body.monthlyAmount : undefined,
-        billingDay: body.planType === "RECURRING" ? body.billingDay : undefined,
-      },
-      include: feeStructureInclude,
+    // First structure for a course defaults itself — SetupFeeAccountModal
+    // needs something to pre-select, and there's nothing to conflict with
+    // yet. Later ones stay non-default unless the caller explicitly asks.
+    const existingCount = await prisma.feeStructure.count({ where: { courseId: body.courseId } });
+    const makeDefault = existingCount === 0 || body.isDefault === true;
+
+    const structure = await prisma.$transaction(async (tx) => {
+      if (makeDefault) await clearOtherDefaults(tx, body.courseId);
+      return tx.feeStructure.create({
+        data: {
+          instituteId,
+          courseId: body.courseId,
+          name: body.name,
+          planType: body.planType,
+          courseFee: body.planType === "ONE_TIME" ? body.courseFee : undefined,
+          installmentCount: body.planType === "ONE_TIME" ? body.installmentCount : undefined,
+          monthlyAmount: body.planType === "RECURRING" ? body.monthlyAmount : undefined,
+          billingDay: body.planType === "RECURRING" ? body.billingDay : undefined,
+          isDefault: makeDefault,
+        },
+        include: feeStructureInclude,
+      });
     });
 
     res.status(201).json(serializeFeeStructure(structure));
@@ -470,6 +494,7 @@ const updateFeeStructureSchema = z.object({
   monthlyAmount: z.number().nonnegative().optional(),
   billingDay: z.number().int().min(1).max(28).optional(),
   isActive: z.boolean().optional(),
+  isDefault: z.boolean().optional(),
 });
 
 academicsRouter.patch(
@@ -484,10 +509,18 @@ academicsRouter.patch(
       const structure = await prisma.feeStructure.findUnique({ where: { id: req.params.id as string } });
       if (!structure || structure.instituteId !== instituteId) throw ApiError.notFound("Fee structure not found");
 
-      const updated = await prisma.feeStructure.update({
-        where: { id: structure.id },
-        data: body,
-        include: feeStructureInclude,
+      // Turning the default OFF directly isn't allowed — a course always has
+      // exactly one once it has any structures, so "off" only ever happens by
+      // another structure taking over via clearOtherDefaults below.
+      if (body.isDefault === false) throw ApiError.badRequest("Set another structure as default instead of turning this one off.");
+
+      const updated = await prisma.$transaction(async (tx) => {
+        if (body.isDefault) await clearOtherDefaults(tx, structure.courseId, structure.id);
+        return tx.feeStructure.update({
+          where: { id: structure.id },
+          data: body,
+          include: feeStructureInclude,
+        });
       });
 
       res.json(serializeFeeStructure(updated));
