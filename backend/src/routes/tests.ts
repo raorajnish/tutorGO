@@ -353,7 +353,7 @@ testsRouter.get("/:id", requireRoles(...MANAGE_ROLES), async (req, res, next) =>
           prisma.attendanceRecord.count({ where: { lectureId: s.id } }),
           prisma.attendanceRecord.count({ where: { lectureId: s.id, status: { in: [...PRESENT_STATUSES] } } }),
           prisma.testResult.count({ where: { lectureId: s.id } }),
-          deriveRoster(s.batchId, s.date),
+          deriveRoster(s.batchId, s.date, s.subjectId),
         ]);
         return { ...serializeLecture(s), expected: roster.length, markedCount, presentCount, resultCount };
       })
@@ -502,7 +502,7 @@ testsRouter.get("/:id/sessions/:lectureId/report", requireRoles(...MANAGE_ROLES)
     const session = await loadSession(test.id, req.params.lectureId as string, instituteId);
 
     const [roster, attendance, results, institute] = await Promise.all([
-      deriveRoster(session.batchId, session.date),
+      deriveRoster(session.batchId, session.date, session.subjectId),
       prisma.attendanceRecord.findMany({ where: { lectureId: session.id } }),
       prisma.testResult.findMany({ where: { lectureId: session.id } }),
       prisma.institute.findUnique({ where: { id: instituteId }, select: { name: true } }),

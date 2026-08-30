@@ -631,14 +631,6 @@ export type TestResultUncheckedUpdateManyWithoutTestNestedInput = {
   deleteMany?: Prisma.TestResultScalarWhereInput | Prisma.TestResultScalarWhereInput[]
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type TestResultCreateWithoutEnteredByInput = {
   id?: string
   marksObtained: runtime.Decimal | runtime.DecimalJsLike | number | string

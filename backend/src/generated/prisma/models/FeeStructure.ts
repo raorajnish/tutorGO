@@ -299,6 +299,7 @@ export type FeeStructureWhereInput = {
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   feeAccounts?: Prisma.FeeAccountListRelationFilter
+  subjectLines?: Prisma.FeeStructureSubjectLineListRelationFilter
 }
 
 export type FeeStructureOrderByWithRelationInput = {
@@ -318,6 +319,7 @@ export type FeeStructureOrderByWithRelationInput = {
   institute?: Prisma.InstituteOrderByWithRelationInput
   course?: Prisma.CourseOrderByWithRelationInput
   feeAccounts?: Prisma.FeeAccountOrderByRelationAggregateInput
+  subjectLines?: Prisma.FeeStructureSubjectLineOrderByRelationAggregateInput
 }
 
 export type FeeStructureWhereUniqueInput = Prisma.AtLeast<{
@@ -340,6 +342,7 @@ export type FeeStructureWhereUniqueInput = Prisma.AtLeast<{
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   feeAccounts?: Prisma.FeeAccountListRelationFilter
+  subjectLines?: Prisma.FeeStructureSubjectLineListRelationFilter
 }, "id">
 
 export type FeeStructureOrderByWithAggregationInput = {
@@ -397,6 +400,7 @@ export type FeeStructureCreateInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutFeeStructuresInput
   course: Prisma.CourseCreateNestedOneWithoutFeeStructuresInput
   feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutFeeStructureInput
+  subjectLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutFeeStructureInput
 }
 
 export type FeeStructureUncheckedCreateInput = {
@@ -414,6 +418,7 @@ export type FeeStructureUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutFeeStructureInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutFeeStructureInput
 }
 
 export type FeeStructureUpdateInput = {
@@ -431,6 +436,7 @@ export type FeeStructureUpdateInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutFeeStructuresNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutFeeStructuresNestedInput
   feeAccounts?: Prisma.FeeAccountUpdateManyWithoutFeeStructureNestedInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutFeeStructureNestedInput
 }
 
 export type FeeStructureUncheckedUpdateInput = {
@@ -448,6 +454,7 @@ export type FeeStructureUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutFeeStructureNestedInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutFeeStructureNestedInput
 }
 
 export type FeeStructureCreateManyInput = {
@@ -568,6 +575,11 @@ export type FeeStructureSumOrderByAggregateInput = {
   billingDay?: Prisma.SortOrder
 }
 
+export type FeeStructureScalarRelationFilter = {
+  is?: Prisma.FeeStructureWhereInput
+  isNot?: Prisma.FeeStructureWhereInput
+}
+
 export type FeeStructureNullableScalarRelationFilter = {
   is?: Prisma.FeeStructureWhereInput | null
   isNot?: Prisma.FeeStructureWhereInput | null
@@ -661,6 +673,20 @@ export type EnumFeePlanTypeFieldUpdateOperationsInput = {
   set?: $Enums.FeePlanType
 }
 
+export type FeeStructureCreateNestedOneWithoutSubjectLinesInput = {
+  create?: Prisma.XOR<Prisma.FeeStructureCreateWithoutSubjectLinesInput, Prisma.FeeStructureUncheckedCreateWithoutSubjectLinesInput>
+  connectOrCreate?: Prisma.FeeStructureCreateOrConnectWithoutSubjectLinesInput
+  connect?: Prisma.FeeStructureWhereUniqueInput
+}
+
+export type FeeStructureUpdateOneRequiredWithoutSubjectLinesNestedInput = {
+  create?: Prisma.XOR<Prisma.FeeStructureCreateWithoutSubjectLinesInput, Prisma.FeeStructureUncheckedCreateWithoutSubjectLinesInput>
+  connectOrCreate?: Prisma.FeeStructureCreateOrConnectWithoutSubjectLinesInput
+  upsert?: Prisma.FeeStructureUpsertWithoutSubjectLinesInput
+  connect?: Prisma.FeeStructureWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FeeStructureUpdateToOneWithWhereWithoutSubjectLinesInput, Prisma.FeeStructureUpdateWithoutSubjectLinesInput>, Prisma.FeeStructureUncheckedUpdateWithoutSubjectLinesInput>
+}
+
 export type FeeStructureCreateNestedOneWithoutFeeAccountsInput = {
   create?: Prisma.XOR<Prisma.FeeStructureCreateWithoutFeeAccountsInput, Prisma.FeeStructureUncheckedCreateWithoutFeeAccountsInput>
   connectOrCreate?: Prisma.FeeStructureCreateOrConnectWithoutFeeAccountsInput
@@ -691,6 +717,7 @@ export type FeeStructureCreateWithoutInstituteInput = {
   updatedAt?: Date | string
   course: Prisma.CourseCreateNestedOneWithoutFeeStructuresInput
   feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutFeeStructureInput
+  subjectLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutFeeStructureInput
 }
 
 export type FeeStructureUncheckedCreateWithoutInstituteInput = {
@@ -707,6 +734,7 @@ export type FeeStructureUncheckedCreateWithoutInstituteInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutFeeStructureInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutFeeStructureInput
 }
 
 export type FeeStructureCreateOrConnectWithoutInstituteInput = {
@@ -768,6 +796,7 @@ export type FeeStructureCreateWithoutCourseInput = {
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutFeeStructuresInput
   feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutFeeStructureInput
+  subjectLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutFeeStructureInput
 }
 
 export type FeeStructureUncheckedCreateWithoutCourseInput = {
@@ -784,6 +813,7 @@ export type FeeStructureUncheckedCreateWithoutCourseInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutFeeStructureInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutFeeStructureInput
 }
 
 export type FeeStructureCreateOrConnectWithoutCourseInput = {
@@ -812,6 +842,90 @@ export type FeeStructureUpdateManyWithWhereWithoutCourseInput = {
   data: Prisma.XOR<Prisma.FeeStructureUpdateManyMutationInput, Prisma.FeeStructureUncheckedUpdateManyWithoutCourseInput>
 }
 
+export type FeeStructureCreateWithoutSubjectLinesInput = {
+  id?: string
+  name: string
+  planType: $Enums.FeePlanType
+  courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  installmentCount?: number | null
+  monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  billingDay?: number | null
+  isActive?: boolean
+  isDefault?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutFeeStructuresInput
+  course: Prisma.CourseCreateNestedOneWithoutFeeStructuresInput
+  feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutFeeStructureInput
+}
+
+export type FeeStructureUncheckedCreateWithoutSubjectLinesInput = {
+  id?: string
+  instituteId: string
+  courseId: string
+  name: string
+  planType: $Enums.FeePlanType
+  courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  installmentCount?: number | null
+  monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  billingDay?: number | null
+  isActive?: boolean
+  isDefault?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutFeeStructureInput
+}
+
+export type FeeStructureCreateOrConnectWithoutSubjectLinesInput = {
+  where: Prisma.FeeStructureWhereUniqueInput
+  create: Prisma.XOR<Prisma.FeeStructureCreateWithoutSubjectLinesInput, Prisma.FeeStructureUncheckedCreateWithoutSubjectLinesInput>
+}
+
+export type FeeStructureUpsertWithoutSubjectLinesInput = {
+  update: Prisma.XOR<Prisma.FeeStructureUpdateWithoutSubjectLinesInput, Prisma.FeeStructureUncheckedUpdateWithoutSubjectLinesInput>
+  create: Prisma.XOR<Prisma.FeeStructureCreateWithoutSubjectLinesInput, Prisma.FeeStructureUncheckedCreateWithoutSubjectLinesInput>
+  where?: Prisma.FeeStructureWhereInput
+}
+
+export type FeeStructureUpdateToOneWithWhereWithoutSubjectLinesInput = {
+  where?: Prisma.FeeStructureWhereInput
+  data: Prisma.XOR<Prisma.FeeStructureUpdateWithoutSubjectLinesInput, Prisma.FeeStructureUncheckedUpdateWithoutSubjectLinesInput>
+}
+
+export type FeeStructureUpdateWithoutSubjectLinesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  planType?: Prisma.EnumFeePlanTypeFieldUpdateOperationsInput | $Enums.FeePlanType
+  courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutFeeStructuresNestedInput
+  course?: Prisma.CourseUpdateOneRequiredWithoutFeeStructuresNestedInput
+  feeAccounts?: Prisma.FeeAccountUpdateManyWithoutFeeStructureNestedInput
+}
+
+export type FeeStructureUncheckedUpdateWithoutSubjectLinesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  planType?: Prisma.EnumFeePlanTypeFieldUpdateOperationsInput | $Enums.FeePlanType
+  courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  billingDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutFeeStructureNestedInput
+}
+
 export type FeeStructureCreateWithoutFeeAccountsInput = {
   id?: string
   name: string
@@ -826,6 +940,7 @@ export type FeeStructureCreateWithoutFeeAccountsInput = {
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutFeeStructuresInput
   course: Prisma.CourseCreateNestedOneWithoutFeeStructuresInput
+  subjectLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutFeeStructureInput
 }
 
 export type FeeStructureUncheckedCreateWithoutFeeAccountsInput = {
@@ -842,6 +957,7 @@ export type FeeStructureUncheckedCreateWithoutFeeAccountsInput = {
   isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  subjectLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutFeeStructureInput
 }
 
 export type FeeStructureCreateOrConnectWithoutFeeAccountsInput = {
@@ -874,6 +990,7 @@ export type FeeStructureUpdateWithoutFeeAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutFeeStructuresNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutFeeStructuresNestedInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutFeeStructureNestedInput
 }
 
 export type FeeStructureUncheckedUpdateWithoutFeeAccountsInput = {
@@ -890,6 +1007,7 @@ export type FeeStructureUncheckedUpdateWithoutFeeAccountsInput = {
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subjectLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutFeeStructureNestedInput
 }
 
 export type FeeStructureCreateManyInstituteInput = {
@@ -921,6 +1039,7 @@ export type FeeStructureUpdateWithoutInstituteInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   course?: Prisma.CourseUpdateOneRequiredWithoutFeeStructuresNestedInput
   feeAccounts?: Prisma.FeeAccountUpdateManyWithoutFeeStructureNestedInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutFeeStructureNestedInput
 }
 
 export type FeeStructureUncheckedUpdateWithoutInstituteInput = {
@@ -937,6 +1056,7 @@ export type FeeStructureUncheckedUpdateWithoutInstituteInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutFeeStructureNestedInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutFeeStructureNestedInput
 }
 
 export type FeeStructureUncheckedUpdateManyWithoutInstituteInput = {
@@ -983,6 +1103,7 @@ export type FeeStructureUpdateWithoutCourseInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutFeeStructuresNestedInput
   feeAccounts?: Prisma.FeeAccountUpdateManyWithoutFeeStructureNestedInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutFeeStructureNestedInput
 }
 
 export type FeeStructureUncheckedUpdateWithoutCourseInput = {
@@ -999,6 +1120,7 @@ export type FeeStructureUncheckedUpdateWithoutCourseInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutFeeStructureNestedInput
+  subjectLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutFeeStructureNestedInput
 }
 
 export type FeeStructureUncheckedUpdateManyWithoutCourseInput = {
@@ -1023,10 +1145,12 @@ export type FeeStructureUncheckedUpdateManyWithoutCourseInput = {
 
 export type FeeStructureCountOutputType = {
   feeAccounts: number
+  subjectLines: number
 }
 
 export type FeeStructureCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   feeAccounts?: boolean | FeeStructureCountOutputTypeCountFeeAccountsArgs
+  subjectLines?: boolean | FeeStructureCountOutputTypeCountSubjectLinesArgs
 }
 
 /**
@@ -1044,6 +1168,13 @@ export type FeeStructureCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
  */
 export type FeeStructureCountOutputTypeCountFeeAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FeeAccountWhereInput
+}
+
+/**
+ * FeeStructureCountOutputType without action
+ */
+export type FeeStructureCountOutputTypeCountSubjectLinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FeeStructureSubjectLineWhereInput
 }
 
 
@@ -1064,6 +1195,7 @@ export type FeeStructureSelect<ExtArgs extends runtime.Types.Extensions.Internal
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   feeAccounts?: boolean | Prisma.FeeStructure$feeAccountsArgs<ExtArgs>
+  subjectLines?: boolean | Prisma.FeeStructure$subjectLinesArgs<ExtArgs>
   _count?: boolean | Prisma.FeeStructureCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["feeStructure"]>
 
@@ -1124,6 +1256,7 @@ export type FeeStructureInclude<ExtArgs extends runtime.Types.Extensions.Interna
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   feeAccounts?: boolean | Prisma.FeeStructure$feeAccountsArgs<ExtArgs>
+  subjectLines?: boolean | Prisma.FeeStructure$subjectLinesArgs<ExtArgs>
   _count?: boolean | Prisma.FeeStructureCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FeeStructureIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1141,6 +1274,7 @@ export type $FeeStructurePayload<ExtArgs extends runtime.Types.Extensions.Intern
     institute: Prisma.$InstitutePayload<ExtArgs>
     course: Prisma.$CoursePayload<ExtArgs>
     feeAccounts: Prisma.$FeeAccountPayload<ExtArgs>[]
+    subjectLines: Prisma.$FeeStructureSubjectLinePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1559,6 +1693,7 @@ export interface Prisma__FeeStructureClient<T, Null = never, ExtArgs extends run
   institute<T extends Prisma.InstituteDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InstituteDefaultArgs<ExtArgs>>): Prisma.Prisma__InstituteClient<runtime.Types.Result.GetResult<Prisma.$InstitutePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   course<T extends Prisma.CourseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   feeAccounts<T extends Prisma.FeeStructure$feeAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FeeStructure$feeAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeeAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  subjectLines<T extends Prisma.FeeStructure$subjectLinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FeeStructure$subjectLinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeeStructureSubjectLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2023,6 +2158,30 @@ export type FeeStructure$feeAccountsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.FeeAccountScalarFieldEnum | Prisma.FeeAccountScalarFieldEnum[]
+}
+
+/**
+ * FeeStructure.subjectLines
+ */
+export type FeeStructure$subjectLinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FeeStructureSubjectLine
+   */
+  select?: Prisma.FeeStructureSubjectLineSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FeeStructureSubjectLine
+   */
+  omit?: Prisma.FeeStructureSubjectLineOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FeeStructureSubjectLineInclude<ExtArgs> | null
+  where?: Prisma.FeeStructureSubjectLineWhereInput
+  orderBy?: Prisma.FeeStructureSubjectLineOrderByWithRelationInput | Prisma.FeeStructureSubjectLineOrderByWithRelationInput[]
+  cursor?: Prisma.FeeStructureSubjectLineWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FeeStructureSubjectLineScalarFieldEnum | Prisma.FeeStructureSubjectLineScalarFieldEnum[]
 }
 
 /**

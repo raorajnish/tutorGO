@@ -140,10 +140,7 @@ export type Notification = Prisma.NotificationModel
 export type ScheduledReminder = Prisma.ScheduledReminderModel
 /**
  * Model Course
- * Doubles as the institute's "class/standard" — e.g. "10th Standard" (code
- * "10"), "12th — JEE" (code "12JEE"). `code` is short, staff-defined once at
- * setup, and feeds directly into Student.studentCode generation — no
- * free-text parsing needed at admission time.
+ * 
  */
 export type Course = Prisma.CourseModel
 /**
@@ -186,6 +183,26 @@ export type StudentCodeCounter = Prisma.StudentCodeCounterModel
  * 
  */
 export type Student = Prisma.StudentModel
+/**
+ * Model StudentSubject
+ * Which subjects a student is enrolled in on a SUBJECT_WISE course — doing
+ * double duty as "what they're paying for" and "what they appear on the
+ * roster for", so free and paid subjects are one uniform source of truth
+ * rather than two kinds of enrollment. Written only at fee-account creation.
+ * 
+ * `amount` is snapshotted from the chosen FeeStructure's subject line at
+ * enrollment, on the same principle as FeeAccount.finalFee: repricing a
+ * structure next year must never silently reprice a student already paying
+ * the old rate.
+ * 
+ * `joinedAt` copies StudentBatch.joinedAt — NOT the date the fee account was
+ * created. Guard B in changes-phase8.md §8c: deriveRoster filters
+ * `joinedAt <= date`, so stamping "today" on a student who joined the batch
+ * months earlier would erase them from every earlier roster while their
+ * AttendanceRecord rows survive — attendance records for someone the roster
+ * says was never there.
+ */
+export type StudentSubject = Prisma.StudentSubjectModel
 /**
  * Model StudentBatch
  * Batch enrollment history — never edited or deleted after the fact.
@@ -253,6 +270,21 @@ export type MessageTemplate = Prisma.MessageTemplateModel
  * retroactively reprices students already attached to it.
  */
 export type FeeStructure = Prisma.FeeStructureModel
+/**
+ * Model FeeStructureSubjectLine
+ * Per-subject pricing for a SUBJECT_WISE FeeStructure. Prices live here
+ * rather than on CourseSubject so two cohorts can coexist at different rates
+ * ("12th Science — Batch 2026-27" and "...2027-28" are simply two structures
+ * on the same course); CourseSubject stays a bare join answering "which
+ * subjects does this course offer", never "what do they cost".
+ * 
+ * A SUBJECT_WISE structure must carry a line for EVERY CourseSubject on its
+ * course — enforced in academics.ts, not by the DB. Guard C in
+ * changes-phase8.md §8c: a missing line means no student ever gets a
+ * StudentSubject for that subject, so every one of its lectures derives an
+ * empty roster, silently and forever.
+ */
+export type FeeStructureSubjectLine = Prisma.FeeStructureSubjectLineModel
 /**
  * Model FeeAccount
  * One per student. ONE_TIME accounts use courseFee/discount/finalFee/

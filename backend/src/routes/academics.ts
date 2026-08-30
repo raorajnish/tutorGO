@@ -40,7 +40,7 @@ academicsRouter.get("/courses", async (req, res, next) => {
     const courses = await prisma.course.findMany({
       where: { instituteId: req.tenantId!, isActive: activeOnly ? true : undefined },
       include: {
-        _count: { select: { batches: true, students: true, subjects: true } },
+        _count: { select: { batches: true, students: true, subjects: true, feeStructures: true } },
       },
       orderBy: { name: "asc" },
     });
@@ -53,9 +53,13 @@ academicsRouter.get("/courses", async (req, res, next) => {
         durationMonths: c.durationMonths,
         description: c.description,
         isActive: c.isActive,
+        feeMode: c.feeMode,
         batchCount: c._count.batches,
         studentCount: c._count.students,
         subjectCount: c._count.subjects,
+        // Drives the disabled-with-a-reason state on the feeMode toggle in
+        // CoursesTab — see assertFeeModeSwitchAllowed below for why.
+        feeModeLocked: c._count.students > 0 || c._count.feeStructures > 0,
       }))
     );
   } catch (err) {
@@ -63,11 +67,33 @@ academicsRouter.get("/courses", async (req, res, next) => {
   }
 });
 
+/// Guard A (changes-phase8.md §8c). Flipping feeMode on a course that already
+/// has people in it is not a pricing change — it silently breaks attendance.
+/// StudentSubject rows are written *only* at fee-account creation, so a course
+/// running as FLAT with enrolled students but no fee accounts yet would, the
+/// moment it became SUBJECT_WISE, require a StudentSubject row nobody has:
+/// every roster for that course derives empty, with no error anywhere. Hence
+/// the guard checks enrolled students as well as fee accounts — checking fee
+/// accounts alone would let exactly that case through.
+async function assertFeeModeSwitchAllowed(courseId: string) {
+  const [studentCount, accountCount] = await Promise.all([
+    prisma.student.count({ where: { courseId } }),
+    prisma.feeAccount.count({ where: { student: { courseId } } }),
+  ]);
+
+  if (studentCount > 0 || accountCount > 0) {
+    throw ApiError.badRequest(
+      "This course already has students enrolled, so its fee mode can't be changed. Create a new course for the new pricing model instead."
+    );
+  }
+}
+
 const createCourseSchema = z.object({
   name: z.string().min(1, "Course name is required"),
   code: courseCodeSchema,
   durationMonths: z.number().int().positive().optional(),
   description: z.string().optional(),
+  feeMode: z.enum(["FLAT", "SUBJECT_WISE"]).optional(),
 });
 
 academicsRouter.post("/courses", requireRoles(...MANAGE_ROLES), validateBody(createCourseSchema), async (req, res, next) => {
@@ -80,7 +106,14 @@ academicsRouter.post("/courses", requireRoles(...MANAGE_ROLES), validateBody(cre
     if (existing) throw ApiError.conflict("A course with this code already exists");
 
     const course = await prisma.course.create({
-      data: { instituteId, name: body.name, code, durationMonths: body.durationMonths, description: body.description },
+      data: {
+        instituteId,
+        name: body.name,
+        code,
+        durationMonths: body.durationMonths,
+        description: body.description,
+        feeMode: body.feeMode ?? "FLAT",
+      },
     });
 
     await auditLog({
@@ -105,6 +138,7 @@ const updateCourseSchema = z.object({
   durationMonths: z.number().int().positive().nullable().optional(),
   description: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
+  feeMode: z.enum(["FLAT", "SUBJECT_WISE"]).optional(),
 });
 
 academicsRouter.patch("/courses/:id", requireRoles(...MANAGE_ROLES), validateBody(updateCourseSchema), async (req, res, next) => {
@@ -120,6 +154,8 @@ academicsRouter.patch("/courses/:id", requireRoles(...MANAGE_ROLES), validateBod
       const clash = await prisma.course.findUnique({ where: { instituteId_code: { instituteId, code } } });
       if (clash && clash.id !== course.id) throw ApiError.conflict("A course with this code already exists");
     }
+
+    if (body.feeMode && body.feeMode !== course.feeMode) await assertFeeModeSwitchAllowed(course.id);
 
     const updated = await prisma.course.update({
       where: { id: course.id },
@@ -387,7 +423,8 @@ function serializeFeeStructure(s: {
   billingDay: number | null;
   isActive: boolean;
   isDefault: boolean;
-  course: { id: string; name: string; code: string };
+  course: { id: string; name: string; code: string; feeMode?: string };
+  subjectLines?: { subjectId: string; amount: unknown; subject: { id: string; name: string; shortCode: string } }[];
 }) {
   return {
     id: s.id,
@@ -400,7 +437,51 @@ function serializeFeeStructure(s: {
     billingDay: s.billingDay,
     isActive: s.isActive,
     isDefault: s.isDefault,
+    // Present (possibly empty) only for SUBJECT_WISE structures; FLAT ones
+    // return null so the frontend can branch without guessing from length.
+    subjectLines:
+      s.course.feeMode === "SUBJECT_WISE"
+        ? (s.subjectLines ?? []).map((l) => ({
+            subjectId: l.subjectId,
+            subjectName: l.subject.name,
+            subjectShortCode: l.subject.shortCode,
+            amount: String(l.amount),
+          }))
+        : null,
   };
+}
+
+/// Guard C (changes-phase8.md §8c). A SUBJECT_WISE structure must price every
+/// subject its course offers — ₹0 for complementary ones. A missing line is
+/// silent and permanent: no student ever receives a StudentSubject for that
+/// subject, so every lecture of it derives an empty roster forever, from one
+/// omission on a form months earlier.
+async function assertSubjectLinesCoverCourse(
+  courseId: string,
+  lines: { subjectId: string; amount: number }[]
+) {
+  const courseSubjects = await prisma.courseSubject.findMany({
+    where: { courseId },
+    include: { subject: { select: { id: true, name: true } } },
+  });
+
+  if (courseSubjects.length === 0) {
+    throw ApiError.badRequest("Add subjects to this course before creating a subject-wise fee structure for it.");
+  }
+
+  const priced = new Set(lines.map((l) => l.subjectId));
+  const missing = courseSubjects.filter((cs) => !priced.has(cs.subjectId));
+  if (missing.length > 0) {
+    throw ApiError.badRequest(
+      `Every subject on this course needs a price (use 0 for complementary ones). Missing: ${missing
+        .map((m) => m.subject.name)
+        .join(", ")}`
+    );
+  }
+
+  const allowed = new Set(courseSubjects.map((cs) => cs.subjectId));
+  const foreign = lines.filter((l) => !allowed.has(l.subjectId));
+  if (foreign.length > 0) throw ApiError.badRequest("One or more priced subjects aren't taught on this course");
 }
 
 /** At most one default per course — flips every other structure in the
@@ -413,7 +494,13 @@ async function clearOtherDefaults(tx: Prisma.TransactionClient, courseId: string
   });
 }
 
-const feeStructureInclude = { course: { select: { id: true, name: true, code: true } } } as const;
+const feeStructureInclude = {
+  course: { select: { id: true, name: true, code: true, feeMode: true } },
+  subjectLines: {
+    include: { subject: { select: { id: true, name: true, shortCode: true } } },
+    orderBy: { subject: { name: "asc" } },
+  },
+} as const;
 
 academicsRouter.get("/fee-structures", async (req, res, next) => {
   try {
@@ -439,6 +526,10 @@ const feeStructureSchema = z
     monthlyAmount: z.number().nonnegative().optional(),
     billingDay: z.number().int().min(1).max(28).optional(),
     isDefault: z.boolean().optional(),
+    /// Only for a SUBJECT_WISE course; 0 marks a complementary subject.
+    subjectLines: z
+      .array(z.object({ subjectId: z.string().min(1), amount: z.number().nonnegative() }))
+      .optional(),
   })
   .superRefine((body, ctx) => {
     if (body.planType === "ONE_TIME" && !body.installmentCount) {
@@ -457,6 +548,21 @@ academicsRouter.post("/fee-structures", requireRoles(...MANAGE_ROLES), validateB
     const course = await prisma.course.findUnique({ where: { id: body.courseId } });
     if (!course || course.instituteId !== instituteId) throw ApiError.badRequest("Course not found");
 
+    const subjectWise = course.feeMode === "SUBJECT_WISE";
+
+    if (subjectWise) {
+      // A sum of per-subject prices is a term total, so it belongs to
+      // ONE_TIME. Allowing RECURRING would leave FeeStructureSubjectLine.amount
+      // meaning "whole term" on one plan type and "per month" on the other —
+      // one column with two meanings is how silent pricing bugs start.
+      if (body.planType !== "ONE_TIME") {
+        throw ApiError.badRequest("Subject-wise courses use one-time plans — a per-subject monthly rate isn't supported.");
+      }
+      await assertSubjectLinesCoverCourse(body.courseId, body.subjectLines ?? []);
+    } else if (body.subjectLines?.length) {
+      throw ApiError.badRequest("Per-subject pricing is only available on a subject-wise course");
+    }
+
     // First structure for a course defaults itself — SetupFeeAccountModal
     // needs something to pre-select, and there's nothing to conflict with
     // yet. Later ones stay non-default unless the caller explicitly asks.
@@ -471,11 +577,16 @@ academicsRouter.post("/fee-structures", requireRoles(...MANAGE_ROLES), validateB
           courseId: body.courseId,
           name: body.name,
           planType: body.planType,
-          courseFee: body.planType === "ONE_TIME" ? body.courseFee : undefined,
+          // On a subject-wise structure the per-student total is the sum of
+          // the subjects they pick, so there is no single courseFee to store.
+          courseFee: body.planType === "ONE_TIME" && !subjectWise ? body.courseFee : undefined,
           installmentCount: body.planType === "ONE_TIME" ? body.installmentCount : undefined,
           monthlyAmount: body.planType === "RECURRING" ? body.monthlyAmount : undefined,
           billingDay: body.planType === "RECURRING" ? body.billingDay : undefined,
           isDefault: makeDefault,
+          subjectLines: subjectWise
+            ? { create: (body.subjectLines ?? []).map((l) => ({ subjectId: l.subjectId, amount: l.amount })) }
+            : undefined,
         },
         include: feeStructureInclude,
       });
@@ -495,6 +606,9 @@ const updateFeeStructureSchema = z.object({
   billingDay: z.number().int().min(1).max(28).optional(),
   isActive: z.boolean().optional(),
   isDefault: z.boolean().optional(),
+  subjectLines: z
+    .array(z.object({ subjectId: z.string().min(1), amount: z.number().nonnegative() }))
+    .optional(),
 });
 
 academicsRouter.patch(
@@ -506,7 +620,10 @@ academicsRouter.patch(
       const instituteId = req.tenantId!;
       const body = req.body as z.infer<typeof updateFeeStructureSchema>;
 
-      const structure = await prisma.feeStructure.findUnique({ where: { id: req.params.id as string } });
+      const structure = await prisma.feeStructure.findUnique({
+        where: { id: req.params.id as string },
+        include: { course: { select: { feeMode: true } } },
+      });
       if (!structure || structure.instituteId !== instituteId) throw ApiError.notFound("Fee structure not found");
 
       // Turning the default OFF directly isn't allowed — a course always has
@@ -514,11 +631,32 @@ academicsRouter.patch(
       // another structure taking over via clearOtherDefaults below.
       if (body.isDefault === false) throw ApiError.badRequest("Set another structure as default instead of turning this one off.");
 
+      const subjectWise = structure.course.feeMode === "SUBJECT_WISE";
+      if (body.subjectLines) {
+        if (!subjectWise) throw ApiError.badRequest("Per-subject pricing is only available on a subject-wise course");
+        await assertSubjectLinesCoverCourse(structure.courseId, body.subjectLines);
+      }
+
+      const { subjectLines, ...scalars } = body;
+
       const updated = await prisma.$transaction(async (tx) => {
         if (body.isDefault) await clearOtherDefaults(tx, structure.courseId, structure.id);
+
+        // Replace wholesale rather than diffing: the payload is always the
+        // course's full subject list (guard C enforces that), so a delete-then-
+        // create is both simpler and can't leave a stale line behind. Editing
+        // prices here never touches students already enrolled — their
+        // StudentSubject.amount is a snapshot taken at enrollment.
+        if (subjectLines) {
+          await tx.feeStructureSubjectLine.deleteMany({ where: { feeStructureId: structure.id } });
+          await tx.feeStructureSubjectLine.createMany({
+            data: subjectLines.map((l) => ({ feeStructureId: structure.id, subjectId: l.subjectId, amount: l.amount })),
+          });
+        }
+
         return tx.feeStructure.update({
           where: { id: structure.id },
-          data: body,
+          data: scalars,
           include: feeStructureInclude,
         });
       });

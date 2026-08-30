@@ -457,6 +457,13 @@ export type EnumReminderAudienceWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumReminderAudienceFilter<$PrismaModel>
 }
 
+export type EnumCourseFeeModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.CourseFeeMode | Prisma.EnumCourseFeeModeFieldRefInput<$PrismaModel>
+  in?: $Enums.CourseFeeMode[] | Prisma.ListEnumCourseFeeModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CourseFeeMode[] | Prisma.ListEnumCourseFeeModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCourseFeeModeFilter<$PrismaModel> | $Enums.CourseFeeMode
+}
+
 export type DecimalNullableFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
@@ -466,6 +473,16 @@ export type DecimalNullableFilter<$PrismaModel = never> = {
   gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   not?: Prisma.NestedDecimalNullableFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+}
+
+export type EnumCourseFeeModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CourseFeeMode | Prisma.EnumCourseFeeModeFieldRefInput<$PrismaModel>
+  in?: $Enums.CourseFeeMode[] | Prisma.ListEnumCourseFeeModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CourseFeeMode[] | Prisma.ListEnumCourseFeeModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCourseFeeModeWithAggregatesFilter<$PrismaModel> | $Enums.CourseFeeMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCourseFeeModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCourseFeeModeFilter<$PrismaModel>
 }
 
 export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -535,23 +552,6 @@ export type EnumEnquiryActivityTypeWithAggregatesFilter<$PrismaModel = never> = 
   _max?: Prisma.NestedEnumEnquiryActivityTypeFilter<$PrismaModel>
 }
 
-export type EnumLectureKindFilter<$PrismaModel = never> = {
-  equals?: $Enums.LectureKind | Prisma.EnumLectureKindFieldRefInput<$PrismaModel>
-  in?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
-  notIn?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumLectureKindFilter<$PrismaModel> | $Enums.LectureKind
-}
-
-export type EnumLectureKindWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.LectureKind | Prisma.EnumLectureKindFieldRefInput<$PrismaModel>
-  in?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
-  notIn?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumLectureKindWithAggregatesFilter<$PrismaModel> | $Enums.LectureKind
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumLectureKindFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumLectureKindFilter<$PrismaModel>
-}
-
 export type DecimalFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -577,6 +577,23 @@ export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedDecimalFilter<$PrismaModel>
   _min?: Prisma.NestedDecimalFilter<$PrismaModel>
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
+}
+
+export type EnumLectureKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.LectureKind | Prisma.EnumLectureKindFieldRefInput<$PrismaModel>
+  in?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLectureKindFilter<$PrismaModel> | $Enums.LectureKind
+}
+
+export type EnumLectureKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LectureKind | Prisma.EnumLectureKindFieldRefInput<$PrismaModel>
+  in?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLectureKindWithAggregatesFilter<$PrismaModel> | $Enums.LectureKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLectureKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLectureKindFilter<$PrismaModel>
 }
 
 export type EnumAttendanceStatusFilter<$PrismaModel = never> = {
@@ -1117,6 +1134,13 @@ export type NestedEnumReminderAudienceWithAggregatesFilter<$PrismaModel = never>
   _max?: Prisma.NestedEnumReminderAudienceFilter<$PrismaModel>
 }
 
+export type NestedEnumCourseFeeModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.CourseFeeMode | Prisma.EnumCourseFeeModeFieldRefInput<$PrismaModel>
+  in?: $Enums.CourseFeeMode[] | Prisma.ListEnumCourseFeeModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CourseFeeMode[] | Prisma.ListEnumCourseFeeModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCourseFeeModeFilter<$PrismaModel> | $Enums.CourseFeeMode
+}
+
 export type NestedDecimalNullableFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
@@ -1126,6 +1150,16 @@ export type NestedDecimalNullableFilter<$PrismaModel = never> = {
   gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   not?: Prisma.NestedDecimalNullableFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+}
+
+export type NestedEnumCourseFeeModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CourseFeeMode | Prisma.EnumCourseFeeModeFieldRefInput<$PrismaModel>
+  in?: $Enums.CourseFeeMode[] | Prisma.ListEnumCourseFeeModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CourseFeeMode[] | Prisma.ListEnumCourseFeeModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCourseFeeModeWithAggregatesFilter<$PrismaModel> | $Enums.CourseFeeMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCourseFeeModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCourseFeeModeFilter<$PrismaModel>
 }
 
 export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -1195,23 +1229,6 @@ export type NestedEnumEnquiryActivityTypeWithAggregatesFilter<$PrismaModel = nev
   _max?: Prisma.NestedEnumEnquiryActivityTypeFilter<$PrismaModel>
 }
 
-export type NestedEnumLectureKindFilter<$PrismaModel = never> = {
-  equals?: $Enums.LectureKind | Prisma.EnumLectureKindFieldRefInput<$PrismaModel>
-  in?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
-  notIn?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumLectureKindFilter<$PrismaModel> | $Enums.LectureKind
-}
-
-export type NestedEnumLectureKindWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.LectureKind | Prisma.EnumLectureKindFieldRefInput<$PrismaModel>
-  in?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
-  notIn?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumLectureKindWithAggregatesFilter<$PrismaModel> | $Enums.LectureKind
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumLectureKindFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumLectureKindFilter<$PrismaModel>
-}
-
 export type NestedDecimalFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -1237,6 +1254,23 @@ export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedDecimalFilter<$PrismaModel>
   _min?: Prisma.NestedDecimalFilter<$PrismaModel>
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
+}
+
+export type NestedEnumLectureKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.LectureKind | Prisma.EnumLectureKindFieldRefInput<$PrismaModel>
+  in?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLectureKindFilter<$PrismaModel> | $Enums.LectureKind
+}
+
+export type NestedEnumLectureKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LectureKind | Prisma.EnumLectureKindFieldRefInput<$PrismaModel>
+  in?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LectureKind[] | Prisma.ListEnumLectureKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLectureKindWithAggregatesFilter<$PrismaModel> | $Enums.LectureKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLectureKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLectureKindFilter<$PrismaModel>
 }
 
 export type NestedEnumAttendanceStatusFilter<$PrismaModel = never> = {

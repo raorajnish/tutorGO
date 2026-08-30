@@ -9,8 +9,15 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { EditStudentModal } from "@/components/students/EditStudentModal";
 import { SetupFeeAccountModal } from "@/components/fees/SetupFeeAccountModal";
+import { EditFeeAccountPricingModal } from "@/components/fees/EditFeeAccountPricingModal";
 import { formatMoney } from "@/lib/money";
-import { ATTENDANCE_STATUS_LABELS, FEE_PLAN_TYPE_LABELS, type Batch, type StudentDetail } from "@/lib/types";
+import {
+  ATTENDANCE_STATUS_LABELS,
+  FEE_PLAN_TYPE_LABELS,
+  type Batch,
+  type StudentDetail,
+  type StudentSubject,
+} from "@/lib/types";
 
 function fmtDate(d: string | null) {
   if (!d) return "—";
@@ -31,20 +38,48 @@ export function StudentProfileModal({ studentId, onClose, onChanged }: Props) {
   const [deactivateOpen, setDeactivateOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [setupFeeOpen, setSetupFeeOpen] = useState(false);
+  const [editPricingOpen, setEditPricingOpen] = useState(false);
+  const [subjects, setSubjects] = useState<StudentSubject[]>([]);
+  const [subjectBusy, setSubjectBusy] = useState<string | null>(null);
 
   function load() {
     if (!studentId) return;
     apiFetch<StudentDetail>(`/students/${studentId}`)
       .then(setStudent)
       .catch(() => setError("Could not load this student."));
+    // Empty on a FLAT course, which is why the section below renders nothing
+    // rather than an empty state — there is no subject enrollment to show.
+    apiFetch<StudentSubject[]>(`/students/${studentId}/subjects`)
+      .then(setSubjects)
+      .catch(() => setSubjects([]));
   }
 
   useEffect(() => {
     setStudent(null);
     setError(null);
+    setSubjects([]);
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId]);
+
+  /// Roster-only. Dropping a subject deliberately leaves every installment
+  /// alone — whether a family is owed anything back is a policy call, made
+  /// explicitly through the fee tools, not as a silent side-effect here.
+  async function toggleSubject(subjectId: string, isActive: boolean) {
+    if (!student) return;
+    setSubjectBusy(subjectId);
+    try {
+      await apiFetch(`/students/${student.id}/subjects/${subjectId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ isActive }),
+      });
+      load();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not update this subject.");
+    } finally {
+      setSubjectBusy(null);
+    }
+  }
 
   async function toggleActive() {
     if (!student) return;
@@ -114,6 +149,38 @@ export function StudentProfileModal({ studentId, onClose, onChanged }: Props) {
               </div>
             </div>
 
+            {subjects.length > 0 && (
+              <div>
+                <div className="mb-2 flex items-baseline justify-between">
+                  <p className="text-sm font-medium text-foreground">Subjects</p>
+                  <p className="text-xs text-muted-foreground">Dropping a subject changes rosters only — never the fee.</p>
+                </div>
+                <div className="divide-y divide-border rounded-xl border border-border">
+                  {subjects.map((s) => (
+                    <div key={s.id} className="flex flex-wrap items-center gap-3 px-3.5 py-2.5">
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-sm ${s.isActive ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                          {s.subjectName} <span className="text-muted-foreground">· {s.subjectShortCode}</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {Number(s.amount) === 0 ? "Complementary" : formatMoney(s.amount)}
+                          {s.leftAt ? ` · dropped ${fmtDate(s.leftAt)}` : ""}
+                        </p>
+                      </div>
+                      <Badge tone={s.isActive ? "success" : "neutral"}>{s.isActive ? "Enrolled" : "Dropped"}</Badge>
+                      <Button
+                        variant="ghost"
+                        disabled={subjectBusy === s.subjectId}
+                        onClick={() => toggleSubject(s.subjectId, !s.isActive)}
+                      >
+                        {subjectBusy === s.subjectId ? "Saving…" : s.isActive ? "Drop" : "Resume"}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <p className="mb-2 text-sm font-medium text-foreground">Fee account</p>
@@ -123,11 +190,28 @@ export function StudentProfileModal({ studentId, onClose, onChanged }: Props) {
                   </p>
                 ) : student.feeAccount ? (
                   <div className="space-y-2 rounded-xl border border-border px-3.5 py-3 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Badge tone="primary">{FEE_PLAN_TYPE_LABELS[student.feeAccount.planType]}</Badge>
-                      <Badge tone={student.feeAccount.status === "ACTIVE" ? "success" : "neutral"}>
-                        {student.feeAccount.status === "ACTIVE" ? "Active" : "Closed"}
-                      </Badge>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Badge tone="primary">{FEE_PLAN_TYPE_LABELS[student.feeAccount.planType]}</Badge>
+                        <Badge tone={student.feeAccount.status === "ACTIVE" ? "success" : "neutral"}>
+                          {student.feeAccount.status === "ACTIVE" ? "Active" : "Closed"}
+                        </Badge>
+                      </div>
+                      {/* Once a rupee has been collected, finalFee is what the
+                          payment waterfall is allocating against — correcting
+                          it would leave that allocation describing a total
+                          that no longer exists. So this is only ever offered
+                          while the account is still exactly what staff typed,
+                          untouched by any real payment. */}
+                      {student.feeAccount.planType === "ONE_TIME" && Number(student.feeAccount.totalPaid) === 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setEditPricingOpen(true)}
+                          className="text-xs font-medium text-accent underline underline-offset-2 hover:text-accent/80"
+                        >
+                          Correct pricing
+                        </button>
+                      )}
                     </div>
                     <div className="flex justify-between text-foreground">
                       <span className="text-muted-foreground">Total due</span>
@@ -188,6 +272,17 @@ export function StudentProfileModal({ studentId, onClose, onChanged }: Props) {
           onClose={() => setSetupFeeOpen(false)}
           onSaved={load}
           student={student}
+        />
+      )}
+
+      {student && (
+        <EditFeeAccountPricingModal
+          open={editPricingOpen}
+          onClose={() => setEditPricingOpen(false)}
+          onSaved={load}
+          studentId={student.id}
+          studentName={student.name}
+          courseId={student.course.id}
         />
       )}
 

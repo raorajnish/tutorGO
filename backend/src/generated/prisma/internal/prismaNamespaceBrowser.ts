@@ -76,6 +76,7 @@ export const ModelName = {
   EnquiryActivity: 'EnquiryActivity',
   StudentCodeCounter: 'StudentCodeCounter',
   Student: 'Student',
+  StudentSubject: 'StudentSubject',
   StudentBatch: 'StudentBatch',
   Lecture: 'Lecture',
   Test: 'Test',
@@ -84,6 +85,7 @@ export const ModelName = {
   FacultyAssignment: 'FacultyAssignment',
   MessageTemplate: 'MessageTemplate',
   FeeStructure: 'FeeStructure',
+  FeeStructureSubjectLine: 'FeeStructureSubjectLine',
   FeeAccount: 'FeeAccount',
   FeeInstallment: 'FeeInstallment',
   Payment: 'Payment',
@@ -411,6 +413,7 @@ export const CourseScalarFieldEnum = {
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  feeMode: 'feeMode',
   defaultFee: 'defaultFee',
   defaultMonthlyFee: 'defaultMonthlyFee'
 } as const
@@ -523,6 +526,19 @@ export const StudentScalarFieldEnum = {
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
+
+
+export const StudentSubjectScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  subjectId: 'subjectId',
+  amount: 'amount',
+  isActive: 'isActive',
+  joinedAt: 'joinedAt',
+  leftAt: 'leftAt'
+} as const
+
+export type StudentSubjectScalarFieldEnum = (typeof StudentSubjectScalarFieldEnum)[keyof typeof StudentSubjectScalarFieldEnum]
 
 
 export const StudentBatchScalarFieldEnum = {
@@ -641,6 +657,16 @@ export const FeeStructureScalarFieldEnum = {
 } as const
 
 export type FeeStructureScalarFieldEnum = (typeof FeeStructureScalarFieldEnum)[keyof typeof FeeStructureScalarFieldEnum]
+
+
+export const FeeStructureSubjectLineScalarFieldEnum = {
+  id: 'id',
+  feeStructureId: 'feeStructureId',
+  subjectId: 'subjectId',
+  amount: 'amount'
+} as const
+
+export type FeeStructureSubjectLineScalarFieldEnum = (typeof FeeStructureSubjectLineScalarFieldEnum)[keyof typeof FeeStructureSubjectLineScalarFieldEnum]
 
 
 export const FeeAccountScalarFieldEnum = {

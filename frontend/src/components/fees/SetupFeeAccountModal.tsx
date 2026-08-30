@@ -53,6 +53,7 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
   const [installmentCount, setInstallmentCount] = useState("3");
   const [firstDueDate, setFirstDueDate] = useState(todayInput());
   const [rows, setRows] = useState<InstallmentInput[]>([]);
+  const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
   const [monthlyAmount, setMonthlyAmount] = useState("");
   const [billingDay, setBillingDay] = useState("5");
   const [startDate, setStartDate] = useState(todayInput());
@@ -68,6 +69,7 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
     setInstallmentCount("3");
     setFirstDueDate(todayInput());
     setRows([]);
+    setSelectedSubjectIds([]);
     setMonthlyAmount("");
     setBillingDay("5");
     setStartDate(todayInput());
@@ -94,10 +96,37 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
   const selectedStructure = structures.find((s) => s.id === structureId) ?? null;
   const effectivePlanType = selectedStructure ? selectedStructure.planType : planType;
 
+  // A subject-wise course prices per subject, so the "custom, type your own
+  // amount" path doesn't apply — the total has to come from the checklist or
+  // the per-subject rows on the receipt wouldn't add up to it.
+  const courseIsSubjectWise = structures.some((s) => s.course.feeMode === "SUBJECT_WISE");
+  const subjectLines = selectedStructure?.subjectLines ?? null;
+  const isSubjectWise = subjectLines !== null;
+
+  // Every subject starts checked — paid and complementary alike. Staff uncheck
+  // what a student isn't taking rather than building the list up from nothing.
+  useEffect(() => {
+    setSelectedSubjectIds(selectedStructure?.subjectLines?.map((l) => l.subjectId) ?? []);
+  }, [selectedStructure]);
+
+  const selectedLines = useMemo(
+    () => (subjectLines ?? []).filter((l) => selectedSubjectIds.includes(l.subjectId)),
+    [subjectLines, selectedSubjectIds]
+  );
+  const subjectTotal = selectedLines.reduce((sum, l) => sum + Number(l.amount), 0);
+  // Complementary subjects come *with* a paid enrollment; a ₹0-only selection
+  // is a free ride and is rejected server-side too. A genuine full waiver is a
+  // discount, which keeps the original price on the record.
+  const hasPaidSubject = selectedLines.some((l) => Number(l.amount) > 0);
+
   const finalFee = useMemo(() => {
-    const base = selectedStructure ? Number(selectedStructure.courseFee ?? 0) : Number(courseFee || 0);
+    const base = isSubjectWise
+      ? subjectTotal
+      : selectedStructure
+        ? Number(selectedStructure.courseFee ?? 0)
+        : Number(courseFee || 0);
     return Math.max(0, base - (Number(discount) || 0));
-  }, [selectedStructure, courseFee, discount]);
+  }, [isSubjectWise, subjectTotal, selectedStructure, courseFee, discount]);
 
   // A structure only pre-fills the count as a default — always editable per
   // student, since one student on the standard plan might genuinely need
@@ -147,6 +176,11 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
     e.preventDefault();
     setError(null);
 
+    if (isSubjectWise && !hasPaidSubject) {
+      setError("Select at least one paid subject — complementary subjects are included with a paid enrollment, not offered on their own.");
+      return;
+    }
+
     if (effectivePlanType === "ONE_TIME" && allocatedMismatch) {
       setError(`Installments add up to ${formatMoney(allocated)}, which doesn't match the final fee of ${formatMoney(finalFee)}`);
       return;
@@ -165,7 +199,10 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
           planType: isCustom ? planType : undefined,
           ...(effectivePlanType === "ONE_TIME"
             ? {
+                // Never sent on a subject-wise account — the server sums the
+                // selected subjects itself and rejects a client-supplied total.
                 courseFee: isCustom ? Number(courseFee) : undefined,
+                subjectIds: isSubjectWise ? selectedSubjectIds : undefined,
                 discount: Number(discount) || undefined,
                 installments: rows.map((r) => ({ dueDate: r.dueDate, amount: Number(r.amount) })),
               }
@@ -196,7 +233,13 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" form="setup-fee-account-form" disabled={submitting || (effectivePlanType === "ONE_TIME" && allocatedMismatch)}>
+          <Button
+            type="submit"
+            form="setup-fee-account-form"
+            disabled={
+              submitting || (isSubjectWise && !hasPaidSubject) || (effectivePlanType === "ONE_TIME" && allocatedMismatch)
+            }
+          >
             {submitting ? "Setting up…" : "Set up account"}
           </Button>
         </>
@@ -209,10 +252,62 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
           onChange={setStructureId}
           options={[
             ...structures.map((s) => ({ value: s.id, label: `${s.name} (${FEE_PLAN_TYPE_LABELS[s.planType]})` })),
-            { value: CUSTOM_OPTION, label: "Custom — enter amounts manually" },
+            ...(courseIsSubjectWise ? [] : [{ value: CUSTOM_OPTION, label: "Custom — enter amounts manually" }]),
           ]}
           placeholder="Select a fee structure"
         />
+
+        {isSubjectWise && (
+          <div className="space-y-2">
+            <div className="flex items-baseline justify-between">
+              <p className="text-sm font-medium text-foreground">Subjects</p>
+              <p className="text-xs text-muted-foreground">Everything is included by default — uncheck what {student.name} isn&apos;t taking.</p>
+            </div>
+
+            <div className="overflow-hidden rounded-xl border border-border">
+              {subjectLines!.map((line, i) => {
+                const checked = selectedSubjectIds.includes(line.subjectId);
+                const free = Number(line.amount) === 0;
+                return (
+                  <label
+                    key={line.subjectId}
+                    className={`flex cursor-pointer items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-secondary/50 ${
+                      i > 0 ? "border-t border-border" : ""
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) =>
+                        setSelectedSubjectIds((prev) =>
+                          e.target.checked ? [...prev, line.subjectId] : prev.filter((id) => id !== line.subjectId)
+                        )
+                      }
+                      className="h-4 w-4 shrink-0 cursor-pointer accent-accent"
+                    />
+                    <span className={`flex-1 text-sm ${checked ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                      {line.subjectName}
+                    </span>
+                    <span className={`text-sm font-medium ${free ? "text-success" : "text-foreground"}`}>
+                      {free ? "Included" : formatMoney(Number(line.amount))}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-between rounded-xl border border-border bg-muted px-3.5 py-2.5">
+              <span className="text-sm font-medium text-foreground">Course fee</span>
+              <span className="font-display text-base font-semibold text-foreground">{formatMoney(subjectTotal)}</span>
+            </div>
+
+            {!hasPaidSubject && (
+              <p className="text-xs font-medium text-danger">
+                Select at least one paid subject — complementary subjects are included with a paid enrollment, not offered on their own.
+              </p>
+            )}
+          </div>
+        )}
 
         {structureId === CUSTOM_OPTION && (
           <div className="flex gap-1.5">
@@ -240,7 +335,11 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium text-foreground">Course fee</span>
                   <div className="flex h-[42px] items-center rounded-xl border border-border bg-muted px-3.5 text-sm text-muted-foreground">
-                    {selectedStructure ? `₹${selectedStructure.courseFee}` : "—"}
+                    {isSubjectWise
+                      ? `${formatMoney(subjectTotal)} (${selectedLines.length} subject${selectedLines.length === 1 ? "" : "s"})`
+                      : selectedStructure
+                        ? `₹${selectedStructure.courseFee}`
+                        : "—"}
                   </div>
                 </div>
               )}

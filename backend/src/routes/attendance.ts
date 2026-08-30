@@ -11,9 +11,8 @@ import {
   serializeLecture,
   timeSchema,
   toTimeDate,
-  toTimeString,
-  todayDateOnly,
 } from "../lib/lectureShared.js";
+import { todayDateOnly } from "../lib/dateOnly.js";
 
 export const attendanceRouter = Router();
 
@@ -407,7 +406,7 @@ attendanceRouter.get("/lectures/:id/roster", async (req, res, next) => {
     const instituteId = req.tenantId!;
     const lecture = await loadLecture(req.params.id as string, instituteId);
     assertCanActOnLecture(req, lecture.facultyId);
-    const roster = await deriveRoster(lecture.batchId, lecture.date);
+    const roster = await deriveRoster(lecture.batchId, lecture.date, lecture.subjectId);
 
     const records = await prisma.attendanceRecord.findMany({ where: { lectureId: lecture.id } });
     const markedByIds = [...new Set(records.map((r) => r.markedById).filter((id): id is string => !!id))];
@@ -445,7 +444,7 @@ attendanceRouter.post("/lectures/:id/mark", requireRoles(...SCHEDULE_ROLES), val
     assertCanActOnLecture(req, lecture.facultyId);
     if (lecture.cancelledAt) throw ApiError.badRequest("This lecture was cancelled — attendance can't be marked");
 
-    const roster = await deriveRoster(lecture.batchId, lecture.date);
+    const roster = await deriveRoster(lecture.batchId, lecture.date, lecture.subjectId);
     const rosterIds = new Set(roster.map((s) => s.id));
     for (const r of body.records) {
       if (!rosterIds.has(r.studentId)) throw ApiError.badRequest("One or more students are not on this lecture's roster");
@@ -474,7 +473,7 @@ attendanceRouter.post("/lectures/:id/mark-all-present", requireRoles(...SCHEDULE
     assertCanActOnLecture(req, lecture.facultyId);
     if (lecture.cancelledAt) throw ApiError.badRequest("This lecture was cancelled — attendance can't be marked");
 
-    const roster = await deriveRoster(lecture.batchId, lecture.date);
+    const roster = await deriveRoster(lecture.batchId, lecture.date, lecture.subjectId);
     const existing = await prisma.attendanceRecord.findMany({ where: { lectureId: lecture.id } });
     const alreadyMarked = new Set(existing.map((r) => r.studentId));
     const unmarked = roster.filter((s) => !alreadyMarked.has(s.id));
@@ -512,7 +511,7 @@ attendanceRouter.get("/summary", async (req, res, next) => {
 
     const summary = await Promise.all(
       lectures.map(async (l) => {
-        const roster = await deriveRoster(l.batchId, l.date);
+        const roster = await deriveRoster(l.batchId, l.date, l.subjectId);
         const records = await prisma.attendanceRecord.findMany({ where: { lectureId: l.id } });
         const byStatus = (status: string) => records.filter((r) => r.status === status).length;
 

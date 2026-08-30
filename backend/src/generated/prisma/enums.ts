@@ -202,3 +202,11 @@ export const ReminderAudience = {
 } as const
 
 export type ReminderAudience = (typeof ReminderAudience)[keyof typeof ReminderAudience]
+
+
+export const CourseFeeMode = {
+  FLAT: 'FLAT',
+  SUBJECT_WISE: 'SUBJECT_WISE'
+} as const
+
+export type CourseFeeMode = (typeof CourseFeeMode)[keyof typeof CourseFeeMode]

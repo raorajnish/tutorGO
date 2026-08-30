@@ -19,11 +19,6 @@ export function toTimeString(d: Date): string {
   return `${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
 }
 
-export function todayDateOnly(): Date {
-  const now = new Date();
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-}
-
 export const lectureInclude = {
   batch: { include: { course: { select: { id: true, name: true, code: true } } } },
   subject: { select: { id: true, name: true, shortCode: true } },
@@ -65,12 +60,48 @@ export function serializeLecture(l: {
 
 /// The roster is derived per-read from StudentBatch rows active on `date`, so
 /// it never goes stale when a student is later moved between batches.
-export async function deriveRoster(batchId: string, date: Date) {
+///
+/// `subjectId` (the lecture's own subject) narrows the roster further, but
+/// **only on a SUBJECT_WISE course**: there, a student appears solely on the
+/// subjects they actually enrolled in, so someone who opted out of Biology is
+/// absent from Biology lectures while still on every other subject's. On a
+/// FLAT course the argument is ignored entirely and the result is byte-for-byte
+/// what it has always been. Callers should always pass `lecture.subjectId` —
+/// the mode check lives here, not at the call sites. See changes-phase8.md §8c.
+export async function deriveRoster(batchId: string, date: Date, subjectId?: string) {
+  let subjectScoped = false;
+  if (subjectId) {
+    const batch = await prisma.batch.findUnique({
+      where: { id: batchId },
+      select: { course: { select: { feeMode: true } } },
+    });
+    subjectScoped = batch?.course.feeMode === "SUBJECT_WISE";
+  }
+
   const rows = await prisma.studentBatch.findMany({
     where: {
       batchId,
       joinedAt: { lte: date },
       OR: [{ leftAt: null }, { leftAt: { gte: date } }],
+      ...(subjectScoped
+        ? {
+            student: {
+              subjects: {
+                // Date-windowed rather than `isActive`, deliberately: dropping a
+                // subject sets leftAt to that day, and a student who *was*
+                // enrolled must still appear on rosters from before they left —
+                // otherwise their existing attendance records would belong to
+                // lectures whose roster says they were never there. Exactly the
+                // filter StudentBatch itself uses, one level down.
+                some: {
+                  subjectId,
+                  joinedAt: { lte: date },
+                  OR: [{ leftAt: null }, { leftAt: { gte: date } }],
+                },
+              },
+            },
+          }
+        : {}),
     },
     include: { student: { select: { id: true, name: true, studentCode: true } } },
     orderBy: { student: { name: "asc" } },

@@ -8,6 +8,8 @@ import { validateBody } from "../middleware/validate.js";
 import { nextReceiptNumber } from "../services/receiptNumber.js";
 import { money } from "../lib/money.js";
 import { loadUserRefs } from "../lib/userRefs.js";
+import { auditLog } from "../services/audit.js";
+import { todayDateOnly } from "../lib/dateOnly.js";
 
 export const feesRouter = Router();
 
@@ -27,11 +29,6 @@ const READ_ROLES = ["OWNER", "ADMIN", "RECEPTION", "ACCOUNTANT"] as const;
 // ---------------------------------------------------------------------------
 // Money + date helpers
 // ---------------------------------------------------------------------------
-
-function todayDateOnly(): Date {
-  const now = new Date();
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-}
 
 /** Adds `months` to `date`, keeping the day-of-month capped at 28 to dodge Feb/30-day edge cases. */
 function addMonthsCapped(date: Date, months: number, day?: number): Date {
@@ -237,8 +234,68 @@ const createAccountSchema = z
     monthlyAmount: z.number().nonnegative().optional(),
     billingDay: z.number().int().min(1).max(28).optional(),
     startDate: z.coerce.date().optional(),
+    /// SUBJECT_WISE only: which of the structure's priced subjects this
+    /// student is actually taking. Their prices are summed into courseFee.
+    subjectIds: z.array(z.string().min(1)).optional(),
   })
   .refine((b) => b.feeStructureId || b.planType, { message: "Either a fee structure or a plan type is required" });
+
+/// Resolves a subject-wise selection into the rows and total a fee account
+/// needs. Returns the priced `courseFee` plus one StudentSubject payload per
+/// selected subject — complementary (₹0) subjects included, because they drive
+/// rosters exactly as much as paid ones do.
+///
+/// `joinedAt` per subject is copied from the student's *batch* join date, not
+/// today (guard B, changes-phase8.md §8c): deriveRoster filters
+/// `joinedAt <= date`, so stamping today on a student who joined months ago
+/// would erase them from every earlier roster while their AttendanceRecord
+/// rows survive. Falls back to the student's admission date when they aren't
+/// in a batch yet.
+async function resolveSubjectSelection(
+  studentId: string,
+  admissionDate: Date,
+  structureId: string,
+  subjectIds: string[]
+) {
+  const lines = await prisma.feeStructureSubjectLine.findMany({
+    where: { feeStructureId: structureId },
+    include: { subject: { select: { id: true, name: true } } },
+  });
+
+  if (lines.length === 0) {
+    throw ApiError.badRequest("This fee structure has no subject pricing set up yet");
+  }
+
+  const byId = new Map(lines.map((l) => [l.subjectId, l]));
+  const unknown = subjectIds.filter((id) => !byId.has(id));
+  if (unknown.length > 0) throw ApiError.badRequest("One or more selected subjects aren't priced on this fee structure");
+
+  const selected = subjectIds.map((id) => byId.get(id)!);
+
+  // Complementary subjects are included *with* a paid enrollment, not sold on
+  // their own — a selection of only ₹0 subjects is a free ride, and almost
+  // always a mis-click. A genuine full waiver goes through `discount` instead,
+  // which keeps the original price visible on the receipt.
+  if (!selected.some((l) => l.amount.gt(0))) {
+    throw ApiError.badRequest(
+      "Select at least one paid subject — complementary subjects are included with a paid enrollment, not offered on their own."
+    );
+  }
+
+  const courseFee = selected.reduce((sum, l) => sum.plus(l.amount), new Prisma.Decimal(0));
+
+  const earliestBatch = await prisma.studentBatch.findFirst({
+    where: { studentId },
+    orderBy: { joinedAt: "asc" },
+    select: { joinedAt: true },
+  });
+  const joinedAt = earliestBatch?.joinedAt ?? admissionDate;
+
+  return {
+    courseFee,
+    studentSubjects: selected.map((l) => ({ subjectId: l.subjectId, amount: l.amount, joinedAt })),
+  };
+}
 
 feesRouter.post("/accounts", requireRoles(...MANAGE_ROLES), validateBody(createAccountSchema), async (req, res, next) => {
   try {
@@ -259,20 +316,55 @@ feesRouter.post("/accounts", requireRoles(...MANAGE_ROLES), validateBody(createA
 
     const planType = body.planType ?? structure!.planType;
 
+    const course = await prisma.course.findUnique({ where: { id: student.courseId }, select: { feeMode: true } });
+    const subjectWise = course?.feeMode === "SUBJECT_WISE";
+
+    // On a subject-wise course the total is derived from the checked subjects,
+    // never typed. Accepting a client courseFee would let the stored total
+    // contradict the per-subject rows the receipt itemises from.
+    let subjectSelection: Awaited<ReturnType<typeof resolveSubjectSelection>> | null = null;
+    if (subjectWise) {
+      if (planType !== "ONE_TIME") {
+        throw ApiError.badRequest("Subject-wise courses use one-time plans — a per-subject monthly rate isn't supported.");
+      }
+      if (!structure) throw ApiError.badRequest("A fee structure is required for a subject-wise course");
+      if (body.courseFee !== undefined) {
+        throw ApiError.badRequest("Course fee is calculated from the selected subjects and can't be set directly");
+      }
+      if (!body.subjectIds || body.subjectIds.length === 0) throw ApiError.badRequest("Select at least one subject");
+
+      subjectSelection = await resolveSubjectSelection(
+        student.id,
+        student.admissionDate,
+        structure.id,
+        body.subjectIds
+      );
+    }
+
     const account = await prisma.$transaction(async (tx) => {
       if (planType === "ONE_TIME") {
-        const courseFeeInput = body.courseFee ?? (structure?.courseFee ? Number(structure.courseFee) : undefined);
+        const courseFeeInput =
+          subjectSelection?.courseFee ?? body.courseFee ?? (structure?.courseFee ? Number(structure.courseFee) : undefined);
         if (courseFeeInput === undefined) throw ApiError.badRequest("Course fee is required");
 
         const courseFee = new Prisma.Decimal(courseFeeInput);
         const discount = new Prisma.Decimal(body.discount ?? 0);
         const finalFee = courseFee.minus(discount);
-        if (finalFee.lte(0)) throw ApiError.badRequest("Final fee must be greater than zero");
+        if (finalFee.lt(0)) throw ApiError.badRequest("Discount can't be more than the course fee");
+        // A ₹0 total is only reachable by discounting the whole fee — a real
+        // full waiver, which stays a valid enrollment with its original price
+        // still on record. (A ₹0 *selection* was already rejected upstream.)
+        if (finalFee.eq(0) && discount.lte(0)) throw ApiError.badRequest("Final fee must be greater than zero");
 
         let installmentRows: { seq: number; dueDate: Date; amount: Prisma.Decimal }[];
         let installmentCount: number;
 
-        if (body.installments && body.installments.length > 0) {
+        if (finalFee.eq(0)) {
+          // Fully waived — there is nothing to collect, so the account exists
+          // for its record and its StudentSubject rows, with no schedule.
+          installmentCount = 0;
+          installmentRows = [];
+        } else if (body.installments && body.installments.length > 0) {
           const sum = body.installments.reduce((s, i) => s.plus(new Prisma.Decimal(i.amount)), new Prisma.Decimal(0));
           if (sum.minus(finalFee).abs().gt(0.01)) {
             throw ApiError.badRequest(
@@ -307,9 +399,25 @@ feesRouter.post("/accounts", requireRoles(...MANAGE_ROLES), validateBody(createA
           },
         });
 
-        await tx.feeInstallment.createMany({
-          data: installmentRows.map((r) => ({ feeAccountId: created.id, seq: r.seq, dueDate: r.dueDate, amount: r.amount })),
-        });
+        if (installmentRows.length > 0) {
+          await tx.feeInstallment.createMany({
+            data: installmentRows.map((r) => ({ feeAccountId: created.id, seq: r.seq, dueDate: r.dueDate, amount: r.amount })),
+          });
+        }
+
+        // Written in the same transaction as the account: these rows are what
+        // the student's rosters are derived from, so an account without them
+        // would leave the student invisible on every lecture of their course.
+        if (subjectSelection) {
+          await tx.studentSubject.createMany({
+            data: subjectSelection.studentSubjects.map((s) => ({
+              studentId: body.studentId,
+              subjectId: s.subjectId,
+              amount: s.amount,
+              joinedAt: s.joinedAt,
+            })),
+          });
+        }
 
         return created;
       }
@@ -487,6 +595,148 @@ feesRouter.patch(
       });
 
       res.json(serializeInstallment(updated));
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+const revisePricingSchema = z
+  .object({
+    /// SUBJECT_WISE only — mutually exclusive with courseFee below, since the
+    /// total is computed from the selection, never typed, same rule as account
+    /// creation.
+    subjectIds: z.array(z.string().min(1)).optional(),
+    /// FLAT only — the typed-total equivalent of subjectIds, for correcting a
+    /// mistyped base fee rather than a wrong subject selection.
+    courseFee: z.number().nonnegative().optional(),
+    discount: z.number().nonnegative().optional(),
+    firstDueDate: z.coerce.date().optional(),
+    installmentCount: z.number().int().positive().optional(),
+  })
+  .refine((b) => b.subjectIds !== undefined || b.courseFee !== undefined || b.discount !== undefined, {
+    message: "Nothing to revise — pass subjectIds/courseFee, discount, or both",
+  });
+
+/// Correcting an account that was set up wrong — the wrong subjects ticked, or
+/// a mistyped discount. Repricing regenerates the schedule from scratch, so it
+/// is only ever allowed **before any money has moved**: once a payment exists,
+/// finalFee is the figure the allocation waterfall has been working against,
+/// and moving it would leave those allocations describing a total that no
+/// longer exists. That gate is the same idiom the installment-level edits use
+/// one level down (a paid installment can't be edited or rescheduled either).
+///
+/// This is NOT the way to handle a student dropping a subject in November —
+/// that is PATCH /students/:id/subjects/:subjectId, which touches the roster
+/// and deliberately leaves the money alone.
+feesRouter.patch(
+  "/accounts/:studentId/pricing",
+  requireRoles(...STRICT_ROLES),
+  validateBody(revisePricingSchema),
+  async (req, res, next) => {
+    try {
+      const instituteId = req.tenantId!;
+      const body = req.body as z.infer<typeof revisePricingSchema>;
+      const account = await loadFeeAccount(req.params.studentId as string, instituteId);
+
+      if (account.planType !== "ONE_TIME") throw ApiError.badRequest("Only one-time accounts can be repriced");
+
+      const paymentCount = await prisma.payment.count({ where: { feeAccountId: account.id, voidedAt: null } });
+      if (paymentCount > 0) {
+        throw ApiError.badRequest(
+          "A payment has already been recorded on this account, so it can't be repriced. Adjust the remaining installments instead."
+        );
+      }
+
+      const student = await prisma.student.findUnique({
+        where: { id: account.studentId },
+        include: { course: { select: { feeMode: true } } },
+      });
+      if (!student) throw ApiError.notFound("Student not found");
+
+      const subjectWise = student.course.feeMode === "SUBJECT_WISE";
+      if (body.subjectIds && !subjectWise) {
+        throw ApiError.badRequest("Subject selection only applies to a subject-wise course");
+      }
+      if (body.courseFee !== undefined && subjectWise) {
+        throw ApiError.badRequest("Course fee is calculated from the selected subjects on this course — revise the subject selection instead");
+      }
+
+      let selection: Awaited<ReturnType<typeof resolveSubjectSelection>> | null = null;
+      if (body.subjectIds) {
+        if (!account.feeStructureId) throw ApiError.badRequest("This account has no fee structure to price against");
+        selection = await resolveSubjectSelection(
+          student.id,
+          student.admissionDate,
+          account.feeStructureId,
+          body.subjectIds
+        );
+      }
+
+      const courseFee = selection?.courseFee ?? (body.courseFee !== undefined ? new Prisma.Decimal(body.courseFee) : account.courseFee) ?? new Prisma.Decimal(0);
+      const discount = new Prisma.Decimal(body.discount ?? Number(account.discount ?? 0));
+      const finalFee = courseFee.minus(discount);
+      if (finalFee.lt(0)) throw ApiError.badRequest("Discount can't be more than the course fee");
+
+      const count = body.installmentCount ?? account.installmentCount ?? 1;
+      // Keep the existing schedule's start date unless the caller moves it, so
+      // a pure discount correction doesn't silently shift every due date.
+      const firstExisting = await prisma.feeInstallment.findFirst({
+        where: { feeAccountId: account.id },
+        orderBy: { seq: "asc" },
+        select: { dueDate: true },
+      });
+      const firstDueDate = body.firstDueDate ?? firstExisting?.dueDate ?? todayDateOnly();
+
+      const updated = await withFeeAccountLock(account.id, async (tx) => {
+        // Safe to drop and rebuild: no payment exists, so no PaymentAllocation
+        // can be pointing at any of these rows.
+        await tx.feeInstallment.deleteMany({ where: { feeAccountId: account.id } });
+
+        if (finalFee.gt(0)) {
+          const rows = generateOneTimeInstallments(finalFee, count, firstDueDate);
+          await tx.feeInstallment.createMany({
+            data: rows.map((r) => ({ feeAccountId: account.id, seq: r.seq, dueDate: r.dueDate, amount: r.amount })),
+          });
+        }
+
+        if (selection) {
+          // The selection was wrong from the start, so the old rows are not
+          // history worth keeping — unlike a mid-course drop, which preserves
+          // them precisely so past rosters stay correct.
+          await tx.studentSubject.deleteMany({ where: { studentId: student.id } });
+          await tx.studentSubject.createMany({
+            data: selection.studentSubjects.map((s) => ({
+              studentId: student.id,
+              subjectId: s.subjectId,
+              amount: s.amount,
+              joinedAt: s.joinedAt,
+            })),
+          });
+        }
+
+        return tx.feeAccount.update({
+          where: { id: account.id },
+          data: {
+            courseFee,
+            discount,
+            finalFee,
+            installmentCount: finalFee.gt(0) ? count : 0,
+          },
+        });
+      });
+
+      await auditLog({
+        action: "FEE_ACCOUNT_REPRICED",
+        instituteId,
+        organizationId: req.user!.organizationId,
+        userId: req.user!.id,
+        targetType: "FeeAccount",
+        targetId: account.id,
+        metadata: { finalFee: money(finalFee) },
+      });
+
+      res.json({ id: updated.id, courseFee: money(courseFee), discount: money(discount), finalFee: money(finalFee) });
     } catch (err) {
       next(err);
     }

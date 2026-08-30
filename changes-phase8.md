@@ -400,6 +400,10 @@ second one).
 
 ## 8c. Subject-wise fees (e.g. 12th std) — APPROVED FOR BUILD (revised 2026-08-29)
 
+> **Status 2026-08-29: IMPLEMENTED (stages 1–6).** Schema, academics routes, fees routes, roster
+> filtering and the frontend are all in. Stage 1 (`FeeStructure.isDefault`) was already complete
+> before this pass. Not yet done: the stage-7 manual test pass against real data.
+>
 > **Status 2026-08-29: scheduled, scope reduced, approved to build.** The 2026-08-28 design below
 > was reviewed against the code a second time and three errors were found in it (see "Corrections"
 > immediately below). Add-on plans are **cut from scope**. All previously-open questions are now

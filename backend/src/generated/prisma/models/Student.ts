@@ -364,6 +364,7 @@ export type StudentWhereInput = {
   enquiry?: Prisma.XOR<Prisma.EnquiryNullableScalarRelationFilter, Prisma.EnquiryWhereInput> | null
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   batches?: Prisma.StudentBatchListRelationFilter
+  subjects?: Prisma.StudentSubjectListRelationFilter
   attendance?: Prisma.AttendanceRecordListRelationFilter
   testResults?: Prisma.TestResultListRelationFilter
   feeAccount?: Prisma.XOR<Prisma.FeeAccountNullableScalarRelationFilter, Prisma.FeeAccountWhereInput> | null
@@ -399,6 +400,7 @@ export type StudentOrderByWithRelationInput = {
   enquiry?: Prisma.EnquiryOrderByWithRelationInput
   course?: Prisma.CourseOrderByWithRelationInput
   batches?: Prisma.StudentBatchOrderByRelationAggregateInput
+  subjects?: Prisma.StudentSubjectOrderByRelationAggregateInput
   attendance?: Prisma.AttendanceRecordOrderByRelationAggregateInput
   testResults?: Prisma.TestResultOrderByRelationAggregateInput
   feeAccount?: Prisma.FeeAccountOrderByWithRelationInput
@@ -437,6 +439,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   enquiry?: Prisma.XOR<Prisma.EnquiryNullableScalarRelationFilter, Prisma.EnquiryWhereInput> | null
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   batches?: Prisma.StudentBatchListRelationFilter
+  subjects?: Prisma.StudentSubjectListRelationFilter
   attendance?: Prisma.AttendanceRecordListRelationFilter
   testResults?: Prisma.TestResultListRelationFilter
   feeAccount?: Prisma.XOR<Prisma.FeeAccountNullableScalarRelationFilter, Prisma.FeeAccountWhereInput> | null
@@ -529,6 +532,7 @@ export type StudentCreateInput = {
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
@@ -561,6 +565,7 @@ export type StudentUncheckedCreateInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
@@ -593,6 +598,7 @@ export type StudentUpdateInput = {
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
@@ -625,6 +631,7 @@ export type StudentUncheckedUpdateInput = {
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
@@ -945,6 +952,20 @@ export type StudentUncheckedUpdateOneWithoutEnquiryNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutEnquiryInput, Prisma.StudentUpdateWithoutEnquiryInput>, Prisma.StudentUncheckedUpdateWithoutEnquiryInput>
 }
 
+export type StudentCreateNestedOneWithoutSubjectsInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutSubjectsInput, Prisma.StudentUncheckedCreateWithoutSubjectsInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutSubjectsInput
+  connect?: Prisma.StudentWhereUniqueInput
+}
+
+export type StudentUpdateOneRequiredWithoutSubjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutSubjectsInput, Prisma.StudentUncheckedCreateWithoutSubjectsInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutSubjectsInput
+  upsert?: Prisma.StudentUpsertWithoutSubjectsInput
+  connect?: Prisma.StudentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutSubjectsInput, Prisma.StudentUpdateWithoutSubjectsInput>, Prisma.StudentUncheckedUpdateWithoutSubjectsInput>
+}
+
 export type StudentCreateNestedOneWithoutBatchesInput = {
   create?: Prisma.XOR<Prisma.StudentCreateWithoutBatchesInput, Prisma.StudentUncheckedCreateWithoutBatchesInput>
   connectOrCreate?: Prisma.StudentCreateOrConnectWithoutBatchesInput
@@ -1039,6 +1060,7 @@ export type StudentCreateWithoutInstituteInput = {
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
@@ -1070,6 +1092,7 @@ export type StudentUncheckedCreateWithoutInstituteInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
@@ -1157,6 +1180,7 @@ export type StudentCreateWithoutOutboundMessagesInput = {
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
@@ -1188,6 +1212,7 @@ export type StudentUncheckedCreateWithoutOutboundMessagesInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
@@ -1235,6 +1260,7 @@ export type StudentUpdateWithoutOutboundMessagesInput = {
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
@@ -1266,6 +1292,7 @@ export type StudentUncheckedUpdateWithoutOutboundMessagesInput = {
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
@@ -1296,6 +1323,7 @@ export type StudentCreateWithoutCourseInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutStudentsInput
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
@@ -1327,6 +1355,7 @@ export type StudentUncheckedCreateWithoutCourseInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
@@ -1384,6 +1413,7 @@ export type StudentCreateWithoutEnquiryInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutStudentsInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
@@ -1415,6 +1445,7 @@ export type StudentUncheckedCreateWithoutEnquiryInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
@@ -1462,6 +1493,7 @@ export type StudentUpdateWithoutEnquiryInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutStudentsNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
@@ -1473,6 +1505,151 @@ export type StudentUncheckedUpdateWithoutEnquiryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   studentCode?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fatherName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  motherName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  selfFillEligible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  profileCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  selfFillPin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
+  attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
+  testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
+  feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
+  distributionReceipts?: Prisma.DistributionReceiptUncheckedUpdateManyWithoutStudentNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutStudentNestedInput
+}
+
+export type StudentCreateWithoutSubjectsInput = {
+  id?: string
+  studentCode: string
+  name: string
+  email: string
+  phone?: string | null
+  parentPhone?: string | null
+  dob?: Date | string | null
+  fatherName?: string | null
+  motherName?: string | null
+  school?: string | null
+  admissionDate: Date | string
+  fingerprintId?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  selfFillEligible?: boolean
+  profileCompletedAt?: Date | string | null
+  selfFillPin?: string | null
+  selfFillAttempts?: number
+  selfFillLockedAt?: Date | string | null
+  institute: Prisma.InstituteCreateNestedOneWithoutStudentsInput
+  enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
+  course: Prisma.CourseCreateNestedOneWithoutStudentsInput
+  batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
+  testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
+  feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
+  distributionReceipts?: Prisma.DistributionReceiptCreateNestedManyWithoutStudentInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutStudentInput
+}
+
+export type StudentUncheckedCreateWithoutSubjectsInput = {
+  id?: string
+  instituteId: string
+  studentCode: string
+  enquiryId?: string | null
+  courseId: string
+  name: string
+  email: string
+  phone?: string | null
+  parentPhone?: string | null
+  dob?: Date | string | null
+  fatherName?: string | null
+  motherName?: string | null
+  school?: string | null
+  admissionDate: Date | string
+  fingerprintId?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  selfFillEligible?: boolean
+  profileCompletedAt?: Date | string | null
+  selfFillPin?: string | null
+  selfFillAttempts?: number
+  selfFillLockedAt?: Date | string | null
+  batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
+  testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
+  feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
+  distributionReceipts?: Prisma.DistributionReceiptUncheckedCreateNestedManyWithoutStudentInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutStudentInput
+}
+
+export type StudentCreateOrConnectWithoutSubjectsInput = {
+  where: Prisma.StudentWhereUniqueInput
+  create: Prisma.XOR<Prisma.StudentCreateWithoutSubjectsInput, Prisma.StudentUncheckedCreateWithoutSubjectsInput>
+}
+
+export type StudentUpsertWithoutSubjectsInput = {
+  update: Prisma.XOR<Prisma.StudentUpdateWithoutSubjectsInput, Prisma.StudentUncheckedUpdateWithoutSubjectsInput>
+  create: Prisma.XOR<Prisma.StudentCreateWithoutSubjectsInput, Prisma.StudentUncheckedCreateWithoutSubjectsInput>
+  where?: Prisma.StudentWhereInput
+}
+
+export type StudentUpdateToOneWithWhereWithoutSubjectsInput = {
+  where?: Prisma.StudentWhereInput
+  data: Prisma.XOR<Prisma.StudentUpdateWithoutSubjectsInput, Prisma.StudentUncheckedUpdateWithoutSubjectsInput>
+}
+
+export type StudentUpdateWithoutSubjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  studentCode?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fatherName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  motherName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  school?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admissionDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fingerprintId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  selfFillEligible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  profileCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  selfFillPin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutStudentsNestedInput
+  enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
+  course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
+  batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
+  testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
+  feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
+  distributionReceipts?: Prisma.DistributionReceiptUpdateManyWithoutStudentNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutStudentNestedInput
+}
+
+export type StudentUncheckedUpdateWithoutSubjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentCode?: Prisma.StringFieldUpdateOperationsInput | string
+  enquiryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1524,6 +1701,7 @@ export type StudentCreateWithoutBatchesInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutStudentsInput
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
@@ -1555,6 +1733,7 @@ export type StudentUncheckedCreateWithoutBatchesInput = {
   selfFillPin?: string | null
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
@@ -1602,6 +1781,7 @@ export type StudentUpdateWithoutBatchesInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutStudentsNestedInput
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
@@ -1633,6 +1813,7 @@ export type StudentUncheckedUpdateWithoutBatchesInput = {
   selfFillPin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
@@ -1665,6 +1846,7 @@ export type StudentCreateWithoutTestResultsInput = {
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
   distributionReceipts?: Prisma.DistributionReceiptCreateNestedManyWithoutStudentInput
@@ -1696,6 +1878,7 @@ export type StudentUncheckedCreateWithoutTestResultsInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
   distributionReceipts?: Prisma.DistributionReceiptUncheckedCreateNestedManyWithoutStudentInput
@@ -1743,6 +1926,7 @@ export type StudentUpdateWithoutTestResultsInput = {
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
   distributionReceipts?: Prisma.DistributionReceiptUpdateManyWithoutStudentNestedInput
@@ -1774,6 +1958,7 @@ export type StudentUncheckedUpdateWithoutTestResultsInput = {
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
   distributionReceipts?: Prisma.DistributionReceiptUncheckedUpdateManyWithoutStudentNestedInput
@@ -1805,6 +1990,7 @@ export type StudentCreateWithoutAttendanceInput = {
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
   distributionReceipts?: Prisma.DistributionReceiptCreateNestedManyWithoutStudentInput
@@ -1836,6 +2022,7 @@ export type StudentUncheckedCreateWithoutAttendanceInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
   distributionReceipts?: Prisma.DistributionReceiptUncheckedCreateNestedManyWithoutStudentInput
@@ -1883,6 +2070,7 @@ export type StudentUpdateWithoutAttendanceInput = {
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
   distributionReceipts?: Prisma.DistributionReceiptUpdateManyWithoutStudentNestedInput
@@ -1914,6 +2102,7 @@ export type StudentUncheckedUpdateWithoutAttendanceInput = {
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
   distributionReceipts?: Prisma.DistributionReceiptUncheckedUpdateManyWithoutStudentNestedInput
@@ -1945,6 +2134,7 @@ export type StudentCreateWithoutFeeAccountInput = {
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   distributionReceipts?: Prisma.DistributionReceiptCreateNestedManyWithoutStudentInput
@@ -1976,6 +2166,7 @@ export type StudentUncheckedCreateWithoutFeeAccountInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   distributionReceipts?: Prisma.DistributionReceiptUncheckedCreateNestedManyWithoutStudentInput
@@ -2023,6 +2214,7 @@ export type StudentUpdateWithoutFeeAccountInput = {
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   distributionReceipts?: Prisma.DistributionReceiptUpdateManyWithoutStudentNestedInput
@@ -2054,6 +2246,7 @@ export type StudentUncheckedUpdateWithoutFeeAccountInput = {
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
   distributionReceipts?: Prisma.DistributionReceiptUncheckedUpdateManyWithoutStudentNestedInput
@@ -2085,6 +2278,7 @@ export type StudentCreateWithoutDistributionReceiptsInput = {
   enquiry?: Prisma.EnquiryCreateNestedOneWithoutStudentInput
   course: Prisma.CourseCreateNestedOneWithoutStudentsInput
   batches?: Prisma.StudentBatchCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountCreateNestedOneWithoutStudentInput
@@ -2116,6 +2310,7 @@ export type StudentUncheckedCreateWithoutDistributionReceiptsInput = {
   selfFillAttempts?: number
   selfFillLockedAt?: Date | string | null
   batches?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutStudentInput
+  subjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutStudentInput
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
   testResults?: Prisma.TestResultUncheckedCreateNestedManyWithoutStudentInput
   feeAccount?: Prisma.FeeAccountUncheckedCreateNestedOneWithoutStudentInput
@@ -2163,6 +2358,7 @@ export type StudentUpdateWithoutDistributionReceiptsInput = {
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
@@ -2194,6 +2390,7 @@ export type StudentUncheckedUpdateWithoutDistributionReceiptsInput = {
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
@@ -2249,6 +2446,7 @@ export type StudentUpdateWithoutInstituteInput = {
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudentsNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
@@ -2280,6 +2478,7 @@ export type StudentUncheckedUpdateWithoutInstituteInput = {
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
@@ -2361,6 +2560,7 @@ export type StudentUpdateWithoutCourseInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutStudentsNestedInput
   enquiry?: Prisma.EnquiryUpdateOneWithoutStudentNestedInput
   batches?: Prisma.StudentBatchUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneWithoutStudentNestedInput
@@ -2392,6 +2592,7 @@ export type StudentUncheckedUpdateWithoutCourseInput = {
   selfFillAttempts?: Prisma.IntFieldUpdateOperationsInput | number
   selfFillLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   batches?: Prisma.StudentBatchUncheckedUpdateManyWithoutStudentNestedInput
+  subjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutStudentNestedInput
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
   testResults?: Prisma.TestResultUncheckedUpdateManyWithoutStudentNestedInput
   feeAccount?: Prisma.FeeAccountUncheckedUpdateOneWithoutStudentNestedInput
@@ -2431,6 +2632,7 @@ export type StudentUncheckedUpdateManyWithoutCourseInput = {
 
 export type StudentCountOutputType = {
   batches: number
+  subjects: number
   attendance: number
   testResults: number
   distributionReceipts: number
@@ -2439,6 +2641,7 @@ export type StudentCountOutputType = {
 
 export type StudentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   batches?: boolean | StudentCountOutputTypeCountBatchesArgs
+  subjects?: boolean | StudentCountOutputTypeCountSubjectsArgs
   attendance?: boolean | StudentCountOutputTypeCountAttendanceArgs
   testResults?: boolean | StudentCountOutputTypeCountTestResultsArgs
   distributionReceipts?: boolean | StudentCountOutputTypeCountDistributionReceiptsArgs
@@ -2460,6 +2663,13 @@ export type StudentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  */
 export type StudentCountOutputTypeCountBatchesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.StudentBatchWhereInput
+}
+
+/**
+ * StudentCountOutputType without action
+ */
+export type StudentCountOutputTypeCountSubjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StudentSubjectWhereInput
 }
 
 /**
@@ -2519,6 +2729,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   enquiry?: boolean | Prisma.Student$enquiryArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   batches?: boolean | Prisma.Student$batchesArgs<ExtArgs>
+  subjects?: boolean | Prisma.Student$subjectsArgs<ExtArgs>
   attendance?: boolean | Prisma.Student$attendanceArgs<ExtArgs>
   testResults?: boolean | Prisma.Student$testResultsArgs<ExtArgs>
   feeAccount?: boolean | Prisma.Student$feeAccountArgs<ExtArgs>
@@ -2617,6 +2828,7 @@ export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   enquiry?: boolean | Prisma.Student$enquiryArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   batches?: boolean | Prisma.Student$batchesArgs<ExtArgs>
+  subjects?: boolean | Prisma.Student$subjectsArgs<ExtArgs>
   attendance?: boolean | Prisma.Student$attendanceArgs<ExtArgs>
   testResults?: boolean | Prisma.Student$testResultsArgs<ExtArgs>
   feeAccount?: boolean | Prisma.Student$feeAccountArgs<ExtArgs>
@@ -2642,6 +2854,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     enquiry: Prisma.$EnquiryPayload<ExtArgs> | null
     course: Prisma.$CoursePayload<ExtArgs>
     batches: Prisma.$StudentBatchPayload<ExtArgs>[]
+    subjects: Prisma.$StudentSubjectPayload<ExtArgs>[]
     attendance: Prisma.$AttendanceRecordPayload<ExtArgs>[]
     testResults: Prisma.$TestResultPayload<ExtArgs>[]
     feeAccount: Prisma.$FeeAccountPayload<ExtArgs> | null
@@ -3097,6 +3310,7 @@ export interface Prisma__StudentClient<T, Null = never, ExtArgs extends runtime.
   enquiry<T extends Prisma.Student$enquiryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$enquiryArgs<ExtArgs>>): Prisma.Prisma__EnquiryClient<runtime.Types.Result.GetResult<Prisma.$EnquiryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   course<T extends Prisma.CourseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   batches<T extends Prisma.Student$batchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$batchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudentBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  subjects<T extends Prisma.Student$subjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$subjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudentSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attendance<T extends Prisma.Student$attendanceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$attendanceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   testResults<T extends Prisma.Student$testResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$testResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   feeAccount<T extends Prisma.Student$feeAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$feeAccountArgs<ExtArgs>>): Prisma.Prisma__FeeAccountClient<runtime.Types.Result.GetResult<Prisma.$FeeAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -3595,6 +3809,30 @@ export type Student$batchesArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.StudentBatchScalarFieldEnum | Prisma.StudentBatchScalarFieldEnum[]
+}
+
+/**
+ * Student.subjects
+ */
+export type Student$subjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StudentSubject
+   */
+  select?: Prisma.StudentSubjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StudentSubject
+   */
+  omit?: Prisma.StudentSubjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StudentSubjectInclude<ExtArgs> | null
+  where?: Prisma.StudentSubjectWhereInput
+  orderBy?: Prisma.StudentSubjectOrderByWithRelationInput | Prisma.StudentSubjectOrderByWithRelationInput[]
+  cursor?: Prisma.StudentSubjectWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StudentSubjectScalarFieldEnum | Prisma.StudentSubjectScalarFieldEnum[]
 }
 
 /**

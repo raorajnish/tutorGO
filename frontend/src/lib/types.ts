@@ -507,6 +507,9 @@ export interface CourseRef {
   code: string;
 }
 
+/** FLAT = one course fee; SUBJECT_WISE = the sum of the subjects a student picks. */
+export type CourseFeeMode = "FLAT" | "SUBJECT_WISE";
+
 export interface Course {
   id: string;
   name: string;
@@ -514,6 +517,9 @@ export interface Course {
   durationMonths: number | null;
   description: string | null;
   isActive: boolean;
+  feeMode: CourseFeeMode;
+  /** True once the course has students or fee structures — the mode is then fixed. */
+  feeModeLocked: boolean;
   batchCount: number;
   studentCount: number;
   subjectCount: number;
@@ -962,10 +968,18 @@ export interface FeeStudentRef {
   course?: CourseRef;
 }
 
+/** One priced subject on a SUBJECT_WISE structure. `amount` "0" = complementary. */
+export interface FeeStructureSubjectLine {
+  subjectId: string;
+  subjectName: string;
+  subjectShortCode: string;
+  amount: string;
+}
+
 export interface FeeStructure {
   id: string;
   name: string;
-  course: CourseRef;
+  course: CourseRef & { feeMode?: CourseFeeMode };
   planType: FeePlanType;
   courseFee: string | null;
   installmentCount: number | null;
@@ -973,6 +987,13 @@ export interface FeeStructure {
   billingDay: number | null;
   isActive: boolean;
   isDefault: boolean;
+  /** Null on a FLAT structure; the full priced subject list on a SUBJECT_WISE one. */
+  subjectLines: FeeStructureSubjectLine[] | null;
+}
+
+export interface SubjectLineInput {
+  subjectId: string;
+  amount: number;
 }
 
 export interface CreateFeeStructurePayload {
@@ -983,6 +1004,7 @@ export interface CreateFeeStructurePayload {
   installmentCount?: number;
   monthlyAmount?: number;
   billingDay?: number;
+  subjectLines?: SubjectLineInput[];
 }
 
 export interface FeeInstallment {
@@ -1066,6 +1088,30 @@ export interface CreateFeeAccountPayload {
   monthlyAmount?: number;
   billingDay?: number;
   startDate?: string;
+  /** SUBJECT_WISE only — the subjects this student is taking. Their prices are summed server-side. */
+  subjectIds?: string[];
+}
+
+/** A student's subject enrollment on a SUBJECT_WISE course — drives their rosters. */
+export interface StudentSubject {
+  id: string;
+  subjectId: string;
+  subjectName: string;
+  subjectShortCode: string;
+  amount: string;
+  isActive: boolean;
+  joinedAt: string;
+  leftAt: string | null;
+}
+
+export interface RevisePricingPayload {
+  /** SUBJECT_WISE only — mutually exclusive with courseFee. */
+  subjectIds?: string[];
+  /** FLAT only — mutually exclusive with subjectIds. */
+  courseFee?: number;
+  discount?: number;
+  firstDueDate?: string;
+  installmentCount?: number;
 }
 
 export interface RecordPaymentPayload {

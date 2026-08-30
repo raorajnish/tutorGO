@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
-import type { Course } from "@/lib/types";
+import type { Course, CourseFeeMode } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 
 export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_props, ref) {
@@ -152,8 +152,14 @@ function CourseModal({
   const [durationMonths, setDurationMonths] = useState(editing?.durationMonths ? String(editing.durationMonths) : "");
   const [description, setDescription] = useState(editing?.description ?? "");
   const [isActive, setIsActive] = useState(editing?.isActive ?? true);
+  const [feeMode, setFeeMode] = useState<CourseFeeMode>(editing?.feeMode ?? "FLAT");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Guard A (changes-phase8.md §8c): once a course has students or fee
+  // structures, switching mode would silently empty every roster it owns,
+  // because StudentSubject rows only ever get written at fee-account creation.
+  const feeModeLocked = editing?.feeModeLocked ?? false;
 
   useEffect(() => {
     if (!open) return;
@@ -162,6 +168,7 @@ function CourseModal({
     setDurationMonths(editing?.durationMonths ? String(editing.durationMonths) : "");
     setDescription(editing?.description ?? "");
     setIsActive(editing?.isActive ?? true);
+    setFeeMode(editing?.feeMode ?? "FLAT");
     setError(null);
   }, [open, editing]);
 
@@ -175,6 +182,8 @@ function CourseModal({
       code,
       durationMonths: durationMonths ? Number(durationMonths) : undefined,
       description: description || undefined,
+      // Omitted when locked so an unchanged edit never trips the server guard.
+      feeMode: feeModeLocked ? undefined : feeMode,
     };
 
     try {
@@ -237,6 +246,45 @@ function CourseModal({
         />
 
         <Input label="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} />
+
+        <div className="space-y-2">
+          <span className="text-sm font-medium text-foreground">Fee mode</span>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {(
+              [
+                { value: "FLAT", label: "Flat fee", hint: "One course fee for everyone" },
+                { value: "SUBJECT_WISE", label: "Subject-wise", hint: "Fee is the sum of subjects taken" },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                disabled={feeModeLocked}
+                onClick={() => setFeeMode(opt.value)}
+                className={`flex-1 rounded-xl border px-3.5 py-2.5 text-left transition-colors ${
+                  feeMode === opt.value ? "border-accent bg-accent/10" : "border-border bg-card hover:bg-secondary"
+                } ${feeModeLocked ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+              >
+                <span className={`block text-sm font-medium ${feeMode === opt.value ? "text-accent" : "text-foreground"}`}>
+                  {opt.label}
+                </span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">{opt.hint}</span>
+              </button>
+            ))}
+          </div>
+          {feeModeLocked && (
+            <p className="text-xs text-muted-foreground">
+              This course already has students or fee structures, so its fee mode is fixed. Create a new course to use a
+              different pricing model.
+            </p>
+          )}
+          {!feeModeLocked && feeMode === "SUBJECT_WISE" && (
+            <p className="text-xs text-muted-foreground">
+              Add this course&apos;s subjects first, then price every one of them on its fee structure — use ₹0 for
+              complementary subjects.
+            </p>
+          )}
+        </div>
 
         {editing && (
           <label className="flex items-center gap-2 text-sm text-foreground">

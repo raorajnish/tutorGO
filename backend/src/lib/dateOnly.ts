@@ -2,9 +2,21 @@
  * instant. Everything here works in UTC so a date read back from Postgres
  * compares equal to one built here, regardless of the server's timezone. */
 
-/** UTC midnight of today. */
+/** Every institute this app serves is in India — "today" always means
+ * today on the India Standard Time calendar (UTC+5:30, no DST), not the
+ * UTC calendar day and not the host server's local day. Those two only
+ * disagree with IST for a few hours around midnight, but that window is
+ * exactly when it matters: a cloud server almost always runs its system
+ * clock in UTC, so "today" computed naively stays on yesterday's UTC date
+ * until 05:30 IST — a lecture scheduled at 1 AM IST would file under
+ * "history" instead of "upcoming," and a fee due today could read as not
+ * yet due for the first five and a half hours of the Indian day. */
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+/** UTC midnight of today, where "today" is the current calendar day in IST. */
 export function todayDateOnly(now: Date = new Date()): Date {
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const ist = new Date(now.getTime() + IST_OFFSET_MS);
+  return new Date(Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate()));
 }
 
 /** UTC midnight of the given date, discarding any time component. */

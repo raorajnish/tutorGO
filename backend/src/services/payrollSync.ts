@@ -1,4 +1,5 @@
 import { Prisma } from "../generated/prisma/client.js";
+import { todayDateOnly } from "../lib/dateOnly.js";
 
 type Db = Prisma.TransactionClient;
 
@@ -42,11 +43,6 @@ function periodsBetween(from: string, to: string): string[] {
     if (out.length > 600) break; // sanity guard against a runaway loop
   }
   return out;
-}
-
-function todayDateOnly(): Date {
-  const now = new Date();
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
 }
 
 function daysInPeriod(period: string): number {

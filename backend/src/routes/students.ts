@@ -11,6 +11,7 @@ import { money } from "../lib/money.js";
 import { nextStudentCode } from "../services/studentCode.js";
 import { createDistributionReceiptsForNewStudent } from "../services/distributionSync.js";
 import { toCsv } from "../lib/csv.js";
+import { todayDateOnly } from "../lib/dateOnly.js";
 
 async function isModuleActive(instituteId: string, code: "FEES" | "ATTENDANCE"): Promise<boolean> {
   const sub = await prisma.instituteModule.findFirst({ where: { instituteId, isActive: true, module: { code } } });
@@ -664,6 +665,99 @@ studentsRouter.post("/:id/self-fill/reset-lock", async (req, res, next) => {
     });
 
     res.json({ id: updated.id, selfFillLocked: false });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Subject enrollment (SUBJECT_WISE courses) — see changes-phase8.md §8c
+// ---------------------------------------------------------------------------
+
+function serializeStudentSubject(s: {
+  id: string;
+  amount: Prisma.Decimal;
+  isActive: boolean;
+  joinedAt: Date;
+  leftAt: Date | null;
+  subject: { id: string; name: string; shortCode: string };
+}) {
+  return {
+    id: s.id,
+    subjectId: s.subject.id,
+    subjectName: s.subject.name,
+    subjectShortCode: s.subject.shortCode,
+    amount: money(s.amount),
+    isActive: s.isActive,
+    joinedAt: s.joinedAt,
+    leftAt: s.leftAt,
+  };
+}
+
+studentsRouter.get("/:id/subjects", async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const student = await loadStudent(req.params.id as string, instituteId);
+
+    const rows = await prisma.studentSubject.findMany({
+      where: { studentId: student.id },
+      include: { subject: { select: { id: true, name: true, shortCode: true } } },
+      orderBy: { subject: { name: "asc" } },
+    });
+
+    res.json(rows.map(serializeStudentSubject));
+  } catch (err) {
+    next(err);
+  }
+});
+
+const setSubjectActiveSchema = z.object({ isActive: z.boolean() });
+
+/// Dropping or resuming a subject mid-course. This is an *enrollment* action
+/// and touches the roster only — it deliberately never adjusts an installment.
+/// Whether a family gets money back for a dropped subject is a policy call that
+/// varies by institute and even by negotiation, so it stays an explicit,
+/// deliberate act via the existing fee-correction tools rather than a silent
+/// side-effect here that could under- or over-charge someone.
+///
+/// Distinct from correcting a wrong selection (PATCH /fees/accounts/:id/pricing),
+/// which does reprice — because there the enrollment was never right in the
+/// first place. Keeping them as separate actions is the point: sharing one
+/// control would eventually wipe a real outstanding balance.
+studentsRouter.patch("/:id/subjects/:subjectId", validateBody(setSubjectActiveSchema), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const body = req.body as z.infer<typeof setSubjectActiveSchema>;
+    const student = await loadStudent(req.params.id as string, instituteId);
+
+    const row = await prisma.studentSubject.findUnique({
+      where: { studentId_subjectId: { studentId: student.id, subjectId: req.params.subjectId as string } },
+    });
+    if (!row) throw ApiError.notFound("This student isn't enrolled in that subject");
+    if (row.isActive === body.isActive) {
+      throw ApiError.badRequest(body.isActive ? "That subject is already active" : "That subject is already dropped");
+    }
+
+    // leftAt is what deriveRoster actually filters on, so it must move in step
+    // with isActive — set on a drop so past rosters keep the student, cleared
+    // on a resume so future ones get them back.
+    const updated = await prisma.studentSubject.update({
+      where: { id: row.id },
+      data: { isActive: body.isActive, leftAt: body.isActive ? null : todayDateOnly() },
+      include: { subject: { select: { id: true, name: true, shortCode: true } } },
+    });
+
+    await auditLog({
+      action: body.isActive ? "STUDENT_SUBJECT_RESUMED" : "STUDENT_SUBJECT_DROPPED",
+      instituteId,
+      organizationId: req.user!.organizationId,
+      userId: req.user!.id,
+      targetType: "Student",
+      targetId: student.id,
+      metadata: { subjectId: updated.subjectId },
+    });
+
+    res.json(serializeStudentSubject(updated));
   } catch (err) {
     next(err);
   }
