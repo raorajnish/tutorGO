@@ -7,16 +7,12 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
 import { MAX_NOTE_LENGTH, type Lecture } from "@/lib/types";
+import { todayInput } from "@/lib/format";
 
 interface Props {
   lecture: Lecture | null;
   onClose: () => void;
   onSaved: () => void;
-}
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 export function EditLectureModal({ lecture, onClose, onSaved }: Props) {

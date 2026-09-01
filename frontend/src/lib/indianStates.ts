@@ -37,6 +37,4 @@ export const INDIAN_STATES = [
   "Puducherry",
 ] as const;
 
-export type IndianState = (typeof INDIAN_STATES)[number];
-
 export const INDIAN_STATE_OPTIONS = INDIAN_STATES.map((state) => ({ value: state, label: state }));

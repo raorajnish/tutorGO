@@ -10,10 +10,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
 import type { Batch, Course } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_props, ref) {
   const [batches, setBatches] = useState<Batch[]>([]);

@@ -79,3 +79,33 @@ export async function apiUpload<T>(path: string, file: File, field = "file"): Pr
 
   return res.json() as Promise<T>;
 }
+
+/** Downloads a file-returning endpoint (CSV export, etc.) and saves it under
+ * `filename`. Checks `res.ok` before touching the body — without that check,
+ * a 403/500's error JSON gets blobbed and saved as if it were the real file. */
+export async function apiDownload(path: string, filename: string): Promise<void> {
+  const token = getToken();
+  const headers = new Headers();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  const res = await fetch(`/api${path}`, { headers });
+
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as ApiErrorBody | null;
+    throw new ApiClientError(
+      res.status,
+      body?.error.code ?? "UNKNOWN_ERROR",
+      body?.error.message ?? "Download failed"
+    );
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}

@@ -12,17 +12,13 @@ import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import { useMessageTemplate } from "@/lib/useMessageTemplate";
 import { lectureScheduledVars, renderTemplate } from "@/lib/messageTemplates";
 import { MAX_NOTE_LENGTH, type Batch, type Course, type FacultyCourseAssignment, type FacultyRef, type Lecture, type ScheduleLecturePayload } from "@/lib/types";
+import { todayInput } from "@/lib/format";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   onScheduled: () => void;
   defaultDate: string;
-}
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 // 1 hr through 12 hrs, in 30-minute steps.

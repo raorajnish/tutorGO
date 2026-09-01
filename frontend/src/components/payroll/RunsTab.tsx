@@ -8,10 +8,14 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { formatMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import type { PayrollRun, PayrollRunPreview } from "@/lib/types";
+import { formatDate } from "@/lib/format";
 
+/** "YYYY-MM" for the current payroll period, computed in IST regardless of
+ * the browser's own timezone — otherwise a browser near a month boundary in
+ * a timezone behind IST could show last month's period as "current". */
 function currentPeriod() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit" }).format(new Date());
+  return parts;
 }
 
 const STATUS_TONE = { DRAFT: "neutral", APPROVED: "warning", PAID: "success" } as const;
@@ -231,8 +235,8 @@ export function RunsTab() {
                     <td className="px-4 py-3">
                       <Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge>
                     </td>
-                    <td className="px-4 py-3 text-foreground">{r.approvedAt ? new Date(r.approvedAt).toLocaleDateString("en-IN") : "—"}</td>
-                    <td className="px-4 py-3 text-foreground">{r.paidAt ? new Date(r.paidAt).toLocaleDateString("en-IN") : "—"}</td>
+                    <td className="px-4 py-3 text-foreground">{formatDate(r.approvedAt)}</td>
+                    <td className="px-4 py-3 text-foreground">{formatDate(r.paidAt)}</td>
                   </tr>
                 ))}
                 {runs.length === 0 && (

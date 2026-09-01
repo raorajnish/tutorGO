@@ -9,10 +9,7 @@ import { formatMoney, parseMoney } from "@/lib/money";
 import { renderTemplate, feeOverdueReminderVars } from "@/lib/messageTemplates";
 import { resolveMessageTemplate } from "@/lib/useMessageTemplate";
 import type { OverdueEntry } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: string) => void }) {
   const [entries, setEntries] = useState<OverdueEntry[] | null>(null);

@@ -363,7 +363,7 @@ function FeeStructureModal({
         {!editing && isSubjectWise && (
           <p className="text-xs text-muted-foreground">
             {courses.find((c) => c.id === courseId)?.name} prices per subject, so this structure is always a one-time
-            plan — there's no such thing as a per-subject monthly rate.
+            plan — there&apos;s no such thing as a per-subject monthly rate.
           </p>
         )}
 

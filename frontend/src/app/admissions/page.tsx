@@ -10,10 +10,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { AdmitModal } from "@/components/admissions/AdmitModal";
 import { SelfFillTab } from "@/components/admissions/SelfFillTab";
 import { ENQUIRY_SOURCE_LABELS, type Course, type Enquiry, type StudentListItem } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 function UsersIcon() {
   return (

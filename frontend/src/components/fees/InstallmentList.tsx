@@ -10,6 +10,7 @@ import { RescheduleControl } from "./RescheduleControl";
 import { EditAmountControl } from "./EditAmountControl";
 import { AddInstallmentRow } from "./AddInstallmentRow";
 import type { FeeInstallment, InstallmentStatus } from "@/lib/types";
+import { formatDate as fmtDate } from "@/lib/format";
 
 const STATUS_TONE: Record<InstallmentStatus, "success" | "warning" | "danger" | "neutral"> = {
   PAID: "success",
@@ -17,10 +18,6 @@ const STATUS_TONE: Record<InstallmentStatus, "success" | "warning" | "danger" | 
   PENDING: "neutral",
   OVERDUE: "danger",
 };
-
-function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
 
 interface Props {
   studentId: string;

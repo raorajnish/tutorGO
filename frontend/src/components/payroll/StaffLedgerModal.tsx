@@ -10,10 +10,7 @@ import { PayslipModal } from "@/components/payroll/PayslipModal";
 import { formatMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import { PAYMENT_MODE_LABELS, SALARY_TYPE_LABELS, type PayrollLedger, type PayrollPayment, type PaymentMode } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 interface Props {
   salaryProfileId: string | null;

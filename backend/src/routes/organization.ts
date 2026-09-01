@@ -1,78 +1,14 @@
-import { Router, type Request } from "express";
+import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../lib/http.js";
 import { authenticate, requireOrganization, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
-import { hashPassword, generateTempPassword } from "../lib/password.js";
-import { sendMail } from "../services/mailer.js";
-import { inviteEmailHtml } from "../lib/emailTemplates.js";
 import { auditLog } from "../services/audit.js";
-import { assertRoleCapacity } from "../services/planLimits.js";
 
 export const organizationRouter = Router();
 
 organizationRouter.use(authenticate, requireRoles("OWNER"), requireOrganization);
-
-// ---------------------------------------------------------------------------
-// Organization profile
-// ---------------------------------------------------------------------------
-
-organizationRouter.get("/", async (req, res, next) => {
-  try {
-    const org = await prisma.organization.findUniqueOrThrow({
-      where: { id: req.organizationId! },
-      include: {
-        institutes: { include: { modules: { where: { isActive: true }, include: { module: true } } } },
-      },
-    });
-
-    res.json({
-      id: org.id,
-      code: org.code,
-      name: org.name,
-      email: org.email,
-      phone: org.phone,
-      address: org.address,
-      city: org.city,
-      state: org.state,
-      isActive: org.isActive,
-      institutes: org.institutes.map((i) => ({
-        id: i.id,
-        code: i.code,
-        name: i.name,
-        city: i.city,
-        state: i.state,
-        isActive: i.isActive,
-        onboardingDone: i.onboardingDone,
-        activeModules: i.modules.map((m) => m.module.code),
-      })),
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
-const updateOrgSchema = z.object({
-  name: z.string().min(1).optional(),
-  email: z.string().email().optional(),
-  phone: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-});
-
-organizationRouter.patch("/", validateBody(updateOrgSchema), async (req, res, next) => {
-  try {
-    const org = await prisma.organization.update({
-      where: { id: req.organizationId! },
-      data: req.body as z.infer<typeof updateOrgSchema>,
-    });
-    res.json(org);
-  } catch (err) {
-    next(err);
-  }
-});
 
 // ---------------------------------------------------------------------------
 // Institutes (branches) under this organization
@@ -278,89 +214,3 @@ organizationRouter.post(
   }
 );
 
-// ---------------------------------------------------------------------------
-// Invite staff (Admin / Accountant) for a specific institute
-// ---------------------------------------------------------------------------
-
-const inviteStaffSchema = z.object({
-  fullName: z.string().min(1, "Name is required"),
-  email: z.string().email("A valid email is required"),
-  phone: z.string().optional(),
-});
-
-async function inviteInstituteStaff(req: Request, role: "ADMIN" | "ACCOUNTANT") {
-  const institute = await loadOwnedInstitute(req.organizationId!, req.params.id as string);
-  const body = req.body as z.infer<typeof inviteStaffSchema>;
-  const email = body.email.toLowerCase();
-
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) throw ApiError.conflict("A user with this email already exists");
-
-  await assertRoleCapacity(institute.id, role);
-
-  const tempPassword = generateTempPassword();
-  const passwordHash = await hashPassword(tempPassword);
-
-  const staff = await prisma.user.create({
-    data: {
-      instituteId: institute.id,
-      email,
-      passwordHash,
-      fullName: body.fullName,
-      phone: body.phone,
-      role,
-      mustChangePassword: true,
-    },
-  });
-
-  await auditLog({
-    action: role === "ADMIN" ? "ADMIN_INVITED" : "ACCOUNTANT_INVITED",
-    organizationId: req.organizationId!,
-    instituteId: institute.id,
-    userId: req.user!.id,
-    targetType: "User",
-    targetId: staff.id,
-    metadata: { email },
-  });
-
-  const loginUrl = `${process.env.FRONTEND_URL ?? "http://127.0.0.1:3000"}/login`;
-  const mailResult = await sendMail({
-    to: email,
-    subject: `You're set up on TutorGO — ${institute.name}`,
-    html: inviteEmailHtml({
-      recipientName: body.fullName,
-      orgOrInstituteName: institute.name,
-      email,
-      tempPassword,
-      role: role === "ADMIN" ? "Admin" : "Accountant",
-      loginUrl,
-    }),
-    purpose: role === "ADMIN" ? "ADMIN_INVITE" : "ACCOUNTANT_INVITE",
-    organizationId: req.organizationId!,
-    instituteId: institute.id,
-  });
-
-  return {
-    staff: { id: staff.id, fullName: staff.fullName, email: staff.email },
-    emailDelivered: mailResult.delivered,
-    tempPassword: mailResult.delivered ? undefined : tempPassword,
-  };
-}
-
-organizationRouter.post("/institutes/:id/admins", validateBody(inviteStaffSchema), async (req, res, next) => {
-  try {
-    const result = await inviteInstituteStaff(req, "ADMIN");
-    res.status(201).json({ admin: result.staff, emailDelivered: result.emailDelivered, tempPassword: result.tempPassword });
-  } catch (err) {
-    next(err);
-  }
-});
-
-organizationRouter.post("/institutes/:id/accountants", validateBody(inviteStaffSchema), async (req, res, next) => {
-  try {
-    const result = await inviteInstituteStaff(req, "ACCOUNTANT");
-    res.status(201).json({ accountant: result.staff, emailDelivered: result.emailDelivered, tempPassword: result.tempPassword });
-  } catch (err) {
-    next(err);
-  }
-});

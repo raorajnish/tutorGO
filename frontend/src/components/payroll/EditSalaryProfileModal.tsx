@@ -8,10 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { formatMoney, parseMoney } from "@/lib/money";
 import { SALARY_TYPE_LABELS, type RateHistoryEntry, type SalaryProfileListItem } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 interface Props {
   profile: SalaryProfileListItem | null;

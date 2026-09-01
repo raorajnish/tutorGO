@@ -4,11 +4,7 @@ import { useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+import { todayInput } from "@/lib/format";
 
 interface Props {
   studentId: string;

@@ -12,6 +12,7 @@ import { ActionMenu } from "@/components/ui/ActionMenu";
 import { EnquiryModal } from "@/components/enquiries/EnquiryModal";
 import { MarkContactedModal } from "@/components/enquiries/MarkContactedModal";
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, type Course, type Enquiry, type EnquiryStatus } from "@/lib/types";
+import { formatDate as fmtDate } from "@/lib/format";
 
 function EditIcon() {
   return (
@@ -32,9 +33,6 @@ function TrashIcon() {
   );
 }
 
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
 
 const STATUS_TONE: Record<EnquiryStatus, "primary" | "accent" | "success" | "danger"> = {
   NEW: "primary",

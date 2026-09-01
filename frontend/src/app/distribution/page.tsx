@@ -10,10 +10,7 @@ import { Modal } from "@/components/ui/Modal";
 import { StatCard } from "@/components/ui/StatCard";
 import { DistributionRosterModal } from "@/components/distribution/DistributionRosterModal";
 import type { Course, DistributionItem } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 export default function DistributionPage() {
   const [items, setItems] = useState<DistributionItem[]>([]);

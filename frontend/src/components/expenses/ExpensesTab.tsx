@@ -10,10 +10,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type Expense, type ExpenseCategory, type ExpenseEvent, type PaymentMode } from "@/lib/types";
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate } from "@/lib/format";
+import { formatMoney } from "@/lib/money";
 
 export function ExpensesTab() {
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
@@ -107,7 +105,7 @@ export function ExpensesTab() {
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">{e.event?.name ?? "—"}</td>
                 <td className="px-4 py-3 text-muted-foreground">{PAYMENT_MODE_LABELS[e.mode]}</td>
-                <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-foreground">₹{e.amount}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-foreground">{formatMoney(e.amount)}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" onClick={() => setEditing(e)}>

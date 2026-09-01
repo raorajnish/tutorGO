@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request } from "express";
 import { z } from "zod";
 import { Prisma } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
@@ -6,6 +6,7 @@ import { ApiError } from "../lib/http.js";
 import { authenticate, requireInstitute, requireModule, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
 import { money } from "../lib/money.js";
+import { toCsv } from "../lib/csv.js";
 
 export const expensesRouter = Router();
 
@@ -114,39 +115,6 @@ expensesRouter.post("/events", requireRoles(...MANAGE_ROLES), validateBody(event
   }
 });
 
-const updateEventSchema = z.object({
-  name: z.string().min(1).max(120).optional(),
-  notes: z.string().max(500).nullable().optional(),
-});
-
-expensesRouter.patch("/events/:id", requireRoles(...MANAGE_ROLES), validateBody(updateEventSchema), async (req, res, next) => {
-  try {
-    const instituteId = req.tenantId!;
-    const event = await prisma.event.findUnique({ where: { id: req.params.id as string } });
-    if (!event || event.instituteId !== instituteId) throw ApiError.notFound("Event not found");
-
-    const updated = await prisma.event.update({ where: { id: event.id }, data: req.body as z.infer<typeof updateEventSchema> });
-    res.json(updated);
-  } catch (err) {
-    next(err);
-  }
-});
-
-expensesRouter.delete("/events/:id", requireRoles(...MANAGE_ROLES), async (req, res, next) => {
-  try {
-    const instituteId = req.tenantId!;
-    const event = await prisma.event.findUnique({ where: { id: req.params.id as string } });
-    if (!event || event.instituteId !== instituteId) throw ApiError.notFound("Event not found");
-
-    const linked = await prisma.expense.count({ where: { eventId: event.id } });
-    if (linked > 0) throw ApiError.badRequest("This event has expenses recorded against it — remove those first.");
-
-    await prisma.event.delete({ where: { id: event.id } });
-    res.status(204).send();
-  } catch (err) {
-    next(err);
-  }
-});
 
 // ---------------------------------------------------------------------------
 // Expenses
@@ -440,31 +408,34 @@ async function buildLedger(instituteId: string, from?: Date, to?: Date): Promise
   };
 }
 
+/** `?from=`/`?to=` are shared by the ledger view and its CSV export — both
+ * filter the same date range, just render it differently. */
+function parseDateRange(req: Request): { from?: Date; to?: Date } {
+  return {
+    from: typeof req.query.from === "string" ? new Date(req.query.from) : undefined,
+    to: typeof req.query.to === "string" ? new Date(req.query.to) : undefined,
+  };
+}
+
 expensesRouter.get("/ledger", requireRoles(...MANAGE_ROLES), async (req, res, next) => {
   try {
-    const from = typeof req.query.from === "string" ? new Date(req.query.from) : undefined;
-    const to = typeof req.query.to === "string" ? new Date(req.query.to) : undefined;
+    const { from, to } = parseDateRange(req);
     res.json(await buildLedger(req.tenantId!, from, to));
   } catch (err) {
     next(err);
   }
 });
 
-function csvEscape(value: string): string {
-  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
-}
-
 expensesRouter.get("/ledger/export.csv", requireRoles(...MANAGE_ROLES), async (req, res, next) => {
   try {
-    const from = typeof req.query.from === "string" ? new Date(req.query.from) : undefined;
-    const to = typeof req.query.to === "string" ? new Date(req.query.to) : undefined;
+    const { from, to } = parseDateRange(req);
     const { entries } = await buildLedger(req.tenantId!, from, to);
 
     const rows = [
       ["Date", "Type", "Description", "Amount"],
       ...entries.map((e) => [e.date.toISOString().slice(0, 10), e.kind, e.description, e.amount]),
     ];
-    const csv = rows.map((row) => row.map((cell) => csvEscape(String(cell))).join(",")).join("\n");
+    const csv = toCsv(rows.map((row) => row.map(String)));
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader("Content-Disposition", `attachment; filename="ledger.csv"`);

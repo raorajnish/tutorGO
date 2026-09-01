@@ -954,13 +954,6 @@ export const PAYMENT_MODE_LABELS: Record<PaymentMode, string> = {
 export const INSTALLMENT_STATUSES = ["PENDING", "PARTIAL", "PAID", "OVERDUE"] as const;
 export type InstallmentStatus = (typeof INSTALLMENT_STATUSES)[number];
 
-export const INSTALLMENT_STATUS_LABELS: Record<InstallmentStatus, string> = {
-  PENDING: "Pending",
-  PARTIAL: "Partial",
-  PAID: "Paid",
-  OVERDUE: "Overdue",
-};
-
 export interface FeeStudentRef {
   id: string;
   name: string;
@@ -989,22 +982,6 @@ export interface FeeStructure {
   isDefault: boolean;
   /** Null on a FLAT structure; the full priced subject list on a SUBJECT_WISE one. */
   subjectLines: FeeStructureSubjectLine[] | null;
-}
-
-export interface SubjectLineInput {
-  subjectId: string;
-  amount: number;
-}
-
-export interface CreateFeeStructurePayload {
-  name: string;
-  courseId: string;
-  planType: FeePlanType;
-  courseFee?: number;
-  installmentCount?: number;
-  monthlyAmount?: number;
-  billingDay?: number;
-  subjectLines?: SubjectLineInput[];
 }
 
 export interface FeeInstallment {
@@ -1076,22 +1053,6 @@ export interface InstallmentInput {
   amount: number;
 }
 
-export interface CreateFeeAccountPayload {
-  studentId: string;
-  feeStructureId?: string;
-  planType?: FeePlanType;
-  courseFee?: number;
-  discount?: number;
-  installmentCount?: number;
-  firstDueDate?: string;
-  installments?: InstallmentInput[];
-  monthlyAmount?: number;
-  billingDay?: number;
-  startDate?: string;
-  /** SUBJECT_WISE only — the subjects this student is taking. Their prices are summed server-side. */
-  subjectIds?: string[];
-}
-
 /** A student's subject enrollment on a SUBJECT_WISE course — drives their rosters. */
 export interface StudentSubject {
   id: string;
@@ -1112,14 +1073,6 @@ export interface RevisePricingPayload {
   discount?: number;
   firstDueDate?: string;
   installmentCount?: number;
-}
-
-export interface RecordPaymentPayload {
-  studentId: string;
-  amount: number;
-  mode: PaymentMode;
-  paidOn: string;
-  notes?: string;
 }
 
 export interface OverdueEntry {
@@ -1178,15 +1131,6 @@ export interface UnconfiguredStaffUser {
 export interface PayrollStaffResponse {
   staff: SalaryProfileListItem[];
   unconfigured: UnconfiguredStaffUser[];
-}
-
-export interface UpdateSalaryProfilePayload {
-  title?: string | null;
-  externalEmail?: string | null;
-  externalPhone?: string | null;
-  monthlyRate?: number;
-  perLectureRate?: number;
-  isActive?: boolean;
 }
 
 export interface RateHistoryEntry {
@@ -1306,16 +1250,6 @@ export interface CreateSalaryProfilePayload {
   perLectureRate?: number;
 }
 
-export interface RecordPayrollPaymentPayload {
-  salaryProfileId: string;
-  amount: number;
-  mode: PaymentMode;
-  paidOn: string;
-  lineItemIds: string[];
-  notes?: string;
-  autoApplyCredit: boolean;
-}
-
 // ---------------------------------------------------------------------------
 // Institute email settings (Settings → Email)
 // ---------------------------------------------------------------------------
@@ -1329,17 +1263,6 @@ export interface InstituteEmailConfig {
   fromEmail: string;
   isEnabled: boolean;
   updatedAt: string;
-}
-
-export interface UpdateInstituteEmailConfigPayload {
-  host: string;
-  port: number;
-  secure: boolean;
-  username: string;
-  password?: string;
-  fromName: string;
-  fromEmail: string;
-  isEnabled: boolean;
 }
 
 // ---------------------------------------------------------------------------

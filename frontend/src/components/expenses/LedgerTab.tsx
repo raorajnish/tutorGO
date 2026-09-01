@@ -1,16 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFetch, getToken } from "@/lib/api";
+import { apiFetch, apiDownload, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import type { LedgerEntry, LedgerResponse } from "@/lib/types";
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate } from "@/lib/format";
+import { formatMoney } from "@/lib/money";
 
 const KIND_TONE: Record<LedgerEntry["kind"], "success" | "danger" | "warning"> = {
   INCOME: "success",
@@ -54,21 +52,9 @@ export function LedgerTab() {
       const params = new URLSearchParams();
       if (from) params.set("from", from);
       if (to) params.set("to", to);
-      const token = getToken();
-      const res = await fetch(`/api/expenses/ledger/export.csv?${params.toString()}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "ledger.csv";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      setError("Could not export the ledger.");
+      await apiDownload(`/expenses/ledger/export.csv?${params.toString()}`, "ledger.csv");
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not export the ledger.");
     } finally {
       setExporting(false);
     }
@@ -90,10 +76,10 @@ export function LedgerTab() {
 
       {ledger && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard label="Income" value={`₹${ledger.summary.income}`} tone="success" />
-          <StatCard label="Expense" value={`₹${ledger.summary.expense}`} tone="danger" />
-          <StatCard label="Payroll" value={`₹${ledger.summary.payroll}`} tone="warning" />
-          <StatCard label="Net" value={`₹${ledger.summary.net}`} tone="primary" />
+          <StatCard label="Income" value={formatMoney(ledger.summary.income)} tone="success" />
+          <StatCard label="Expense" value={formatMoney(ledger.summary.expense)} tone="danger" />
+          <StatCard label="Payroll" value={formatMoney(ledger.summary.payroll)} tone="warning" />
+          <StatCard label="Net" value={formatMoney(ledger.summary.net)} tone="primary" />
         </div>
       )}
 
@@ -116,7 +102,7 @@ export function LedgerTab() {
                 </td>
                 <td className="px-4 py-3 text-foreground">{e.description}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-foreground">
-                  {KIND_SIGN[e.kind]}₹{e.amount}
+                  {KIND_SIGN[e.kind]}{formatMoney(e.amount)}
                 </td>
               </tr>
             ))}

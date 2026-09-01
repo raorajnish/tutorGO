@@ -12,10 +12,7 @@ import { StaffLedgerModal } from "@/components/payroll/StaffLedgerModal";
 import { formatMoney, parseMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import { SALARY_TYPE_LABELS, type PayrollStaffResponse, type SalaryProfileListItem, type UnconfiguredStaffUser } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 export function StaffTab() {
   const { user } = useAuth();

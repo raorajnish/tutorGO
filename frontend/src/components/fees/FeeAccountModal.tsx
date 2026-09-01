@@ -14,10 +14,7 @@ import { ReceiptModal } from "@/components/fees/ReceiptModal";
 import { formatMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import { FEE_PLAN_TYPE_LABELS, PAYMENT_MODE_LABELS, type FeeAccountResponse, type FeePayment } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 const STAT_TONE = {
   primary: "bg-secondary text-secondary-foreground",

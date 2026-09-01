@@ -9,11 +9,7 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { Textarea } from "@/components/ui/Textarea";
 import { formatMoney, parseMoney } from "@/lib/money";
 import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type PaymentMode } from "@/lib/types";
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+import { todayInput, formatDate } from "@/lib/format";
 
 interface Props {
   open: boolean;
@@ -139,7 +135,7 @@ export function RecordPaymentModal({ open, onClose, onSaved, studentId, remainin
               This payment didn&apos;t fully cover the installment it landed on. The remaining{" "}
               <strong>{formatMoney(parseMoney(carryForwardNotice.amount))}</strong> has been{" "}
               {carryForwardNotice.entries[0]!.created ? "added as a new installment" : "carried onto the next installment"} due{" "}
-              {new Date(carryForwardNotice.entries[0]!.dueDate).toLocaleDateString()}.
+              {formatDate(carryForwardNotice.entries[0]!.dueDate)}.
             </>
           ) : (
             <>

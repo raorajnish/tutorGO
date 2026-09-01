@@ -21,6 +21,7 @@ import {
   type PlatformInstituteDetail,
   type RoleLimitValues,
 } from "@/lib/types";
+import { formatDate } from "@/lib/format";
 
 interface PageProps {
   params: Promise<{ orgId: string; instituteId: string }>;
@@ -204,11 +205,7 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
 
                   {detail.planLimitsSetAt && (
                     <p className="mt-2 text-center text-xs text-muted-foreground">
-                      Set {new Date(detail.planLimitsSetAt).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      Set {formatDate(detail.planLimitsSetAt)}
                     </p>
                   )}
                 </>

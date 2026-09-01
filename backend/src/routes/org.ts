@@ -99,26 +99,6 @@ orgRouter.post(
   }
 );
 
-orgRouter.get("/modules", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
-  try {
-    const modules = await prisma.module.findMany({
-      include: { institutes: { where: { instituteId: req.tenantId! } } },
-      orderBy: { code: "asc" },
-    });
-
-    res.json(
-      modules.map((m) => ({
-        code: m.code,
-        label: m.label,
-        description: m.description,
-        isActive: m.institutes[0]?.isActive ?? false,
-      }))
-    );
-  } catch (err) {
-    next(err);
-  }
-});
-
 // ---------------------------------------------------------------------------
 // Team — staff for the current institute (visible to OWNER/ADMIN)
 // ---------------------------------------------------------------------------

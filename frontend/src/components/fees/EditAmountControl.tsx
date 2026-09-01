@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import type { FeeInstallment } from "@/lib/types";
+import { formatMoney } from "@/lib/money";
 
 interface Props {
   studentId: string;
@@ -98,7 +99,7 @@ export function EditAmountControl({ studentId, installment, onChanged }: Props) 
             />
             {Number(installment.paidAmount) > 0 && (
               <p className={`text-xs ${amountBelowPaid ? "text-danger" : "text-muted-foreground"}`}>
-                Can&apos;t go below ₹{installment.paidAmount} already paid
+                Can&apos;t go below {formatMoney(installment.paidAmount)} already paid
               </p>
             )}
             {error && <p className="text-xs text-danger">{error}</p>}

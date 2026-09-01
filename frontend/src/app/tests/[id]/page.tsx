@@ -10,10 +10,7 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { MarkAttendanceModal } from "@/components/attendance/MarkAttendanceModal";
 import { EnterMarksModal } from "@/components/tests/EnterMarksModal";
 import type { TestDetail, TestSession } from "@/lib/types";
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate } from "@/lib/format";
 
 function SessionStatus({ s }: { s: TestSession }) {
   if (s.cancelled) return <Badge tone="danger">Cancelled</Badge>;

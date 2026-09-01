@@ -45,26 +45,6 @@ platformRouter.get("/stats", async (_req, res, next) => {
   }
 });
 
-platformRouter.get("/modules", async (_req, res, next) => {
-  try {
-    const modules = await prisma.module.findMany({
-      include: { institutes: { where: { isActive: true } } },
-      orderBy: { code: "asc" },
-    });
-
-    res.json(
-      modules.map((m) => ({
-        code: m.code,
-        label: m.label,
-        description: m.description,
-        activeSubscriptions: m.institutes.length,
-      }))
-    );
-  } catch (err) {
-    next(err);
-  }
-});
-
 // ---------------------------------------------------------------------------
 // Organizations
 // ---------------------------------------------------------------------------

@@ -6,10 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { formatMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import { PAYMENT_MODE_LABELS, type ReceiptDetail } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 function receiptText(receipt: ReceiptDetail, instituteName: string): string {
   const lines = [

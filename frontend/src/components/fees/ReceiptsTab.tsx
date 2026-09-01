@@ -7,10 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ReceiptModal } from "@/components/fees/ReceiptModal";
 import { formatMoney } from "@/lib/money";
 import { PAYMENT_MODE_LABELS, type ReceiptListItem } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 export function ReceiptsTab() {
   const [search, setSearch] = useState("");

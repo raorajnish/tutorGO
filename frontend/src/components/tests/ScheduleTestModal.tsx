@@ -19,16 +19,12 @@ import type {
   TestPaperAsset,
   TestSessionPayload,
 } from "@/lib/types";
+import { todayInput } from "@/lib/format";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   onScheduled: (test: Test) => void;
-}
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 // 30 mins through 6 hrs — tests are typically shorter than lectures.

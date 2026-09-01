@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { apiFetch } from "@/lib/api";
 import { PushToggle } from "./PushToggle";
 import type { AppNotification } from "@/lib/types";
+import { formatDate } from "@/lib/format";
 
 function relativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -16,7 +17,7 @@ function relativeTime(iso: string): string {
   const days = Math.floor(hours / 24);
   if (days === 1) return "Yesterday";
   if (days < 7) return `${days} days ago`;
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  return formatDate(iso, { year: false });
 }
 
 interface NotificationDrawerProps {

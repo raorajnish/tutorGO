@@ -8,11 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { formatMoney } from "@/lib/money";
 import { FEE_PLAN_TYPE_LABELS, type FeePlanType, type FeeStructure, type FeeStudentRef, type InstallmentInput } from "@/lib/types";
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+import { todayInput } from "@/lib/format";
 
 function addMonthsCapped(dateInput: string, months: number): string {
   const d = new Date(`${dateInput}T00:00:00Z`);
@@ -338,7 +334,7 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
                     {isSubjectWise
                       ? `${formatMoney(subjectTotal)} (${selectedLines.length} subject${selectedLines.length === 1 ? "" : "s"})`
                       : selectedStructure
-                        ? `₹${selectedStructure.courseFee}`
+                        ? formatMoney(selectedStructure.courseFee)
                         : "—"}
                   </div>
                 </div>

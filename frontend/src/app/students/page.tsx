@@ -7,10 +7,8 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { StudentProfileModal } from "@/components/students/StudentProfileModal";
 import type { StudentsResponse } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
+import { formatMoney } from "@/lib/money";
 
 const STATUS_FILTERS = [
   { id: "active", label: "Active" },
@@ -60,7 +58,7 @@ export default function StudentsPage() {
         <StatCard label="Active students" value={data?.stats.activeStudents ?? "—"} tone="primary" />
         <StatCard label="Total on file" value={data?.stats.totalStudents ?? "—"} tone="accent" />
         <StatCard label="Active batches" value={data?.stats.activeBatches ?? "—"} tone="success" />
-        <StatCard label="Fee book value" value={data ? `₹${data.stats.feeBookValue}` : "—"} tone="warning" />
+        <StatCard label="Fee book value" value={data ? formatMoney(data.stats.feeBookValue) : "—"} tone="warning" />
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">

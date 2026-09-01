@@ -71,9 +71,3 @@ export function rateLimit({ max, windowMs, keyPrefix }: RateLimitOptions) {
     next();
   };
 }
-
-/** For tests only — the module-level Map otherwise leaks state between test
- * cases that share a process. */
-export function __resetRateLimitsForTests(): void {
-  buckets.clear();
-}

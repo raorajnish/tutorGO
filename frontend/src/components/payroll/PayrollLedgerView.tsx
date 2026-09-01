@@ -9,11 +9,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Textarea } from "@/components/ui/Textarea";
 import { formatMoney, parseMoney } from "@/lib/money";
 import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type PayrollLedger, type PayrollLineItem, type PaymentMode } from "@/lib/types";
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+import { todayInput } from "@/lib/format";
 
 const STATUS_TONE = { PAID: "success", PARTIAL: "warning", UNPAID: "neutral" } as const;
 
@@ -207,7 +203,7 @@ export function PayrollLedgerView({ ledger, readOnly = false, submitting = false
               <p className="text-xs text-muted-foreground">
                 {autoApplyCredit
                   ? `${formatMoney(amountNum - selectedTotal)} more than the selected items — the extra becomes a credit balance, auto-applied to future dues.`
-                  : `Only ₹${(Math.min(amountNum, selectedTotal)).toFixed(2)} of ${formatMoney(amountNum)} can be applied to the selected items — turn this on to carry the rest forward instead, or select more items / lower the amount.`}
+                  : `Only ${formatMoney(Math.min(amountNum, selectedTotal))} of ${formatMoney(amountNum)} can be applied to the selected items — turn this on to carry the rest forward instead, or select more items / lower the amount.`}
               </p>
             </div>
           )}

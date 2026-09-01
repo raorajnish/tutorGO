@@ -134,33 +134,6 @@ async function loadItem(id: string, instituteId: string) {
   return item;
 }
 
-const updateItemSchema = z.object({
-  name: z.string().min(1).max(120).optional(),
-  totalSets: z.number().int().positive().nullable().optional(),
-  isActive: z.boolean().optional(),
-});
-
-distributionRouter.patch("/items/:id", validateBody(updateItemSchema), async (req, res, next) => {
-  try {
-    const instituteId = req.tenantId!;
-    const body = req.body as z.infer<typeof updateItemSchema>;
-    const item = await loadItem(req.params.id as string, instituteId);
-
-    const updated = await prisma.distributionItem.update({
-      where: { id: item.id },
-      data: body,
-      include: { course: { select: { id: true, name: true, code: true } }, _count: { select: { receipts: true } } },
-    });
-    const receivedCount = await prisma.distributionReceipt.count({
-      where: { distributionItemId: updated.id, receivedAt: { not: null } },
-    });
-
-    res.json(serializeItem(updated, receivedCount));
-  } catch (err) {
-    next(err);
-  }
-});
-
 distributionRouter.get("/items/:id/receipts", async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;

@@ -3,14 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { ENQUIRY_ACTIVITY_LABELS, type EnquiryActivity } from "@/lib/types";
-
-function fmtDateTime(d: string) {
-  return new Date(d).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
-}
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate, formatDateTime as fmtDateTime } from "@/lib/format";
 
 const DOT_TONE: Record<EnquiryActivity["type"], string> = {
   CONTACTED: "bg-accent",

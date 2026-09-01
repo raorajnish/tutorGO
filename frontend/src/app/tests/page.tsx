@@ -8,11 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { ScheduleTestModal } from "@/components/tests/ScheduleTestModal";
 import type { TestListItem } from "@/lib/types";
-
-function formatDate(iso: string | null) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate } from "@/lib/format";
 
 export default function TestsPage() {
   const router = useRouter();

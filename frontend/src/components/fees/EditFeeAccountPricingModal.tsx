@@ -64,7 +64,7 @@ export function EditFeeAccountPricingModal({ open, onClose, onSaved, studentId, 
   }, [open, studentId, courseId]);
 
   const isSubjectWise = structure?.subjectLines != null;
-  const subjectLines = structure?.subjectLines ?? [];
+  const subjectLines = useMemo(() => structure?.subjectLines ?? [], [structure]);
 
   const selectedLines = useMemo(
     () => subjectLines.filter((l) => selectedSubjectIds.includes(l.subjectId)),

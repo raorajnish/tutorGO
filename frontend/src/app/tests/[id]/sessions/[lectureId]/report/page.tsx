@@ -6,10 +6,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import type { TestReport } from "@/lib/types";
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate } from "@/lib/format";
 
 /** Plain-text summary sized for a WhatsApp message — no markdown tables,
  * since WhatsApp renders them as literal pipes. */

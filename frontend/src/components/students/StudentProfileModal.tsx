@@ -18,11 +18,7 @@ import {
   type StudentDetail,
   type StudentSubject,
 } from "@/lib/types";
-
-function fmtDate(d: string | null) {
-  if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 interface Props {
   studentId: string | null;

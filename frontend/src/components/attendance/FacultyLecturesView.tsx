@@ -12,6 +12,7 @@ import { EditLectureModal } from "@/components/attendance/EditLectureModal";
 import { CancelLectureModal } from "@/components/attendance/CancelLectureModal";
 import { CopyLectureButton } from "@/components/attendance/CopyLectureButton";
 import type { AttendanceStats, Lecture } from "@/lib/types";
+import { formatDate, fmtTime12, todayInput } from "@/lib/format";
 
 function EditIcon() {
   return (
@@ -32,20 +33,9 @@ function XCircleIcon() {
 }
 
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  return formatDate(iso, { weekday: true });
 }
 
-function fmtTime12(hhmm: string) {
-  const [h, m] = hhmm.split(":").map(Number);
-  const period = h >= 12 ? "PM" : "AM";
-  const hour12 = h % 12 === 0 ? 12 : h % 12;
-  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
-}
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
 
 const TABS = [
   { id: "upcoming", label: "Upcoming" },

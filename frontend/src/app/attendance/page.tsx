@@ -15,6 +15,7 @@ import { CancelLectureModal } from "@/components/attendance/CancelLectureModal";
 import { CopyLectureButton } from "@/components/attendance/CopyLectureButton";
 import { FacultyLecturesView } from "@/components/attendance/FacultyLecturesView";
 import type { Lecture, LectureSummary } from "@/lib/types";
+import { todayInput, fmtTime12, formatDate } from "@/lib/format";
 
 function EditIcon() {
   return (
@@ -41,12 +42,9 @@ function pad(n: number) {
 // Local-calendar-date arithmetic throughout — never round-trip through
 // toISOString()/local-Date mixing, which silently shifts the date by a day
 // in any timezone ahead of UTC (e.g. IST) because setDate() mutates in local
-// time while toISOString() serializes in UTC.
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
+// time while toISOString() serializes in UTC. todayInput() itself is pinned
+// to Asia/Kolkata explicitly (see lib/format.ts) rather than trusting the
+// browser's own timezone to already be IST.
 function addDays(iso: string, days: number) {
   const [y, m, d] = iso.split("-").map(Number);
   const next = new Date(y, m - 1, d + days);
@@ -54,18 +52,9 @@ function addDays(iso: string, days: number) {
 }
 
 function fmtDateLabel(iso: string) {
-  const [y, m, d] = iso.split("-").map(Number);
-  const date = new Date(y, m - 1, d);
   const today = todayInput();
   if (iso === today) return "Today";
-  return date.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
-}
-
-function fmtTime12(hhmm: string) {
-  const [h, m] = hhmm.split(":").map(Number);
-  const period = h >= 12 ? "PM" : "AM";
-  const hour12 = h % 12 === 0 ? 12 : h % 12;
-  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
+  return formatDate(iso, { weekday: true });
 }
 
 export default function AttendancePage() {

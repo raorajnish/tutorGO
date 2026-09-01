@@ -64,7 +64,12 @@ const GLYPH_CLOCK = (
 );
 
 function DateLabel() {
-  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const today = new Date().toLocaleDateString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
   return <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{today}</p>;
 }
 

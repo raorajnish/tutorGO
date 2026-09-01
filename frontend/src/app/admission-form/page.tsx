@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { todayInput } from "@/lib/format";
 
 /** No app-shell on purpose — this directory has no layout.tsx, so it falls
  * through to the bare root layout, same as /login. This is the one screen
@@ -22,11 +23,6 @@ interface LookupResult {
   fatherName: string;
   motherName: string;
   school: string;
-}
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 export default function AdmissionFormPage() {

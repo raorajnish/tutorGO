@@ -5,9 +5,10 @@ import { apiFetch } from "@/lib/api";
 import { ListSection } from "@/components/dashboard/ListSection";
 import { MarkAttendanceModal } from "@/components/attendance/MarkAttendanceModal";
 import type { Lecture } from "@/lib/types";
+import { formatDate } from "@/lib/format";
 
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+  return formatDate(iso, { weekday: true, year: false });
 }
 
 const ICON_CLOCK = (

@@ -1,17 +1,14 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { apiFetch, ApiClientError, getToken } from "@/lib/api";
+import { apiFetch, ApiClientError, apiDownload } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import type { Batch, Course, SelfFillStatusRow } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 export function SelfFillTab({ courses }: { courses: Course[] }) {
   const [courseId, setCourseId] = useState("");
@@ -75,21 +72,13 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
   }, [courseId, batchId]);
 
   async function downloadFile(path: string, filename: string) {
-    const token = getToken();
-    const res = await fetch(`/api${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-    if (!res.ok) {
-      setError("Could not export the roster — set up a course and batch with pending students first.");
-      return;
+    try {
+      await apiDownload(path, filename);
+    } catch (err) {
+      setError(
+        err instanceof ApiClientError ? err.message : "Could not export the roster — set up a course and batch with pending students first."
+      );
     }
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
   }
 
   function exportCsv() {

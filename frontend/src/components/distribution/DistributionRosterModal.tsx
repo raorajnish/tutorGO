@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import type { DistributionItem, DistributionRosterResponse } from "@/lib/types";
+import { formatDate } from "@/lib/format";
 
 function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  return formatDate(d, { year: false });
 }
 
 interface Props {

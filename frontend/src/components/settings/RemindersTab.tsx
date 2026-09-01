@@ -25,6 +25,7 @@ import {
   type ReminderRepeat,
   type ReminderStatus,
 } from "@/lib/types";
+import { formatDate as fmtDate, todayInput } from "@/lib/format";
 
 const STATUS_TONE: Record<ReminderStatus, "success" | "warning" | "danger" | "neutral"> = {
   SCHEDULED: "neutral",
@@ -39,15 +40,6 @@ const STATUS_LABEL: Record<ReminderStatus, string> = {
   DUE_TODAY: "Due today",
   OVERDUE: "Overdue",
 };
-
-function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-}
-
-function todayInput() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
 
 /** "Due in 12 days" / "Overdue by 3 days" — the thing you actually scan for. */
 function dueSummary(r: Reminder) {

@@ -323,8 +323,3 @@ export function startReminderScheduler(): void {
 
   console.log(`[reminders] scheduler started (every ${minutes}m)`);
 }
-
-export function stopReminderScheduler(): void {
-  if (timer) clearInterval(timer);
-  timer = null;
-}

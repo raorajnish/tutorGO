@@ -8,7 +8,7 @@ import { validateBody } from "../middleware/validate.js";
 import { money } from "../lib/money.js";
 import { loadUserRefs } from "../lib/userRefs.js";
 import { allocateWaterfall } from "../services/waterfallAllocation.js";
-import { periodKey, periodLabel, previewPeriod, syncLineItems } from "../services/payrollSync.js";
+import { periodLabel, previewPeriod, syncLineItems } from "../services/payrollSync.js";
 import { auditLog } from "../services/audit.js";
 import { notify } from "../services/notify.js";
 import { sendMail } from "../services/mailer.js";
@@ -920,7 +920,7 @@ payrollRouter.post("/runs/:id/pay", requireRoles(...PAY_ROLES), async (req, res,
     const paidProfileIds: string[] = [];
     const paidOn = new Date();
 
-    await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx) => {
       for (const [salaryProfileId, profileItems] of byProfile) {
         const outstanding = profileItems.filter((i) => i.amount.gt(i.paidAmount));
         const total = outstanding.reduce((sum, i) => sum.plus(i.amount.minus(i.paidAmount)), new Prisma.Decimal(0));
@@ -945,7 +945,9 @@ payrollRouter.post("/runs/:id/pay", requireRoles(...PAY_ROLES), async (req, res,
         paidProfileIds.push(salaryProfileId);
       }
 
-      await tx.payrollRun.update({ where: { id: run.id }, data: { status: "PAID", paidAt: new Date() } });
+      // Returned straight from the update — re-reading the row this
+      // transaction just wrote would be a needless round trip.
+      return tx.payrollRun.update({ where: { id: run.id }, data: { status: "PAID", paidAt: new Date() } });
     });
 
     for (const salaryProfileId of paidProfileIds) {
@@ -958,8 +960,7 @@ payrollRouter.post("/runs/:id/pay", requireRoles(...PAY_ROLES), async (req, res,
       void notifyPaymentRecorded(profile, { amount: total, mode: "BANK_TRANSFER", paidOn });
     }
 
-    const updated = await prisma.payrollRun.findUnique({ where: { id: run.id } });
-    res.json({ ...serializeRun(updated!), summary: await runSummary(run.instituteId, run.periodMonth) });
+    res.json({ ...serializeRun(updated), summary: await runSummary(run.instituteId, run.periodMonth) });
   } catch (err) {
     next(err);
   }

@@ -10,13 +10,10 @@ import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import { useMessageTemplate } from "@/lib/useMessageTemplate";
 import { attendanceMarkedVars, renderTemplate } from "@/lib/messageTemplates";
 import type { AttendanceStatus, Lecture, RosterEntry } from "@/lib/types";
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+import { formatDate as fmtDate } from "@/lib/format";
 
 function fmtTime(d: string) {
-  return new Date(d).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+  return new Date(d).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });
 }
 
 interface Props {
