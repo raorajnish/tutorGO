@@ -50,6 +50,7 @@ export type TestMinAggregateOutputType = {
   paperAssetUrl: string | null
   paperAssetType: string | null
   paperAssetName: string | null
+  paperAssetPublicId: string | null
   createdByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -67,6 +68,7 @@ export type TestMaxAggregateOutputType = {
   paperAssetUrl: string | null
   paperAssetType: string | null
   paperAssetName: string | null
+  paperAssetPublicId: string | null
   createdByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -84,6 +86,7 @@ export type TestCountAggregateOutputType = {
   paperAssetUrl: number
   paperAssetType: number
   paperAssetName: number
+  paperAssetPublicId: number
   createdByUserId: number
   createdAt: number
   updatedAt: number
@@ -113,6 +116,7 @@ export type TestMinAggregateInputType = {
   paperAssetUrl?: true
   paperAssetType?: true
   paperAssetName?: true
+  paperAssetPublicId?: true
   createdByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -130,6 +134,7 @@ export type TestMaxAggregateInputType = {
   paperAssetUrl?: true
   paperAssetType?: true
   paperAssetName?: true
+  paperAssetPublicId?: true
   createdByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -147,6 +152,7 @@ export type TestCountAggregateInputType = {
   paperAssetUrl?: true
   paperAssetType?: true
   paperAssetName?: true
+  paperAssetPublicId?: true
   createdByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -251,6 +257,7 @@ export type TestGroupByOutputType = {
   paperAssetUrl: string | null
   paperAssetType: string | null
   paperAssetName: string | null
+  paperAssetPublicId: string | null
   createdByUserId: string
   createdAt: Date
   updatedAt: Date
@@ -291,6 +298,7 @@ export type TestWhereInput = {
   paperAssetUrl?: Prisma.StringNullableFilter<"Test"> | string | null
   paperAssetType?: Prisma.StringNullableFilter<"Test"> | string | null
   paperAssetName?: Prisma.StringNullableFilter<"Test"> | string | null
+  paperAssetPublicId?: Prisma.StringNullableFilter<"Test"> | string | null
   createdByUserId?: Prisma.StringFilter<"Test"> | string
   createdAt?: Prisma.DateTimeFilter<"Test"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Test"> | Date | string
@@ -314,6 +322,7 @@ export type TestOrderByWithRelationInput = {
   paperAssetUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   paperAssetType?: Prisma.SortOrderInput | Prisma.SortOrder
   paperAssetName?: Prisma.SortOrderInput | Prisma.SortOrder
+  paperAssetPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -340,6 +349,7 @@ export type TestWhereUniqueInput = Prisma.AtLeast<{
   paperAssetUrl?: Prisma.StringNullableFilter<"Test"> | string | null
   paperAssetType?: Prisma.StringNullableFilter<"Test"> | string | null
   paperAssetName?: Prisma.StringNullableFilter<"Test"> | string | null
+  paperAssetPublicId?: Prisma.StringNullableFilter<"Test"> | string | null
   createdByUserId?: Prisma.StringFilter<"Test"> | string
   createdAt?: Prisma.DateTimeFilter<"Test"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Test"> | Date | string
@@ -363,6 +373,7 @@ export type TestOrderByWithAggregationInput = {
   paperAssetUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   paperAssetType?: Prisma.SortOrderInput | Prisma.SortOrder
   paperAssetName?: Prisma.SortOrderInput | Prisma.SortOrder
+  paperAssetPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -388,6 +399,7 @@ export type TestScalarWhereWithAggregatesInput = {
   paperAssetUrl?: Prisma.StringNullableWithAggregatesFilter<"Test"> | string | null
   paperAssetType?: Prisma.StringNullableWithAggregatesFilter<"Test"> | string | null
   paperAssetName?: Prisma.StringNullableWithAggregatesFilter<"Test"> | string | null
+  paperAssetPublicId?: Prisma.StringNullableWithAggregatesFilter<"Test"> | string | null
   createdByUserId?: Prisma.StringWithAggregatesFilter<"Test"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Test"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Test"> | Date | string
@@ -402,6 +414,7 @@ export type TestCreateInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutTestsInput
@@ -424,6 +437,7 @@ export type TestUncheckedCreateInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -440,6 +454,7 @@ export type TestUpdateInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutTestsNestedInput
@@ -462,6 +477,7 @@ export type TestUncheckedUpdateInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -481,6 +497,7 @@ export type TestCreateManyInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -495,6 +512,7 @@ export type TestUpdateManyMutationInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -511,6 +529,7 @@ export type TestUncheckedUpdateManyInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -543,6 +562,7 @@ export type TestCountOrderByAggregateInput = {
   paperAssetUrl?: Prisma.SortOrder
   paperAssetType?: Prisma.SortOrder
   paperAssetName?: Prisma.SortOrder
+  paperAssetPublicId?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -565,6 +585,7 @@ export type TestMaxOrderByAggregateInput = {
   paperAssetUrl?: Prisma.SortOrder
   paperAssetType?: Prisma.SortOrder
   paperAssetName?: Prisma.SortOrder
+  paperAssetPublicId?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -582,6 +603,7 @@ export type TestMinOrderByAggregateInput = {
   paperAssetUrl?: Prisma.SortOrder
   paperAssetType?: Prisma.SortOrder
   paperAssetName?: Prisma.SortOrder
+  paperAssetPublicId?: Prisma.SortOrder
   createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -804,6 +826,7 @@ export type TestCreateWithoutInstituteInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   course: Prisma.CourseCreateNestedOneWithoutTestsInput
@@ -824,6 +847,7 @@ export type TestUncheckedCreateWithoutInstituteInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -872,6 +896,7 @@ export type TestScalarWhereInput = {
   paperAssetUrl?: Prisma.StringNullableFilter<"Test"> | string | null
   paperAssetType?: Prisma.StringNullableFilter<"Test"> | string | null
   paperAssetName?: Prisma.StringNullableFilter<"Test"> | string | null
+  paperAssetPublicId?: Prisma.StringNullableFilter<"Test"> | string | null
   createdByUserId?: Prisma.StringFilter<"Test"> | string
   createdAt?: Prisma.DateTimeFilter<"Test"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Test"> | Date | string
@@ -886,6 +911,7 @@ export type TestCreateWithoutCreatedByInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutTestsInput
@@ -907,6 +933,7 @@ export type TestUncheckedCreateWithoutCreatedByInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.LectureUncheckedCreateNestedManyWithoutTestInput
@@ -948,6 +975,7 @@ export type TestCreateWithoutCourseInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutTestsInput
@@ -968,6 +996,7 @@ export type TestUncheckedCreateWithoutCourseInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1010,6 +1039,7 @@ export type TestCreateWithoutSubjectInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutTestsInput
@@ -1030,6 +1060,7 @@ export type TestUncheckedCreateWithoutSubjectInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1072,6 +1103,7 @@ export type TestCreateWithoutSessionsInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutTestsInput
@@ -1093,6 +1125,7 @@ export type TestUncheckedCreateWithoutSessionsInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1124,6 +1157,7 @@ export type TestUpdateWithoutSessionsInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutTestsNestedInput
@@ -1145,6 +1179,7 @@ export type TestUncheckedUpdateWithoutSessionsInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1160,6 +1195,7 @@ export type TestCreateWithoutResultsInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutTestsInput
@@ -1181,6 +1217,7 @@ export type TestUncheckedCreateWithoutResultsInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1212,6 +1249,7 @@ export type TestUpdateWithoutResultsInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutTestsNestedInput
@@ -1233,6 +1271,7 @@ export type TestUncheckedUpdateWithoutResultsInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1250,6 +1289,7 @@ export type TestCreateManyInstituteInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1264,6 +1304,7 @@ export type TestUpdateWithoutInstituteInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   course?: Prisma.CourseUpdateOneRequiredWithoutTestsNestedInput
@@ -1284,6 +1325,7 @@ export type TestUncheckedUpdateWithoutInstituteInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1302,6 +1344,7 @@ export type TestUncheckedUpdateManyWithoutInstituteInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1319,6 +1362,7 @@ export type TestCreateManyCreatedByInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1332,6 +1376,7 @@ export type TestUpdateWithoutCreatedByInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutTestsNestedInput
@@ -1353,6 +1398,7 @@ export type TestUncheckedUpdateWithoutCreatedByInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.LectureUncheckedUpdateManyWithoutTestNestedInput
@@ -1371,6 +1417,7 @@ export type TestUncheckedUpdateManyWithoutCreatedByInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1386,6 +1433,7 @@ export type TestCreateManyCourseInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1400,6 +1448,7 @@ export type TestUpdateWithoutCourseInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutTestsNestedInput
@@ -1420,6 +1469,7 @@ export type TestUncheckedUpdateWithoutCourseInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1438,6 +1488,7 @@ export type TestUncheckedUpdateManyWithoutCourseInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1454,6 +1505,7 @@ export type TestCreateManySubjectInput = {
   paperAssetUrl?: string | null
   paperAssetType?: string | null
   paperAssetName?: string | null
+  paperAssetPublicId?: string | null
   createdByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1468,6 +1520,7 @@ export type TestUpdateWithoutSubjectInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutTestsNestedInput
@@ -1488,6 +1541,7 @@ export type TestUncheckedUpdateWithoutSubjectInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1506,6 +1560,7 @@ export type TestUncheckedUpdateManyWithoutSubjectInput = {
   paperAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1563,6 +1618,7 @@ export type TestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   paperAssetUrl?: boolean
   paperAssetType?: boolean
   paperAssetName?: boolean
+  paperAssetPublicId?: boolean
   createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1587,6 +1643,7 @@ export type TestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   paperAssetUrl?: boolean
   paperAssetType?: boolean
   paperAssetName?: boolean
+  paperAssetPublicId?: boolean
   createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1608,6 +1665,7 @@ export type TestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   paperAssetUrl?: boolean
   paperAssetType?: boolean
   paperAssetName?: boolean
+  paperAssetPublicId?: boolean
   createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1629,12 +1687,13 @@ export type TestSelectScalar = {
   paperAssetUrl?: boolean
   paperAssetType?: boolean
   paperAssetName?: boolean
+  paperAssetPublicId?: boolean
   createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "courseId" | "subjectId" | "title" | "totalMarks" | "passingMarks" | "instructions" | "paperAssetUrl" | "paperAssetType" | "paperAssetName" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["test"]>
+export type TestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "courseId" | "subjectId" | "title" | "totalMarks" | "passingMarks" | "instructions" | "paperAssetUrl" | "paperAssetType" | "paperAssetName" | "paperAssetPublicId" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["test"]>
 export type TestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
@@ -1677,12 +1736,19 @@ export type $TestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     passingMarks: number | null
     instructions: string | null
     /**
-     * Cloudinary URL for the question paper. Optional — a test can be
-     * scheduled with no paper attached at all.
+     * URL of the question paper. Optional — a test can be scheduled with no
+     * paper attached at all. Served from Cloudinary when configured, else from
+     * local disk (see services/uploads.ts).
      */
     paperAssetUrl: string | null
     paperAssetType: string | null
     paperAssetName: string | null
+    /**
+     * Handle for deleting the stored asset. Null on rows uploaded before this
+     * column existed — those keep working, they just can't be cleaned up
+     * automatically, so no backfill is needed.
+     */
+    paperAssetPublicId: string | null
     createdByUserId: string
     createdAt: Date
     updatedAt: Date
@@ -2126,6 +2192,7 @@ export interface TestFieldRefs {
   readonly paperAssetUrl: Prisma.FieldRef<"Test", 'String'>
   readonly paperAssetType: Prisma.FieldRef<"Test", 'String'>
   readonly paperAssetName: Prisma.FieldRef<"Test", 'String'>
+  readonly paperAssetPublicId: Prisma.FieldRef<"Test", 'String'>
   readonly createdByUserId: Prisma.FieldRef<"Test", 'String'>
   readonly createdAt: Prisma.FieldRef<"Test", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Test", 'DateTime'>

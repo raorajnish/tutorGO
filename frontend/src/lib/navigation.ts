@@ -18,7 +18,11 @@ export type NavIcon =
   | "expenses"
   | "tests"
   | "subscriptions"
-  | "distribution";
+  | "distribution"
+  | "analytics"
+  | "portalAccess"
+  | "timetable"
+  | "notifications";
 
 export interface NavItem {
   label: string;
@@ -45,7 +49,9 @@ export const NAV_SECTIONS: NavSection[] = [
         label: "Dashboard",
         href: "/dashboard",
         icon: "dashboard",
-        roles: ["SUPERADMIN", "OWNER", "ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION", "STUDENT"],
+        // STUDENT deliberately absent — their landing page is /portal, which
+        // shows their own record rather than the institute's operations.
+        roles: ["SUPERADMIN", "OWNER", "ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION"],
       },
     ],
   },
@@ -100,11 +106,41 @@ export const NAV_SECTIONS: NavSection[] = [
         roles: ["OWNER", "ADMIN", "FACULTY"],
         module: "ATTENDANCE",
       },
+      {
+        label: "Analytics",
+        href: "/analytics",
+        icon: "analytics",
+        // Fee/payroll figures live in here — same OWNER/ADMIN-only bar as
+        // the Fees and Payroll sections themselves, not module-gated since
+        // it draws from whichever modules are actually active.
+        roles: ["OWNER", "ADMIN"],
+      },
+    ],
+  },
+  {
+    // The student's own portal. A separate section rather than reusing
+    // "Institute": every item here reads only the signed-in student's own
+    // record, so nothing in it shares a route or a permission with the
+    // staff-facing pages of the same name.
+    section: "My learning",
+    items: [
+      { label: "Overview", href: "/portal", icon: "dashboard", roles: ["STUDENT"] },
+      { label: "Timetable", href: "/portal/timetable", icon: "timetable", roles: ["STUDENT"] },
+      { label: "Tests", href: "/portal/tests", icon: "tests", roles: ["STUDENT"] },
+      { label: "Attendance", href: "/portal/attendance", icon: "attendance", roles: ["STUDENT"] },
+      { label: "Fees", href: "/portal/fees", icon: "fees", roles: ["STUDENT"] },
+      { label: "Updates", href: "/portal/notifications", icon: "notifications", roles: ["STUDENT"] },
     ],
   },
   {
     section: "Organization",
-    items: [{ label: "Settings", href: "/settings", icon: "settings", roles: ["OWNER", "ADMIN"] }],
+    items: [
+      { label: "Settings", href: "/settings", icon: "settings", roles: ["OWNER", "ADMIN"] },
+      // Sits with Settings rather than under Academics on purpose: issuing a
+      // login is an administrative access decision with the same OWNER/ADMIN
+      // bar as Settings, not course management (which RECEPTION also has).
+      { label: "Portal access", href: "/portal-access", icon: "portalAccess", roles: ["OWNER", "ADMIN"] },
+    ],
   },
   {
     section: "Platform",

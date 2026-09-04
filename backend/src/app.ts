@@ -17,7 +17,10 @@ import { notificationsRouter } from "./routes/notifications.js";
 import { remindersRouter } from "./routes/reminders.js";
 import { publicRouter } from "./routes/public.js";
 import { distributionRouter } from "./routes/distribution.js";
+import { analyticsRouter } from "./routes/analytics.js";
 import { whatsappRouter } from "./routes/whatsapp.js";
+import { portalAccessRouter } from "./routes/portalAccess.js";
+import { portalRouter } from "./routes/portal.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import { UPLOAD_ROOT, UPLOAD_URL_PREFIX } from "./services/uploads.js";
 
@@ -44,11 +47,12 @@ app.use(
   })
 );
 
-// Uploaded test papers, served straight off local disk (services/uploads.ts).
+// Disk-backed uploads (services/uploads.ts). Only reached when Cloudinary is
+// unconfigured — the local-dev fallback — since uploads otherwise live in the
+// object store and are served from its own domain.
 // Hardened deliberately: `nosniff` + a forced attachment disposition mean a
 // file crafted to look like HTML can never execute as script on the API's own
-// origin, and no directory index is exposed. When these move to an object
-// store this mount goes away with them.
+// origin, and no directory index is exposed.
 app.use(
   UPLOAD_URL_PREFIX,
   express.static(UPLOAD_ROOT, {
@@ -82,7 +86,13 @@ app.use("/api/tests", testsRouter);
 app.use("/api/notifications", notificationsRouter);
 app.use("/api/reminders", remindersRouter);
 app.use("/api/distribution", distributionRouter);
+app.use("/api/analytics", analyticsRouter);
 app.use("/api/org/whatsapp", whatsappRouter);
+// Staff-side credential management, and the student's own read-only portal —
+// two separate routers because they have opposite audiences: OWNER/ADMIN vs.
+// the STUDENT login itself. See changes-phase10.md §10.6.
+app.use("/api/portal-access", portalAccessRouter);
+app.use("/api/portal", portalRouter);
 // Deliberately outside authenticate/requireInstitute — the one unauthenticated
 // public surface in the app (now also the WhatsApp webhook — see
 // routes/public.ts's header comment).

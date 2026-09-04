@@ -101,7 +101,8 @@ export const ModelName = {
   Expense: 'Expense',
   FinanceEntry: 'FinanceEntry',
   DistributionItem: 'DistributionItem',
-  DistributionReceipt: 'DistributionReceipt'
+  DistributionReceipt: 'DistributionReceipt',
+  LeaveRequest: 'LeaveRequest'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,6 +415,7 @@ export const CourseScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   feeMode: 'feeMode',
+  portalEnabled: 'portalEnabled',
   defaultFee: 'defaultFee',
   defaultMonthlyFee: 'defaultMonthlyFee'
 } as const
@@ -522,7 +524,9 @@ export const StudentScalarFieldEnum = {
   profileCompletedAt: 'profileCompletedAt',
   selfFillPin: 'selfFillPin',
   selfFillAttempts: 'selfFillAttempts',
-  selfFillLockedAt: 'selfFillLockedAt'
+  selfFillLockedAt: 'selfFillLockedAt',
+  userId: 'userId',
+  portalIssuedForCourseId: 'portalIssuedForCourseId'
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
@@ -585,6 +589,7 @@ export const TestScalarFieldEnum = {
   paperAssetUrl: 'paperAssetUrl',
   paperAssetType: 'paperAssetType',
   paperAssetName: 'paperAssetName',
+  paperAssetPublicId: 'paperAssetPublicId',
   createdByUserId: 'createdByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -678,6 +683,7 @@ export const FeeAccountScalarFieldEnum = {
   status: 'status',
   courseFee: 'courseFee',
   discount: 'discount',
+  discountType: 'discountType',
   finalFee: 'finalFee',
   installmentCount: 'installmentCount',
   monthlyAmount: 'monthlyAmount',
@@ -719,7 +725,9 @@ export const PaymentScalarFieldEnum = {
   voidedAt: 'voidedAt',
   voidReason: 'voidReason',
   voidedByUserId: 'voidedByUserId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  publicToken: 'publicToken',
+  publicTokenRevokedAt: 'publicTokenRevokedAt'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
@@ -906,6 +914,24 @@ export const DistributionReceiptScalarFieldEnum = {
 } as const
 
 export type DistributionReceiptScalarFieldEnum = (typeof DistributionReceiptScalarFieldEnum)[keyof typeof DistributionReceiptScalarFieldEnum]
+
+
+export const LeaveRequestScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  userId: 'userId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  reason: 'reason',
+  status: 'status',
+  reviewedByUserId: 'reviewedByUserId',
+  reviewedAt: 'reviewedAt',
+  reviewNote: 'reviewNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LeaveRequestScalarFieldEnum = (typeof LeaveRequestScalarFieldEnum)[keyof typeof LeaveRequestScalarFieldEnum]
 
 
 export const SortOrder = {

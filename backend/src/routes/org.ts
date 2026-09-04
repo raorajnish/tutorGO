@@ -14,6 +14,7 @@ import { notify } from "../services/notify.js";
 import { sendPush } from "../services/push.js";
 import { DEFAULT_MESSAGE_TEMPLATES, MESSAGE_TEMPLATE_TYPES } from "../lib/messageTemplates.js";
 import type { MessageTemplateType } from "../generated/prisma/enums.js";
+import { daysBetween, todayDateOnly } from "../lib/dateOnly.js";
 
 export const orgRouter = Router();
 
@@ -489,3 +490,207 @@ orgRouter.get("/reminders/audience", requireRoles("OWNER", "ADMIN"), async (req,
     next(err);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Staff leave (changes-phase10.md §10.4) — living on the Payroll page as
+// "My leave" (everyone) and "Leave" (OWNER/ADMIN approve), but the model and
+// routes sit here in org.ts since leave is not a payroll concept: an
+// approved request has no automatic effect on pay in this phase.
+// ---------------------------------------------------------------------------
+
+/** Anyone who can be "on leave" in the HR sense — every institute-tied staff
+ * role. Deliberately excludes STUDENT (not a staff-leave concept) and doesn't
+ * need to include OWNER separately: an OWNER only has req.tenantId set while
+ * "inside" an institute (see requireInstitute), and can request leave from
+ * that institute like any other role if they ever want to log one. */
+const LEAVE_ELIGIBLE_ROLES = ["OWNER", "ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION"] as const;
+
+function serializeLeaveRequest(row: {
+  id: string;
+  userId: string;
+  startDate: Date;
+  endDate: Date;
+  reason: string;
+  status: string;
+  reviewedAt: Date | null;
+  reviewNote: string | null;
+  createdAt: Date;
+  user: { fullName: string; role: string };
+  reviewedBy: { fullName: string } | null;
+}) {
+  return {
+    id: row.id,
+    userId: row.userId,
+    userName: row.user.fullName,
+    userRole: row.user.role,
+    startDate: row.startDate,
+    endDate: row.endDate,
+    // Inclusive day count — a single-day request has startDate === endDate,
+    // which is 1 day off, not 0.
+    days: daysBetween(row.startDate, row.endDate) + 1,
+    reason: row.reason,
+    status: row.status,
+    reviewedByName: row.reviewedBy?.fullName ?? null,
+    reviewedAt: row.reviewedAt,
+    reviewNote: row.reviewNote,
+    createdAt: row.createdAt,
+  };
+}
+
+const leaveRequestInclude = {
+  user: { select: { fullName: true, role: true } },
+  reviewedBy: { select: { fullName: true } },
+} as const;
+
+const createLeaveSchema = z
+  .object({
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date(),
+    reason: z.string().min(1, "A reason is required").max(500),
+  })
+  .refine((b) => b.endDate >= b.startDate, { message: "End date can't be before the start date", path: ["endDate"] });
+
+orgRouter.post(
+  "/leave",
+  requireRoles(...LEAVE_ELIGIBLE_ROLES),
+  validateBody(createLeaveSchema),
+  async (req, res, next) => {
+    try {
+      const body = req.body as z.infer<typeof createLeaveSchema>;
+      const instituteId = req.tenantId!;
+
+      if (daysBetween(todayDateOnly(), body.startDate) < 0) {
+        throw ApiError.badRequest("Start date can't be in the past");
+      }
+
+      // Warn-not-block: staff can knowingly double-book (e.g. a planned
+      // substitute already arranged) — flagged to the requester, decided for
+      // real by whoever reviews it.
+      const overlapping = await prisma.leaveRequest.findFirst({
+        where: {
+          instituteId,
+          userId: req.user!.id,
+          status: "APPROVED",
+          startDate: { lte: body.endDate },
+          endDate: { gte: body.startDate },
+        },
+      });
+
+      const created = await prisma.leaveRequest.create({
+        data: { instituteId, userId: req.user!.id, startDate: body.startDate, endDate: body.endDate, reason: body.reason },
+        include: leaveRequestInclude,
+      });
+
+      res.status(201).json({
+        ...serializeLeaveRequest(created),
+        overlapsApprovedLeave: !!overlapping,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+orgRouter.get("/leave/mine", requireRoles(...LEAVE_ELIGIBLE_ROLES), async (req, res, next) => {
+  try {
+    const rows = await prisma.leaveRequest.findMany({
+      where: { instituteId: req.tenantId!, userId: req.user!.id },
+      include: leaveRequestInclude,
+      orderBy: { createdAt: "desc" },
+    });
+    res.json(rows.map(serializeLeaveRequest));
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Withdraw a request before it's reviewed — a staff member's own PENDING
+ * request only. Never lets anyone touch a request that's already been
+ * decided; that's what the Leave tab's Approve/Reject is for. */
+orgRouter.post("/leave/:id/cancel", requireRoles(...LEAVE_ELIGIBLE_ROLES), async (req, res, next) => {
+  try {
+    const row = await prisma.leaveRequest.findUnique({ where: { id: req.params.id as string } });
+    if (!row || row.instituteId !== req.tenantId) throw ApiError.notFound("Leave request not found");
+    if (row.userId !== req.user!.id) throw ApiError.forbidden("You can only cancel your own request");
+    if (row.status !== "PENDING") throw ApiError.badRequest("Only a pending request can be withdrawn");
+
+    const updated = await prisma.leaveRequest.update({
+      where: { id: row.id },
+      data: { status: "CANCELLED" },
+      include: leaveRequestInclude,
+    });
+    res.json(serializeLeaveRequest(updated));
+  } catch (err) {
+    next(err);
+  }
+});
+
+orgRouter.get("/leave", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const status = typeof req.query.status === "string" ? req.query.status : undefined;
+    const rows = await prisma.leaveRequest.findMany({
+      where: { instituteId: req.tenantId!, ...(status ? { status: status as never } : {}) },
+      include: leaveRequestInclude,
+      orderBy: { createdAt: "desc" },
+    });
+    res.json(rows.map(serializeLeaveRequest));
+  } catch (err) {
+    next(err);
+  }
+});
+
+const reviewLeaveSchema = z.object({
+  status: z.enum(["APPROVED", "REJECTED"]),
+  reviewNote: z.string().max(500).optional(),
+});
+
+orgRouter.patch(
+  "/leave/:id",
+  requireRoles("OWNER", "ADMIN"),
+  validateBody(reviewLeaveSchema),
+  async (req, res, next) => {
+    try {
+      const body = req.body as z.infer<typeof reviewLeaveSchema>;
+      const row = await prisma.leaveRequest.findUnique({ where: { id: req.params.id as string } });
+      if (!row || row.instituteId !== req.tenantId) throw ApiError.notFound("Leave request not found");
+      if (row.status !== "PENDING") throw ApiError.badRequest("This request has already been reviewed");
+
+      const updated = await prisma.leaveRequest.update({
+        where: { id: row.id },
+        data: {
+          status: body.status,
+          reviewedByUserId: req.user!.id,
+          reviewedAt: new Date(),
+          reviewNote: body.reviewNote,
+        },
+        include: leaveRequestInclude,
+      });
+
+      await auditLog({
+        action: body.status === "APPROVED" ? "LEAVE_APPROVED" : "LEAVE_REJECTED",
+        organizationId: req.user!.organizationId,
+        instituteId: req.tenantId!,
+        userId: req.user!.id,
+        targetType: "LeaveRequest",
+        targetId: row.id,
+        metadata: { requestedBy: row.userId },
+      });
+
+      const notifyTitle = body.status === "APPROVED" ? "Leave request approved" : "Leave request rejected";
+      const notifyBody = body.reviewNote ?? `Your leave request was ${body.status === "APPROVED" ? "approved" : "rejected"}.`;
+      await notify({
+        instituteId: req.tenantId!,
+        userId: row.userId,
+        type: "LEAVE_REVIEWED",
+        title: notifyTitle,
+        body: notifyBody,
+        metadata: { leaveRequestId: row.id, status: body.status },
+      }).catch(() => {});
+      await sendPush({ userId: row.userId, title: notifyTitle, body: notifyBody }).catch(() => {});
+
+      res.json(serializeLeaveRequest(updated));
+    } catch (err) {
+      next(err);
+    }
+  }
+);

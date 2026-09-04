@@ -10,6 +10,10 @@ import { money } from "../lib/money.js";
 import { loadUserRefs } from "../lib/userRefs.js";
 import { auditLog } from "../services/audit.js";
 import { todayDateOnly } from "../lib/dateOnly.js";
+import { computeFinalFee } from "../lib/feeMath.js";
+import { newPublicToken } from "../lib/receiptPayload.js";
+import { toCsv } from "../lib/csv.js";
+import { notifyStudent } from "../services/studentNotify.js";
 
 export const feesRouter = Router();
 
@@ -228,6 +232,7 @@ const createAccountSchema = z
     planType: z.enum(["ONE_TIME", "RECURRING"]).optional(),
     courseFee: z.number().nonnegative().optional(),
     discount: z.number().nonnegative().optional(),
+    discountType: z.enum(["FLAT", "PERCENT"]).optional(),
     installmentCount: z.number().int().positive().optional(),
     firstDueDate: z.coerce.date().optional(),
     installments: installmentOverrideSchema.optional(),
@@ -349,8 +354,8 @@ feesRouter.post("/accounts", requireRoles(...MANAGE_ROLES), validateBody(createA
 
         const courseFee = new Prisma.Decimal(courseFeeInput);
         const discount = new Prisma.Decimal(body.discount ?? 0);
-        const finalFee = courseFee.minus(discount);
-        if (finalFee.lt(0)) throw ApiError.badRequest("Discount can't be more than the course fee");
+        const discountType = body.discountType ?? "FLAT";
+        const finalFee = computeFinalFee(courseFee, discount, discountType);
         // A ₹0 total is only reachable by discounting the whole fee — a real
         // full waiver, which stays a valid enrollment with its original price
         // still on record. (A ₹0 *selection* was already rejected upstream.)
@@ -394,6 +399,7 @@ feesRouter.post("/accounts", requireRoles(...MANAGE_ROLES), validateBody(createA
             planType: "ONE_TIME",
             courseFee,
             discount,
+            discountType,
             finalFee,
             installmentCount,
           },
@@ -510,6 +516,7 @@ feesRouter.get("/accounts/:studentId", requireRoles(...READ_ROLES), async (req, 
         feeStructure: account.feeStructure,
         courseFee: money(account.courseFee),
         discount: money(account.discount),
+        discountType: account.discountType,
         finalFee: money(account.finalFee),
         installmentCount: account.installmentCount,
         monthlyAmount: money(account.monthlyAmount),
@@ -611,10 +618,11 @@ const revisePricingSchema = z
     /// mistyped base fee rather than a wrong subject selection.
     courseFee: z.number().nonnegative().optional(),
     discount: z.number().nonnegative().optional(),
+    discountType: z.enum(["FLAT", "PERCENT"]).optional(),
     firstDueDate: z.coerce.date().optional(),
     installmentCount: z.number().int().positive().optional(),
   })
-  .refine((b) => b.subjectIds !== undefined || b.courseFee !== undefined || b.discount !== undefined, {
+  .refine((b) => b.subjectIds !== undefined || b.courseFee !== undefined || b.discount !== undefined || b.discountType !== undefined, {
     message: "Nothing to revise — pass subjectIds/courseFee, discount, or both",
   });
 
@@ -675,8 +683,8 @@ feesRouter.patch(
 
       const courseFee = selection?.courseFee ?? (body.courseFee !== undefined ? new Prisma.Decimal(body.courseFee) : account.courseFee) ?? new Prisma.Decimal(0);
       const discount = new Prisma.Decimal(body.discount ?? Number(account.discount ?? 0));
-      const finalFee = courseFee.minus(discount);
-      if (finalFee.lt(0)) throw ApiError.badRequest("Discount can't be more than the course fee");
+      const discountType = body.discountType ?? account.discountType;
+      const finalFee = computeFinalFee(courseFee, discount, discountType);
 
       const count = body.installmentCount ?? account.installmentCount ?? 1;
       // Keep the existing schedule's start date unless the caller moves it, so
@@ -720,6 +728,7 @@ feesRouter.patch(
           data: {
             courseFee,
             discount,
+            discountType,
             finalFee,
             installmentCount: finalFee.gt(0) ? count : 0,
           },
@@ -736,7 +745,13 @@ feesRouter.patch(
         metadata: { finalFee: money(finalFee) },
       });
 
-      res.json({ id: updated.id, courseFee: money(courseFee), discount: money(discount), finalFee: money(finalFee) });
+      res.json({
+        id: updated.id,
+        courseFee: money(courseFee),
+        discount: money(discount),
+        discountType,
+        finalFee: money(finalFee),
+      });
     } catch (err) {
       next(err);
     }
@@ -921,6 +936,7 @@ feesRouter.post("/payments", requireRoles(...MANAGE_ROLES), validateBody(recordP
           receiptNumber,
           notes: body.notes,
           createdByUserId: req.user!.id,
+          publicToken: newPublicToken(),
         },
       });
 
@@ -1060,6 +1076,109 @@ feesRouter.get("/payments", requireRoles(...READ_ROLES), async (req, res, next) 
   }
 });
 
+/** Same query as GET /payments (the Receipts tab), minus the 200-row cap and
+ * the studentId filter — an export should be complete, not paginated for a
+ * screen. OWNER/ADMIN only: matches Expenses' existing export precedent
+ * (changes-phase10.md §10.5), tighter than READ_ROLES because this hands out
+ * every payment's receipt number and student contact info in bulk. */
+feesRouter.get("/payments/export.csv", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : undefined;
+
+    const payments = await prisma.payment.findMany({
+      where: {
+        instituteId,
+        ...(search
+          ? {
+              OR: [
+                { receiptNumber: { contains: search, mode: "insensitive" } },
+                { feeAccount: { student: { name: { contains: search, mode: "insensitive" } } } },
+                { feeAccount: { student: { phone: { contains: search, mode: "insensitive" } } } },
+                { feeAccount: { student: { parentPhone: { contains: search, mode: "insensitive" } } } },
+              ],
+            }
+          : {}),
+      },
+      include: { feeAccount: { include: { student: { select: { name: true, studentCode: true } } } } },
+      orderBy: { paidOn: "desc" },
+    });
+
+    const rows = [
+      ["Receipt No.", "Student", "Student Code", "Amount", "Mode", "Paid On", "Voided"],
+      ...payments.map((p) => [
+        p.receiptNumber,
+        p.feeAccount.student.name,
+        p.feeAccount.student.studentCode,
+        money(p.amount) ?? "0.00",
+        p.mode,
+        p.paidOn.toISOString().slice(0, 10),
+        p.voidedAt ? "Yes" : "No",
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="payments.csv"`);
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Same query as GET /overdue (the Defaulters tab) — see that route's
+ * comments for the shape. No filters: Defaulters itself has none, so nothing
+ * to mirror. */
+feesRouter.get("/overdue/export.csv", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const today = todayDateOnly();
+
+    const installments = await prisma.feeInstallment.findMany({
+      where: { waived: false, dueDate: { lt: today }, feeAccount: { instituteId, status: "ACTIVE" } },
+      include: {
+        feeAccount: {
+          include: {
+            student: {
+              select: { name: true, studentCode: true, phone: true, parentPhone: true, course: { select: { name: true } } },
+            },
+          },
+        },
+      },
+      orderBy: { dueDate: "asc" },
+    });
+
+    const overdue = installments
+      .filter((i) => !i.paidAmount.gte(i.amount))
+      .map((i) => ({
+        student: i.feeAccount.student,
+        dueDate: i.dueDate,
+        outstanding: money(i.amount.minus(i.paidAmount)) ?? "0.00",
+        daysOverdue: Math.round((today.getTime() - i.dueDate.getTime()) / 86400000),
+      }))
+      .sort((a, b) => b.daysOverdue - a.daysOverdue);
+
+    const rows = [
+      ["Student", "Student Code", "Course", "Phone", "Parent Phone", "Due Date", "Outstanding", "Days Overdue"],
+      ...overdue.map((o) => [
+        o.student.name,
+        o.student.studentCode,
+        o.student.course.name,
+        o.student.phone ?? "",
+        o.student.parentPhone ?? "",
+        o.dueDate.toISOString().slice(0, 10),
+        o.outstanding,
+        String(o.daysOverdue),
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="defaulters.csv"`);
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
 feesRouter.get("/payments/:id/receipt", requireRoles(...READ_ROLES), async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;
@@ -1088,7 +1207,29 @@ feesRouter.get("/payments/:id/receipt", requireRoles(...READ_ROLES), async (req,
       }),
       student: payment.feeAccount.student,
       accountTotals: { totalDue: money(totalDue), totalPaid: money(totalPaid), totalWaived: money(totalWaived), balance: money(balance) },
+      // Null when this row predates the publicToken column, or after a
+      // deliberate revoke — either way, no link exists to hand out.
+      publicToken: payment.publicTokenRevokedAt ? null : payment.publicToken,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Revoking is a one-way flip: staff pull this for the "sent to the wrong
+ * number" case. It does NOT delete or regenerate the token — the receipt and
+ * payment are completely unaffected, only the public URL stops resolving.
+ * There is deliberately no "un-revoke": staff regenerate by contacting
+ * support if this is ever needed for real, which should be rare enough that
+ * a self-service reversal isn't worth the risk of it being a habit. */
+feesRouter.post("/payments/:id/receipt/revoke", requireRoles(...READ_ROLES), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const payment = await prisma.payment.findUnique({ where: { id: req.params.id as string } });
+    if (!payment || payment.instituteId !== instituteId) throw ApiError.notFound("Receipt not found");
+
+    await prisma.payment.update({ where: { id: payment.id }, data: { publicTokenRevokedAt: new Date() } });
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }
@@ -1156,6 +1297,61 @@ feesRouter.get("/overdue", requireRoles(...READ_ROLES), async (req, res, next) =
       .sort((a, b) => b.daysOverdue - a.daysOverdue);
 
     res.json(overdue);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * Sends the fee reminder for one overdue installment — to the student's portal
+ * (when they have a working login) and to the parent over WhatsApp.
+ *
+ * Staff-triggered on purpose. This is the same trigger point the Defaulters
+ * screen already had a "copy this message" button on; it now actually delivers
+ * instead of putting text on a clipboard. The automatic overdue *sweep* stays
+ * deferred (§10.2) — nothing here polls or schedules.
+ */
+feesRouter.post("/overdue/:installmentId/remind", requireRoles(...MANAGE_ROLES), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const today = todayDateOnly();
+
+    const installment = await prisma.feeInstallment.findUnique({
+      where: { id: req.params.installmentId as string },
+      include: {
+        feeAccount: {
+          include: { student: { select: { id: true, name: true, course: { select: { name: true } } } } },
+        },
+      },
+    });
+    if (!installment || installment.feeAccount.instituteId !== instituteId) {
+      throw ApiError.notFound("Installment not found");
+    }
+
+    const outstanding = installment.amount.minus(installment.paidAmount);
+    if (installment.waived || outstanding.lessThanOrEqualTo(0)) {
+      throw ApiError.badRequest("Nothing is outstanding on this installment.");
+    }
+
+    const daysOverdue = Math.max(0, Math.round((today.getTime() - installment.dueDate.getTime()) / 86400000));
+    const student = installment.feeAccount.student;
+
+    const result = await notifyStudent({
+      instituteId,
+      studentId: student.id,
+      type: "FEE_OVERDUE_REMINDER",
+      title: "Fee reminder",
+      vars: {
+        studentName: student.name,
+        amount: money(outstanding) ?? "0.00",
+        course: student.course.name,
+        dueDate: installment.dueDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+        daysOverdue: String(daysOverdue),
+      },
+      metadata: { installmentId: installment.id, feeAccountId: installment.feeAccountId },
+    });
+
+    res.json(result);
   } catch (err) {
     next(err);
   }

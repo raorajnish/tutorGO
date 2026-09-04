@@ -447,7 +447,8 @@ export const ModelName = {
   Expense: 'Expense',
   FinanceEntry: 'FinanceEntry',
   DistributionItem: 'DistributionItem',
-  DistributionReceipt: 'DistributionReceipt'
+  DistributionReceipt: 'DistributionReceipt',
+  LeaveRequest: 'LeaveRequest'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -463,7 +464,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "instituteWhatsAppConfig" | "whatsAppTemplate" | "outboundMessage" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentSubject" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeStructureSubjectLine" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt"
+    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "instituteWhatsAppConfig" | "whatsAppTemplate" | "outboundMessage" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentSubject" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeStructureSubjectLine" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt" | "leaveRequest"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4241,6 +4242,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LeaveRequest: {
+      payload: Prisma.$LeaveRequestPayload<ExtArgs>
+      fields: Prisma.LeaveRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LeaveRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LeaveRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.LeaveRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LeaveRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>
+        }
+        findMany: {
+          args: Prisma.LeaveRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>[]
+        }
+        create: {
+          args: Prisma.LeaveRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>
+        }
+        createMany: {
+          args: Prisma.LeaveRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LeaveRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.LeaveRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>
+        }
+        update: {
+          args: Prisma.LeaveRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.LeaveRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LeaveRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LeaveRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.LeaveRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LeaveRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.LeaveRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLeaveRequest>
+        }
+        groupBy: {
+          args: Prisma.LeaveRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LeaveRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LeaveRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LeaveRequestCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4574,6 +4649,7 @@ export const CourseScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   feeMode: 'feeMode',
+  portalEnabled: 'portalEnabled',
   defaultFee: 'defaultFee',
   defaultMonthlyFee: 'defaultMonthlyFee'
 } as const
@@ -4682,7 +4758,9 @@ export const StudentScalarFieldEnum = {
   profileCompletedAt: 'profileCompletedAt',
   selfFillPin: 'selfFillPin',
   selfFillAttempts: 'selfFillAttempts',
-  selfFillLockedAt: 'selfFillLockedAt'
+  selfFillLockedAt: 'selfFillLockedAt',
+  userId: 'userId',
+  portalIssuedForCourseId: 'portalIssuedForCourseId'
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
@@ -4745,6 +4823,7 @@ export const TestScalarFieldEnum = {
   paperAssetUrl: 'paperAssetUrl',
   paperAssetType: 'paperAssetType',
   paperAssetName: 'paperAssetName',
+  paperAssetPublicId: 'paperAssetPublicId',
   createdByUserId: 'createdByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -4838,6 +4917,7 @@ export const FeeAccountScalarFieldEnum = {
   status: 'status',
   courseFee: 'courseFee',
   discount: 'discount',
+  discountType: 'discountType',
   finalFee: 'finalFee',
   installmentCount: 'installmentCount',
   monthlyAmount: 'monthlyAmount',
@@ -4879,7 +4959,9 @@ export const PaymentScalarFieldEnum = {
   voidedAt: 'voidedAt',
   voidReason: 'voidReason',
   voidedByUserId: 'voidedByUserId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  publicToken: 'publicToken',
+  publicTokenRevokedAt: 'publicTokenRevokedAt'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
@@ -5066,6 +5148,24 @@ export const DistributionReceiptScalarFieldEnum = {
 } as const
 
 export type DistributionReceiptScalarFieldEnum = (typeof DistributionReceiptScalarFieldEnum)[keyof typeof DistributionReceiptScalarFieldEnum]
+
+
+export const LeaveRequestScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  userId: 'userId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  reason: 'reason',
+  status: 'status',
+  reviewedByUserId: 'reviewedByUserId',
+  reviewedAt: 'reviewedAt',
+  reviewNote: 'reviewNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LeaveRequestScalarFieldEnum = (typeof LeaveRequestScalarFieldEnum)[keyof typeof LeaveRequestScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -5438,6 +5538,20 @@ export type ListEnumFeeAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'DiscountType'
+ */
+export type EnumDiscountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DiscountType'>
+    
+
+
+/**
+ * Reference to a field of type 'DiscountType[]'
+ */
+export type ListEnumDiscountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DiscountType[]'>
+    
+
+
+/**
  * Reference to a field of type 'PaymentMode'
  */
 export type EnumPaymentModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMode'>
@@ -5490,6 +5604,20 @@ export type EnumPayrollRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
  * Reference to a field of type 'PayrollRunStatus[]'
  */
 export type ListEnumPayrollRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayrollRunStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'LeaveStatus'
+ */
+export type EnumLeaveStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LeaveStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'LeaveStatus[]'
+ */
+export type ListEnumLeaveStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LeaveStatus[]'>
     
 
 
@@ -5708,6 +5836,7 @@ export type GlobalOmitConfig = {
   financeEntry?: Prisma.FinanceEntryOmit
   distributionItem?: Prisma.DistributionItemOmit
   distributionReceipt?: Prisma.DistributionReceiptOmit
+  leaveRequest?: Prisma.LeaveRequestOmit
 }
 
 /* Types for Logging */

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
+import { ExportButton } from "@/components/ui/ExportButton";
 import { ReceiptModal } from "@/components/fees/ReceiptModal";
 import { formatMoney } from "@/lib/money";
 import { PAYMENT_MODE_LABELS, type ReceiptListItem } from "@/lib/types";
@@ -31,12 +32,19 @@ export function ReceiptsTab() {
 
   return (
     <div className="space-y-4">
-      <Input
-        placeholder="Search receipt no., student name or phone…"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="max-w-xs"
-      />
+      <div className="flex items-end justify-between gap-3">
+        <Input
+          placeholder="Search receipt no., student name or phone…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-xs"
+        />
+        <ExportButton
+          path={`/fees/payments/export.csv${search ? `?search=${encodeURIComponent(search)}` : ""}`}
+          filename="payments.csv"
+          title="Export payment history as CSV"
+        />
+      </div>
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 

@@ -61,18 +61,21 @@ export default function EnquiriesPage() {
     setError(null);
     try {
       const qs = search ? `?search=${encodeURIComponent(search)}` : "";
-      const [e, c] = await Promise.all([
-        apiFetch<Enquiry[]>(`/enquiries${qs}`),
-        apiFetch<Course[]>("/academics/courses?active=true"),
-      ]);
-      setEnquiries(e);
-      setCourses(c);
+      setEnquiries(await apiFetch<Enquiry[]>(`/enquiries${qs}`));
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Could not load enquiries.");
     } finally {
       setLoading(false);
     }
   }
+
+  // Courses are a static lookup for the enquiry form/filter, not filtered by
+  // search — fetched once rather than on every debounced keystroke.
+  useEffect(() => {
+    apiFetch<Course[]>("/academics/courses?active=true")
+      .then(setCourses)
+      .catch(() => setCourses([]));
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(load, 250);

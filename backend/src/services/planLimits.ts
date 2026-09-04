@@ -5,8 +5,11 @@ import { effectiveLimits, ROLE_LABEL, type CappedRole, type RoleLimits } from ".
 export type { CappedRole };
 
 /** Current active headcount per capped role. STUDENT deliberately comes from
- * the Student table — students never get a User row (changes.md §1), so
- * counting them via User silently reports 0 forever. */
+ * the Student table, not User. Since §10.6 a student *may* have a User row
+ * (a portal login, issued manually and only for portal-enabled courses), but
+ * the plan caps enrolled students, not logins — counting via User would both
+ * under-report every student without a login and make issuing one look like
+ * an extra admission. */
 export async function countUsage(instituteId: string): Promise<RoleLimits> {
   const [roleCounts, studentCount] = await Promise.all([
     prisma.user.groupBy({
@@ -39,8 +42,7 @@ export async function assertRoleCapacity(instituteId: string, role: CappedRole):
   if (!limits) return;
   const max = limits[role];
 
-  // Students never get a User row (login is deferred — see changes.md §1),
-  // so their headcount comes from the Student table, not User.
+  // Students are capped by enrollment, not by login — see countUsage above.
   const current =
     role === "STUDENT"
       ? await prisma.student.count({ where: { instituteId, isActive: true } })

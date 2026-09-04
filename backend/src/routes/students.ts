@@ -143,6 +143,65 @@ studentsRouter.get("/", async (req, res, next) => {
 // registration order, and "roster.csv" etc. would otherwise be swallowed as
 // an :id value and never reach these handlers.
 
+/** The real student directory export — NOT the same thing as roster.csv
+ * below, which is a narrow self-fill-PIN handout sheet for a different
+ * purpose. Mirrors GET /'s filters (search/status/courseId/batchId) so the
+ * export matches whatever's currently on screen. OWNER/ADMIN only — see
+ * changes-phase10.md §10.5; RECEPTION can use the on-screen directory but
+ * not bulk-export contact details. */
+studentsRouter.get("/export.csv", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
+    const status = typeof req.query.status === "string" ? req.query.status : "active";
+    const courseId = typeof req.query.courseId === "string" ? req.query.courseId : undefined;
+    const batchId = typeof req.query.batchId === "string" ? req.query.batchId : undefined;
+
+    const students = await prisma.student.findMany({
+      where: {
+        instituteId,
+        isActive: status === "all" ? undefined : status === "inactive" ? false : true,
+        courseId,
+        batches: batchId ? { some: { batchId, leftAt: null } } : undefined,
+        OR: search
+          ? [
+              { name: { contains: search, mode: "insensitive" } },
+              { studentCode: { contains: search, mode: "insensitive" } },
+              { phone: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+            ]
+          : undefined,
+      },
+      include: {
+        course: { select: { name: true } },
+        batches: { where: { leftAt: null }, include: { batch: { select: { name: true } } } },
+      },
+      orderBy: { name: "asc" },
+    });
+
+    const rows = [
+      ["Name", "Student Code", "Course", "Batch", "Phone", "Parent Phone", "Email", "Status", "Admission Date"],
+      ...students.map((s) => [
+        s.name,
+        s.studentCode,
+        s.course.name,
+        s.batches[0]?.batch.name ?? "",
+        s.phone ?? "",
+        s.parentPhone ?? "",
+        s.email,
+        s.isActive ? "Active" : "Inactive",
+        s.admissionDate.toISOString().slice(0, 10),
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="students.csv"`);
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
 /** Name + student ID + PIN, scoped to one course/batch — the actual handout
  * sheet. Deliberately never returned by any other endpoint; see
  * bulk-precreate's comment above it. Only rows still awaiting self-fill are

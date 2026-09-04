@@ -15,6 +15,10 @@ export interface AuthUser {
   /// Set for OWNER (their Organization) and institute-tied roles (their
   /// institute's Organization).
   organizationId: string | null;
+  /// The Student row a STUDENT login grants access to. Null for every other
+  /// role. Every /portal/* read scopes to this rather than trusting an id
+  /// from the request, so one student can never read another's records.
+  studentId: string | null;
 }
 
 declare global {
@@ -44,7 +48,22 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
       // below costs nothing extra for ADMIN/FACULTY/RECEPTION/STUDENT — the
       // common case. Only OWNER needs a second lookup, since their institute
       // is session state rather than a column on their User row.
-      include: { institute: { select: { isActive: true } } },
+      include: {
+        institute: { select: { isActive: true } },
+        // Only ever populated for a STUDENT login (nothing else has a linked
+        // student row), so this rides along on the query that was happening
+        // anyway rather than costing a second round trip — same technique as
+        // the institute-suspension check below.
+        portalStudent: {
+          select: {
+            id: true,
+            courseId: true,
+            portalIssuedForCourseId: true,
+            isActive: true,
+            course: { select: { portalEnabled: true } },
+          },
+        },
+      },
     });
     if (!user || !user.isActive) {
       throw ApiError.unauthorized("Account is inactive or no longer exists");
@@ -77,8 +96,34 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
       }
     }
 
+    // Student portal access is derived live, on every request, rather than
+    // stored — so turning `portalEnabled` off on a course, moving a student
+    // to a course without it, or deactivating the student revokes access
+    // *immediately* instead of whenever their 7-day token happens to expire.
+    // None of this touches their records: attendance, results and fees key
+    // off studentId and are untouched, and access returns the moment the
+    // course flag or their enrollment says it should.
+    let portalStudentId: string | null = null;
+    if (user.role === "STUDENT") {
+      const student = user.portalStudent;
+      if (!student || !student.isActive) {
+        throw ApiError.unauthorized("This student account is no longer active. Contact your institute.");
+      }
+      if (
+        !student.course.portalEnabled ||
+        student.portalIssuedForCourseId !== student.courseId
+      ) {
+        throw ApiError.forbidden(
+          "Portal access isn't available for your course right now. Contact your institute.",
+          "PORTAL_ACCESS_REVOKED"
+        );
+      }
+      portalStudentId = student.id;
+    }
+
     req.user = {
       id: user.id,
+      studentId: portalStudentId,
       email: user.email,
       fullName: user.fullName,
       role: user.role,
@@ -137,6 +182,20 @@ export function requireOrganization(req: Request, _res: Response, next: NextFunc
     return next(ApiError.forbidden("This action requires an organization account"));
   }
   req.organizationId = req.user.organizationId;
+  next();
+}
+
+/** Gate for the student portal (`/portal/*`). By the time this runs,
+ * `authenticate` has already re-derived portal eligibility and rejected the
+ * request if it lapsed — so this only has to assert the role and that the
+ * linked student row is present, and stamps `req.tenantId` the way
+ * `requireInstitute` does for staff. */
+export function requireStudent(req: Request, _res: Response, next: NextFunction) {
+  if (!req.user) return next(ApiError.unauthorized());
+  if (req.user.role !== "STUDENT" || !req.user.studentId || !req.user.instituteId) {
+    return next(ApiError.forbidden("This area is for student accounts"));
+  }
+  req.tenantId = req.user.instituteId;
   next();
 }
 

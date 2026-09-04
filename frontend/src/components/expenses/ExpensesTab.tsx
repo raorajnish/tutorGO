@@ -28,9 +28,17 @@ export function ExpensesTab() {
   const [editing, setEditing] = useState<Expense | null>(null);
   const [deleting, setDeleting] = useState<Expense | null>(null);
 
-  function loadLookups() {
-    apiFetch<ExpenseCategory[]>("/expenses/categories").then((all) => setCategories(all.filter((c) => c.isActive)));
-    apiFetch<ExpenseEvent[]>("/expenses/events").then(setEvents);
+  async function loadLookups() {
+    try {
+      const [allCategories, allEvents] = await Promise.all([
+        apiFetch<ExpenseCategory[]>("/expenses/categories"),
+        apiFetch<ExpenseEvent[]>("/expenses/events"),
+      ]);
+      setCategories(allCategories.filter((c) => c.isActive));
+      setEvents(allEvents);
+    } catch {
+      setError("Could not load categories and events.");
+    }
   }
 
   function loadExpenses() {
@@ -44,7 +52,9 @@ export function ExpensesTab() {
       .catch(() => setError("Could not load expenses."));
   }
 
-  useEffect(loadLookups, []);
+  useEffect(() => {
+    loadLookups();
+  }, []);
   useEffect(loadExpenses, [from, to, categoryFilter, eventFilter]);
 
   const categoryOptions = useMemo(

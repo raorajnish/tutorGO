@@ -89,7 +89,8 @@ export const MessageTemplateType = {
   LECTURE_CANCELLED: 'LECTURE_CANCELLED',
   ATTENDANCE_MARKED: 'ATTENDANCE_MARKED',
   FEE_OVERDUE_REMINDER: 'FEE_OVERDUE_REMINDER',
-  PAYROLL_PAYMENT_RECORDED: 'PAYROLL_PAYMENT_RECORDED'
+  PAYROLL_PAYMENT_RECORDED: 'PAYROLL_PAYMENT_RECORDED',
+  TEST_RESULT_ENTERED: 'TEST_RESULT_ENTERED'
 } as const
 
 export type MessageTemplateType = (typeof MessageTemplateType)[keyof typeof MessageTemplateType]
@@ -112,6 +113,14 @@ export const FeePlanType = {
 } as const
 
 export type FeePlanType = (typeof FeePlanType)[keyof typeof FeePlanType]
+
+
+export const DiscountType = {
+  FLAT: 'FLAT',
+  PERCENT: 'PERCENT'
+} as const
+
+export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
 
 
 export const FeeAccountStatus = {
@@ -210,3 +219,13 @@ export const CourseFeeMode = {
 } as const
 
 export type CourseFeeMode = (typeof CourseFeeMode)[keyof typeof CourseFeeMode]
+
+
+export const LeaveStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type LeaveStatus = (typeof LeaveStatus)[keyof typeof LeaveStatus]

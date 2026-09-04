@@ -7,7 +7,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { OnboardingLayout } from "@/components/onboarding/OnboardingLayout";
 import { TermsModal } from "@/components/onboarding/TermsModal";
-import { nextOnboardingRoute } from "@/lib/onboarding";
+import { homeRoute, nextOnboardingRoute } from "@/lib/onboarding";
 
 export default function WelcomePage() {
   const { user, refresh } = useAuth();
@@ -31,7 +31,7 @@ export default function WelcomePage() {
     try {
       await apiFetch("/auth/accept-terms", { method: "POST" });
       await refresh();
-      router.replace("/dashboard");
+      router.replace(homeRoute(user!));
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Could not continue. Please try again.");
     } finally {

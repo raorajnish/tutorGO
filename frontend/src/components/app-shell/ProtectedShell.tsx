@@ -4,7 +4,7 @@ import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { AppShell } from "./AppShell";
-import { nextOnboardingRoute } from "@/lib/onboarding";
+import { homeRoute, nextOnboardingRoute } from "@/lib/onboarding";
 
 export function ProtectedShell({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -20,10 +20,13 @@ export function ProtectedShell({ children }: { children: ReactNode }) {
     if (user.role === "SUPERADMIN") return;
 
     const target = nextOnboardingRoute(user);
-    if (target !== "/dashboard") router.replace(target);
+    if (target !== homeRoute(user)) router.replace(target);
   }, [loading, user, router]);
 
-  const needsOnboarding = user && user.role !== "SUPERADMIN" && nextOnboardingRoute(user) !== "/dashboard";
+  // "Onboarding still pending" is exactly "the gate order points somewhere
+  // other than where this role belongs" — compared against homeRoute rather
+  // than a hard-coded /dashboard, which a STUDENT never lands on.
+  const needsOnboarding = user && user.role !== "SUPERADMIN" && nextOnboardingRoute(user) !== homeRoute(user);
 
   if (loading || !user || needsOnboarding) {
     return (

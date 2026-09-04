@@ -13,6 +13,7 @@ import { MarkAttendanceModal } from "@/components/attendance/MarkAttendanceModal
 import { EditLectureModal } from "@/components/attendance/EditLectureModal";
 import { CancelLectureModal } from "@/components/attendance/CancelLectureModal";
 import { CopyLectureButton } from "@/components/attendance/CopyLectureButton";
+import { ExportButton } from "@/components/ui/ExportButton";
 import { FacultyLecturesView } from "@/components/attendance/FacultyLecturesView";
 import type { Lecture, LectureSummary } from "@/lib/types";
 import { todayInput, fmtTime12, formatDate } from "@/lib/format";
@@ -156,11 +157,18 @@ function StaffScheduleView() {
               </svg>
             </button>
           </div>
-          {date !== todayInput() && (
-            <Button variant="ghost" onClick={() => setDate(todayInput())}>
-              Jump to today
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {date !== todayInput() && (
+              <Button variant="ghost" onClick={() => setDate(todayInput())}>
+                Jump to today
+              </Button>
+            )}
+            <ExportButton
+              path={`/attendance/summary/export.csv?date=${date}`}
+              filename={`attendance-${date}.csv`}
+              title="Export this day's attendance as CSV"
+            />
+          </div>
         </div>
 
         {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}

@@ -73,6 +73,10 @@ enum MessageTemplateType {
   ATTENDANCE_MARKED
   FEE_OVERDUE_REMINDER
   PAYROLL_PAYMENT_RECORDED
+  /// Fires from the marks-entry route the moment a TestResult is written —
+  /// the student's own portal notification and the parent's WhatsApp copy
+  /// come from the same dispatch call. See changes-phase10.md §10.6.
+  TEST_RESULT_ENTERED
 }
 
 enum PaymentMode {
@@ -86,6 +90,14 @@ enum PaymentMode {
 enum FeePlanType {
   ONE_TIME
   RECURRING
+}
+
+/// How FeeAccount.discount is interpreted — a flat rupee amount, or a
+/// percentage of courseFee. FLAT is the default and matches every account
+/// created before this column existed, so nothing changes for them.
+enum DiscountType {
+  FLAT
+  PERCENT
 }
 
 enum FeeAccountStatus {
@@ -236,6 +248,7 @@ model Institute {
   tests             Test[]
   reminders         ScheduledReminder[]
   distributionItems DistributionItem[]
+  leaveRequests     LeaveRequest[]
 
   @@index([organizationId])
   @@map("institutes")
@@ -301,6 +314,10 @@ model User {
   testsAuthored       Test[]              @relation("TestAuthor")
   testResultsEntered  TestResult[]        @relation("TestResultAuthor")
   pushSubscriptions   PushSubscription[]
+  leaveRequests       LeaveRequest[]      @relation("LeaveRequester")
+  leaveReviews        LeaveRequest[]      @relation("LeaveReviewer")
+  /// Set only on a role=STUDENT login — the student row it grants access to.
+  portalStudent       Student?            @relation("StudentPortalLogin")
 
   @@index([instituteId])
   @@map("users")
@@ -660,6 +677,15 @@ model Course {
   /// course would silently empty every one of its rosters).
   feeMode CourseFeeMode @default(FLAT)
 
+  /// The single gate on student-portal access. There is deliberately no
+  /// institute-wide switch alongside it: turning this off on every course
+  /// already means "portal off here", with one less flag to keep in sync.
+  /// Turning it off does not delete anything — the student's login simply
+  /// stops authenticating (see middleware/auth.ts), and every attendance,
+  /// test and fee record they have is untouched and reappears if it is
+  /// turned back on. See changes-phase10.md §10.6.
+  portalEnabled Boolean @default(false)
+
   /// Pre-fills FeeAccount.courseFee when creating a ONE_TIME plan for a
   /// student in this course — editable per-student, just a sane default.
   defaultFee        Decimal? @db.Decimal(10, 2)
@@ -842,7 +868,25 @@ model Student {
   selfFillAttempts   Int       @default(0)
   selfFillLockedAt   DateTime?
 
+  // --- Student portal (Phase 10.6) -----------------------------------------
+  // Portal *status* is never stored — it is derived on every read from these
+  // two columns plus the live course flag, the same "derive, don't store"
+  // principle used for FeeInstallment and DistributionReceipt status. A
+  // stored enum would drift the moment a course toggled or a student moved.
+  // See lib/portalAccess.ts.
+
+  /// The student's login, once staff have explicitly issued one. Null means
+  /// no login has ever been created — which is every student by default: a
+  /// new admission never gets one automatically.
+  userId                  String? @unique
+  /// The course the CURRENT credential was issued against. Compared with the
+  /// live `courseId` to detect "this student has moved course, the existing
+  /// login no longer matches their enrollment and must be re-issued".
+  portalIssuedForCourseId String?
+
   institute            Institute             @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  /// SetNull, not Cascade: deleting the login must never delete the student.
+  user                 User?                 @relation("StudentPortalLogin", fields: [userId], references: [id], onDelete: SetNull)
   enquiry              Enquiry?              @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
   course               Course                @relation(fields: [courseId], references: [id])
   batches              StudentBatch[]
@@ -972,11 +1016,16 @@ model Test {
   totalMarks      Int
   passingMarks    Int?
   instructions    String?
-  /// Cloudinary URL for the question paper. Optional — a test can be
-  /// scheduled with no paper attached at all.
-  paperAssetUrl   String?
-  paperAssetType  String?
-  paperAssetName  String?
+  /// URL of the question paper. Optional — a test can be scheduled with no
+  /// paper attached at all. Served from Cloudinary when configured, else from
+  /// local disk (see services/uploads.ts).
+  paperAssetUrl      String?
+  paperAssetType     String?
+  paperAssetName     String?
+  /// Handle for deleting the stored asset. Null on rows uploaded before this
+  /// column existed — those keep working, they just can't be cleaned up
+  /// automatically, so no backfill is needed.
+  paperAssetPublicId String?
   createdByUserId String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -1152,6 +1201,10 @@ model FeeAccount {
   status           FeeAccountStatus @default(ACTIVE)
   courseFee        Decimal?         @db.Decimal(10, 2)
   discount         Decimal?         @default(0) @db.Decimal(10, 2)
+  /// FLAT = discount is a rupee amount; PERCENT = discount is 0-100, applied
+  /// to courseFee. See lib/feeMath.ts for the one place finalFee is derived
+  /// from these two fields.
+  discountType     DiscountType     @default(FLAT)
   finalFee         Decimal?         @db.Decimal(10, 2)
   installmentCount Int?
   monthlyAmount    Decimal?         @db.Decimal(10, 2)
@@ -1221,6 +1274,17 @@ model Payment {
   voidReason      String?
   voidedByUserId  String?
   createdAt       DateTime    @default(now())
+
+  /// Opaque, unguessable — the auth for GET /public/receipts/:token. Never
+  /// the sequential receiptNumber (guessable: try the next SEQ) and never the
+  /// cuid id (not designed to be shared). Generated once at creation, stable
+  /// for the life of the payment. Null on rows created before this column
+  /// existed; those simply have no public link until backfilled.
+  publicToken          String?   @unique
+  /// Set when staff pull the "Revoke link" trigger — a public request for a
+  /// revoked token 404s exactly like one that never had a link, but the
+  /// receipt itself and the payment record are completely unaffected.
+  publicTokenRevokedAt DateTime?
 
   institute   Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   feeAccount  FeeAccount          @relation(fields: [feeAccountId], references: [id], onDelete: Cascade)
@@ -1550,4 +1614,44 @@ model DistributionReceipt {
   @@unique([distributionItemId, studentId])
   @@index([studentId])
   @@map("distribution_receipts")
+}
+
+// ---------------------------------------------------------------------------
+// Staff leave (changes-phase10.md §10.4)
+// ---------------------------------------------------------------------------
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+/// A staff member's own request for one or more days off. Deliberately does
+/// NOT touch PayrollLineItem/SalaryProfile — an approved leave has no
+/// automatic effect on pay in this phase (FIXED salary is unaffected;
+/// PER_LECTURE pay is already zero for a day nothing was taught). Whether
+/// unpaid leave should deduct from a FIXED salary is a policy decision left
+/// for a follow-up once an institute actually asks for it — see phase10 doc.
+model LeaveRequest {
+  id               String      @id @default(cuid())
+  instituteId      String
+  userId           String
+  startDate        DateTime    @db.Date
+  endDate          DateTime    @db.Date
+  reason           String
+  status           LeaveStatus @default(PENDING)
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  reviewNote       String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  institute  Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  user       User      @relation("LeaveRequester", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User?     @relation("LeaveReviewer", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([instituteId, userId])
+  @@index([instituteId, status])
+  @@map("leave_requests")
 }

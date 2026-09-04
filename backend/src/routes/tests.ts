@@ -17,7 +17,8 @@ import {
   toTimeDate,
 } from "../lib/lectureShared.js";
 import { checkSessionConflict, type ConflictSplit } from "../services/lectureConflicts.js";
-import { MAX_UPLOAD_BYTES, uploadTestPaper } from "../services/uploads.js";
+import { notifyStudent } from "../services/studentNotify.js";
+import { MAX_UPLOAD_BYTES, deleteAsset, uploadTestPaper } from "../services/uploads.js";
 
 export const testsRouter = Router();
 
@@ -50,6 +51,7 @@ function serializeTest(t: {
   paperAssetUrl: string | null;
   paperAssetType: string | null;
   paperAssetName: string | null;
+  paperAssetPublicId: string | null;
   createdAt: Date;
   course: { id: string; name: string; code: string };
   subject: { id: string; name: string; shortCode: string };
@@ -63,6 +65,7 @@ function serializeTest(t: {
     paperAssetUrl: t.paperAssetUrl,
     paperAssetType: t.paperAssetType,
     paperAssetName: t.paperAssetName,
+    paperAssetPublicId: t.paperAssetPublicId,
     createdAt: t.createdAt,
     course: t.course,
     subject: t.subject,
@@ -85,13 +88,15 @@ async function loadSession(testId: string, lectureId: string, instituteId: strin
 
 /// An OWNER's User row has instituteId = null (they're org-scoped), so the
 /// tenant check has to go through their organization instead.
-async function assertValidInvigilator(userId: string, instituteId: string, organizationId: string | null) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+function assertValidInvigilatorUser(
+  user: { id: string; isActive: boolean; role: string; instituteId: string | null } | undefined,
+  instituteId: string,
+  org: { ownerId: string | null } | null
+) {
   if (!user || !user.isActive || !INVIGILATOR_ROLES.includes(user.role as (typeof INVIGILATOR_ROLES)[number])) {
     throw ApiError.badRequest("Invigilator not found");
   }
   if (user.role === "OWNER") {
-    const org = organizationId ? await prisma.organization.findUnique({ where: { id: organizationId } }) : null;
     if (!org || org.ownerId !== user.id) throw ApiError.badRequest("Invigilator not found");
   } else if (user.instituteId !== instituteId) {
     throw ApiError.badRequest("Invigilator not found");
@@ -153,6 +158,9 @@ const createTestSchema = z.object({
   paperAssetUrl: z.string().url().optional(),
   paperAssetType: z.enum(["pdf", "image"]).optional(),
   paperAssetName: z.string().max(255).optional(),
+  /// Returned by POST /tests/upload. Carried through so the asset can be
+  /// deleted if the paper is later replaced or removed.
+  paperAssetPublicId: z.string().max(255).optional(),
   sessions: z.array(sessionSchema).min(1, "Schedule the test for at least one batch"),
   /// Lecture ids the admin has explicitly agreed to split around this test.
   acceptSplitFor: z.array(z.string()).default([]),
@@ -179,15 +187,31 @@ testsRouter.post("/", requireRoles(...MANAGE_ROLES), validateBody(createTestSche
     // third batch never leaves a half-scheduled test behind.
     const pendingSplits: { batchId: string; batchName: string; split: ConflictSplit }[] = [];
 
+    // One query each for every batch/invigilator this request could possibly
+    // need, instead of one findUnique per session inside the loop.
+    const batchIds = [...new Set(body.sessions.map((s) => s.batchId))];
+    const invigilatorIds = [...new Set(body.sessions.map((s) => s.invigilatorId))];
+    const [batches, invigilators] = await Promise.all([
+      prisma.batch.findMany({ where: { id: { in: batchIds } } }),
+      prisma.user.findMany({ where: { id: { in: invigilatorIds } } }),
+    ]);
+    const batchById = new Map(batches.map((b) => [b.id, b]));
+    const invigilatorById = new Map(invigilators.map((u) => [u.id, u]));
+    // Only fetched if some invigilator is actually an OWNER — the common
+    // case (ADMIN/FACULTY invigilators) never pays for this lookup at all.
+    const org = invigilators.some((u) => u.role === "OWNER") && req.user!.organizationId
+      ? await prisma.organization.findUnique({ where: { id: req.user!.organizationId } })
+      : null;
+
     for (const session of body.sessions) {
-      const batch = await prisma.batch.findUnique({ where: { id: session.batchId } });
+      const batch = batchById.get(session.batchId);
       if (!batch || batch.instituteId !== instituteId) throw ApiError.badRequest("Batch not found");
       if (batch.courseId !== body.courseId) {
         throw ApiError.badRequest(`"${batch.name}" doesn't belong to the selected course`);
       }
       if (session.endTime <= session.startTime) throw ApiError.badRequest("End time must be after start time");
 
-      await assertValidInvigilator(session.invigilatorId, instituteId, req.user!.organizationId);
+      assertValidInvigilatorUser(invigilatorById.get(session.invigilatorId), instituteId, org);
 
       const conflict = await checkSessionConflict({
         batchId: session.batchId,
@@ -226,6 +250,7 @@ testsRouter.post("/", requireRoles(...MANAGE_ROLES), validateBody(createTestSche
           paperAssetUrl: body.paperAssetUrl,
           paperAssetType: body.paperAssetType,
           paperAssetName: body.paperAssetName,
+          paperAssetPublicId: body.paperAssetPublicId,
           createdByUserId: req.user!.id,
         },
         include: testInclude,
@@ -373,6 +398,7 @@ const updateTestSchema = z.object({
   paperAssetUrl: z.string().url().nullable().optional(),
   paperAssetType: z.enum(["pdf", "image"]).nullable().optional(),
   paperAssetName: z.string().max(255).nullable().optional(),
+  paperAssetPublicId: z.string().max(255).nullable().optional(),
 });
 
 testsRouter.patch("/:id", requireRoles(...MANAGE_ROLES), validateBody(updateTestSchema), async (req, res, next) => {
@@ -396,6 +422,14 @@ testsRouter.patch("/:id", requireRoles(...MANAGE_ROLES), validateBody(updateTest
     }
 
     const updated = await prisma.test.update({ where: { id: test.id }, data: body, include: testInclude });
+
+    // The paper was replaced or cleared — drop the old asset rather than
+    // orphaning it in storage forever. After the update, so a failed write
+    // can never leave the row pointing at a file that no longer exists.
+    if (body.paperAssetPublicId !== undefined && test.paperAssetPublicId && test.paperAssetPublicId !== body.paperAssetPublicId) {
+      await deleteAsset(test.paperAssetPublicId);
+    }
+
     res.json(serializeTest(updated));
   } catch (err) {
     next(err);
@@ -412,6 +446,7 @@ testsRouter.delete("/:id", requireRoles("OWNER", "ADMIN"), async (req, res, next
     }
 
     await prisma.test.delete({ where: { id: test.id } }); // sessions + results cascade
+    await deleteAsset(test.paperAssetPublicId);
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -487,6 +522,40 @@ testsRouter.post(
         )
       );
 
+      // Tell each student their own result — and only their own. The loop is
+      // per-student because the marks differ per recipient, which is exactly
+      // why this can't be a notifyBatch call. Best-effort: a WhatsApp template
+      // that isn't set up must never lose marks a teacher has just entered,
+      // which is why this runs after the transaction has committed rather
+      // than inside it.
+      const heldOn = session.date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+      const names = new Map(
+        (
+          await prisma.student.findMany({
+            where: { id: { in: body.results.map((r) => r.studentId) } },
+            select: { id: true, name: true },
+          })
+        ).map((s) => [s.id, s.name])
+      );
+
+      for (const r of body.results) {
+        await notifyStudent({
+          instituteId,
+          studentId: r.studentId,
+          type: "TEST_RESULT_ENTERED",
+          title: `Result — ${test.title}`,
+          vars: {
+            studentName: names.get(r.studentId) ?? "",
+            marksObtained: String(r.marksObtained),
+            totalMarks: String(test.totalMarks),
+            testTitle: test.title,
+            subject: test.subject.name,
+            heldOn,
+          },
+          metadata: { testId: test.id, lectureId: session.id },
+        });
+      }
+
       res.json({ saved: body.results.length });
     } catch (err) {
       next(err);
@@ -550,7 +619,7 @@ testsRouter.get("/:id/sessions/:lectureId/report", requireRoles(...MANAGE_ROLES)
 });
 
 // ---------------------------------------------------------------------------
-// Question-paper upload (local disk, services/uploads.ts) — optional per test
+// Question-paper upload (services/uploads.ts) — optional per test
 // ---------------------------------------------------------------------------
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_UPLOAD_BYTES } });

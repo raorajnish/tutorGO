@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export interface DropdownOption {
@@ -39,10 +39,14 @@ interface FloatingPosition {
   bottom?: number;
 }
 
-let dropdownIdCounter = 0;
-
 export function Dropdown({ label, value, onChange, options, placeholder = "Select…", disabled, error }: DropdownProps) {
-  const [listboxId] = useState(() => `dropdown-listbox-${++dropdownIdCounter}`);
+  // useId(), not a module-level counter: a plain mutable counter increments
+  // in whatever order components happen to mount, which the server's render
+  // pass and the browser's hydration pass aren't guaranteed to agree on once
+  // a page has more than one Dropdown — exactly what surfaced a hydration
+  // mismatch on the Analytics page's course/batch filters. useId is stable
+  // across both passes by construction.
+  const listboxId = `dropdown-listbox-${useId()}`;
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);

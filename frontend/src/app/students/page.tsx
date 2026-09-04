@@ -5,8 +5,10 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { StudentProfileModal } from "@/components/students/StudentProfileModal";
-import type { StudentsResponse } from "@/lib/types";
+import { ExportButton } from "@/components/ui/ExportButton";
+import type { Batch, Course, StudentsResponse } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 
@@ -20,17 +22,47 @@ export default function StudentsPage() {
   const [data, setData] = useState<StudentsResponse | null>(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<(typeof STATUS_FILTERS)[number]["id"]>("active");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [courseId, setCourseId] = useState("");
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [batchId, setBatchId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // Static lookup, loaded once — kept out of the debounced filter effect
+  // below so typing a search term never re-fetches the course list.
+  useEffect(() => {
+    apiFetch<Course[]>("/academics/courses?active=true")
+      .then(setCourses)
+      .catch(() => setCourses([]));
+  }, []);
+
+  useEffect(() => {
+    if (!courseId) {
+      setBatches([]);
+      setBatchId("");
+      return;
+    }
+    apiFetch<Batch[]>(`/academics/batches?courseId=${courseId}`)
+      .then(setBatches)
+      .catch(() => setBatches([]));
+    setBatchId("");
+  }, [courseId]);
+
+  function buildQuery() {
+    const qs = new URLSearchParams({ status });
+    if (search) qs.set("search", search);
+    if (courseId) qs.set("courseId", courseId);
+    if (batchId) qs.set("batchId", batchId);
+    return qs;
+  }
 
   async function load() {
     setLoading(true);
     setError(null);
     try {
-      const qs = new URLSearchParams({ status });
-      if (search) qs.set("search", search);
-      setData(await apiFetch<StudentsResponse>(`/students?${qs.toString()}`));
+      setData(await apiFetch<StudentsResponse>(`/students?${buildQuery().toString()}`));
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Could not load students.");
     } finally {
@@ -42,7 +74,7 @@ export default function StudentsPage() {
     const t = setTimeout(load, 250);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, status]);
+  }, [search, status, courseId, batchId]);
 
   const students = data?.students ?? [];
 
@@ -62,26 +94,48 @@ export default function StudentsPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
-          <Input
-            placeholder="Search name, code, phone, email…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="max-w-xs"
-          />
-          <div className="flex gap-1.5">
-            {STATUS_FILTERS.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => setStatus(f.id)}
-                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                  status === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
+        <div className="flex flex-col gap-3 border-b border-border p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              placeholder="Search name, code, phone, email…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="max-w-xs"
+            />
+            <div className="w-full max-w-50">
+              <Dropdown
+                value={courseId}
+                onChange={setCourseId}
+                options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
+                placeholder="All courses"
+              />
+            </div>
+            <div className="w-full max-w-50">
+              <Dropdown
+                value={batchId}
+                onChange={setBatchId}
+                options={[{ value: "", label: "All batches" }, ...batches.map((b) => ({ value: b.id, label: b.name }))]}
+                placeholder="All batches"
+                disabled={!courseId}
+              />
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex gap-1.5">
+              {STATUS_FILTERS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setStatus(f.id)}
+                  className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                    status === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <ExportButton path={`/students/export.csv?${buildQuery().toString()}`} filename="students.csv" title="Export student directory as CSV" />
           </div>
         </div>
 

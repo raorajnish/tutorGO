@@ -6,6 +6,7 @@ import { ApiError } from "../lib/http.js";
 import { validateBody } from "../middleware/validate.js";
 import { rateLimit } from "../middleware/rateLimit.js";
 import { auditLog } from "../services/audit.js";
+import { loadReceiptByToken, serializeReceipt } from "../lib/receiptPayload.js";
 
 /** Everything mounted here is intentionally unauthenticated — the one public
  * surface in the whole app (§8f). Kept in its own file rather than scattered
@@ -238,5 +239,28 @@ publicRouter.post("/whatsapp/webhook", webhookLimiter, async (req, res) => {
   } catch {
     // Best-effort — the 200 is already sent; a malformed payload here must
     // never surface as a 5xx to Meta.
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Public receipt links — no auth, the token itself is the auth (changes-
+// phase10.md §10.3). Never expires; staff revoke a specific link on demand
+// (POST /fees/payments/:id/receipt/revoke) rather than a blanket TTL — a
+// receipt is a permanent proof-of-payment document by nature.
+// ---------------------------------------------------------------------------
+
+const receiptLimiter = rateLimit({ max: 30, windowMs: 5 * 60_000, keyPrefix: "public-receipt" });
+
+publicRouter.get("/receipts/:token", receiptLimiter, async (req, res, next) => {
+  try {
+    const payment = await loadReceiptByToken(req.params.token as string);
+    // Same 404 whether the token never existed or was revoked — a
+    // distinguishing response would let someone probe which tokens are
+    // merely wrong versus ones that once worked.
+    if (!payment || payment.publicTokenRevokedAt) throw ApiError.notFound("This receipt link is no longer available.");
+
+    res.json(serializeReceipt(payment));
+  } catch (err) {
+    next(err);
   }
 });

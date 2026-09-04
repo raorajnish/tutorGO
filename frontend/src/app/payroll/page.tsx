@@ -5,18 +5,26 @@ import { Tabs } from "@/components/ui/Tabs";
 import { StaffTab } from "@/components/payroll/StaffTab";
 import { RunsTab } from "@/components/payroll/RunsTab";
 import { MyPayslipsTab } from "@/components/payroll/MyPayslipsTab";
+import { LeaveTab } from "@/components/payroll/LeaveTab";
+import { MyLeaveTab } from "@/components/payroll/MyLeaveTab";
 import { useAuth } from "@/lib/auth-context";
 
 export default function PayrollPage() {
   const { user } = useAuth();
   const canManage = user?.role === "OWNER" || user?.role === "ADMIN" || user?.role === "ACCOUNTANT";
+  // Leave approval is an OWNER/ADMIN call, narrower than canManage — an
+  // ACCOUNTANT runs payroll day-to-day but reviewing someone's time off isn't
+  // an accounting decision.
+  const canApproveLeave = user?.role === "OWNER" || user?.role === "ADMIN";
 
   const tabs = useMemo(
     () => [
       ...(canManage ? [{ id: "staff", label: "Staff" }, { id: "runs", label: "Runs" }] : []),
       { id: "payslips", label: "My payslips" },
+      ...(canApproveLeave ? [{ id: "leave", label: "Leave" }] : []),
+      { id: "my-leave", label: "My leave" },
     ],
-    [canManage]
+    [canManage, canApproveLeave]
   );
 
   const [tab, setTab] = useState(canManage ? "staff" : "payslips");
@@ -38,6 +46,8 @@ export default function PayrollPage() {
       {tab === "staff" && canManage && <StaffTab />}
       {tab === "runs" && canManage && <RunsTab />}
       {tab === "payslips" && <MyPayslipsTab />}
+      {tab === "leave" && canApproveLeave && <LeaveTab />}
+      {tab === "my-leave" && <MyLeaveTab />}
     </div>
   );
 }

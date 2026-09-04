@@ -654,6 +654,13 @@ export type EnumFeeAccountStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumFeeAccountStatusFilter<$PrismaModel> | $Enums.FeeAccountStatus
 }
 
+export type EnumDiscountTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.DiscountType | Prisma.EnumDiscountTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.DiscountType[] | Prisma.ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DiscountType[] | Prisma.ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDiscountTypeFilter<$PrismaModel> | $Enums.DiscountType
+}
+
 export type EnumFeeAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.FeeAccountStatus | Prisma.EnumFeeAccountStatusFieldRefInput<$PrismaModel>
   in?: $Enums.FeeAccountStatus[] | Prisma.ListEnumFeeAccountStatusFieldRefInput<$PrismaModel>
@@ -662,6 +669,16 @@ export type EnumFeeAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFeeAccountStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFeeAccountStatusFilter<$PrismaModel>
+}
+
+export type EnumDiscountTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DiscountType | Prisma.EnumDiscountTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.DiscountType[] | Prisma.ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DiscountType[] | Prisma.ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel> | $Enums.DiscountType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDiscountTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDiscountTypeFilter<$PrismaModel>
 }
 
 export type EnumPaymentModeFilter<$PrismaModel = never> = {
@@ -730,6 +747,23 @@ export type EnumPayrollRunStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPayrollRunStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPayrollRunStatusFilter<$PrismaModel>
+}
+
+export type EnumLeaveStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.LeaveStatus | Prisma.EnumLeaveStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LeaveStatus[] | Prisma.ListEnumLeaveStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LeaveStatus[] | Prisma.ListEnumLeaveStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel> | $Enums.LeaveStatus
+}
+
+export type EnumLeaveStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LeaveStatus | Prisma.EnumLeaveStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LeaveStatus[] | Prisma.ListEnumLeaveStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LeaveStatus[] | Prisma.ListEnumLeaveStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLeaveStatusWithAggregatesFilter<$PrismaModel> | $Enums.LeaveStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -1331,6 +1365,13 @@ export type NestedEnumFeeAccountStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumFeeAccountStatusFilter<$PrismaModel> | $Enums.FeeAccountStatus
 }
 
+export type NestedEnumDiscountTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.DiscountType | Prisma.EnumDiscountTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.DiscountType[] | Prisma.ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DiscountType[] | Prisma.ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDiscountTypeFilter<$PrismaModel> | $Enums.DiscountType
+}
+
 export type NestedEnumFeeAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.FeeAccountStatus | Prisma.EnumFeeAccountStatusFieldRefInput<$PrismaModel>
   in?: $Enums.FeeAccountStatus[] | Prisma.ListEnumFeeAccountStatusFieldRefInput<$PrismaModel>
@@ -1339,6 +1380,16 @@ export type NestedEnumFeeAccountStatusWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumFeeAccountStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumFeeAccountStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DiscountType | Prisma.EnumDiscountTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.DiscountType[] | Prisma.ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DiscountType[] | Prisma.ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel> | $Enums.DiscountType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDiscountTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDiscountTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumPaymentModeFilter<$PrismaModel = never> = {
@@ -1407,6 +1458,23 @@ export type NestedEnumPayrollRunStatusWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPayrollRunStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPayrollRunStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumLeaveStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.LeaveStatus | Prisma.EnumLeaveStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LeaveStatus[] | Prisma.ListEnumLeaveStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LeaveStatus[] | Prisma.ListEnumLeaveStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel> | $Enums.LeaveStatus
+}
+
+export type NestedEnumLeaveStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LeaveStatus | Prisma.EnumLeaveStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LeaveStatus[] | Prisma.ListEnumLeaveStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LeaveStatus[] | Prisma.ListEnumLeaveStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLeaveStatusWithAggregatesFilter<$PrismaModel> | $Enums.LeaveStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel>
 }
 
 

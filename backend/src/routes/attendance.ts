@@ -11,8 +11,11 @@ import {
   serializeLecture,
   timeSchema,
   toTimeDate,
+  toTimeString,
 } from "../lib/lectureShared.js";
 import { todayDateOnly } from "../lib/dateOnly.js";
+import { toCsv } from "../lib/csv.js";
+import { notifyBatch } from "../services/studentNotify.js";
 
 export const attendanceRouter = Router();
 
@@ -157,27 +160,35 @@ attendanceRouter.put(
         if (courses.length !== new Set(courseIds).size) throw ApiError.badRequest("One or more courses were not found");
       }
 
+      // One query for every course-subject link this request could possibly
+      // need, instead of one findMany per assignment — grouped by courseId in
+      // memory so each assignment's subjectIds still validates against only
+      // its own course's links.
+      const allLinks = await prisma.courseSubject.findMany({ where: { courseId: { in: courseIds } } });
+      const linkedSubjectIdsByCourse = new Map<string, Set<string>>();
+      for (const link of allLinks) {
+        if (!linkedSubjectIdsByCourse.has(link.courseId)) linkedSubjectIdsByCourse.set(link.courseId, new Set());
+        linkedSubjectIdsByCourse.get(link.courseId)!.add(link.subjectId);
+      }
       for (const a of body.assignments) {
         if (a.subjectIds.length === 0) continue;
-        const links = await prisma.courseSubject.findMany({
-          where: { courseId: a.courseId, subjectId: { in: a.subjectIds } },
-        });
-        if (links.length !== new Set(a.subjectIds).size) {
+        const linked = linkedSubjectIdsByCourse.get(a.courseId) ?? new Set();
+        if (!a.subjectIds.every((id) => linked.has(id))) {
           throw ApiError.badRequest("One or more subjects are not linked to their course");
         }
       }
 
+      // Flattened to one row array so the whole set is a single createMany
+      // instead of one create/createMany per assignment.
+      const rows = body.assignments.flatMap((a) =>
+        a.subjectIds.length === 0
+          ? [{ facultyId, courseId: a.courseId, subjectId: null as string | null }]
+          : a.subjectIds.map((subjectId) => ({ facultyId, courseId: a.courseId, subjectId }))
+      );
+
       await prisma.$transaction(async (tx) => {
         await tx.facultyAssignment.deleteMany({ where: { facultyId } });
-        for (const a of body.assignments) {
-          if (a.subjectIds.length === 0) {
-            await tx.facultyAssignment.create({ data: { facultyId, courseId: a.courseId, subjectId: null } });
-          } else {
-            await tx.facultyAssignment.createMany({
-              data: a.subjectIds.map((subjectId) => ({ facultyId, courseId: a.courseId, subjectId })),
-            });
-          }
-        }
+        if (rows.length > 0) await tx.facultyAssignment.createMany({ data: rows });
       });
 
       res.json(await resolveAssignments(facultyId, instituteId));
@@ -251,6 +262,58 @@ const createLectureSchema = z.object({
   note: noteSchema.optional(),
 });
 
+/**
+ * Fans a lecture event out to the batch's students (changes-phase10.md §10.6).
+ *
+ * A TEST-kind lecture is announced as the test it actually is — same trigger,
+ * richer title, and the test id in metadata so the portal can deep-link to the
+ * full paper details rather than showing a bare timetable row. That's why
+ * "test details" needs no trigger of its own.
+ *
+ * Vars match WHATSAPP_PARAM_ORDER for these two types exactly — the order is
+ * positional once a template is approved by Meta, so the keys are not free to
+ * drift here (see services/dispatch.ts).
+ */
+async function notifyLecture(
+  lecture: {
+    id: string;
+    kind: string;
+    testId: string | null;
+    date: Date;
+    startTime: Date;
+    endTime: Date;
+    instituteId: string;
+    batchId: string;
+    cancelReason: string | null;
+    batch: { name: string; course: { name: string } };
+    subject: { name: string };
+    faculty: { fullName: string };
+    test?: { title: string } | null;
+  },
+  type: "LECTURE_SCHEDULED" | "LECTURE_CANCELLED",
+  titlePrefix: string
+) {
+  const isTest = lecture.kind === "TEST";
+
+  await notifyBatch({
+    instituteId: lecture.instituteId,
+    batchId: lecture.batchId,
+    type,
+    title: isTest ? `${titlePrefix} — ${lecture.test?.title ?? "Test"}` : `${titlePrefix} — ${lecture.subject.name}`,
+    vars: {
+      subject: lecture.subject.name,
+      batch: lecture.batch.name,
+      course: lecture.batch.course.name,
+      date: lecture.date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+      startTime: toTimeString(lecture.startTime),
+      endTime: toTimeString(lecture.endTime),
+      cancelReason: lecture.cancelReason ?? "",
+      note: "",
+    },
+    metadata: { lectureId: lecture.id, testId: lecture.testId },
+  });
+}
+
 attendanceRouter.post("/lectures", requireRoles(...SCHEDULE_ROLES), validateBody(createLectureSchema), async (req, res, next) => {
   try {
     const body = req.body as z.infer<typeof createLectureSchema>;
@@ -292,6 +355,13 @@ attendanceRouter.post("/lectures", requireRoles(...SCHEDULE_ROLES), validateBody
       },
       include: lectureInclude,
     });
+
+    // Tell the batch it's been scheduled — in-app for students with a portal
+    // login, WhatsApp to parents where a template is connected. Awaited so a
+    // template misconfiguration surfaces in logs rather than as an unhandled
+    // rejection, but its failure never fails the scheduling itself (see
+    // notifyBatch — every channel is best-effort by construction).
+    await notifyLecture(lecture, "LECTURE_SCHEDULED", "Lecture scheduled");
 
     res.status(201).json({ ...serializeLecture(lecture), markedCount: 0 });
   } catch (err) {
@@ -389,6 +459,8 @@ attendanceRouter.post(
         data: { cancelledAt: new Date(), cancelReason: body.reason },
         include: lectureInclude,
       });
+
+      await notifyLecture(updated, "LECTURE_CANCELLED", "Lecture cancelled");
 
       res.json(serializeLecture(updated));
     } catch (err) {
@@ -532,6 +604,64 @@ attendanceRouter.get("/summary", async (req, res, next) => {
     );
 
     res.json(summary);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Same query and per-lecture math as GET /summary — the export mirrors
+ * whatever date is on screen. OWNER/ADMIN only (changes-phase10.md §10.5),
+ * tighter than /summary itself, which any staff role with the module can view. */
+attendanceRouter.get("/summary/export.csv", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const date = typeof req.query.date === "string" ? new Date(req.query.date) : todayDateOnly();
+
+    const lectures = await prisma.lecture.findMany({
+      where: { instituteId, date, facultyId: facultyScope(req) },
+      include: lectureInclude,
+      orderBy: { startTime: "asc" },
+    });
+
+    const summary = await Promise.all(
+      lectures.map(async (l) => {
+        const roster = await deriveRoster(l.batchId, l.date, l.subjectId);
+        const records = await prisma.attendanceRecord.findMany({ where: { lectureId: l.id } });
+        const byStatus = (status: string) => records.filter((r) => r.status === status).length;
+        return {
+          ...serializeLecture(l),
+          expected: roster.length,
+          present: byStatus("PRESENT") + byStatus("PRESENT_BIOMETRIC") + byStatus("LATE"),
+          absent: byStatus("ABSENT"),
+          leave: byStatus("LEAVE"),
+          late: byStatus("LATE"),
+          holiday: byStatus("HOLIDAY"),
+          unmarked: roster.length - records.length,
+        };
+      })
+    );
+
+    const rows = [
+      ["Time", "Batch", "Course", "Subject", "Faculty", "Expected", "Present", "Absent", "Leave", "Late", "Holiday", "Unmarked"],
+      ...summary.map((s) => [
+        s.startTime,
+        s.batch.name,
+        s.batch.course.name,
+        s.subject.name,
+        s.faculty.fullName,
+        String(s.expected),
+        String(s.present),
+        String(s.absent),
+        String(s.leave),
+        String(s.late),
+        String(s.holiday),
+        String(s.unmarked),
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="attendance-${date.toISOString().slice(0, 10)}.csv"`);
+    res.send(toCsv(rows));
   } catch (err) {
     next(err);
   }

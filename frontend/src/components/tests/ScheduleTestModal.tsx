@@ -168,6 +168,7 @@ export function ScheduleTestModal({ open, onClose, onScheduled }: Props) {
       paperAssetUrl: paper?.url,
       paperAssetType: paper?.type,
       paperAssetName: paper?.name,
+      paperAssetPublicId: paper?.publicId,
       sessions: sessions.map<TestSessionPayload>((s) => ({
         batchId: s.batchId,
         date: s.date,

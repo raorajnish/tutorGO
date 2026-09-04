@@ -5,6 +5,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
+import { ExportButton } from "@/components/ui/ExportButton";
 import { formatMoney, parseMoney } from "@/lib/money";
 import { renderTemplate, feeOverdueReminderVars } from "@/lib/messageTemplates";
 import { resolveMessageTemplate } from "@/lib/useMessageTemplate";
@@ -16,6 +17,8 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
   const [error, setError] = useState<string | null>(null);
   const [reminderFor, setReminderFor] = useState<string | null>(null);
   const [reminderMessage, setReminderMessage] = useState<string | null>(null);
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const [sentResult, setSentResult] = useState<{ id: string; text: string } | null>(null);
 
   function load() {
     apiFetch<OverdueEntry[]>("/fees/overdue")
@@ -32,6 +35,36 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
     setReminderMessage(renderTemplate(body, feeOverdueReminderVars(entry)));
   }
 
+  /** Actually delivers the reminder — the student's portal feed when they have
+   * a working login, and the parent's WhatsApp when a template is connected.
+   * The copy-to-clipboard button stays alongside it for institutes with
+   * neither channel set up. */
+  async function handleSendReminder(entry: OverdueEntry) {
+    setSendingId(entry.installment.id);
+    setSentResult(null);
+    try {
+      const result = await apiFetch<{ inApp: string; whatsapp: string }>(
+        `/fees/overdue/${entry.installment.id}/remind`,
+        { method: "POST" }
+      );
+      const channels = [
+        result.inApp === "SENT" ? "portal" : null,
+        result.whatsapp === "SENT" ? "WhatsApp" : null,
+      ].filter(Boolean);
+      setSentResult({
+        id: entry.installment.id,
+        text: channels.length > 0 ? `Sent via ${channels.join(" and ")}.` : "No channel was available for this student.",
+      });
+    } catch (err) {
+      setSentResult({
+        id: entry.installment.id,
+        text: err instanceof ApiClientError ? err.message : "Could not send the reminder.",
+      });
+    } finally {
+      setSendingId(null);
+    }
+  }
+
   const totalOverdue = (entries ?? []).reduce((sum, e) => sum + parseMoney(e.outstanding), 0);
   const studentCount = new Set((entries ?? []).map((e) => e.student.id)).size;
 
@@ -44,6 +77,10 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
       </div>
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
+
+      <div className="flex justify-end">
+        <ExportButton path="/fees/overdue/export.csv" filename="defaulters.csv" title="Export defaulters as CSV" />
+      </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="overflow-x-auto">
@@ -74,13 +111,26 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
                   </td>
                   <td className="px-4 py-3 text-foreground">{formatMoney(e.outstanding)}</td>
                   <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={() => handleShowReminder(e)}
-                      className="rounded-lg bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground hover:bg-secondary/70"
-                    >
-                      Copy reminder
-                    </button>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleSendReminder(e)}
+                        disabled={sendingId === e.installment.id}
+                        className="cursor-pointer rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                      >
+                        {sendingId === e.installment.id ? "Sending…" : "Send reminder"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleShowReminder(e)}
+                        className="cursor-pointer rounded-lg bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground hover:bg-secondary/70"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    {sentResult?.id === e.installment.id && (
+                      <p className="mt-1 text-xs text-muted-foreground">{sentResult.text}</p>
+                    )}
                   </td>
                 </tr>
               ))}

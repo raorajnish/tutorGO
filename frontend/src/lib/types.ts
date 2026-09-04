@@ -819,6 +819,10 @@ export interface TestPaperAsset {
   url: string;
   type: "pdf" | "image";
   name: string;
+  /// Storage handle, round-tripped back on save so the server can delete the
+  /// asset if the paper is later replaced or removed.
+  publicId: string;
+  bytes: number;
 }
 
 export interface Test {
@@ -830,6 +834,7 @@ export interface Test {
   paperAssetUrl: string | null;
   paperAssetType: "pdf" | "image" | null;
   paperAssetName: string | null;
+  paperAssetPublicId: string | null;
   createdAt: string;
   course: CourseRef;
   subject: SubjectRef;
@@ -872,6 +877,7 @@ export interface CreateTestPayload {
   paperAssetUrl?: string;
   paperAssetType?: "pdf" | "image";
   paperAssetName?: string;
+  paperAssetPublicId?: string;
   sessions: TestSessionPayload[];
   acceptSplitFor?: string[];
 }
@@ -1023,6 +1029,8 @@ export interface FeePayment {
   allocations: PaymentAllocationRef[];
 }
 
+export type DiscountType = "FLAT" | "PERCENT";
+
 export interface FeeAccount {
   id: string;
   studentId: string;
@@ -1031,6 +1039,7 @@ export interface FeeAccount {
   feeStructure: { id: string; name: string } | null;
   courseFee: string | null;
   discount: string | null;
+  discountType: DiscountType;
   finalFee: string | null;
   installmentCount: number | null;
   monthlyAmount: string | null;
@@ -1071,6 +1080,7 @@ export interface RevisePricingPayload {
   /** FLAT only — mutually exclusive with subjectIds. */
   courseFee?: number;
   discount?: number;
+  discountType?: DiscountType;
   firstDueDate?: string;
   installmentCount?: number;
 }
@@ -1085,10 +1095,62 @@ export interface OverdueEntry {
 export interface ReceiptDetail extends FeePayment {
   student: FeeStudentRef & { course: CourseRef };
   accountTotals: { totalDue: string; totalPaid: string; totalWaived: string; balance: string };
+  /// Null when this payment predates the publicToken column, or the link was
+  /// revoked — no public link exists to share in either case.
+  publicToken: string | null;
+}
+
+/// What GET /public/receipts/:token returns — deliberately narrower than
+/// ReceiptDetail: a receipt documents one payment, not the whole fee
+/// account, so there's no accountTotals/createdByName here (nothing an
+/// unauthenticated visitor should see beyond this one payment).
+export interface PublicReceipt {
+  receiptNumber: string;
+  amount: string;
+  mode: PaymentMode;
+  paidOn: string;
+  notes: string | null;
+  voided: boolean;
+  voidReason: string | null;
+  createdAt: string;
+  institute: { name: string; address: string | null; phone: string | null; email: string | null };
+  student: { id: string; name: string; studentCode: string; course: { name: string; code: string } | null };
+  allocations: { installmentSeq: number; dueDate: string; amount: string }[];
 }
 
 export interface ReceiptListItem extends FeePayment {
   student: { id: string; name: string; studentCode: string; phone: string | null };
+}
+
+// ---------------------------------------------------------------------------
+// Staff leave (Phase 10.4)
+// ---------------------------------------------------------------------------
+
+export const LEAVE_STATUSES = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] as const;
+export type LeaveStatus = (typeof LEAVE_STATUSES)[number];
+
+export interface LeaveRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userRole: Role;
+  startDate: string;
+  endDate: string;
+  /** Inclusive day count — a single-day request is 1, not 0. */
+  days: number;
+  reason: string;
+  status: LeaveStatus;
+  reviewedByName: string | null;
+  reviewedAt: string | null;
+  reviewNote: string | null;
+  createdAt: string;
+}
+
+export interface CreateLeaveRequestResult extends LeaveRequest {
+  /** True when this new request's dates overlap an already-APPROVED request
+   * for the same person — surfaced as a warning, not blocked; the reviewer
+   * decides. */
+  overlapsApprovedLeave: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -1337,4 +1399,323 @@ export interface DistributionRosterResponse {
   receipts: DistributionReceiptRow[];
   receivedCount: number;
   totalCount: number;
+}
+
+// ---------------------------------------------------------------------------
+// Analytics
+// ---------------------------------------------------------------------------
+
+export interface AnalyticsRange {
+  from: string;
+  to: string;
+}
+
+export interface TrendPoint {
+  label: string;
+  value: number;
+}
+
+export interface InstituteAnalytics {
+  range: AnalyticsRange;
+  enrollment: {
+    totalActive: number;
+    admissionsInRange: number;
+    byCourse: { course: CourseRef | null; count: number }[];
+    admissionsTrend: TrendPoint[];
+  };
+  lectures: {
+    total: number;
+    cancelled: number;
+    byCourse: { course: CourseRef | null; held: number; cancelled: number }[];
+  };
+  attendance: {
+    overallPercent: number;
+    byStatus: Record<string, number>;
+    trend: TrendPoint[];
+  };
+  tests: {
+    testCount: number;
+    totalAttempts: number;
+    averagePercent: number;
+    passRate: number;
+    byCourse: { course: { id: string; name: string }; attempts: number; passRate: number; averagePercent: number }[];
+  };
+  fees: {
+    totalDue: string;
+    totalCollected: string;
+    coveragePercent: number;
+    collectedInRange: string;
+    overdueCount: number;
+    overdueAmount: string;
+    collectedTrend: TrendPoint[];
+  };
+  payroll: {
+    totalInRange: string;
+    paidInRange: string;
+    trend: TrendPoint[];
+  };
+  expenses: {
+    totalInRange: string;
+    byCategory: { category: { id: string; name: string } | null; amount: string }[];
+    trend: TrendPoint[];
+  };
+  finance: {
+    collected: string;
+    payrollPaid: string;
+    expensesPaid: string;
+    net: string;
+    trend: { label: string; income: number; payroll: number; expenses: number; net: number }[];
+  };
+}
+
+export type StudentAnalyticsFlag = "LOW_ATTENDANCE" | "DECLINING_SCORES";
+
+export interface StudentAnalyticsRow {
+  student: { id: string; name: string; studentCode: string; course: CourseRef };
+  attendancePercent: number | null;
+  testAveragePercent: number | null;
+  testCount: number;
+  flags: StudentAnalyticsFlag[];
+}
+
+export interface StudentAnalyticsListResponse {
+  range: AnalyticsRange;
+  students: StudentAnalyticsRow[];
+}
+
+export interface StudentAnalyticsDetail {
+  student: { id: string; name: string; studentCode: string; course: CourseRef & { feeMode: CourseFeeMode } };
+  range: AnalyticsRange;
+  attendance: {
+    overallPercent: number;
+    trend: TrendPoint[];
+    bySubject: { subject: { id: string; name: string }; percent: number }[];
+  };
+  tests: {
+    history: {
+      testId: string;
+      title: string;
+      subject: string;
+      marksObtained: number;
+      totalMarks: number;
+      percent: number;
+      passed: boolean | null;
+      date: string;
+    }[];
+    averagePercent: number | null;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Student portal (Phase 10.6)
+// ---------------------------------------------------------------------------
+
+/// Derived on the server on every read — never stored. See
+/// backend/src/lib/portalAccess.ts for why.
+export type PortalAccessStatus = "NOT_ELIGIBLE" | "PENDING" | "ACTIVE" | "SUSPENDED";
+
+export interface PortalAccessStudent {
+  id: string;
+  name: string;
+  email: string;
+  batch: { id: string; name: string } | null;
+  status: PortalAccessStatus;
+  hasLogin: boolean;
+  lastLoginAt: string | null;
+  /// Login exists but the temp password has never been changed — i.e. they
+  /// were sent credentials and haven't signed in yet.
+  awaitingFirstLogin: boolean;
+}
+
+export interface PortalAccessCourse {
+  id: string;
+  name: string;
+  code: string;
+  isActive: boolean;
+  portalEnabled: boolean;
+  counts: { total: number; active: number; pending: number };
+  students: PortalAccessStudent[];
+}
+
+/// Credential delivery result. `tempPassword` is only ever returned when the
+/// email could NOT be delivered, so staff can hand it over another way —
+/// same contract as the existing staff-invite flow.
+export interface IssueCredentialResult {
+  emailDelivered: boolean;
+  tempPassword?: string;
+}
+
+export interface BulkIssueResult {
+  issued: number;
+  failed: number;
+  results: { studentId: string; name: string; outcome: "ISSUED" | "FAILED"; message?: string }[];
+}
+
+export interface PortalLecture {
+  id: string;
+  kind: "LECTURE" | "TEST";
+  date: string;
+  startTime: string;
+  endTime: string;
+  cancelled: boolean;
+  cancelReason: string | null;
+  note: string | null;
+  subject: string;
+  faculty: string;
+  test: { id: string; title: string; totalMarks: number } | null;
+  attendanceStatus: AttendanceStatus | null;
+}
+
+export interface PortalAttendanceStats {
+  total: number;
+  present: number;
+  absent: number;
+  leave: number;
+  rate: number | null;
+}
+
+export interface PortalFeeSummary {
+  planType: FeePlanType;
+  status: string;
+  totalDue: string | null;
+  totalPaid: string | null;
+  balance: string | null;
+  nextDueDate: string | null;
+  nextDueAmount: string | null;
+  overdueCount: number;
+}
+
+export interface PortalDashboard {
+  student: {
+    name: string;
+    studentCode: string;
+    email: string;
+    course: { name: string; code: string };
+    instituteName: string;
+    admissionDate: string;
+  };
+  attendance: PortalAttendanceStats;
+  upcoming: {
+    id: string;
+    kind: "LECTURE" | "TEST";
+    date: string;
+    startTime: string;
+    endTime: string;
+    subject: string;
+    faculty: string;
+    test: { id: string; title: string; totalMarks: number } | null;
+  }[];
+  recentResults: {
+    id: string;
+    title: string;
+    subject: string;
+    marksObtained: string | null;
+    totalMarks: number;
+    enteredAt: string;
+  }[];
+  fees: PortalFeeSummary | null;
+  unreadNotifications: number;
+}
+
+export interface PortalTimetable {
+  batch: { id: string; name: string } | null;
+  lectures: PortalLecture[];
+}
+
+export interface PortalTestDetail {
+  id: string;
+  title: string;
+  subject: string;
+  totalMarks: number;
+  passingMarks: number | null;
+  instructions: string | null;
+  paperAssetUrl: string | null;
+  paperAssetName: string | null;
+}
+
+export interface PortalTests {
+  upcoming: {
+    lectureId: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    test: PortalTestDetail;
+  }[];
+  results: {
+    id: string;
+    heldOn: string;
+    enteredAt: string;
+    marksObtained: string | null;
+    remarks: string | null;
+    test: PortalTestDetail;
+  }[];
+}
+
+export interface PortalAttendance {
+  stats: PortalAttendanceStats;
+  records: {
+    id: string;
+    status: AttendanceStatus;
+    date: string;
+    startTime: string;
+    kind: "LECTURE" | "TEST";
+    subject: string;
+    batch: string;
+  }[];
+}
+
+export interface PortalInstallment {
+  id: string;
+  seq: number;
+  dueDate: string;
+  amount: string | null;
+  paidAmount: string | null;
+  outstanding: string | null;
+  status: "PAID" | "OVERDUE" | "PARTIAL" | "DUE" | "WAIVED";
+}
+
+export interface PortalFees {
+  summary: PortalFeeSummary | null;
+  installments: PortalInstallment[];
+  payments: {
+    id: string;
+    amount: string | null;
+    mode: string;
+    paidOn: string;
+    receiptNumber: string;
+    /// Null when the institute revoked the public link — the portal then
+    /// simply shows no receipt link rather than one that would 404.
+    receiptToken: string | null;
+  }[];
+}
+
+export interface PortalNotification {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  metadata: Record<string, unknown> | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface PortalNotifications {
+  notifications: PortalNotification[];
+  unread: number;
+}
+
+export interface PortalProfile {
+  name: string;
+  studentCode: string;
+  email: string;
+  phone: string | null;
+  parentPhone: string | null;
+  dob: string | null;
+  fatherName: string | null;
+  motherName: string | null;
+  school: string | null;
+  admissionDate: string;
+  course: { name: string; code: string };
+  institute: { name: string; phone: string | null; email: string | null; city: string | null };
+  currentBatch: { name: string } | null;
 }

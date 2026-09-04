@@ -403,6 +403,7 @@ export type InstituteWhereInput = {
   tests?: Prisma.TestListRelationFilter
   reminders?: Prisma.ScheduledReminderListRelationFilter
   distributionItems?: Prisma.DistributionItemListRelationFilter
+  leaveRequests?: Prisma.LeaveRequestListRelationFilter
 }
 
 export type InstituteOrderByWithRelationInput = {
@@ -457,6 +458,7 @@ export type InstituteOrderByWithRelationInput = {
   tests?: Prisma.TestOrderByRelationAggregateInput
   reminders?: Prisma.ScheduledReminderOrderByRelationAggregateInput
   distributionItems?: Prisma.DistributionItemOrderByRelationAggregateInput
+  leaveRequests?: Prisma.LeaveRequestOrderByRelationAggregateInput
 }
 
 export type InstituteWhereUniqueInput = Prisma.AtLeast<{
@@ -514,6 +516,7 @@ export type InstituteWhereUniqueInput = Prisma.AtLeast<{
   tests?: Prisma.TestListRelationFilter
   reminders?: Prisma.ScheduledReminderListRelationFilter
   distributionItems?: Prisma.DistributionItemListRelationFilter
+  leaveRequests?: Prisma.LeaveRequestListRelationFilter
 }, "id" | "code">
 
 export type InstituteOrderByWithAggregationInput = {
@@ -624,6 +627,7 @@ export type InstituteCreateInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateInput = {
@@ -676,6 +680,7 @@ export type InstituteUncheckedCreateInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUpdateInput = {
@@ -728,6 +733,7 @@ export type InstituteUpdateInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateInput = {
@@ -780,6 +786,7 @@ export type InstituteUncheckedUpdateInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateManyInput = {
@@ -1444,6 +1451,20 @@ export type InstituteUpdateOneRequiredWithoutDistributionItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutDistributionItemsInput, Prisma.InstituteUpdateWithoutDistributionItemsInput>, Prisma.InstituteUncheckedUpdateWithoutDistributionItemsInput>
 }
 
+export type InstituteCreateNestedOneWithoutLeaveRequestsInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutLeaveRequestsInput, Prisma.InstituteUncheckedCreateWithoutLeaveRequestsInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutLeaveRequestsInput
+  connect?: Prisma.InstituteWhereUniqueInput
+}
+
+export type InstituteUpdateOneRequiredWithoutLeaveRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutLeaveRequestsInput, Prisma.InstituteUncheckedCreateWithoutLeaveRequestsInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutLeaveRequestsInput
+  upsert?: Prisma.InstituteUpsertWithoutLeaveRequestsInput
+  connect?: Prisma.InstituteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutLeaveRequestsInput, Prisma.InstituteUpdateWithoutLeaveRequestsInput>, Prisma.InstituteUncheckedUpdateWithoutLeaveRequestsInput>
+}
+
 export type InstituteCreateWithoutPlanInput = {
   id?: string
   code: string
@@ -1493,6 +1514,7 @@ export type InstituteCreateWithoutPlanInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutPlanInput = {
@@ -1544,6 +1566,7 @@ export type InstituteUncheckedCreateWithoutPlanInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutPlanInput = {
@@ -1649,6 +1672,7 @@ export type InstituteCreateWithoutOrganizationInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutOrganizationInput = {
@@ -1700,6 +1724,7 @@ export type InstituteUncheckedCreateWithoutOrganizationInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutOrganizationInput = {
@@ -1777,6 +1802,7 @@ export type InstituteCreateWithoutModulesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutModulesInput = {
@@ -1828,6 +1854,7 @@ export type InstituteUncheckedCreateWithoutModulesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutModulesInput = {
@@ -1895,6 +1922,7 @@ export type InstituteUpdateWithoutModulesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutModulesInput = {
@@ -1946,6 +1974,7 @@ export type InstituteUncheckedUpdateWithoutModulesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutUsersInput = {
@@ -1997,6 +2026,7 @@ export type InstituteCreateWithoutUsersInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutUsersInput = {
@@ -2048,6 +2078,7 @@ export type InstituteUncheckedCreateWithoutUsersInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutUsersInput = {
@@ -2115,6 +2146,7 @@ export type InstituteUpdateWithoutUsersInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutUsersInput = {
@@ -2166,6 +2198,7 @@ export type InstituteUncheckedUpdateWithoutUsersInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutEmailConfigInput = {
@@ -2217,6 +2250,7 @@ export type InstituteCreateWithoutEmailConfigInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutEmailConfigInput = {
@@ -2268,6 +2302,7 @@ export type InstituteUncheckedCreateWithoutEmailConfigInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutEmailConfigInput = {
@@ -2335,6 +2370,7 @@ export type InstituteUpdateWithoutEmailConfigInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutEmailConfigInput = {
@@ -2386,6 +2422,7 @@ export type InstituteUncheckedUpdateWithoutEmailConfigInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutWhatsAppConfigInput = {
@@ -2437,6 +2474,7 @@ export type InstituteCreateWithoutWhatsAppConfigInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutWhatsAppConfigInput = {
@@ -2488,6 +2526,7 @@ export type InstituteUncheckedCreateWithoutWhatsAppConfigInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutWhatsAppConfigInput = {
@@ -2555,6 +2594,7 @@ export type InstituteUpdateWithoutWhatsAppConfigInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutWhatsAppConfigInput = {
@@ -2606,6 +2646,7 @@ export type InstituteUncheckedUpdateWithoutWhatsAppConfigInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutWhatsAppTemplatesInput = {
@@ -2657,6 +2698,7 @@ export type InstituteCreateWithoutWhatsAppTemplatesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutWhatsAppTemplatesInput = {
@@ -2708,6 +2750,7 @@ export type InstituteUncheckedCreateWithoutWhatsAppTemplatesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutWhatsAppTemplatesInput = {
@@ -2775,6 +2818,7 @@ export type InstituteUpdateWithoutWhatsAppTemplatesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutWhatsAppTemplatesInput = {
@@ -2826,6 +2870,7 @@ export type InstituteUncheckedUpdateWithoutWhatsAppTemplatesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutOutboundMessagesInput = {
@@ -2877,6 +2922,7 @@ export type InstituteCreateWithoutOutboundMessagesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutOutboundMessagesInput = {
@@ -2928,6 +2974,7 @@ export type InstituteUncheckedCreateWithoutOutboundMessagesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutOutboundMessagesInput = {
@@ -2995,6 +3042,7 @@ export type InstituteUpdateWithoutOutboundMessagesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutOutboundMessagesInput = {
@@ -3046,6 +3094,7 @@ export type InstituteUncheckedUpdateWithoutOutboundMessagesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutNotificationsInput = {
@@ -3097,6 +3146,7 @@ export type InstituteCreateWithoutNotificationsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutNotificationsInput = {
@@ -3148,6 +3198,7 @@ export type InstituteUncheckedCreateWithoutNotificationsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutNotificationsInput = {
@@ -3215,6 +3266,7 @@ export type InstituteUpdateWithoutNotificationsInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutNotificationsInput = {
@@ -3266,6 +3318,7 @@ export type InstituteUncheckedUpdateWithoutNotificationsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutRemindersInput = {
@@ -3317,6 +3370,7 @@ export type InstituteCreateWithoutRemindersInput = {
   financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutRemindersInput = {
@@ -3368,6 +3422,7 @@ export type InstituteUncheckedCreateWithoutRemindersInput = {
   financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutRemindersInput = {
@@ -3435,6 +3490,7 @@ export type InstituteUpdateWithoutRemindersInput = {
   financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutRemindersInput = {
@@ -3486,6 +3542,7 @@ export type InstituteUncheckedUpdateWithoutRemindersInput = {
   financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutCoursesInput = {
@@ -3537,6 +3594,7 @@ export type InstituteCreateWithoutCoursesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutCoursesInput = {
@@ -3588,6 +3646,7 @@ export type InstituteUncheckedCreateWithoutCoursesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutCoursesInput = {
@@ -3655,6 +3714,7 @@ export type InstituteUpdateWithoutCoursesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutCoursesInput = {
@@ -3706,6 +3766,7 @@ export type InstituteUncheckedUpdateWithoutCoursesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutSubjectsInput = {
@@ -3757,6 +3818,7 @@ export type InstituteCreateWithoutSubjectsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutSubjectsInput = {
@@ -3808,6 +3870,7 @@ export type InstituteUncheckedCreateWithoutSubjectsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutSubjectsInput = {
@@ -3875,6 +3938,7 @@ export type InstituteUpdateWithoutSubjectsInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutSubjectsInput = {
@@ -3926,6 +3990,7 @@ export type InstituteUncheckedUpdateWithoutSubjectsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutBatchesInput = {
@@ -3977,6 +4042,7 @@ export type InstituteCreateWithoutBatchesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutBatchesInput = {
@@ -4028,6 +4094,7 @@ export type InstituteUncheckedCreateWithoutBatchesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutBatchesInput = {
@@ -4095,6 +4162,7 @@ export type InstituteUpdateWithoutBatchesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutBatchesInput = {
@@ -4146,6 +4214,7 @@ export type InstituteUncheckedUpdateWithoutBatchesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutEnquiriesInput = {
@@ -4197,6 +4266,7 @@ export type InstituteCreateWithoutEnquiriesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutEnquiriesInput = {
@@ -4248,6 +4318,7 @@ export type InstituteUncheckedCreateWithoutEnquiriesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutEnquiriesInput = {
@@ -4315,6 +4386,7 @@ export type InstituteUpdateWithoutEnquiriesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutEnquiriesInput = {
@@ -4366,6 +4438,7 @@ export type InstituteUncheckedUpdateWithoutEnquiriesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutStudentsInput = {
@@ -4417,6 +4490,7 @@ export type InstituteCreateWithoutStudentsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutStudentsInput = {
@@ -4468,6 +4542,7 @@ export type InstituteUncheckedCreateWithoutStudentsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutStudentsInput = {
@@ -4535,6 +4610,7 @@ export type InstituteUpdateWithoutStudentsInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutStudentsInput = {
@@ -4586,6 +4662,7 @@ export type InstituteUncheckedUpdateWithoutStudentsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutLecturesInput = {
@@ -4637,6 +4714,7 @@ export type InstituteCreateWithoutLecturesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutLecturesInput = {
@@ -4688,6 +4766,7 @@ export type InstituteUncheckedCreateWithoutLecturesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutLecturesInput = {
@@ -4755,6 +4834,7 @@ export type InstituteUpdateWithoutLecturesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutLecturesInput = {
@@ -4806,6 +4886,7 @@ export type InstituteUncheckedUpdateWithoutLecturesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutTestsInput = {
@@ -4857,6 +4938,7 @@ export type InstituteCreateWithoutTestsInput = {
   financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutTestsInput = {
@@ -4908,6 +4990,7 @@ export type InstituteUncheckedCreateWithoutTestsInput = {
   financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutTestsInput = {
@@ -4975,6 +5058,7 @@ export type InstituteUpdateWithoutTestsInput = {
   financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutTestsInput = {
@@ -5026,6 +5110,7 @@ export type InstituteUncheckedUpdateWithoutTestsInput = {
   financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutMessageTemplatesInput = {
@@ -5077,6 +5162,7 @@ export type InstituteCreateWithoutMessageTemplatesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutMessageTemplatesInput = {
@@ -5128,6 +5214,7 @@ export type InstituteUncheckedCreateWithoutMessageTemplatesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutMessageTemplatesInput = {
@@ -5195,6 +5282,7 @@ export type InstituteUpdateWithoutMessageTemplatesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutMessageTemplatesInput = {
@@ -5246,6 +5334,7 @@ export type InstituteUncheckedUpdateWithoutMessageTemplatesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutFeeStructuresInput = {
@@ -5297,6 +5386,7 @@ export type InstituteCreateWithoutFeeStructuresInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutFeeStructuresInput = {
@@ -5348,6 +5438,7 @@ export type InstituteUncheckedCreateWithoutFeeStructuresInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutFeeStructuresInput = {
@@ -5415,6 +5506,7 @@ export type InstituteUpdateWithoutFeeStructuresInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutFeeStructuresInput = {
@@ -5466,6 +5558,7 @@ export type InstituteUncheckedUpdateWithoutFeeStructuresInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutFeeAccountsInput = {
@@ -5517,6 +5610,7 @@ export type InstituteCreateWithoutFeeAccountsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutFeeAccountsInput = {
@@ -5568,6 +5662,7 @@ export type InstituteUncheckedCreateWithoutFeeAccountsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutFeeAccountsInput = {
@@ -5635,6 +5730,7 @@ export type InstituteUpdateWithoutFeeAccountsInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutFeeAccountsInput = {
@@ -5686,6 +5782,7 @@ export type InstituteUncheckedUpdateWithoutFeeAccountsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutPaymentsInput = {
@@ -5737,6 +5834,7 @@ export type InstituteCreateWithoutPaymentsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutPaymentsInput = {
@@ -5788,6 +5886,7 @@ export type InstituteUncheckedCreateWithoutPaymentsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutPaymentsInput = {
@@ -5855,6 +5954,7 @@ export type InstituteUpdateWithoutPaymentsInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutPaymentsInput = {
@@ -5906,6 +6006,7 @@ export type InstituteUncheckedUpdateWithoutPaymentsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutSalaryProfilesInput = {
@@ -5957,6 +6058,7 @@ export type InstituteCreateWithoutSalaryProfilesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutSalaryProfilesInput = {
@@ -6008,6 +6110,7 @@ export type InstituteUncheckedCreateWithoutSalaryProfilesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutSalaryProfilesInput = {
@@ -6075,6 +6178,7 @@ export type InstituteUpdateWithoutSalaryProfilesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutSalaryProfilesInput = {
@@ -6126,6 +6230,7 @@ export type InstituteUncheckedUpdateWithoutSalaryProfilesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutPayrollPaymentsInput = {
@@ -6177,6 +6282,7 @@ export type InstituteCreateWithoutPayrollPaymentsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutPayrollPaymentsInput = {
@@ -6228,6 +6334,7 @@ export type InstituteUncheckedCreateWithoutPayrollPaymentsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutPayrollPaymentsInput = {
@@ -6295,6 +6402,7 @@ export type InstituteUpdateWithoutPayrollPaymentsInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutPayrollPaymentsInput = {
@@ -6346,6 +6454,7 @@ export type InstituteUncheckedUpdateWithoutPayrollPaymentsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutPayrollRunsInput = {
@@ -6397,6 +6506,7 @@ export type InstituteCreateWithoutPayrollRunsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutPayrollRunsInput = {
@@ -6448,6 +6558,7 @@ export type InstituteUncheckedCreateWithoutPayrollRunsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutPayrollRunsInput = {
@@ -6515,6 +6626,7 @@ export type InstituteUpdateWithoutPayrollRunsInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutPayrollRunsInput = {
@@ -6566,6 +6678,7 @@ export type InstituteUncheckedUpdateWithoutPayrollRunsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutExpenseCategoriesInput = {
@@ -6617,6 +6730,7 @@ export type InstituteCreateWithoutExpenseCategoriesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutExpenseCategoriesInput = {
@@ -6668,6 +6782,7 @@ export type InstituteUncheckedCreateWithoutExpenseCategoriesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutExpenseCategoriesInput = {
@@ -6735,6 +6850,7 @@ export type InstituteUpdateWithoutExpenseCategoriesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutExpenseCategoriesInput = {
@@ -6786,6 +6902,7 @@ export type InstituteUncheckedUpdateWithoutExpenseCategoriesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutEventsInput = {
@@ -6837,6 +6954,7 @@ export type InstituteCreateWithoutEventsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutEventsInput = {
@@ -6888,6 +7006,7 @@ export type InstituteUncheckedCreateWithoutEventsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutEventsInput = {
@@ -6955,6 +7074,7 @@ export type InstituteUpdateWithoutEventsInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutEventsInput = {
@@ -7006,6 +7126,7 @@ export type InstituteUncheckedUpdateWithoutEventsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutExpensesInput = {
@@ -7057,6 +7178,7 @@ export type InstituteCreateWithoutExpensesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutExpensesInput = {
@@ -7108,6 +7230,7 @@ export type InstituteUncheckedCreateWithoutExpensesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutExpensesInput = {
@@ -7175,6 +7298,7 @@ export type InstituteUpdateWithoutExpensesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutExpensesInput = {
@@ -7226,6 +7350,7 @@ export type InstituteUncheckedUpdateWithoutExpensesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutFinanceEntriesInput = {
@@ -7277,6 +7402,7 @@ export type InstituteCreateWithoutFinanceEntriesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutFinanceEntriesInput = {
@@ -7328,6 +7454,7 @@ export type InstituteUncheckedCreateWithoutFinanceEntriesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
   distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutFinanceEntriesInput = {
@@ -7395,6 +7522,7 @@ export type InstituteUpdateWithoutFinanceEntriesInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutFinanceEntriesInput = {
@@ -7446,6 +7574,7 @@ export type InstituteUncheckedUpdateWithoutFinanceEntriesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateWithoutDistributionItemsInput = {
@@ -7497,6 +7626,7 @@ export type InstituteCreateWithoutDistributionItemsInput = {
   financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
   tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteUncheckedCreateWithoutDistributionItemsInput = {
@@ -7548,6 +7678,7 @@ export type InstituteUncheckedCreateWithoutDistributionItemsInput = {
   financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
   reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
 }
 
 export type InstituteCreateOrConnectWithoutDistributionItemsInput = {
@@ -7615,6 +7746,7 @@ export type InstituteUpdateWithoutDistributionItemsInput = {
   financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutDistributionItemsInput = {
@@ -7666,6 +7798,231 @@ export type InstituteUncheckedUpdateWithoutDistributionItemsInput = {
   financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteCreateWithoutLeaveRequestsInput = {
+  id?: string
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
+  organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
+  plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
+  users?: Prisma.UserCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteUncheckedCreateWithoutLeaveRequestsInput = {
+  id?: string
+  organizationId: string
+  planId?: string | null
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteCreateOrConnectWithoutLeaveRequestsInput = {
+  where: Prisma.InstituteWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutLeaveRequestsInput, Prisma.InstituteUncheckedCreateWithoutLeaveRequestsInput>
+}
+
+export type InstituteUpsertWithoutLeaveRequestsInput = {
+  update: Prisma.XOR<Prisma.InstituteUpdateWithoutLeaveRequestsInput, Prisma.InstituteUncheckedUpdateWithoutLeaveRequestsInput>
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutLeaveRequestsInput, Prisma.InstituteUncheckedCreateWithoutLeaveRequestsInput>
+  where?: Prisma.InstituteWhereInput
+}
+
+export type InstituteUpdateToOneWithWhereWithoutLeaveRequestsInput = {
+  where?: Prisma.InstituteWhereInput
+  data: Prisma.XOR<Prisma.InstituteUpdateWithoutLeaveRequestsInput, Prisma.InstituteUncheckedUpdateWithoutLeaveRequestsInput>
+}
+
+export type InstituteUpdateWithoutLeaveRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
+  plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
+  users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteUncheckedUpdateWithoutLeaveRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteCreateManyPlanInput = {
@@ -7741,6 +8098,7 @@ export type InstituteUpdateWithoutPlanInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutPlanInput = {
@@ -7792,6 +8150,7 @@ export type InstituteUncheckedUpdateWithoutPlanInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateManyWithoutPlanInput = {
@@ -7891,6 +8250,7 @@ export type InstituteUpdateWithoutOrganizationInput = {
   tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateWithoutOrganizationInput = {
@@ -7942,6 +8302,7 @@ export type InstituteUncheckedUpdateWithoutOrganizationInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
   reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
   distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
 }
 
 export type InstituteUncheckedUpdateManyWithoutOrganizationInput = {
@@ -7999,6 +8360,7 @@ export type InstituteCountOutputType = {
   tests: number
   reminders: number
   distributionItems: number
+  leaveRequests: number
 }
 
 export type InstituteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -8027,6 +8389,7 @@ export type InstituteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   tests?: boolean | InstituteCountOutputTypeCountTestsArgs
   reminders?: boolean | InstituteCountOutputTypeCountRemindersArgs
   distributionItems?: boolean | InstituteCountOutputTypeCountDistributionItemsArgs
+  leaveRequests?: boolean | InstituteCountOutputTypeCountLeaveRequestsArgs
 }
 
 /**
@@ -8214,6 +8577,13 @@ export type InstituteCountOutputTypeCountDistributionItemsArgs<ExtArgs extends r
   where?: Prisma.DistributionItemWhereInput
 }
 
+/**
+ * InstituteCountOutputType without action
+ */
+export type InstituteCountOutputTypeCountLeaveRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LeaveRequestWhereInput
+}
+
 
 export type InstituteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -8267,6 +8637,7 @@ export type InstituteSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   tests?: boolean | Prisma.Institute$testsArgs<ExtArgs>
   reminders?: boolean | Prisma.Institute$remindersArgs<ExtArgs>
   distributionItems?: boolean | Prisma.Institute$distributionItemsArgs<ExtArgs>
+  leaveRequests?: boolean | Prisma.Institute$leaveRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.InstituteCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["institute"]>
 
@@ -8380,6 +8751,7 @@ export type InstituteInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   tests?: boolean | Prisma.Institute$testsArgs<ExtArgs>
   reminders?: boolean | Prisma.Institute$remindersArgs<ExtArgs>
   distributionItems?: boolean | Prisma.Institute$distributionItemsArgs<ExtArgs>
+  leaveRequests?: boolean | Prisma.Institute$leaveRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.InstituteCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InstituteIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -8423,6 +8795,7 @@ export type $InstitutePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     tests: Prisma.$TestPayload<ExtArgs>[]
     reminders: Prisma.$ScheduledReminderPayload<ExtArgs>[]
     distributionItems: Prisma.$DistributionItemPayload<ExtArgs>[]
+    leaveRequests: Prisma.$LeaveRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -8887,6 +9260,7 @@ export interface Prisma__InstituteClient<T, Null = never, ExtArgs extends runtim
   tests<T extends Prisma.Institute$testsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$testsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reminders<T extends Prisma.Institute$remindersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$remindersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScheduledReminderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   distributionItems<T extends Prisma.Institute$distributionItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$distributionItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DistributionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  leaveRequests<T extends Prisma.Institute$leaveRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$leaveRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9993,6 +10367,30 @@ export type Institute$distributionItemsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.DistributionItemScalarFieldEnum | Prisma.DistributionItemScalarFieldEnum[]
+}
+
+/**
+ * Institute.leaveRequests
+ */
+export type Institute$leaveRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LeaveRequest
+   */
+  select?: Prisma.LeaveRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LeaveRequest
+   */
+  omit?: Prisma.LeaveRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LeaveRequestInclude<ExtArgs> | null
+  where?: Prisma.LeaveRequestWhereInput
+  orderBy?: Prisma.LeaveRequestOrderByWithRelationInput | Prisma.LeaveRequestOrderByWithRelationInput[]
+  cursor?: Prisma.LeaveRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LeaveRequestScalarFieldEnum | Prisma.LeaveRequestScalarFieldEnum[]
 }
 
 /**

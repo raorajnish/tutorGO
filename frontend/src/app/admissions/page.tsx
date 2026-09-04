@@ -56,14 +56,13 @@ function AdmissionsContent() {
     setLoading(true);
     setError(null);
     try {
-      const [open, students, c] = await Promise.all([
-        apiFetch<Enquiry[]>("/enquiries?status=NEW").then(async (newOnes) => {
-          const contacted = await apiFetch<Enquiry[]>("/enquiries?status=CONTACTED");
-          return [...newOnes, ...contacted];
-        }),
+      const [newOnes, contacted, students, c] = await Promise.all([
+        apiFetch<Enquiry[]>("/enquiries?status=NEW"),
+        apiFetch<Enquiry[]>("/enquiries?status=CONTACTED"),
         apiFetch<{ students: StudentListItem[] }>("/students?status=all"),
         apiFetch<Course[]>("/academics/courses?active=true"),
       ]);
+      const open = [...newOnes, ...contacted];
       setPipeline(open);
       setAdmitted(students.students);
       setCourses(c);

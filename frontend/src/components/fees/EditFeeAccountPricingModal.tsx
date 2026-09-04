@@ -6,7 +6,8 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatMoney } from "@/lib/money";
-import type { FeeAccountResponse, FeeStructure, RevisePricingPayload, StudentSubject } from "@/lib/types";
+import type { DiscountType, FeeAccountResponse, FeeStructure, RevisePricingPayload, StudentSubject } from "@/lib/types";
+import { DiscountTypeToggle } from "./DiscountTypeToggle";
 
 interface Props {
   open: boolean;
@@ -32,6 +33,7 @@ export function EditFeeAccountPricingModal({ open, onClose, onSaved, studentId, 
   const [structure, setStructure] = useState<FeeStructure | null>(null);
   const [installmentCount, setInstallmentCount] = useState("");
   const [discount, setDiscount] = useState("0");
+  const [discountType, setDiscountType] = useState<DiscountType>("FLAT");
   const [courseFee, setCourseFee] = useState("");
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +58,7 @@ export function EditFeeAccountPricingModal({ open, onClose, onSaved, studentId, 
         setStructure(matched);
         setInstallmentCount(String(account.installmentCount ?? 1));
         setDiscount(account.discount ?? "0");
+        setDiscountType(account.discountType ?? "FLAT");
         setCourseFee(account.courseFee ?? "");
         setSelectedSubjectIds(subjects.filter((s) => s.isActive).map((s) => s.subjectId));
       })
@@ -74,7 +77,10 @@ export function EditFeeAccountPricingModal({ open, onClose, onSaved, studentId, 
   const hasPaidSubject = selectedLines.some((l) => Number(l.amount) > 0);
 
   const baseFee = isSubjectWise ? subjectTotal : Number(courseFee || 0);
-  const finalFee = Math.max(0, baseFee - (Number(discount) || 0));
+  const discountValue = Number(discount) || 0;
+  // Mirrors lib/feeMath.ts's computeFinalFee exactly.
+  const discountOff = discountType === "PERCENT" ? (baseFee * discountValue) / 100 : discountValue;
+  const finalFee = Math.max(0, baseFee - discountOff);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -89,6 +95,7 @@ export function EditFeeAccountPricingModal({ open, onClose, onSaved, studentId, 
     try {
       const body: RevisePricingPayload = {
         discount: Number(discount) || 0,
+        discountType,
         installmentCount: Number(installmentCount) || undefined,
         ...(isSubjectWise ? { subjectIds: selectedSubjectIds } : { courseFee: Number(courseFee) || 0 }),
       };
@@ -189,7 +196,22 @@ export function EditFeeAccountPricingModal({ open, onClose, onSaved, studentId, 
           )}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Input label="Discount (₹, optional)" type="number" min={0} step="0.01" value={discount} onChange={(e) => setDiscount(e.target.value)} />
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium text-foreground">Discount (optional)</span>
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={discountType === "PERCENT" ? 100 : undefined}
+                    step="0.01"
+                    value={discount}
+                    onChange={(e) => setDiscount(e.target.value)}
+                  />
+                </div>
+                <DiscountTypeToggle value={discountType} onChange={setDiscountType} />
+              </div>
+            </div>
             <Input
               label="Installments"
               type="number"

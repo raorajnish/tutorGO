@@ -7,7 +7,15 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { formatMoney } from "@/lib/money";
-import { FEE_PLAN_TYPE_LABELS, type FeePlanType, type FeeStructure, type FeeStudentRef, type InstallmentInput } from "@/lib/types";
+import {
+  FEE_PLAN_TYPE_LABELS,
+  type DiscountType,
+  type FeePlanType,
+  type FeeStructure,
+  type FeeStudentRef,
+  type InstallmentInput,
+} from "@/lib/types";
+import { DiscountTypeToggle } from "./DiscountTypeToggle";
 import { todayInput } from "@/lib/format";
 
 function addMonthsCapped(dateInput: string, months: number): string {
@@ -46,6 +54,7 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
   const [planType, setPlanType] = useState<FeePlanType>("ONE_TIME");
   const [courseFee, setCourseFee] = useState("");
   const [discount, setDiscount] = useState("0");
+  const [discountType, setDiscountType] = useState<DiscountType>("FLAT");
   const [installmentCount, setInstallmentCount] = useState("3");
   const [firstDueDate, setFirstDueDate] = useState(todayInput());
   const [rows, setRows] = useState<InstallmentInput[]>([]);
@@ -62,6 +71,7 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
     setPlanType("ONE_TIME");
     setCourseFee("");
     setDiscount("0");
+    setDiscountType("FLAT");
     setInstallmentCount("3");
     setFirstDueDate(todayInput());
     setRows([]);
@@ -121,8 +131,12 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
       : selectedStructure
         ? Number(selectedStructure.courseFee ?? 0)
         : Number(courseFee || 0);
-    return Math.max(0, base - (Number(discount) || 0));
-  }, [isSubjectWise, subjectTotal, selectedStructure, courseFee, discount]);
+    const discountValue = Number(discount) || 0;
+    // Mirrors lib/feeMath.ts's computeFinalFee exactly, so this live preview
+    // never disagrees with what the server actually saves.
+    const off = discountType === "PERCENT" ? (base * discountValue) / 100 : discountValue;
+    return Math.max(0, base - off);
+  }, [isSubjectWise, subjectTotal, selectedStructure, courseFee, discount, discountType]);
 
   // A structure only pre-fills the count as a default — always editable per
   // student, since one student on the standard plan might genuinely need
@@ -200,6 +214,7 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
                 courseFee: isCustom ? Number(courseFee) : undefined,
                 subjectIds: isSubjectWise ? selectedSubjectIds : undefined,
                 discount: Number(discount) || undefined,
+                discountType,
                 installments: rows.map((r) => ({ dueDate: r.dueDate, amount: Number(r.amount) })),
               }
             : {
@@ -347,7 +362,22 @@ export function SetupFeeAccountModal({ open, onClose, onSaved, student }: Props)
                 value={installmentCount}
                 onChange={(e) => setInstallmentCount(e.target.value)}
               />
-              <Input label="Discount (₹, optional)" type="number" min={0} step="0.01" value={discount} onChange={(e) => setDiscount(e.target.value)} />
+              <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-foreground">Discount (optional)</span>
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={discountType === "PERCENT" ? 100 : undefined}
+                      step="0.01"
+                      value={discount}
+                      onChange={(e) => setDiscount(e.target.value)}
+                    />
+                  </div>
+                  <DiscountTypeToggle value={discountType} onChange={setDiscountType} />
+                </div>
+              </div>
             </div>
             {selectedStructure && Number(installmentCount) !== selectedStructure.installmentCount && (
               <p className="text-xs text-muted-foreground">

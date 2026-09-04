@@ -56,4 +56,12 @@ export const WHATSAPP_TEMPLATE_SUGGESTIONS: Record<MessageTemplateType, WhatsApp
     bodyText: "Hi {{1}}, Rs. {{2}} was paid to you via {{3}} on {{4}}. Pending balance: Rs. {{5}}.",
     sampleValues: ["Mr. Sharma", "25,000", "Bank Transfer", "1 Mar", "0"],
   },
+  TEST_RESULT_ENTERED: {
+    mappedType: "TEST_RESULT_ENTERED",
+    name: "test_result_entered",
+    language: "en",
+    category: "UTILITY",
+    bodyText: "{{1}} scored {{2}} out of {{3}} in {{4}} ({{5}}), held on {{6}}.",
+    sampleValues: ["Rohan Mehta", "42", "50", "Unit Test 2", "Physics", "12 Mar"],
+  },
 };

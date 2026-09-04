@@ -59,6 +59,7 @@ export type FeeAccountMinAggregateOutputType = {
   status: $Enums.FeeAccountStatus | null
   courseFee: runtime.Decimal | null
   discount: runtime.Decimal | null
+  discountType: $Enums.DiscountType | null
   finalFee: runtime.Decimal | null
   installmentCount: number | null
   monthlyAmount: runtime.Decimal | null
@@ -76,6 +77,7 @@ export type FeeAccountMaxAggregateOutputType = {
   status: $Enums.FeeAccountStatus | null
   courseFee: runtime.Decimal | null
   discount: runtime.Decimal | null
+  discountType: $Enums.DiscountType | null
   finalFee: runtime.Decimal | null
   installmentCount: number | null
   monthlyAmount: runtime.Decimal | null
@@ -93,6 +95,7 @@ export type FeeAccountCountAggregateOutputType = {
   status: number
   courseFee: number
   discount: number
+  discountType: number
   finalFee: number
   installmentCount: number
   monthlyAmount: number
@@ -130,6 +133,7 @@ export type FeeAccountMinAggregateInputType = {
   status?: true
   courseFee?: true
   discount?: true
+  discountType?: true
   finalFee?: true
   installmentCount?: true
   monthlyAmount?: true
@@ -147,6 +151,7 @@ export type FeeAccountMaxAggregateInputType = {
   status?: true
   courseFee?: true
   discount?: true
+  discountType?: true
   finalFee?: true
   installmentCount?: true
   monthlyAmount?: true
@@ -164,6 +169,7 @@ export type FeeAccountCountAggregateInputType = {
   status?: true
   courseFee?: true
   discount?: true
+  discountType?: true
   finalFee?: true
   installmentCount?: true
   monthlyAmount?: true
@@ -268,6 +274,7 @@ export type FeeAccountGroupByOutputType = {
   status: $Enums.FeeAccountStatus
   courseFee: runtime.Decimal | null
   discount: runtime.Decimal | null
+  discountType: $Enums.DiscountType
   finalFee: runtime.Decimal | null
   installmentCount: number | null
   monthlyAmount: runtime.Decimal | null
@@ -308,6 +315,7 @@ export type FeeAccountWhereInput = {
   status?: Prisma.EnumFeeAccountStatusFilter<"FeeAccount"> | $Enums.FeeAccountStatus
   courseFee?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFilter<"FeeAccount"> | $Enums.DiscountType
   finalFee?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.IntNullableFilter<"FeeAccount"> | number | null
   monthlyAmount?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -330,6 +338,7 @@ export type FeeAccountOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   courseFee?: Prisma.SortOrderInput | Prisma.SortOrder
   discount?: Prisma.SortOrderInput | Prisma.SortOrder
+  discountType?: Prisma.SortOrder
   finalFee?: Prisma.SortOrderInput | Prisma.SortOrder
   installmentCount?: Prisma.SortOrderInput | Prisma.SortOrder
   monthlyAmount?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -355,6 +364,7 @@ export type FeeAccountWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumFeeAccountStatusFilter<"FeeAccount"> | $Enums.FeeAccountStatus
   courseFee?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFilter<"FeeAccount"> | $Enums.DiscountType
   finalFee?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.IntNullableFilter<"FeeAccount"> | number | null
   monthlyAmount?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -377,6 +387,7 @@ export type FeeAccountOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   courseFee?: Prisma.SortOrderInput | Prisma.SortOrder
   discount?: Prisma.SortOrderInput | Prisma.SortOrder
+  discountType?: Prisma.SortOrder
   finalFee?: Prisma.SortOrderInput | Prisma.SortOrder
   installmentCount?: Prisma.SortOrderInput | Prisma.SortOrder
   monthlyAmount?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -402,6 +413,7 @@ export type FeeAccountScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumFeeAccountStatusWithAggregatesFilter<"FeeAccount"> | $Enums.FeeAccountStatus
   courseFee?: Prisma.DecimalNullableWithAggregatesFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.DecimalNullableWithAggregatesFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeWithAggregatesFilter<"FeeAccount"> | $Enums.DiscountType
   finalFee?: Prisma.DecimalNullableWithAggregatesFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.IntNullableWithAggregatesFilter<"FeeAccount"> | number | null
   monthlyAmount?: Prisma.DecimalNullableWithAggregatesFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -416,6 +428,7 @@ export type FeeAccountCreateInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -438,6 +451,7 @@ export type FeeAccountUncheckedCreateInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -454,6 +468,7 @@ export type FeeAccountUpdateInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -476,6 +491,7 @@ export type FeeAccountUncheckedUpdateInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -495,6 +511,7 @@ export type FeeAccountCreateManyInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -509,6 +526,7 @@ export type FeeAccountUpdateManyMutationInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -526,6 +544,7 @@ export type FeeAccountUncheckedUpdateManyInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -558,6 +577,7 @@ export type FeeAccountCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   courseFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
+  discountType?: Prisma.SortOrder
   finalFee?: Prisma.SortOrder
   installmentCount?: Prisma.SortOrder
   monthlyAmount?: Prisma.SortOrder
@@ -584,6 +604,7 @@ export type FeeAccountMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   courseFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
+  discountType?: Prisma.SortOrder
   finalFee?: Prisma.SortOrder
   installmentCount?: Prisma.SortOrder
   monthlyAmount?: Prisma.SortOrder
@@ -601,6 +622,7 @@ export type FeeAccountMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   courseFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
+  discountType?: Prisma.SortOrder
   finalFee?: Prisma.SortOrder
   installmentCount?: Prisma.SortOrder
   monthlyAmount?: Prisma.SortOrder
@@ -743,6 +765,10 @@ export type EnumFeeAccountStatusFieldUpdateOperationsInput = {
   set?: $Enums.FeeAccountStatus
 }
 
+export type EnumDiscountTypeFieldUpdateOperationsInput = {
+  set?: $Enums.DiscountType
+}
+
 export type FeeAccountCreateNestedOneWithoutInstallmentsInput = {
   create?: Prisma.XOR<Prisma.FeeAccountCreateWithoutInstallmentsInput, Prisma.FeeAccountUncheckedCreateWithoutInstallmentsInput>
   connectOrCreate?: Prisma.FeeAccountCreateOrConnectWithoutInstallmentsInput
@@ -777,6 +803,7 @@ export type FeeAccountCreateWithoutInstituteInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -797,6 +824,7 @@ export type FeeAccountUncheckedCreateWithoutInstituteInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -845,6 +873,7 @@ export type FeeAccountScalarWhereInput = {
   status?: Prisma.EnumFeeAccountStatusFilter<"FeeAccount"> | $Enums.FeeAccountStatus
   courseFee?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFilter<"FeeAccount"> | $Enums.DiscountType
   finalFee?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.IntNullableFilter<"FeeAccount"> | number | null
   monthlyAmount?: Prisma.DecimalNullableFilter<"FeeAccount"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -859,6 +888,7 @@ export type FeeAccountCreateWithoutStudentInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -879,6 +909,7 @@ export type FeeAccountUncheckedCreateWithoutStudentInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -911,6 +942,7 @@ export type FeeAccountUpdateWithoutStudentInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -931,6 +963,7 @@ export type FeeAccountUncheckedUpdateWithoutStudentInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -947,6 +980,7 @@ export type FeeAccountCreateWithoutFeeStructureInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -967,6 +1001,7 @@ export type FeeAccountUncheckedCreateWithoutFeeStructureInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1009,6 +1044,7 @@ export type FeeAccountCreateWithoutInstallmentsInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1030,6 +1066,7 @@ export type FeeAccountUncheckedCreateWithoutInstallmentsInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1061,6 +1098,7 @@ export type FeeAccountUpdateWithoutInstallmentsInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1082,6 +1120,7 @@ export type FeeAccountUncheckedUpdateWithoutInstallmentsInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1097,6 +1136,7 @@ export type FeeAccountCreateWithoutPaymentsInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1118,6 +1158,7 @@ export type FeeAccountUncheckedCreateWithoutPaymentsInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1149,6 +1190,7 @@ export type FeeAccountUpdateWithoutPaymentsInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1170,6 +1212,7 @@ export type FeeAccountUncheckedUpdateWithoutPaymentsInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1187,6 +1230,7 @@ export type FeeAccountCreateManyInstituteInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1201,6 +1245,7 @@ export type FeeAccountUpdateWithoutInstituteInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1221,6 +1266,7 @@ export type FeeAccountUncheckedUpdateWithoutInstituteInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1239,6 +1285,7 @@ export type FeeAccountUncheckedUpdateManyWithoutInstituteInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1255,6 +1302,7 @@ export type FeeAccountCreateManyFeeStructureInput = {
   status?: $Enums.FeeAccountStatus
   courseFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: $Enums.DiscountType
   finalFee?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: number | null
   monthlyAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1269,6 +1317,7 @@ export type FeeAccountUpdateWithoutFeeStructureInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1289,6 +1338,7 @@ export type FeeAccountUncheckedUpdateWithoutFeeStructureInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1307,6 +1357,7 @@ export type FeeAccountUncheckedUpdateManyWithoutFeeStructureInput = {
   status?: Prisma.EnumFeeAccountStatusFieldUpdateOperationsInput | $Enums.FeeAccountStatus
   courseFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountType?: Prisma.EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
   finalFee?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   installmentCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   monthlyAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1364,6 +1415,7 @@ export type FeeAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   status?: boolean
   courseFee?: boolean
   discount?: boolean
+  discountType?: boolean
   finalFee?: boolean
   installmentCount?: boolean
   monthlyAmount?: boolean
@@ -1387,6 +1439,7 @@ export type FeeAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   status?: boolean
   courseFee?: boolean
   discount?: boolean
+  discountType?: boolean
   finalFee?: boolean
   installmentCount?: boolean
   monthlyAmount?: boolean
@@ -1407,6 +1460,7 @@ export type FeeAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   status?: boolean
   courseFee?: boolean
   discount?: boolean
+  discountType?: boolean
   finalFee?: boolean
   installmentCount?: boolean
   monthlyAmount?: boolean
@@ -1427,6 +1481,7 @@ export type FeeAccountSelectScalar = {
   status?: boolean
   courseFee?: boolean
   discount?: boolean
+  discountType?: boolean
   finalFee?: boolean
   installmentCount?: boolean
   monthlyAmount?: boolean
@@ -1435,7 +1490,7 @@ export type FeeAccountSelectScalar = {
   updatedAt?: boolean
 }
 
-export type FeeAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "studentId" | "feeStructureId" | "planType" | "status" | "courseFee" | "discount" | "finalFee" | "installmentCount" | "monthlyAmount" | "billingDay" | "createdAt" | "updatedAt", ExtArgs["result"]["feeAccount"]>
+export type FeeAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "studentId" | "feeStructureId" | "planType" | "status" | "courseFee" | "discount" | "discountType" | "finalFee" | "installmentCount" | "monthlyAmount" | "billingDay" | "createdAt" | "updatedAt", ExtArgs["result"]["feeAccount"]>
 export type FeeAccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
@@ -1473,6 +1528,12 @@ export type $FeeAccountPayload<ExtArgs extends runtime.Types.Extensions.Internal
     status: $Enums.FeeAccountStatus
     courseFee: runtime.Decimal | null
     discount: runtime.Decimal | null
+    /**
+     * FLAT = discount is a rupee amount; PERCENT = discount is 0-100, applied
+     * to courseFee. See lib/feeMath.ts for the one place finalFee is derived
+     * from these two fields.
+     */
+    discountType: $Enums.DiscountType
     finalFee: runtime.Decimal | null
     installmentCount: number | null
     monthlyAmount: runtime.Decimal | null
@@ -1915,6 +1976,7 @@ export interface FeeAccountFieldRefs {
   readonly status: Prisma.FieldRef<"FeeAccount", 'FeeAccountStatus'>
   readonly courseFee: Prisma.FieldRef<"FeeAccount", 'Decimal'>
   readonly discount: Prisma.FieldRef<"FeeAccount", 'Decimal'>
+  readonly discountType: Prisma.FieldRef<"FeeAccount", 'DiscountType'>
   readonly finalFee: Prisma.FieldRef<"FeeAccount", 'Decimal'>
   readonly installmentCount: Prisma.FieldRef<"FeeAccount", 'Int'>
   readonly monthlyAmount: Prisma.FieldRef<"FeeAccount", 'Decimal'>

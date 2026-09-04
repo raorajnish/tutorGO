@@ -6,6 +6,7 @@ export const MESSAGE_TEMPLATE_TYPES = [
   "ATTENDANCE_MARKED",
   "FEE_OVERDUE_REMINDER",
   "PAYROLL_PAYMENT_RECORDED",
+  "TEST_RESULT_ENTERED",
 ] as const;
 export type MessageTemplateType = (typeof MESSAGE_TEMPLATE_TYPES)[number];
 
@@ -19,6 +20,8 @@ export const DEFAULT_MESSAGE_TEMPLATES: Record<MessageTemplateType, string> = {
     "Dear parent/guardian of *{{studentName}}*,\n\nA fee installment of *₹{{amount}}* for {{course}} was due on {{dueDate}} and is now {{daysOverdue}} day(s) overdue.\n\nKindly clear the pending amount at the earliest. Contact us for any queries.\n\nThank you.",
   PAYROLL_PAYMENT_RECORDED:
     "💰 *Payment recorded*\nHi {{name}}, ₹{{amount}} was paid to you via {{mode}} on {{paidOn}}.\n\nPending balance: ₹{{pendingAmount}}\n\n— {{instituteName}}",
+  TEST_RESULT_ENTERED:
+    "📝 *{{testTitle}}* — {{subject}}\n{{studentName}} scored *{{marksObtained}}/{{totalMarks}}* ({{heldOn}}).",
 };
 
 /** Server-side twin of the frontend's renderTemplate (frontend/src/lib/

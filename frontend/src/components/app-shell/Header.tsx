@@ -20,6 +20,9 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const showBackToOrg = user?.role === "OWNER" && !!user.currentInstituteId;
+  // A student has no directory to search — the box would only ever return
+  // things they cannot see.
+  const showSearch = user?.role !== "STUDENT";
 
   async function handleExit() {
     setExiting(true);
@@ -52,6 +55,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         </Button>
       )}
 
+      {showSearch ? (
       <div className="relative hidden min-w-0 flex-1 sm:block">
         <svg
           width="16"
@@ -73,6 +77,9 @@ export function Header({ onMenuClick }: HeaderProps) {
           className="w-full max-w-md rounded-full border-none bg-muted py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
+      ) : (
+        <div className="hidden flex-1 sm:block" />
+      )}
 
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
         <button

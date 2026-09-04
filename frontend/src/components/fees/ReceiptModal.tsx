@@ -44,18 +44,52 @@ export function ReceiptModal({ paymentId, onClose }: Props) {
   const [receipt, setReceipt] = useState<ReceiptDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [shared, setShared] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [revoking, setRevoking] = useState(false);
 
   const instituteName = user?.institute?.name ?? "TutorGO";
+
+  function load() {
+    if (!paymentId) return;
+    apiFetch<ReceiptDetail>(`/fees/payments/${paymentId}/receipt`)
+      .then(setReceipt)
+      .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load this receipt."));
+  }
 
   useEffect(() => {
     setReceipt(null);
     setError(null);
     setShared(false);
-    if (!paymentId) return;
-    apiFetch<ReceiptDetail>(`/fees/payments/${paymentId}/receipt`)
-      .then(setReceipt)
-      .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load this receipt."));
+    setLinkCopied(false);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentId]);
+
+  async function handleCopyLink() {
+    if (!receipt?.publicToken) return;
+    const url = `${window.location.origin}/r/${receipt.publicToken}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable — nothing more to do here.
+    }
+  }
+
+  async function handleRevoke() {
+    if (!paymentId) return;
+    if (!window.confirm("Revoke this receipt's public link? Anyone who still has it will no longer be able to open it.")) return;
+    setRevoking(true);
+    try {
+      await apiFetch(`/fees/payments/${paymentId}/receipt/revoke`, { method: "POST" });
+      load();
+    } catch {
+      // Best-effort — the modal just keeps showing the (still-live) link if this fails.
+    } finally {
+      setRevoking(false);
+    }
+  }
 
   async function handleShare() {
     if (!receipt) return;
@@ -197,6 +231,40 @@ export function ReceiptModal({ paymentId, onClose }: Props) {
             >
               Print / Save as PDF
             </button>
+          </div>
+
+          {/* A permanent, standalone page the parent can (re)open, download,
+              or forward themselves — distinct from the text-share above,
+              which is a one-time snapshot pasted into a chat. */}
+          <div className="flex flex-col items-center gap-2 border-t border-border pt-4 print:hidden">
+            {receipt.publicToken ? (
+              <>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+                      linkCopied ? "bg-success-soft text-success" : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+                    }`}
+                  >
+                    {linkCopied ? "Link copied!" : "Copy receipt link"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRevoke}
+                    disabled={revoking}
+                    className="rounded-xl px-4 py-2 text-sm font-medium text-danger hover:bg-danger-soft disabled:opacity-50"
+                  >
+                    {revoking ? "Revoking…" : "Revoke link"}
+                  </button>
+                </div>
+                <p className="text-center text-xs text-muted-foreground">
+                  Anyone with this link can view (and print) this receipt — no login needed. It never expires unless revoked.
+                </p>
+              </>
+            ) : (
+              <p className="text-center text-xs text-muted-foreground">No public link for this receipt.</p>
+            )}
           </div>
         </div>
       )}

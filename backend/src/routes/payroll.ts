@@ -13,7 +13,9 @@ import { auditLog } from "../services/audit.js";
 import { notify } from "../services/notify.js";
 import { sendMail } from "../services/mailer.js";
 import { renderTemplate, resolveTemplate } from "../lib/messageTemplates.js";
+import { dispatchMessage } from "../services/dispatch.js";
 import { payslipEmailHtml } from "../lib/emailTemplates.js";
+import { toCsv } from "../lib/csv.js";
 
 export const payrollRouter = Router();
 
@@ -110,7 +112,7 @@ function profileTitle(profile: { title: string | null; user: { role: string } | 
 async function loadProfile(id: string, instituteId: string) {
   const profile = await prisma.salaryProfile.findUnique({
     where: { id },
-    include: { user: { select: { id: true, fullName: true, role: true, instituteId: true, email: true } } },
+    include: { user: { select: { id: true, fullName: true, role: true, instituteId: true, email: true, phone: true } } },
   });
   if (!profile || profile.instituteId !== instituteId) throw ApiError.notFound("Staff member not found");
   return profile;
@@ -157,8 +159,9 @@ async function notifyPaymentRecorded(
     instituteId: string;
     externalName: string | null;
     externalEmail: string | null;
+    externalPhone: string | null;
     title: string | null;
-    user: { id: string; fullName: string; role: string; email: string } | null;
+    user: { id: string; fullName: string; role: string; email: string; phone: string | null } | null;
   },
   payment: { amount: Prisma.Decimal; mode: string; paidOn: Date }
 ) {
@@ -179,17 +182,29 @@ async function notifyPaymentRecorded(
       });
     }
 
+    const vars = {
+      name,
+      amount: money(payment.amount) ?? "0.00",
+      mode: payment.mode,
+      paidOn: paidOnLabel,
+      pendingAmount: money(pending) ?? "0.00",
+      instituteName: institute?.name ?? "TutorGO",
+    };
+
+    // WhatsApp first where it's set up — same event, so whichever channels
+    // are ready all fire; there's no "one wins" here, staff can reasonably
+    // get both a WhatsApp ping and an email for a payment.
+    const phone = profile.user?.phone ?? profile.externalPhone;
+    if (phone) {
+      const result = await dispatchMessage(profile.instituteId, "PAYROLL_PAYMENT_RECORDED", phone, vars);
+      if (result.whatsapp === "SKIPPED") {
+        console.log(`[payroll] WhatsApp skipped for payment on ${profile.id}: ${result.whatsappSkipReason}`);
+      }
+    }
+
     const email = profile.user?.email ?? profile.externalEmail;
     if (email) {
-      const templateBody = await resolveTemplate(profile.instituteId, "PAYROLL_PAYMENT_RECORDED");
-      const subject = renderTemplate(templateBody, {
-        name,
-        amount: money(payment.amount) ?? "0.00",
-        mode: payment.mode,
-        paidOn: paidOnLabel,
-        pendingAmount: money(pending) ?? "0.00",
-        instituteName: institute?.name ?? "TutorGO",
-      })
+      const subject = renderTemplate(await resolveTemplate(profile.instituteId, "PAYROLL_PAYMENT_RECORDED"), vars)
         .split("\n")[0]!
         .replace(/[*_]/g, "");
 
@@ -199,10 +214,10 @@ async function notifyPaymentRecorded(
         html: payslipEmailHtml({
           recipientName: name,
           instituteName: institute?.name ?? "TutorGO",
-          amount: money(payment.amount) ?? "0.00",
+          amount: vars.amount,
           mode: payment.mode,
           paidOn: paidOnLabel,
-          pendingAmount: money(pending) ?? "0.00",
+          pendingAmount: vars.pendingAmount,
         }),
         purpose: "PAYROLL_PAYMENT_RECORDED",
         instituteId: profile.instituteId,
@@ -537,7 +552,7 @@ payrollRouter.get("/my-payslips", async (req, res, next) => {
   try {
     const profile = await prisma.salaryProfile.findUnique({
       where: { userId: req.user!.id },
-      include: { user: { select: { id: true, fullName: true, role: true, instituteId: true, email: true } } },
+      include: { user: { select: { id: true, fullName: true, role: true, instituteId: true, email: true, phone: true } } },
     });
     if (!profile || profile.instituteId !== req.tenantId) {
       return res.json({
@@ -870,6 +885,30 @@ payrollRouter.get("/runs/:id", requireRoles(...REVIEW_ROLES), async (req, res, n
   }
 });
 
+/** Per-staff totals for one run — same `runSummary` the run's detail card
+ * already renders. OWNER/ADMIN only (changes-phase10.md §10.5), tighter than
+ * REVIEW_ROLES: ACCOUNTANT can review a run on screen but not bulk-export
+ * everyone's salary figures. */
+payrollRouter.get("/runs/:id/export.csv", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
+  try {
+    const run = await loadRun(req.params.id as string, req.tenantId!);
+    const summary = await runSummary(run.instituteId, run.periodMonth);
+
+    const rows = [
+      ["Staff", "Total", "Paid", "Outstanding"],
+      ...summary.staff.map((s) => [s.name, s.totalAmount ?? "0.00", s.totalPaid ?? "0.00", s.totalOutstanding ?? "0.00"]),
+      ["", "", "", ""],
+      ["Total", summary.totalAmount ?? "0.00", summary.totalPaid ?? "0.00", summary.totalOutstanding ?? "0.00"],
+    ];
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="payroll-${run.periodMonth}.csv"`);
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
 payrollRouter.post("/runs/:id/approve", requireRoles(...MANAGE_ROLES), async (req, res, next) => {
   try {
     const run = await loadRun(req.params.id as string, req.tenantId!);
@@ -950,13 +989,24 @@ payrollRouter.post("/runs/:id/pay", requireRoles(...PAY_ROLES), async (req, res,
       return tx.payrollRun.update({ where: { id: run.id }, data: { status: "PAID", paidAt: new Date() } });
     });
 
+    // One query for every paid profile's notification data, instead of one
+    // per profile inside the loop — paidProfileIds are already institute-
+    // scoped by construction (byProfile came from a line-item query filtered
+    // on run.instituteId), so this filter is redundant-but-safe, not load-bearing.
+    const notifyProfiles = await prisma.salaryProfile.findMany({
+      where: { id: { in: paidProfileIds }, instituteId: run.instituteId },
+      include: { user: { select: { id: true, fullName: true, role: true, instituteId: true, email: true, phone: true } } },
+    });
+    const profileById = new Map(notifyProfiles.map((p) => [p.id, p]));
+
     for (const salaryProfileId of paidProfileIds) {
       // byProfile was snapshotted before the transaction ran, so paidAmount
       // here is still the pre-payment value — amount minus that is exactly
       // what this bulk payment just covered for this profile.
       const profileItems = byProfile.get(salaryProfileId)!;
       const total = profileItems.reduce((sum, i) => sum.plus(Prisma.Decimal.max(0, i.amount.minus(i.paidAmount))), new Prisma.Decimal(0));
-      const profile = await loadProfile(salaryProfileId, run.instituteId);
+      const profile = profileById.get(salaryProfileId);
+      if (!profile) continue;
       void notifyPaymentRecorded(profile, { amount: total, mode: "BANK_TRANSFER", paidOn });
     }
 

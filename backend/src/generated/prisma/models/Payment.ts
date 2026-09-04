@@ -53,6 +53,8 @@ export type PaymentMinAggregateOutputType = {
   voidReason: string | null
   voidedByUserId: string | null
   createdAt: Date | null
+  publicToken: string | null
+  publicTokenRevokedAt: Date | null
 }
 
 export type PaymentMaxAggregateOutputType = {
@@ -69,6 +71,8 @@ export type PaymentMaxAggregateOutputType = {
   voidReason: string | null
   voidedByUserId: string | null
   createdAt: Date | null
+  publicToken: string | null
+  publicTokenRevokedAt: Date | null
 }
 
 export type PaymentCountAggregateOutputType = {
@@ -85,6 +89,8 @@ export type PaymentCountAggregateOutputType = {
   voidReason: number
   voidedByUserId: number
   createdAt: number
+  publicToken: number
+  publicTokenRevokedAt: number
   _all: number
 }
 
@@ -111,6 +117,8 @@ export type PaymentMinAggregateInputType = {
   voidReason?: true
   voidedByUserId?: true
   createdAt?: true
+  publicToken?: true
+  publicTokenRevokedAt?: true
 }
 
 export type PaymentMaxAggregateInputType = {
@@ -127,6 +135,8 @@ export type PaymentMaxAggregateInputType = {
   voidReason?: true
   voidedByUserId?: true
   createdAt?: true
+  publicToken?: true
+  publicTokenRevokedAt?: true
 }
 
 export type PaymentCountAggregateInputType = {
@@ -143,6 +153,8 @@ export type PaymentCountAggregateInputType = {
   voidReason?: true
   voidedByUserId?: true
   createdAt?: true
+  publicToken?: true
+  publicTokenRevokedAt?: true
   _all?: true
 }
 
@@ -246,6 +258,8 @@ export type PaymentGroupByOutputType = {
   voidReason: string | null
   voidedByUserId: string | null
   createdAt: Date
+  publicToken: string | null
+  publicTokenRevokedAt: Date | null
   _count: PaymentCountAggregateOutputType | null
   _avg: PaymentAvgAggregateOutputType | null
   _sum: PaymentSumAggregateOutputType | null
@@ -285,6 +299,8 @@ export type PaymentWhereInput = {
   voidReason?: Prisma.StringNullableFilter<"Payment"> | string | null
   voidedByUserId?: Prisma.StringNullableFilter<"Payment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  publicToken?: Prisma.StringNullableFilter<"Payment"> | string | null
+  publicTokenRevokedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   feeAccount?: Prisma.XOR<Prisma.FeeAccountScalarRelationFilter, Prisma.FeeAccountWhereInput>
   allocations?: Prisma.PaymentAllocationListRelationFilter
@@ -304,6 +320,8 @@ export type PaymentOrderByWithRelationInput = {
   voidReason?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  publicToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicTokenRevokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   institute?: Prisma.InstituteOrderByWithRelationInput
   feeAccount?: Prisma.FeeAccountOrderByWithRelationInput
   allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput
@@ -311,6 +329,7 @@ export type PaymentOrderByWithRelationInput = {
 
 export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  publicToken?: string
   instituteId_receiptNumber?: Prisma.PaymentInstituteIdReceiptNumberCompoundUniqueInput
   AND?: Prisma.PaymentWhereInput | Prisma.PaymentWhereInput[]
   OR?: Prisma.PaymentWhereInput[]
@@ -327,10 +346,11 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   voidReason?: Prisma.StringNullableFilter<"Payment"> | string | null
   voidedByUserId?: Prisma.StringNullableFilter<"Payment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  publicTokenRevokedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   feeAccount?: Prisma.XOR<Prisma.FeeAccountScalarRelationFilter, Prisma.FeeAccountWhereInput>
   allocations?: Prisma.PaymentAllocationListRelationFilter
-}, "id" | "instituteId_receiptNumber">
+}, "id" | "publicToken" | "instituteId_receiptNumber">
 
 export type PaymentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -346,6 +366,8 @@ export type PaymentOrderByWithAggregationInput = {
   voidReason?: Prisma.SortOrderInput | Prisma.SortOrder
   voidedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  publicToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  publicTokenRevokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PaymentCountOrderByAggregateInput
   _avg?: Prisma.PaymentAvgOrderByAggregateInput
   _max?: Prisma.PaymentMaxOrderByAggregateInput
@@ -370,6 +392,8 @@ export type PaymentScalarWhereWithAggregatesInput = {
   voidReason?: Prisma.StringNullableWithAggregatesFilter<"Payment"> | string | null
   voidedByUserId?: Prisma.StringNullableWithAggregatesFilter<"Payment"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Payment"> | Date | string
+  publicToken?: Prisma.StringNullableWithAggregatesFilter<"Payment"> | string | null
+  publicTokenRevokedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Payment"> | Date | string | null
 }
 
 export type PaymentCreateInput = {
@@ -384,6 +408,8 @@ export type PaymentCreateInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
   institute: Prisma.InstituteCreateNestedOneWithoutPaymentsInput
   feeAccount: Prisma.FeeAccountCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
@@ -403,6 +429,8 @@ export type PaymentUncheckedCreateInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
 }
 
@@ -418,6 +446,8 @@ export type PaymentUpdateInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   institute?: Prisma.InstituteUpdateOneRequiredWithoutPaymentsNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
@@ -437,6 +467,8 @@ export type PaymentUncheckedUpdateInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
@@ -454,6 +486,8 @@ export type PaymentCreateManyInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
 }
 
 export type PaymentUpdateManyMutationInput = {
@@ -468,6 +502,8 @@ export type PaymentUpdateManyMutationInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentUncheckedUpdateManyInput = {
@@ -484,6 +520,8 @@ export type PaymentUncheckedUpdateManyInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentListRelationFilter = {
@@ -515,6 +553,8 @@ export type PaymentCountOrderByAggregateInput = {
   voidReason?: Prisma.SortOrder
   voidedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  publicToken?: Prisma.SortOrder
+  publicTokenRevokedAt?: Prisma.SortOrder
 }
 
 export type PaymentAvgOrderByAggregateInput = {
@@ -535,6 +575,8 @@ export type PaymentMaxOrderByAggregateInput = {
   voidReason?: Prisma.SortOrder
   voidedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  publicToken?: Prisma.SortOrder
+  publicTokenRevokedAt?: Prisma.SortOrder
 }
 
 export type PaymentMinOrderByAggregateInput = {
@@ -551,6 +593,8 @@ export type PaymentMinOrderByAggregateInput = {
   voidReason?: Prisma.SortOrder
   voidedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  publicToken?: Prisma.SortOrder
+  publicTokenRevokedAt?: Prisma.SortOrder
 }
 
 export type PaymentSumOrderByAggregateInput = {
@@ -676,6 +720,8 @@ export type PaymentCreateWithoutInstituteInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
   feeAccount: Prisma.FeeAccountCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
 }
@@ -693,6 +739,8 @@ export type PaymentUncheckedCreateWithoutInstituteInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
 }
 
@@ -739,6 +787,8 @@ export type PaymentScalarWhereInput = {
   voidReason?: Prisma.StringNullableFilter<"Payment"> | string | null
   voidedByUserId?: Prisma.StringNullableFilter<"Payment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  publicToken?: Prisma.StringNullableFilter<"Payment"> | string | null
+  publicTokenRevokedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
 }
 
 export type PaymentCreateWithoutFeeAccountInput = {
@@ -753,6 +803,8 @@ export type PaymentCreateWithoutFeeAccountInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
   institute: Prisma.InstituteCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
 }
@@ -770,6 +822,8 @@ export type PaymentUncheckedCreateWithoutFeeAccountInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
 }
 
@@ -811,6 +865,8 @@ export type PaymentCreateWithoutAllocationsInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
   institute: Prisma.InstituteCreateNestedOneWithoutPaymentsInput
   feeAccount: Prisma.FeeAccountCreateNestedOneWithoutPaymentsInput
 }
@@ -829,6 +885,8 @@ export type PaymentUncheckedCreateWithoutAllocationsInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
 }
 
 export type PaymentCreateOrConnectWithoutAllocationsInput = {
@@ -859,6 +917,8 @@ export type PaymentUpdateWithoutAllocationsInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   institute?: Prisma.InstituteUpdateOneRequiredWithoutPaymentsNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutPaymentsNestedInput
 }
@@ -877,6 +937,8 @@ export type PaymentUncheckedUpdateWithoutAllocationsInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentCreateManyInstituteInput = {
@@ -892,6 +954,8 @@ export type PaymentCreateManyInstituteInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
 }
 
 export type PaymentUpdateWithoutInstituteInput = {
@@ -906,6 +970,8 @@ export type PaymentUpdateWithoutInstituteInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
 }
@@ -923,6 +989,8 @@ export type PaymentUncheckedUpdateWithoutInstituteInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
@@ -939,6 +1007,8 @@ export type PaymentUncheckedUpdateManyWithoutInstituteInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentCreateManyFeeAccountInput = {
@@ -954,6 +1024,8 @@ export type PaymentCreateManyFeeAccountInput = {
   voidReason?: string | null
   voidedByUserId?: string | null
   createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
 }
 
 export type PaymentUpdateWithoutFeeAccountInput = {
@@ -968,6 +1040,8 @@ export type PaymentUpdateWithoutFeeAccountInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   institute?: Prisma.InstituteUpdateOneRequiredWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
 }
@@ -985,6 +1059,8 @@ export type PaymentUncheckedUpdateWithoutFeeAccountInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
@@ -1001,6 +1077,8 @@ export type PaymentUncheckedUpdateManyWithoutFeeAccountInput = {
   voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1048,6 +1126,8 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   voidReason?: boolean
   voidedByUserId?: boolean
   createdAt?: boolean
+  publicToken?: boolean
+  publicTokenRevokedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
   allocations?: boolean | Prisma.Payment$allocationsArgs<ExtArgs>
@@ -1068,6 +1148,8 @@ export type PaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   voidReason?: boolean
   voidedByUserId?: boolean
   createdAt?: boolean
+  publicToken?: boolean
+  publicTokenRevokedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
@@ -1086,6 +1168,8 @@ export type PaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   voidReason?: boolean
   voidedByUserId?: boolean
   createdAt?: boolean
+  publicToken?: boolean
+  publicTokenRevokedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
@@ -1104,9 +1188,11 @@ export type PaymentSelectScalar = {
   voidReason?: boolean
   voidedByUserId?: boolean
   createdAt?: boolean
+  publicToken?: boolean
+  publicTokenRevokedAt?: boolean
 }
 
-export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "feeAccountId" | "amount" | "mode" | "paidOn" | "receiptNumber" | "notes" | "createdByUserId" | "voidedAt" | "voidReason" | "voidedByUserId" | "createdAt", ExtArgs["result"]["payment"]>
+export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "feeAccountId" | "amount" | "mode" | "paidOn" | "receiptNumber" | "notes" | "createdByUserId" | "voidedAt" | "voidReason" | "voidedByUserId" | "createdAt" | "publicToken" | "publicTokenRevokedAt", ExtArgs["result"]["payment"]>
 export type PaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
@@ -1143,6 +1229,20 @@ export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     voidReason: string | null
     voidedByUserId: string | null
     createdAt: Date
+    /**
+     * Opaque, unguessable — the auth for GET /public/receipts/:token. Never
+     * the sequential receiptNumber (guessable: try the next SEQ) and never the
+     * cuid id (not designed to be shared). Generated once at creation, stable
+     * for the life of the payment. Null on rows created before this column
+     * existed; those simply have no public link until backfilled.
+     */
+    publicToken: string | null
+    /**
+     * Set when staff pull the "Revoke link" trigger — a public request for a
+     * revoked token 404s exactly like one that never had a link, but the
+     * receipt itself and the payment record are completely unaffected.
+     */
+    publicTokenRevokedAt: Date | null
   }, ExtArgs["result"]["payment"]>
   composites: {}
 }
@@ -1582,6 +1682,8 @@ export interface PaymentFieldRefs {
   readonly voidReason: Prisma.FieldRef<"Payment", 'String'>
   readonly voidedByUserId: Prisma.FieldRef<"Payment", 'String'>
   readonly createdAt: Prisma.FieldRef<"Payment", 'DateTime'>
+  readonly publicToken: Prisma.FieldRef<"Payment", 'String'>
+  readonly publicTokenRevokedAt: Prisma.FieldRef<"Payment", 'DateTime'>
 }
     
 

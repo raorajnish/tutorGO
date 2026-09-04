@@ -134,6 +134,32 @@ const ICONS: Record<NavIcon, React.ReactNode> = {
       <path d="M12 13v8" strokeLinecap="round" />
     </svg>
   ),
+  analytics: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 3v16a2 2 0 002 2h16" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 15l4-5 3 3 5-7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  portalAccess: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="4" y="10" width="16" height="11" rx="2" />
+      <path d="M8 10V7a4 4 0 018 0v3" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="15.5" r="1.4" />
+    </svg>
+  ),
+  timetable: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="4" width="18" height="17" rx="2" />
+      <path d="M3 9h18M8 2v4M16 2v4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7.5 13h4M7.5 17h9" strokeLinecap="round" />
+    </svg>
+  ),
+  notifications: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M18 8a6 6 0 10-12 0c0 6-2 7-2 7h16s-2-1-2-7z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13.7 20a2 2 0 01-3.4 0" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 };
 
 export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: SidebarProps) {

@@ -25,18 +25,21 @@ export default function DistributionPage() {
     setLoading(true);
     setError(null);
     try {
-      const [i, c] = await Promise.all([
-        apiFetch<DistributionItem[]>(`/distribution/items${includeInactive ? "?includeInactive=true" : ""}`),
-        apiFetch<Course[]>("/academics/courses"),
-      ]);
-      setItems(i);
-      setCourses(c);
+      setItems(await apiFetch<DistributionItem[]>(`/distribution/items${includeInactive ? "?includeInactive=true" : ""}`));
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Could not load distribution items.");
     } finally {
       setLoading(false);
     }
   }
+
+  // Courses are a static lookup for the "new item" form, not filtered by
+  // includeInactive — fetched once rather than every time that toggles.
+  useEffect(() => {
+    apiFetch<Course[]>("/academics/courses")
+      .then(setCourses)
+      .catch(() => setCourses([]));
+  }, []);
 
   useEffect(() => {
     load();

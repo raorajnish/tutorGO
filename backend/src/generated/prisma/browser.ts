@@ -421,3 +421,13 @@ export type DistributionItem = Prisma.DistributionItemModel
  * enum, same principle as FeeInstallment.
  */
 export type DistributionReceipt = Prisma.DistributionReceiptModel
+/**
+ * Model LeaveRequest
+ * A staff member's own request for one or more days off. Deliberately does
+ * NOT touch PayrollLineItem/SalaryProfile — an approved leave has no
+ * automatic effect on pay in this phase (FIXED salary is unaffected;
+ * PER_LECTURE pay is already zero for a day nothing was taught). Whether
+ * unpaid leave should deduct from a FIXED salary is a policy decision left
+ * for a follow-up once an institute actually asks for it — see phase10 doc.
+ */
+export type LeaveRequest = Prisma.LeaveRequestModel

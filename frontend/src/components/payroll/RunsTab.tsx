@@ -5,6 +5,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { ExportButton } from "@/components/ui/ExportButton";
 import { formatMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import type { PayrollRun, PayrollRunPreview } from "@/lib/types";
@@ -155,7 +156,14 @@ export function RunsTab() {
               <p className="text-sm font-semibold text-foreground">{activeRun.label}</p>
               <Badge tone={STATUS_TONE[activeRun.status]}>{activeRun.status}</Badge>
             </div>
-            <p className="text-lg font-semibold text-foreground">{formatMoney(activeRun.summary?.totalAmount)}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-lg font-semibold text-foreground">{formatMoney(activeRun.summary?.totalAmount)}</p>
+              <ExportButton
+                path={`/payroll/runs/${activeRun.id}/export.csv`}
+                filename={`payroll-${activeRun.periodMonth}.csv`}
+                title="Export this run as CSV"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3 text-sm">
