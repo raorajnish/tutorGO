@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use as usePromise } from "react";
 import Link from "next/link";
-import { apiFetch, ApiClientError } from "@/lib/api";
+import { apiFetch, apiDownload, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
@@ -39,6 +39,7 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
   const [limitsOpen, setLimitsOpen] = useState(false);
   const [suspendOpen, setSuspendOpen] = useState(false);
   const [suspending, setSuspending] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [logoutTarget, setLogoutTarget] = useState<{ id: string; fullName: string } | null>(null);
 
   function load() {
@@ -108,6 +109,18 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
   }
 
   useEffect(loadSuspensions, [instituteId]);
+
+  async function handleExport() {
+    setExporting(true);
+    setError(null);
+    try {
+      await apiDownload(`/platform/institutes/${instituteId}/export`, `institute-export-${detail?.code ?? instituteId}.zip`);
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not export this institute's data.");
+    } finally {
+      setExporting(false);
+    }
+  }
 
   const activeByCode = new Map(detail?.modules.map((m) => [m.code, m.isActive]) ?? []);
 
@@ -244,6 +257,18 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
                 onClick={() => (detail.isActive ? setSuspendOpen(true) : setSuspended(true))}
               >
                 {detail.isActive ? "Suspend institute" : "Reactivate institute"}
+              </Button>
+
+              {/* changes-phase14.md §14.2 — the support/offboarding case: a
+                  copy of this institute's data before it's suspended or
+                  wound down. Same bundle as the owner's own Settings export. */}
+              <Button variant="secondary" className="mt-2 w-full" disabled={exporting} onClick={handleExport}>
+                {exporting && (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
+                    <path d="M21 12a9 9 0 11-9-9" strokeLinecap="round" />
+                  </svg>
+                )}
+                {exporting ? "Preparing export…" : "Export institute data"}
               </Button>
 
               {suspensions && suspensions.length > 0 && (

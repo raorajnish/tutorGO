@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { compressImage } from "@/lib/compressImage";
+import { buildUpiUri } from "@/lib/upi";
+import { UpiQr } from "@/components/ui/UpiQr";
 import type { PaymentProof, PaymentProofUploadResult, PortalPaymentConfig } from "@/lib/types";
 
 const COPY_ICON = (
@@ -125,12 +127,19 @@ export function PayFeesSheet({
   }
 
   const latestProof = existingProofs[0];
-  const upiDeepLink =
-    config?.upiId && isTouchDevice()
-      ? `upi://pay?pa=${encodeURIComponent(config.upiId)}&pn=${encodeURIComponent(config.payeeName ?? "")}${
-          amount ? `&am=${encodeURIComponent(amount)}` : ""
-        }&cu=INR`
-      : null;
+
+  // One string, two consumers (changes-phase13.md §13.1): the QR below and
+  // the deep-link button both encode this, so they can't disagree. Rebuilt on
+  // every render, which is what makes the QR follow the amount as it's typed
+  // — and produce an open-amount QR when the field is empty.
+  const upiUri = config?.upiId
+    ? buildUpiUri({ upiId: config.upiId, payeeName: config.payeeName, amount })
+    : null;
+
+  // The QR is useful everywhere (a desktop user scans it with their phone);
+  // the deep link only does anything on a device that has a UPI app, so it
+  // stays touch-only rather than being a dead button on a laptop.
+  const showDeepLink = upiUri && isTouchDevice();
 
   return (
     <Modal open={open} onClose={onClose} title="Pay fees" width="sm">
@@ -159,9 +168,15 @@ export function PayFeesSheet({
       ) : (
         <div className="space-y-5">
           <div className="rounded-xl border border-border bg-muted p-4 text-center">
-            {config.qrAssetUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={config.qrAssetUrl} alt="Payment QR code" className="mx-auto mb-3 h-40 w-40 rounded-lg border border-border bg-card object-contain" />
+            {upiUri && (
+              <>
+                <UpiQr value={upiUri} downloadName="pay-fees-qr" className="mb-2" />
+                <p className="mb-3 text-xs text-muted-foreground">
+                  {amount && Number(amount) > 0
+                    ? `Scan to pay ₹${amount}`
+                    : "Scan to pay — enter the amount in your UPI app"}
+                </p>
+              </>
             )}
             {config.upiId && (
               <button
@@ -178,8 +193,8 @@ export function PayFeesSheet({
             {config.instructions && <p className="mt-2 text-xs text-muted-foreground">{config.instructions}</p>}
           </div>
 
-          {upiDeepLink && (
-            <a href={upiDeepLink}>
+          {showDeepLink && (
+            <a href={upiUri!}>
               <Button className="w-full">Open in payment app</Button>
             </a>
           )}

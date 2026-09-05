@@ -25,7 +25,10 @@ export type NavIcon =
   | "notifications"
   | "ptm"
   | "support"
-  | "auditLog";
+  | "auditLog"
+  | "users"
+  | "studyMaterial"
+  | "health";
 
 export interface NavItem {
   label: string;
@@ -35,6 +38,19 @@ export interface NavItem {
   /// If set, the item only shows when the institute has this module active.
   /// Absent means "not gated" (always shown to matching roles).
   module?: ModuleCode;
+  /// Hides the item until the student's course actually has study material
+  /// (changes-phase12.md §12.5) — a nav item leading to a guaranteed-empty
+  /// page is worse than no nav item. Only meaningful on the portal side;
+  /// staff always see their own library, empty or not, because that's where
+  /// they go to fill it.
+  requiresStudyResources?: boolean;
+}
+
+/// Runtime facts the nav needs beyond role/modules. Kept as one object so
+/// adding a third condition later doesn't mean a fourth positional argument.
+export interface NavContext {
+  activeModules?: ModuleCode[];
+  hasStudyResources?: boolean;
 }
 
 export interface NavSection {
@@ -119,6 +135,14 @@ export const NAV_SECTIONS: NavSection[] = [
         roles: ["OWNER", "ADMIN"],
       },
       {
+        label: "Study material",
+        href: "/study-material",
+        icon: "studyMaterial",
+        // Teaching staff — same bar as tests/lectures. Not module-gated:
+        // sharing notes isn't a billable tier, same reasoning as Distribution.
+        roles: ["OWNER", "ADMIN", "FACULTY"],
+      },
+      {
         label: "PTM",
         href: "/ptm",
         icon: "ptm",
@@ -138,6 +162,13 @@ export const NAV_SECTIONS: NavSection[] = [
       { label: "Overview", href: "/portal", icon: "dashboard", roles: ["STUDENT"] },
       { label: "Timetable", href: "/portal/timetable", icon: "timetable", roles: ["STUDENT"] },
       { label: "Tests", href: "/portal/tests", icon: "tests", roles: ["STUDENT"] },
+      {
+        label: "Study material",
+        href: "/portal/resources",
+        icon: "studyMaterial",
+        roles: ["STUDENT"],
+        requiresStudyResources: true,
+      },
       { label: "Attendance", href: "/portal/attendance", icon: "attendance", roles: ["STUDENT"] },
       { label: "Fees", href: "/portal/fees", icon: "fees", roles: ["STUDENT"] },
       { label: "Updates", href: "/portal/notifications", icon: "notifications", roles: ["STUDENT"] },
@@ -157,6 +188,7 @@ export const NAV_SECTIONS: NavSection[] = [
     section: "Platform",
     items: [
       { label: "Overview", href: "/platform", icon: "platform", roles: ["SUPERADMIN"] },
+      { label: "Health", href: "/platform/health", icon: "health", roles: ["SUPERADMIN"] },
       { label: "Organizations", href: "/platform/organizations", icon: "organizations", roles: ["SUPERADMIN"] },
       { label: "Institutes", href: "/platform/institutes", icon: "institutes", roles: ["SUPERADMIN"] },
       { label: "Plans", href: "/platform/plans", icon: "plans", roles: ["SUPERADMIN"] },
@@ -164,15 +196,20 @@ export const NAV_SECTIONS: NavSection[] = [
       { label: "Email settings", href: "/platform/email-settings", icon: "mail", roles: ["SUPERADMIN"] },
       { label: "Support", href: "/platform/support", icon: "support", roles: ["SUPERADMIN"] },
       { label: "Audit log", href: "/platform/audit-log", icon: "auditLog", roles: ["SUPERADMIN"] },
+      { label: "Users", href: "/platform/users", icon: "users", roles: ["SUPERADMIN"] },
     ],
   },
 ];
 
-export function navForRole(role: Role, activeModules: ModuleCode[] = []): NavSection[] {
+export function navForRole(role: Role, context: NavContext = {}): NavSection[] {
+  const { activeModules = [], hasStudyResources = false } = context;
   return NAV_SECTIONS.map((section) => ({
     ...section,
     items: section.items.filter(
-      (item) => item.roles.includes(role) && (!item.module || activeModules.includes(item.module))
+      (item) =>
+        item.roles.includes(role) &&
+        (!item.module || activeModules.includes(item.module)) &&
+        (!item.requiresStudyResources || hasStudyResources)
     ),
   })).filter((section) => section.items.length > 0);
 }

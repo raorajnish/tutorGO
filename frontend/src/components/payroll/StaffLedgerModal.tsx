@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { PayrollLedgerView } from "@/components/payroll/PayrollLedgerView";
 import { SkeletonBlock } from "@/components/ui/Skeleton";
 import { VoidPayrollPaymentModal } from "@/components/payroll/VoidPayrollPaymentModal";
-import { PayslipModal } from "@/components/payroll/PayslipModal";
+import { PaymentConfirmationModal } from "@/components/payroll/PaymentConfirmationModal";
 import { formatMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import { PAYMENT_MODE_LABELS, SALARY_TYPE_LABELS, type PayrollLedger, type PayrollPayment, type PaymentMode } from "@/lib/types";
@@ -28,7 +28,7 @@ export function StaffLedgerModal({ salaryProfileId, onClose, onChanged }: Props)
   const [submitting, setSubmitting] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
   const [voidTarget, setVoidTarget] = useState<PayrollPayment | null>(null);
-  const [payslipTarget, setPayslipTarget] = useState<PayrollPayment | null>(null);
+  const [confirmationTarget, setConfirmationTarget] = useState<PayrollPayment | null>(null);
 
   function load() {
     if (!salaryProfileId) return;
@@ -112,8 +112,8 @@ export function StaffLedgerModal({ salaryProfileId, onClose, onChanged }: Props)
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-3">
                             {!p.voided && (
-                              <button type="button" onClick={() => setPayslipTarget(p)} className="text-xs font-medium text-accent underline underline-offset-2 hover:text-accent/80">
-                                Payslip
+                              <button type="button" onClick={() => setConfirmationTarget(p)} className="text-xs font-medium text-accent underline underline-offset-2 hover:text-accent/80">
+                                Notify
                               </button>
                             )}
                             {!p.voided && canVoid && (
@@ -152,8 +152,8 @@ export function StaffLedgerModal({ salaryProfileId, onClose, onChanged }: Props)
                     <p className="text-xs text-muted-foreground">{p.createdByName ?? "—"}</p>
                     <div className="flex items-center gap-3">
                       {!p.voided && (
-                        <button type="button" onClick={() => setPayslipTarget(p)} className="text-xs font-medium text-accent underline underline-offset-2">
-                          Payslip
+                        <button type="button" onClick={() => setConfirmationTarget(p)} className="text-xs font-medium text-accent underline underline-offset-2">
+                          Notify
                         </button>
                       )}
                       {!p.voided && canVoid && (
@@ -182,11 +182,11 @@ export function StaffLedgerModal({ salaryProfileId, onClose, onChanged }: Props)
         }}
       />
 
-      <PayslipModal
-        payment={payslipTarget}
+      <PaymentConfirmationModal
+        payment={confirmationTarget}
         staffName={ledger?.name ?? null}
         pendingAmount={ledger?.totals.totalPending ?? null}
-        onClose={() => setPayslipTarget(null)}
+        onClose={() => setConfirmationTarget(null)}
       />
     </Modal>
   );

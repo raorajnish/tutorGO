@@ -3,13 +3,23 @@ import crypto from "node:crypto";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { hashPassword, verifyPassword } from "../lib/password.js";
-import { signToken, signResetToken, verifyResetToken } from "../lib/jwt.js";
+import { signToken, signResetToken, verifyResetToken, signMfaChallengeToken, verifyMfaChallengeToken } from "../lib/jwt.js";
 import { ApiError } from "../lib/http.js";
 import { validateBody } from "../middleware/validate.js";
 import { authenticate, requireRoles } from "../middleware/auth.js";
 import { rateLimit } from "../middleware/rateLimit.js";
 import { sendMail } from "../services/mailer.js";
 import { otpEmailHtml } from "../lib/emailTemplates.js";
+import { encrypt, decrypt } from "../lib/crypto.js";
+import {
+  MFA_ELIGIBLE_ROLES,
+  generateTotpSecret,
+  totpKeyUri,
+  verifyTotpCode,
+  qrCodeDataUrl,
+  generateBackupCodes,
+} from "../lib/mfa.js";
+import type { User } from "../generated/prisma/client.js";
 
 export const authRouter = Router();
 
@@ -22,11 +32,51 @@ const loginLimiter = rateLimit({ max: 20, windowMs: 5 * 60_000, keyPrefix: "auth
 const forgotLimiter = rateLimit({ max: 5, windowMs: 15 * 60_000, keyPrefix: "auth-forgot" });
 const otpLimiter = rateLimit({ max: 15, windowMs: 5 * 60_000, keyPrefix: "auth-verify-otp" });
 const resetLimiter = rateLimit({ max: 10, windowMs: 15 * 60_000, keyPrefix: "auth-reset" });
+// A 6-digit TOTP code has only a million combinations — far tighter than a
+// password guess budget needs to be. Same shape as otpLimiter, its closest
+// existing precedent for a short numeric code on an unauthenticated route.
+const mfaVerifyLimiter = rateLimit({ max: 10, windowMs: 5 * 60_000, keyPrefix: "auth-mfa-verify" });
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 });
+
+/** Shared by the non-MFA path in /login and the post-check path in
+ * /mfa/verify — everything that happens once a login is genuinely approved,
+ * whether that took one step or two. */
+async function completeLogin(user: User) {
+  let instituteId: string | null = null;
+  let organizationId: string | null = null;
+
+  if (user.role === "OWNER") {
+    const org = await prisma.organization.findUnique({ where: { ownerId: user.id } });
+    organizationId = org?.id ?? null;
+    // OWNER always lands at the organization level; they enter a specific
+    // institute afterwards via POST /auth/enter-institute.
+  } else if (user.instituteId) {
+    const institute = await prisma.institute.findUnique({ where: { id: user.instituteId } });
+    instituteId = user.instituteId;
+    organizationId = institute?.organizationId ?? null;
+  }
+
+  await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+
+  const token = signToken({ sub: user.id, role: user.role, instituteId, organizationId, tokenVersion: user.tokenVersion });
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+      instituteId,
+      organizationId,
+    },
+    mustChangePassword: user.mustChangePassword,
+  };
+}
 
 authRouter.post("/login", loginLimiter, validateBody(loginSchema), async (req, res, next) => {
   try {
@@ -42,36 +92,16 @@ authRouter.post("/login", loginLimiter, validateBody(loginSchema), async (req, r
       throw ApiError.unauthorized("Invalid email or password");
     }
 
-    let instituteId: string | null = null;
-    let organizationId: string | null = null;
-
-    if (user.role === "OWNER") {
-      const org = await prisma.organization.findUnique({ where: { ownerId: user.id } });
-      organizationId = org?.id ?? null;
-      // OWNER always lands at the organization level; they enter a specific
-      // institute afterwards via POST /auth/enter-institute.
-    } else if (user.instituteId) {
-      const institute = await prisma.institute.findUnique({ where: { id: user.instituteId } });
-      instituteId = user.instituteId;
-      organizationId = institute?.organizationId ?? null;
+    // MFA gates new logins, not already-issued tokens — every existing
+    // session for this user is unaffected either way. See changes-phase12.md
+    // §12.6: the password check just passed, but a full session token isn't
+    // issued yet, only a short-lived challenge that /mfa/verify exchanges
+    // for the real thing once the second factor also checks out.
+    if (user.mfaEnabledAt) {
+      return res.json({ mfaRequired: true, challengeToken: signMfaChallengeToken(user.id) });
     }
 
-    await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
-
-    const token = signToken({ sub: user.id, role: user.role, instituteId, organizationId, tokenVersion: user.tokenVersion });
-
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role,
-        instituteId,
-        organizationId,
-      },
-      mustChangePassword: user.mustChangePassword,
-    });
+    res.json(await completeLogin(user));
   } catch (err) {
     next(err);
   }
@@ -116,6 +146,8 @@ authRouter.get("/me", authenticate, async (req, res, next) => {
       phone: user.phone,
       mustChangePassword: user.mustChangePassword,
       termsAcceptedAt: user.termsAcceptedAt,
+      mfaEligible: MFA_ELIGIBLE_ROLES.includes(user.role),
+      mfaEnabled: !!user.mfaEnabledAt,
     };
 
     if (user.role === "SUPERADMIN") {
@@ -155,12 +187,29 @@ authRouter.get("/me", authenticate, async (req, res, next) => {
     // ADMIN / FACULTY / RECEPTION / STUDENT — always tied to one institute.
     const institute = await loadCurrentInstitute(authUser.instituteId);
 
+    // Drives whether the portal shows a "Study material" nav item at all
+    // (changes-phase12.md §12.5) — an empty section a student can tap into
+    // and find nothing in is worse than no section. Only computed for
+    // STUDENT: it's their own course's material, and no other role's nav
+    // depends on it.
+    let hasStudyResources = false;
+    if (user.role === "STUDENT" && authUser.studentId) {
+      const student = await prisma.student.findUnique({
+        where: { id: authUser.studentId },
+        select: { courseId: true },
+      });
+      if (student) {
+        hasStudyResources = (await prisma.studyResource.count({ where: { courseId: student.courseId } })) > 0;
+      }
+    }
+
     res.json({
       ...base,
       organization: null,
       institutes: null,
       currentInstituteId: authUser.instituteId,
       institute,
+      hasStudyResources,
     });
   } catch (err) {
     next(err);
@@ -431,6 +480,155 @@ authRouter.post("/logout-everywhere", authenticate, async (req, res, next) => {
     // everything else. The frontend's confirm dialog says so up front.
     await prisma.user.update({ where: { id: req.user!.id }, data: { tokenVersion: { increment: 1 } } });
     res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// MFA (TOTP) — see changes-phase12.md §12.6. Opt-in, expanded at build time
+// to every staff role (OWNER/ADMIN/ACCOUNTANT/FACULTY/RECEPTION) rather than
+// just OWNER/ADMIN as originally scoped — see lib/mfa.ts's MFA_ELIGIBLE_ROLES
+// doc comment for why STUDENT/SUPERADMIN stay excluded.
+// ---------------------------------------------------------------------------
+
+function assertMfaEligible(role: string) {
+  if (!MFA_ELIGIBLE_ROLES.includes(role as (typeof MFA_ELIGIBLE_ROLES)[number])) {
+    throw ApiError.forbidden("Two-factor authentication isn't available for this account type");
+  }
+}
+
+authRouter.post("/mfa/setup", authenticate, async (req, res, next) => {
+  try {
+    const authUser = req.user!;
+    assertMfaEligible(authUser.role);
+
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: authUser.id } });
+    if (user.mfaEnabledAt) throw ApiError.badRequest("Two-factor authentication is already enabled — disable it first to reconfigure.");
+
+    // Stored immediately but not enforced — mfaEnabledAt is what actually
+    // gates login, so an abandoned setup (scanned but never confirmed) is
+    // inert. Re-calling this endpoint before confirming just overwrites the
+    // pending secret with a fresh one, which is exactly what "I messed up
+    // the QR scan, let me try again" needs.
+    const secret = generateTotpSecret();
+    await prisma.user.update({ where: { id: user.id }, data: { mfaSecret: encrypt(secret) } });
+
+    const uri = totpKeyUri(user.email, secret);
+    const qrDataUrl = await qrCodeDataUrl(uri);
+
+    res.json({ qrDataUrl, secret });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const mfaConfirmSchema = z.object({ code: z.string().trim().length(6, "Enter the 6-digit code") });
+
+authRouter.post("/mfa/confirm", authenticate, validateBody(mfaConfirmSchema), async (req, res, next) => {
+  try {
+    const authUser = req.user!;
+    assertMfaEligible(authUser.role);
+    const { code } = req.body as z.infer<typeof mfaConfirmSchema>;
+
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: authUser.id } });
+    if (!user.mfaSecret) throw ApiError.badRequest("Start setup first with POST /auth/mfa/setup");
+    if (user.mfaEnabledAt) throw ApiError.badRequest("Two-factor authentication is already enabled");
+
+    if (!verifyTotpCode(decrypt(user.mfaSecret), code)) {
+      throw ApiError.badRequest("That code is incorrect or has expired. Check your authenticator app and try again.", "INVALID_MFA_CODE");
+    }
+
+    // Shown exactly once — same principle as a just-generated temp password.
+    // Hashed before storage; the plaintext list in this response is the only
+    // place they ever exist outside the user's own record of them.
+    const backupCodes = generateBackupCodes();
+    const hashedCodes = await Promise.all(backupCodes.map((c) => hashPassword(c)));
+    await prisma.user.update({ where: { id: user.id }, data: { mfaEnabledAt: new Date(), mfaBackupCodes: hashedCodes } });
+
+    res.json({ backupCodes });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const mfaDisableSchema = z.object({ currentPassword: z.string().min(1) });
+
+authRouter.post("/mfa/disable", authenticate, validateBody(mfaDisableSchema), async (req, res, next) => {
+  try {
+    const authUser = req.user!;
+    const { currentPassword } = req.body as z.infer<typeof mfaDisableSchema>;
+
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: authUser.id } });
+    // "Prove you're still you" before turning off a security feature — the
+    // standard pattern for this, same reasoning as a voluntary password
+    // change requiring the current one.
+    if (!(await verifyPassword(currentPassword, user.passwordHash))) {
+      throw ApiError.badRequest("Current password is incorrect", "INVALID_CURRENT_PASSWORD");
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { mfaSecret: null, mfaEnabledAt: null, mfaBackupCodes: [] },
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const mfaVerifySchema = z
+  .object({
+    challengeToken: z.string().min(1),
+    code: z.string().trim().optional(),
+    backupCode: z.string().trim().optional(),
+  })
+  .refine((v) => !!v.code || !!v.backupCode, { message: "Provide a code or a backup code" });
+
+authRouter.post("/mfa/verify", mfaVerifyLimiter, validateBody(mfaVerifySchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof mfaVerifySchema>;
+
+    let userId: string;
+    try {
+      userId = verifyMfaChallengeToken(body.challengeToken).sub;
+    } catch {
+      throw ApiError.badRequest("This login attempt has expired. Sign in again.", "MFA_CHALLENGE_EXPIRED");
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.isActive || !user.mfaEnabledAt || !user.mfaSecret) {
+      throw ApiError.badRequest("This login attempt is no longer valid. Sign in again.", "MFA_CHALLENGE_EXPIRED");
+    }
+
+    let matched = false;
+    if (body.code) {
+      matched = verifyTotpCode(decrypt(user.mfaSecret), body.code);
+    } else if (body.backupCode) {
+      // No index to look a backup code up by — bcrypt hashes aren't
+      // comparable except through bcrypt.compare, so this checks each
+      // remaining one. There are at most 10, ever fewer as they're consumed,
+      // so this is cheap; a matched code is removed from the array so it
+      // can never be replayed.
+      const normalized = body.backupCode.toUpperCase();
+      for (const hash of user.mfaBackupCodes) {
+        if (await verifyPassword(normalized, hash)) {
+          matched = true;
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { mfaBackupCodes: user.mfaBackupCodes.filter((h) => h !== hash) },
+          });
+          break;
+        }
+      }
+    }
+
+    if (!matched) {
+      throw ApiError.badRequest("That code is incorrect. Check your authenticator app, or use a backup code.", "INVALID_MFA_CODE");
+    }
+
+    res.json(await completeLogin(user));
   } catch (err) {
     next(err);
   }

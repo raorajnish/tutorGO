@@ -205,6 +205,7 @@ export type SubjectWhereInput = {
   tests?: Prisma.TestListRelationFilter
   feeStructureLines?: Prisma.FeeStructureSubjectLineListRelationFilter
   studentSubjects?: Prisma.StudentSubjectListRelationFilter
+  studyResources?: Prisma.StudyResourceListRelationFilter
 }
 
 export type SubjectOrderByWithRelationInput = {
@@ -222,6 +223,7 @@ export type SubjectOrderByWithRelationInput = {
   tests?: Prisma.TestOrderByRelationAggregateInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineOrderByRelationAggregateInput
   studentSubjects?: Prisma.StudentSubjectOrderByRelationAggregateInput
+  studyResources?: Prisma.StudyResourceOrderByRelationAggregateInput
 }
 
 export type SubjectWhereUniqueInput = Prisma.AtLeast<{
@@ -243,6 +245,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   tests?: Prisma.TestListRelationFilter
   feeStructureLines?: Prisma.FeeStructureSubjectLineListRelationFilter
   studentSubjects?: Prisma.StudentSubjectListRelationFilter
+  studyResources?: Prisma.StudyResourceListRelationFilter
 }, "id" | "instituteId_shortCode">
 
 export type SubjectOrderByWithAggregationInput = {
@@ -285,6 +288,7 @@ export type SubjectCreateInput = {
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateInput = {
@@ -301,6 +305,7 @@ export type SubjectUncheckedCreateInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUpdateInput = {
@@ -317,6 +322,7 @@ export type SubjectUpdateInput = {
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateInput = {
@@ -333,6 +339,7 @@ export type SubjectUncheckedUpdateInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateManyInput = {
@@ -547,6 +554,22 @@ export type SubjectUpdateOneRequiredWithoutFeeStructureLinesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutFeeStructureLinesInput, Prisma.SubjectUpdateWithoutFeeStructureLinesInput>, Prisma.SubjectUncheckedUpdateWithoutFeeStructureLinesInput>
 }
 
+export type SubjectCreateNestedOneWithoutStudyResourcesInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutStudyResourcesInput, Prisma.SubjectUncheckedCreateWithoutStudyResourcesInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutStudyResourcesInput
+  connect?: Prisma.SubjectWhereUniqueInput
+}
+
+export type SubjectUpdateOneWithoutStudyResourcesNestedInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutStudyResourcesInput, Prisma.SubjectUncheckedCreateWithoutStudyResourcesInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutStudyResourcesInput
+  upsert?: Prisma.SubjectUpsertWithoutStudyResourcesInput
+  disconnect?: Prisma.SubjectWhereInput | boolean
+  delete?: Prisma.SubjectWhereInput | boolean
+  connect?: Prisma.SubjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutStudyResourcesInput, Prisma.SubjectUpdateWithoutStudyResourcesInput>, Prisma.SubjectUncheckedUpdateWithoutStudyResourcesInput>
+}
+
 export type SubjectCreateWithoutInstituteInput = {
   id?: string
   name: string
@@ -560,6 +583,7 @@ export type SubjectCreateWithoutInstituteInput = {
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutInstituteInput = {
@@ -575,6 +599,7 @@ export type SubjectUncheckedCreateWithoutInstituteInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutInstituteInput = {
@@ -629,6 +654,7 @@ export type SubjectCreateWithoutCoursesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutCoursesInput = {
@@ -644,6 +670,7 @@ export type SubjectUncheckedCreateWithoutCoursesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutCoursesInput = {
@@ -675,6 +702,7 @@ export type SubjectUpdateWithoutCoursesInput = {
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutCoursesInput = {
@@ -690,6 +718,7 @@ export type SubjectUncheckedUpdateWithoutCoursesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateWithoutStudentSubjectsInput = {
@@ -705,6 +734,7 @@ export type SubjectCreateWithoutStudentSubjectsInput = {
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutStudentSubjectsInput = {
@@ -720,6 +750,7 @@ export type SubjectUncheckedCreateWithoutStudentSubjectsInput = {
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutStudentSubjectsInput = {
@@ -751,6 +782,7 @@ export type SubjectUpdateWithoutStudentSubjectsInput = {
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutStudentSubjectsInput = {
@@ -766,6 +798,7 @@ export type SubjectUncheckedUpdateWithoutStudentSubjectsInput = {
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateWithoutLecturesInput = {
@@ -781,6 +814,7 @@ export type SubjectCreateWithoutLecturesInput = {
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutLecturesInput = {
@@ -796,6 +830,7 @@ export type SubjectUncheckedCreateWithoutLecturesInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutLecturesInput = {
@@ -827,6 +862,7 @@ export type SubjectUpdateWithoutLecturesInput = {
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutLecturesInput = {
@@ -842,6 +878,7 @@ export type SubjectUncheckedUpdateWithoutLecturesInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateWithoutTestsInput = {
@@ -857,6 +894,7 @@ export type SubjectCreateWithoutTestsInput = {
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutTestsInput = {
@@ -872,6 +910,7 @@ export type SubjectUncheckedCreateWithoutTestsInput = {
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutTestsInput = {
@@ -903,6 +942,7 @@ export type SubjectUpdateWithoutTestsInput = {
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutTestsInput = {
@@ -918,6 +958,7 @@ export type SubjectUncheckedUpdateWithoutTestsInput = {
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateWithoutAssignmentsInput = {
@@ -933,6 +974,7 @@ export type SubjectCreateWithoutAssignmentsInput = {
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutAssignmentsInput = {
@@ -948,6 +990,7 @@ export type SubjectUncheckedCreateWithoutAssignmentsInput = {
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutAssignmentsInput = {
@@ -979,6 +1022,7 @@ export type SubjectUpdateWithoutAssignmentsInput = {
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutAssignmentsInput = {
@@ -994,6 +1038,7 @@ export type SubjectUncheckedUpdateWithoutAssignmentsInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateWithoutFeeStructureLinesInput = {
@@ -1009,6 +1054,7 @@ export type SubjectCreateWithoutFeeStructureLinesInput = {
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectUncheckedCreateWithoutFeeStructureLinesInput = {
@@ -1024,6 +1070,7 @@ export type SubjectUncheckedCreateWithoutFeeStructureLinesInput = {
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutFeeStructureLinesInput = {
@@ -1055,6 +1102,7 @@ export type SubjectUpdateWithoutFeeStructureLinesInput = {
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutFeeStructureLinesInput = {
@@ -1069,6 +1117,87 @@ export type SubjectUncheckedUpdateWithoutFeeStructureLinesInput = {
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
+  studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
+}
+
+export type SubjectCreateWithoutStudyResourcesInput = {
+  id?: string
+  name: string
+  shortCode: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
+  courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
+  tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
+  feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
+  studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+}
+
+export type SubjectUncheckedCreateWithoutStudyResourcesInput = {
+  id?: string
+  instituteId: string
+  name: string
+  shortCode: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
+  feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
+  studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+}
+
+export type SubjectCreateOrConnectWithoutStudyResourcesInput = {
+  where: Prisma.SubjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutStudyResourcesInput, Prisma.SubjectUncheckedCreateWithoutStudyResourcesInput>
+}
+
+export type SubjectUpsertWithoutStudyResourcesInput = {
+  update: Prisma.XOR<Prisma.SubjectUpdateWithoutStudyResourcesInput, Prisma.SubjectUncheckedUpdateWithoutStudyResourcesInput>
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutStudyResourcesInput, Prisma.SubjectUncheckedCreateWithoutStudyResourcesInput>
+  where?: Prisma.SubjectWhereInput
+}
+
+export type SubjectUpdateToOneWithWhereWithoutStudyResourcesInput = {
+  where?: Prisma.SubjectWhereInput
+  data: Prisma.XOR<Prisma.SubjectUpdateWithoutStudyResourcesInput, Prisma.SubjectUncheckedUpdateWithoutStudyResourcesInput>
+}
+
+export type SubjectUpdateWithoutStudyResourcesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  shortCode?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
+  courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
+  tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
+  feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
+  studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+}
+
+export type SubjectUncheckedUpdateWithoutStudyResourcesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  shortCode?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
+  feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -1094,6 +1223,7 @@ export type SubjectUpdateWithoutInstituteInput = {
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateWithoutInstituteInput = {
@@ -1109,6 +1239,7 @@ export type SubjectUncheckedUpdateWithoutInstituteInput = {
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectUncheckedUpdateManyWithoutInstituteInput = {
@@ -1132,6 +1263,7 @@ export type SubjectCountOutputType = {
   tests: number
   feeStructureLines: number
   studentSubjects: number
+  studyResources: number
 }
 
 export type SubjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1141,6 +1273,7 @@ export type SubjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   tests?: boolean | SubjectCountOutputTypeCountTestsArgs
   feeStructureLines?: boolean | SubjectCountOutputTypeCountFeeStructureLinesArgs
   studentSubjects?: boolean | SubjectCountOutputTypeCountStudentSubjectsArgs
+  studyResources?: boolean | SubjectCountOutputTypeCountStudyResourcesArgs
 }
 
 /**
@@ -1195,6 +1328,13 @@ export type SubjectCountOutputTypeCountStudentSubjectsArgs<ExtArgs extends runti
   where?: Prisma.StudentSubjectWhereInput
 }
 
+/**
+ * SubjectCountOutputType without action
+ */
+export type SubjectCountOutputTypeCountStudyResourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StudyResourceWhereInput
+}
+
 
 export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1211,6 +1351,7 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   tests?: boolean | Prisma.Subject$testsArgs<ExtArgs>
   feeStructureLines?: boolean | Prisma.Subject$feeStructureLinesArgs<ExtArgs>
   studentSubjects?: boolean | Prisma.Subject$studentSubjectsArgs<ExtArgs>
+  studyResources?: boolean | Prisma.Subject$studyResourcesArgs<ExtArgs>
   _count?: boolean | Prisma.SubjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subject"]>
 
@@ -1255,6 +1396,7 @@ export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   tests?: boolean | Prisma.Subject$testsArgs<ExtArgs>
   feeStructureLines?: boolean | Prisma.Subject$feeStructureLinesArgs<ExtArgs>
   studentSubjects?: boolean | Prisma.Subject$studentSubjectsArgs<ExtArgs>
+  studyResources?: boolean | Prisma.Subject$studyResourcesArgs<ExtArgs>
   _count?: boolean | Prisma.SubjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SubjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1274,6 +1416,7 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     tests: Prisma.$TestPayload<ExtArgs>[]
     feeStructureLines: Prisma.$FeeStructureSubjectLinePayload<ExtArgs>[]
     studentSubjects: Prisma.$StudentSubjectPayload<ExtArgs>[]
+    studyResources: Prisma.$StudyResourcePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1684,6 +1827,7 @@ export interface Prisma__SubjectClient<T, Null = never, ExtArgs extends runtime.
   tests<T extends Prisma.Subject$testsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$testsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   feeStructureLines<T extends Prisma.Subject$feeStructureLinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$feeStructureLinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeeStructureSubjectLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   studentSubjects<T extends Prisma.Subject$studentSubjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$studentSubjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudentSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  studyResources<T extends Prisma.Subject$studyResourcesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$studyResourcesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudyResourcePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2262,6 +2406,30 @@ export type Subject$studentSubjectsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.StudentSubjectScalarFieldEnum | Prisma.StudentSubjectScalarFieldEnum[]
+}
+
+/**
+ * Subject.studyResources
+ */
+export type Subject$studyResourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StudyResource
+   */
+  select?: Prisma.StudyResourceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StudyResource
+   */
+  omit?: Prisma.StudyResourceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StudyResourceInclude<ExtArgs> | null
+  where?: Prisma.StudyResourceWhereInput
+  orderBy?: Prisma.StudyResourceOrderByWithRelationInput | Prisma.StudyResourceOrderByWithRelationInput[]
+  cursor?: Prisma.StudyResourceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StudyResourceScalarFieldEnum | Prisma.StudyResourceScalarFieldEnum[]
 }
 
 /**

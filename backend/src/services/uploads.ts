@@ -129,7 +129,10 @@ function safeDisplayName(originalname: string): string {
   return base.slice(0, 120) || "upload";
 }
 
-export type AssetFolder = "test-papers" | "payment-proofs" | "payment-qr";
+/// "payment-qr" is deliberately absent: since changes-phase13.md §13.1 the
+/// payment QR is generated from the UPI ID at render time rather than
+/// uploaded, so there is no longer anything to store under it.
+export type AssetFolder = "test-papers" | "payment-proofs" | "study-resources";
 
 interface UploadOptions {
   instituteId: string;

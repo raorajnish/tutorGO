@@ -259,3 +259,11 @@ export const LeaveStatus = {
 } as const
 
 export type LeaveStatus = (typeof LeaveStatus)[keyof typeof LeaveStatus]
+
+
+export const ResourceKind = {
+  FILE: 'FILE',
+  LINK: 'LINK'
+} as const
+
+export type ResourceKind = (typeof ResourceKind)[keyof typeof ResourceKind]

@@ -4,10 +4,11 @@ import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
-import { ApiClientError } from "@/lib/api";
+import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import type { MfaVerifyResponse } from "@/lib/types";
 
 export default function LoginPage() {
   return (
@@ -18,7 +19,7 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-  const { user, loading, login } = useAuth();
+  const { user, loading, login, loginWithToken } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -27,6 +28,13 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Set only when POST /auth/login comes back with mfaRequired — swaps the
+  // form for a second step rather than a separate page, since it's the same
+  // login attempt continuing, not a new one. See changes-phase12.md §12.6.
+  const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
+  const [useBackupCode, setUseBackupCode] = useState(false);
 
   useEffect(() => {
     if (!loading && user) router.replace("/dashboard");
@@ -37,7 +45,32 @@ function LoginForm() {
     setError(null);
     setSubmitting(true);
     try {
-      await login(email, password);
+      const result = await login(email, password);
+      if ("mfaRequired" in result) {
+        setChallengeToken(result.challengeToken);
+        return;
+      }
+      router.replace("/dashboard");
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleMfaSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    try {
+      const res = await apiFetch<MfaVerifyResponse>("/auth/mfa/verify", {
+        method: "POST",
+        body: JSON.stringify({
+          challengeToken,
+          ...(useBackupCode ? { backupCode: mfaCode } : { code: mfaCode }),
+        }),
+      });
+      await loginWithToken(res.token);
       router.replace("/dashboard");
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Something went wrong. Please try again.");
@@ -96,53 +129,94 @@ function LoginForm() {
             ✦
           </span>
           <h2 className="font-display mt-2 text-2xl font-semibold text-foreground sm:text-3xl">
-            {invited ? "You're invited" : "Welcome back"}
+            {challengeToken ? "Two-factor authentication" : invited ? "You're invited" : "Welcome back"}
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            {invited
-              ? "Enter the temporary password from your invite email to sign in and set up your account."
-              : "Sign in to your institute workspace. Admissions, attendance, fees and payroll — all in one place."}
+            {challengeToken
+              ? useBackupCode
+                ? "Enter one of your saved backup codes."
+                : "Enter the 6-digit code from your authenticator app."
+              : invited
+                ? "Enter the temporary password from your invite email to sign in and set up your account."
+                : "Sign in to your institute workspace. Admissions, attendance, fees and payroll — all in one place."}
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-4">
-            <Input
-              id="email"
-              label="Email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@institute.com"
-            />
-
-            <div className="space-y-1.5">
-              <PasswordInput
-                id="password"
-                label="Password"
-                autoComplete="current-password"
+          {challengeToken ? (
+            <form onSubmit={handleMfaSubmit} className="mt-7 space-y-4">
+              <Input
+                id="mfaCode"
+                label={useBackupCode ? "Backup code" : "6-digit code"}
+                autoComplete="one-time-code"
+                autoFocus
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value)}
+                placeholder={useBackupCode ? "XXXX-XXXX" : "123456"}
               />
-              <div className="text-right">
-                <Link href="/login/forgot-password" className="text-xs font-medium text-accent hover:opacity-80">
-                  Forgot password?
-                </Link>
-              </div>
-            </div>
 
-            {error && (
-              <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">
-                {error}
-              </div>
-            )}
+              {error && (
+                <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">
+                  {error}
+                </div>
+              )}
 
-            <Button type="submit" variant="accent" className="w-full" disabled={submitting}>
-              {submitting ? "Signing in…" : "Sign in"}
-            </Button>
-          </form>
+              <Button type="submit" variant="accent" className="w-full" disabled={submitting}>
+                {submitting ? "Verifying…" : "Verify"}
+              </Button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setUseBackupCode((v) => !v);
+                  setMfaCode("");
+                  setError(null);
+                }}
+                className="block w-full text-center text-xs font-medium text-accent hover:opacity-80"
+              >
+                {useBackupCode ? "Use your authenticator app instead" : "Use a backup code instead"}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="mt-7 space-y-4">
+              <Input
+                id="email"
+                label="Email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@institute.com"
+              />
+
+              <div className="space-y-1.5">
+                <PasswordInput
+                  id="password"
+                  label="Password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
+                <div className="text-right">
+                  <Link href="/login/forgot-password" className="text-xs font-medium text-accent hover:opacity-80">
+                    Forgot password?
+                  </Link>
+                </div>
+              </div>
+
+              {error && (
+                <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" variant="accent" className="w-full" disabled={submitting}>
+                {submitting ? "Signing in…" : "Sign in"}
+              </Button>
+            </form>
+          )}
 
           <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
             TutorGO accounts are invite-only. If you don&apos;t have credentials yet, ask your

@@ -101,3 +101,28 @@ export function verifyResetToken(token: string): ResetTokenPayload {
   }
   return payload as unknown as ResetTokenPayload;
 }
+
+/// changes-phase12.md §12.6 — issued by POST /auth/login in place of a real
+/// session token when the account has MFA enabled. Deliberately short-lived
+/// and single-purpose: it proves "this password check just passed," nothing
+/// more, and POST /auth/mfa/verify is the only thing that accepts it.
+export interface MfaChallengePayload {
+  sub: string;
+  purpose: "mfa_challenge";
+}
+
+const MFA_CHALLENGE_EXPIRES_IN = "5m";
+
+export function signMfaChallengeToken(userId: string): string {
+  return jwt.sign({ sub: userId, purpose: "mfa_challenge" } satisfies MfaChallengePayload, SECRET, {
+    expiresIn: MFA_CHALLENGE_EXPIRES_IN,
+  });
+}
+
+export function verifyMfaChallengeToken(token: string): MfaChallengePayload {
+  const payload = jwt.verify(token, SECRET) as Record<string, unknown>;
+  if (payload.purpose !== "mfa_challenge" || typeof payload.sub !== "string") {
+    throw new jwt.JsonWebTokenError("Not an MFA challenge token");
+  }
+  return payload as unknown as MfaChallengePayload;
+}

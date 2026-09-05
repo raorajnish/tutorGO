@@ -23,6 +23,7 @@ import { portalAccessRouter } from "./routes/portalAccess.js";
 import { portalRouter } from "./routes/portal.js";
 import { ptmRouter } from "./routes/ptm.js";
 import { supportRouter } from "./routes/support.js";
+import { studyResourcesRouter } from "./routes/studyResources.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import { UPLOAD_ROOT, UPLOAD_URL_PREFIX } from "./services/uploads.js";
 
@@ -97,6 +98,7 @@ app.use("/api/portal-access", portalAccessRouter);
 app.use("/api/portal", portalRouter);
 app.use("/api/ptm", ptmRouter);
 app.use("/api/support", supportRouter);
+app.use("/api/study-resources", studyResourcesRouter);
 // Deliberately outside authenticate/requireInstitute — the one unauthenticated
 // public surface in the app (now also the WhatsApp webhook — see
 // routes/public.ts's header comment).

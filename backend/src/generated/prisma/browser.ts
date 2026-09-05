@@ -483,3 +483,21 @@ export type LeaveRequest = Prisma.LeaveRequestModel
  * itself read by any access-control check.
  */
 export type InstituteSuspension = Prisma.InstituteSuspensionModel
+/**
+ * Model StudyResource
+ * Study material — notes, recorded-lecture links, assignment PDFs — shared
+ * with students (changes-phase12.md §12.5).
+ * 
+ * Scoped to a COURSE, not a batch (the plan originally said batch): the same
+ * "Physics — Chapter 3 notes" is the same material for every batch of that
+ * course, and batch-scoping would mean re-uploading it per batch and having
+ * them drift apart. `subjectId` is optional — course-wide material (a
+ * syllabus, a timetable PDF) genuinely belongs to no single subject, so it
+ * is nullable rather than forced into a catch-all subject row.
+ * 
+ * Files reuse the exact test-paper upload pattern: `visibility: "public"`,
+ * because this is course material where an unguessable URL is acceptable
+ * exposure — unlike payment proofs, which are financial documents and are
+ * deliberately `authenticated`. See services/uploads.ts.
+ */
+export type StudyResource = Prisma.StudyResourceModel

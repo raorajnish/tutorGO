@@ -4,10 +4,16 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { apiFetch, clearToken, setToken } from "./api";
 import type { LoginResponse, MeResponse } from "./types";
 
+/// changes-phase12.md §12.6 — login() now returns either a resolved
+/// MeResponse (no MFA, or MFA already satisfied) or a challenge to complete
+/// via POST /auth/mfa/verify + loginWithToken. The caller (login/page.tsx)
+/// branches on `mfaRequired` to decide whether to show the code-entry step.
+export type LoginResult = MeResponse | { mfaRequired: true; challengeToken: string };
+
 interface AuthContextValue {
   user: MeResponse | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<MeResponse>;
+  login: (email: string, password: string) => Promise<LoginResult>;
   loginWithToken: (token: string) => Promise<MeResponse>;
   logout: () => void;
   refresh: () => Promise<void>;
@@ -34,11 +40,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refresh().finally(() => setLoading(false));
   }, [refresh]);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
     const res = await apiFetch<LoginResponse>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
+    if ("mfaRequired" in res) return res;
     setToken(res.token);
     const me = await apiFetch<MeResponse>("/auth/me");
     setUser(me);

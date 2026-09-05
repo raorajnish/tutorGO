@@ -454,7 +454,8 @@ export const ModelName = {
   DistributionItem: 'DistributionItem',
   DistributionReceipt: 'DistributionReceipt',
   LeaveRequest: 'LeaveRequest',
-  InstituteSuspension: 'InstituteSuspension'
+  InstituteSuspension: 'InstituteSuspension',
+  StudyResource: 'StudyResource'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -470,7 +471,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "supportTicket" | "supportTicketMessage" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "instituteWhatsAppConfig" | "whatsAppTemplate" | "outboundMessage" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "parentMeeting" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentSubject" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeStructureSubjectLine" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "institutePaymentConfig" | "paymentProof" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt" | "leaveRequest" | "instituteSuspension"
+    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "supportTicket" | "supportTicketMessage" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "instituteWhatsAppConfig" | "whatsAppTemplate" | "outboundMessage" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "parentMeeting" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentSubject" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeStructureSubjectLine" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "institutePaymentConfig" | "paymentProof" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt" | "leaveRequest" | "instituteSuspension" | "studyResource"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4766,6 +4767,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    StudyResource: {
+      payload: Prisma.$StudyResourcePayload<ExtArgs>
+      fields: Prisma.StudyResourceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StudyResourceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StudyResourceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>
+        }
+        findFirst: {
+          args: Prisma.StudyResourceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StudyResourceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>
+        }
+        findMany: {
+          args: Prisma.StudyResourceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>[]
+        }
+        create: {
+          args: Prisma.StudyResourceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>
+        }
+        createMany: {
+          args: Prisma.StudyResourceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StudyResourceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>[]
+        }
+        delete: {
+          args: Prisma.StudyResourceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>
+        }
+        update: {
+          args: Prisma.StudyResourceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>
+        }
+        deleteMany: {
+          args: Prisma.StudyResourceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StudyResourceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StudyResourceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>[]
+        }
+        upsert: {
+          args: Prisma.StudyResourceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudyResourcePayload>
+        }
+        aggregate: {
+          args: Prisma.StudyResourceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStudyResource>
+        }
+        groupBy: {
+          args: Prisma.StudyResourceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StudyResourceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StudyResourceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StudyResourceCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4906,6 +4981,9 @@ export const UserScalarFieldEnum = {
   termsAcceptedAt: 'termsAcceptedAt',
   lastLoginAt: 'lastLoginAt',
   tokenVersion: 'tokenVersion',
+  mfaSecret: 'mfaSecret',
+  mfaEnabledAt: 'mfaEnabledAt',
+  mfaBackupCodes: 'mfaBackupCodes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -5484,9 +5562,6 @@ export const InstitutePaymentConfigScalarFieldEnum = {
   isEnabled: 'isEnabled',
   upiId: 'upiId',
   payeeName: 'payeeName',
-  qrAssetUrl: 'qrAssetUrl',
-  qrAssetName: 'qrAssetName',
-  qrAssetPublicId: 'qrAssetPublicId',
   instructions: 'instructions',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -5718,6 +5793,26 @@ export const InstituteSuspensionScalarFieldEnum = {
 } as const
 
 export type InstituteSuspensionScalarFieldEnum = (typeof InstituteSuspensionScalarFieldEnum)[keyof typeof InstituteSuspensionScalarFieldEnum]
+
+
+export const StudyResourceScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  courseId: 'courseId',
+  subjectId: 'subjectId',
+  title: 'title',
+  description: 'description',
+  kind: 'kind',
+  assetUrl: 'assetUrl',
+  assetName: 'assetName',
+  assetPublicId: 'assetPublicId',
+  externalUrl: 'externalUrl',
+  uploadedByUserId: 'uploadedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StudyResourceScalarFieldEnum = (typeof StudyResourceScalarFieldEnum)[keyof typeof StudyResourceScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -6216,6 +6311,20 @@ export type ListEnumLeaveStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'ResourceKind'
+ */
+export type EnumResourceKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ResourceKind'>
+    
+
+
+/**
+ * Reference to a field of type 'ResourceKind[]'
+ */
+export type ListEnumResourceKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ResourceKind[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -6437,6 +6546,7 @@ export type GlobalOmitConfig = {
   distributionReceipt?: Prisma.DistributionReceiptOmit
   leaveRequest?: Prisma.LeaveRequestOmit
   instituteSuspension?: Prisma.InstituteSuspensionOmit
+  studyResource?: Prisma.StudyResourceOmit
 }
 
 /* Types for Logging */

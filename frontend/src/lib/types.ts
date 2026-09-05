@@ -48,6 +48,15 @@ export interface MeResponse {
   phone: string | null;
   mustChangePassword: boolean;
   termsAcceptedAt: string | null;
+  /// changes-phase12.md §12.6 — true for every staff role (OWNER/ADMIN/
+  /// ACCOUNTANT/FACULTY/RECEPTION), false for STUDENT/SUPERADMIN. Gates
+  /// whether the Security tab even offers the option.
+  mfaEligible: boolean;
+  mfaEnabled: boolean;
+  /// STUDENT only — true when their course has any study material. Hides the
+  /// portal's "Study material" nav item until there's something to show
+  /// (changes-phase12.md §12.5).
+  hasStudyResources?: boolean;
   /// Set for OWNER only.
   organization: OrganizationSummary | null;
   /// Set for OWNER only — every institute under their organization.
@@ -59,7 +68,7 @@ export interface MeResponse {
   institute: CurrentInstitute | null;
 }
 
-export interface LoginResponse {
+interface LoginSuccess {
   token: string;
   user: {
     id: string;
@@ -71,6 +80,20 @@ export interface LoginResponse {
   };
   mustChangePassword: boolean;
 }
+
+/// changes-phase12.md §12.6 — returned by POST /auth/login in place of
+/// LoginSuccess when the account has MFA enabled. No token yet; the
+/// challengeToken is exchanged for a real one via POST /auth/mfa/verify.
+interface MfaChallengeResponse {
+  mfaRequired: true;
+  challengeToken: string;
+}
+
+export type LoginResponse = LoginSuccess | MfaChallengeResponse;
+
+/// POST /auth/mfa/verify returns this same shape on success — it's the
+/// second half of the same login, not a different response.
+export type MfaVerifyResponse = LoginSuccess;
 
 // ---------------------------------------------------------------------------
 // Forgot password (OTP)
@@ -241,6 +264,32 @@ export interface CreateOrganizationResult {
 // Platform — flat institutes list + per-org institute detail
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Platform health (changes-phase14.md §14.1)
+// ---------------------------------------------------------------------------
+
+export interface ChannelHealth {
+  sent: number;
+  failed: number;
+  total: number;
+  failureRate: number;
+}
+
+export interface InstituteHealth {
+  instituteId: string;
+  instituteName: string;
+  organizationName: string | null;
+  whatsapp: ChannelHealth;
+  email: ChannelHealth;
+}
+
+export interface PlatformHealth {
+  from: string;
+  to: string;
+  overall: { whatsapp: ChannelHealth; email: ChannelHealth };
+  institutes: InstituteHealth[];
+}
+
 export interface PlatformInstituteListItem {
   id: string;
   code: string;
@@ -305,6 +354,7 @@ export interface PlatformUser {
   role: Role;
   isActive: boolean;
   lastLoginAt: string | null;
+  mfaEnabled: boolean;
   instituteId: string | null;
   instituteName: string | null;
   instituteCode: string | null;
@@ -1789,19 +1839,61 @@ export interface InstitutePaymentConfig {
   isEnabled: boolean;
   upiId: string | null;
   payeeName: string | null;
-  qrAssetUrl: string | null;
-  qrAssetName: string | null;
   instructions: string | null;
   updatedAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Study material (changes-phase12.md §12.5) — course-scoped, optionally
+// narrowed to one subject.
+// ---------------------------------------------------------------------------
+
+export type ResourceKind = "FILE" | "LINK";
+
+export interface StudyResource {
+  id: string;
+  courseId: string;
+  subjectId: string | null;
+  title: string;
+  description: string | null;
+  kind: ResourceKind;
+  assetUrl: string | null;
+  assetName: string | null;
+  externalUrl: string | null;
+  createdAt: string;
+  course: { id: string; name: string; code: string };
+  subject: { id: string; name: string; shortCode: string } | null;
+  uploadedBy: { id: string; fullName: string };
+}
+
+/// The student's own view — no course/uploader, since it's always their own
+/// course and who uploaded it isn't theirs to act on.
+export interface PortalStudyResource {
+  id: string;
+  title: string;
+  description: string | null;
+  kind: ResourceKind;
+  assetUrl: string | null;
+  assetName: string | null;
+  externalUrl: string | null;
+  createdAt: string;
+  subject: { id: string; name: string; shortCode: string } | null;
+}
+
+export interface StudyResourceUploadResult {
+  url: string;
+  name: string;
+  publicId: string;
 }
 
 /// The student's own read of the config — narrower than the staff shape:
 /// null in its entirety when the feature is off, and no `updatedAt` since
 /// nothing on the student side cares when it was last edited.
+/// No QR image — the portal generates the QR from these fields at render
+/// time (changes-phase13.md §13.1).
 export interface PortalPaymentConfig {
   upiId: string | null;
   payeeName: string | null;
-  qrAssetUrl: string | null;
   instructions: string | null;
 }
 

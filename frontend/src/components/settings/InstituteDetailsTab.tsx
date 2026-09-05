@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { apiFetch, ApiClientError } from "@/lib/api";
+import { apiFetch, apiDownload, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/Button";
@@ -14,6 +14,8 @@ export function InstituteDetailsTab() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,6 +56,18 @@ export function InstituteDetailsTab() {
     }
   }
 
+  async function handleExport() {
+    setExporting(true);
+    setExportError(null);
+    try {
+      await apiDownload("/org/export", `institute-export-${profile?.code ?? "data"}.zip`);
+    } catch (err) {
+      setExportError(err instanceof ApiClientError ? err.message : "Could not export your data.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   if (!profile) {
     return error ? (
       <div className="rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{error}</div>
@@ -63,7 +77,8 @@ export function InstituteDetailsTab() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
+    <div className="max-w-2xl space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="flex items-center gap-2">
         <Badge tone="primary">{profile.code}</Badge>
         <Badge tone={profile.isActive ? "success" : "danger"}>{profile.isActive ? "Active" : "Inactive"}</Badge>
@@ -90,5 +105,30 @@ export function InstituteDetailsTab() {
         {saving ? "Saving…" : "Save changes"}
       </Button>
     </form>
+
+      {/* changes-phase14.md §14.2 — a full copy of this institute's own
+          records: students, fee installments, payments, attendance,
+          payroll. For peace of mind, or in case of ever leaving the
+          platform — read-only, no data changes here. */}
+      <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-card p-4">
+        <div>
+          <p className="text-sm font-semibold text-foreground">Export your data</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Download a full copy of your students, fees, attendance and payroll records as a zip of CSV files.
+          </p>
+        </div>
+        <Button variant="secondary" onClick={handleExport} disabled={exporting} className="shrink-0">
+          {exporting && (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
+              <path d="M21 12a9 9 0 11-9-9" strokeLinecap="round" />
+            </svg>
+          )}
+          {exporting ? "Preparing…" : "Export"}
+        </Button>
+      </div>
+      {exportError && (
+        <div className="rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{exportError}</div>
+      )}
+    </div>
   );
 }

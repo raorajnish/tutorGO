@@ -5,8 +5,20 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { formatMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
+import { useInstituteProfile } from "@/lib/useInstituteProfile";
 import { PAYMENT_MODE_LABELS, type ReceiptDetail } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
+import {
+  DocumentSheet,
+  DocumentLetterhead,
+  DocumentMeta,
+  DocumentDivider,
+  DocumentPartyBlock,
+  DocumentItemTable,
+  DocumentTotals,
+  DocumentFooter,
+  DocumentStamp,
+} from "@/components/documents/DocumentSheet";
 
 function receiptText(receipt: ReceiptDetail, instituteName: string): string {
   const lines = [
@@ -41,6 +53,7 @@ interface Props {
  * schema change needed when that pass happens. */
 export function ReceiptModal({ paymentId, onClose }: Props) {
   const { user } = useAuth();
+  const profile = useInstituteProfile();
   const [receipt, setReceipt] = useState<ReceiptDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [shared, setShared] = useState(false);
@@ -117,89 +130,69 @@ export function ReceiptModal({ paymentId, onClose }: Props) {
   }
 
   return (
-    <Modal open={paymentId !== null} onClose={onClose} title="Receipt" width="sm">
+    <Modal open={paymentId !== null} onClose={onClose} title="Receipt" width="lg">
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
       {!receipt && !error && <p className="text-sm text-muted-foreground">Loading…</p>}
 
       {receipt && (
         <div className="space-y-5">
-          <div className="space-y-5 rounded-2xl border border-border bg-card p-5 print:border-0 print:p-0" id="receipt-print-area">
-            {receipt.voided && (
-              <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-center text-sm font-semibold text-danger">
-                VOID{receipt.voidReason ? ` — ${receipt.voidReason}` : ""}
+          <div id="receipt-print-area">
+            <DocumentSheet statusBadge={receipt.voided && <DocumentStamp label="Void" />}>
+              <div className="flex items-start justify-between gap-4">
+                <DocumentLetterhead
+                  name={instituteName}
+                  address={[profile?.address, [profile?.city, profile?.state].filter(Boolean).join(", ")].filter(Boolean).join(", ") || null}
+                  contact={[profile?.phone, profile?.email].filter(Boolean).join(" · ") || null}
+                />
+                <DocumentMeta title="Fee Receipt" reference={receipt.receiptNumber} date={fmtDate(receipt.paidOn)} />
               </div>
-            )}
 
-            <div className="space-y-1 border-b border-dashed border-border pb-4 text-center">
-              <p className="font-display text-lg font-bold text-foreground">{instituteName}</p>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Fee Receipt</p>
-              <p className="font-display text-xl font-bold text-foreground">{receipt.receiptNumber}</p>
-            </div>
+              <DocumentDivider />
 
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Student</span>
-                <span className="font-medium text-foreground">
-                  {receipt.student.name} ({receipt.student.studentCode})
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Course</span>
-                <span className="text-foreground">{receipt.student.course.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Amount</span>
-                <span className="font-semibold text-foreground">{formatMoney(receipt.amount)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Mode</span>
-                <span className="text-foreground">{PAYMENT_MODE_LABELS[receipt.mode]}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Paid on</span>
-                <span className="text-foreground">{fmtDate(receipt.paidOn)}</span>
-              </div>
-              {receipt.notes && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Notes</span>
-                  <span className="text-foreground">{receipt.notes}</span>
-                </div>
+              {receipt.voided && receipt.voidReason && (
+                <p className="rounded-lg bg-danger-soft px-3.5 py-2.5 text-sm text-danger">Void reason: {receipt.voidReason}</p>
               )}
-            </div>
 
-            <div className="space-y-1.5 rounded-xl border border-border p-4 text-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Applied to</p>
-              {receipt.allocations.map((a) => (
-                <div key={a.installmentId} className="flex justify-between">
-                  <span className="text-foreground">Installment #{a.installmentSeq}</span>
-                  <span className="font-medium text-foreground">{formatMoney(a.amount)}</span>
-                </div>
-              ))}
-            </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <DocumentPartyBlock
+                  label="Received from"
+                  rows={[
+                    { label: "Student", value: `${receipt.student.name} (${receipt.student.studentCode})` },
+                    { label: "Course", value: receipt.student.course.name },
+                  ]}
+                />
+                <DocumentPartyBlock
+                  label="Payment details"
+                  rows={[
+                    { label: "Mode", value: PAYMENT_MODE_LABELS[receipt.mode] },
+                    ...(receipt.notes ? [{ label: "Notes", value: receipt.notes }] : []),
+                  ]}
+                />
+              </div>
 
-            <div className="space-y-1.5 rounded-xl bg-muted p-4 text-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Account balance (as of now)</p>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Total due</span>
-                <span className="text-foreground">{formatMoney(receipt.accountTotals.totalDue)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Total paid</span>
-                <span className="text-foreground">{formatMoney(receipt.accountTotals.totalPaid)}</span>
-              </div>
-              <div className="flex justify-between font-semibold">
-                <span className="text-foreground">Remaining</span>
-                <span className="text-foreground">{formatMoney(receipt.accountTotals.balance)}</span>
-              </div>
-            </div>
+              <DocumentItemTable
+                columnLabel="Applied to"
+                items={receipt.allocations.map((a) => ({
+                  label: `Installment #${a.installmentSeq}`,
+                  amount: formatMoney(a.amount),
+                }))}
+              />
 
-            <div className="space-y-0.5 border-t border-dashed border-border pt-3 text-center">
-              <p className="text-xs text-muted-foreground">
-                Recorded by {receipt.createdByName ?? "—"} on {fmtDate(receipt.createdAt)}
-              </p>
-              {receipt.voided && receipt.voidedByName && <p className="text-xs text-danger">Voided by {receipt.voidedByName}</p>}
-              <p className="text-[11px] text-muted-foreground">This is a computer-generated receipt.</p>
-            </div>
+              <DocumentTotals
+                rows={[
+                  { label: "Amount received", value: formatMoney(receipt.amount), emphasize: true },
+                  { label: "Account balance remaining", value: formatMoney(receipt.accountTotals.balance) },
+                ]}
+              />
+
+              <DocumentFooter
+                lines={[
+                  `Recorded by ${receipt.createdByName ?? "—"} on ${fmtDate(receipt.createdAt)}`,
+                  ...(receipt.voided && receipt.voidedByName ? [`Voided by ${receipt.voidedByName}`] : []),
+                  "This is a computer-generated receipt and requires no signature.",
+                ]}
+              />
+            </DocumentSheet>
           </div>
 
           <div className="flex justify-center gap-3 print:hidden">

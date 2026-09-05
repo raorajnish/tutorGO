@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/Input";
 import { StatCard } from "@/components/ui/StatCard";
 import { Textarea } from "@/components/ui/Textarea";
 import { formatMoney, parseMoney } from "@/lib/money";
-import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type PayrollLedger, type PayrollLineItem, type PaymentMode } from "@/lib/types";
+import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type PayrollLedger, type PayrollLineItem, type PayrollPeriodGroup, type PaymentMode } from "@/lib/types";
 import { todayInput } from "@/lib/format";
+import { PayslipDocument } from "@/components/payroll/PayslipDocument";
 
 const STATUS_TONE = { PAID: "success", PARTIAL: "warning", UNPAID: "neutral" } as const;
 
@@ -43,6 +44,7 @@ interface Props {
 
 export function PayrollLedgerView({ ledger, readOnly = false, submitting = false, error, onPay }: Props) {
   const [openPeriods, setOpenPeriods] = useState<Set<string>>(new Set());
+  const [payslipPeriod, setPayslipPeriod] = useState<PayrollPeriodGroup | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [amount, setAmount] = useState("");
   const [mode, setMode] = useState<PaymentMode>("BANK_TRANSFER");
@@ -123,12 +125,12 @@ export function PayrollLedgerView({ ledger, readOnly = false, submitting = false
           const open = openPeriods.has(period.periodMonth);
           return (
             <div key={period.periodMonth} className="overflow-hidden rounded-xl border border-border">
-              <button
-                type="button"
-                onClick={() => togglePeriod(period.periodMonth)}
-                className="flex w-full items-center justify-between gap-3 bg-muted px-4 py-3 text-left transition-colors hover:bg-secondary"
-              >
-                <span className="flex items-center gap-2">
+              <div className="flex w-full items-center justify-between gap-3 bg-muted px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => togglePeriod(period.periodMonth)}
+                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                >
                   <svg
                     width="14"
                     height="14"
@@ -140,17 +142,30 @@ export function PayrollLedgerView({ ledger, readOnly = false, submitting = false
                   >
                     <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  <span className="text-sm font-semibold text-foreground">{period.label}</span>
-                </span>
-                <span className="flex items-center gap-2 text-sm">
+                  <span className="truncate text-sm font-semibold text-foreground">{period.label}</span>
+                </button>
+                <span className="flex shrink-0 items-center gap-2 text-sm">
                   <span className="tabular-nums text-foreground">{formatMoney(period.totalAmount)}</span>
                   {Number(period.totalOutstanding) > 0 ? (
                     <Badge tone="warning">{formatMoney(period.totalOutstanding)} due</Badge>
                   ) : (
                     <Badge tone="success">Paid</Badge>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => setPayslipPeriod(period)}
+                    title="View payslip"
+                    aria-label="View payslip"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinejoin="round" />
+                      <path d="M14 2v6h6" strokeLinejoin="round" />
+                      <path d="M9 13h6M9 17h4" strokeLinecap="round" />
+                    </svg>
+                  </button>
                 </span>
-              </button>
+              </div>
               {open && (
                 <div className="divide-y divide-border">
                   {period.lineItems.map((item) => (
@@ -225,6 +240,8 @@ export function PayrollLedgerView({ ledger, readOnly = false, submitting = false
           </div>
         </div>
       )}
+
+      <PayslipDocument ledger={ledger} period={payslipPeriod} onClose={() => setPayslipPeriod(null)} />
     </div>
   );
 }

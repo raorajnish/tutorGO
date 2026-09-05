@@ -1,18 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { apiFetch, apiUpload, ApiClientError } from "@/lib/api";
+import { useEffect, useState, type FormEvent } from "react";
+import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Toggle } from "@/components/ui/Toggle";
+import { UpiQr } from "@/components/ui/UpiQr";
+import { buildUpiUri } from "@/lib/upi";
 import type { InstitutePaymentConfig } from "@/lib/types";
 
 /**
- * Settings → Payments (changes-phase11.md §11.1). Off by default: students
- * only ever see a "Pay fees" button once an owner/admin turns this on, and
- * the server itself refuses to enable it with no UPI ID and no QR — an empty
- * sheet would be worse than no feature at all.
+ * Settings → Payments (changes-phase11.md §11.1, §13.1). Off by default:
+ * students only ever see a "Pay fees" button once an owner/admin turns this
+ * on, and the server refuses to enable it without a UPI ID — an empty sheet
+ * would be worse than no feature at all.
+ *
+ * There is no QR upload any more: the QR students scan is generated from the
+ * UPI ID below, so it can't outlive a changed UPI ID the way an uploaded
+ * image silently could. The preview here is the real thing, rendered by the
+ * same component the portal uses.
  */
 export function PaymentsSettingsTab() {
   const [loading, setLoading] = useState(true);
@@ -20,14 +27,10 @@ export function PaymentsSettingsTab() {
   const [upiId, setUpiId] = useState("");
   const [payeeName, setPayeeName] = useState("");
   const [instructions, setInstructions] = useState("");
-  const [qrAssetUrl, setQrAssetUrl] = useState<string | null>(null);
-  const [qrAssetName, setQrAssetName] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [uploadingQr, setUploadingQr] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     apiFetch<InstitutePaymentConfig | null>("/org/payment-config")
@@ -37,8 +40,6 @@ export function PaymentsSettingsTab() {
         setUpiId(cfg.upiId ?? "");
         setPayeeName(cfg.payeeName ?? "");
         setInstructions(cfg.instructions ?? "");
-        setQrAssetUrl(cfg.qrAssetUrl);
-        setQrAssetName(cfg.qrAssetName);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -67,35 +68,13 @@ export function PaymentsSettingsTab() {
     }
   }
 
-  async function handleQrSelected(file: File) {
-    setError(null);
-    setUploadingQr(true);
-    try {
-      const result = await apiUpload<{ qrAssetUrl: string; qrAssetName: string }>("/org/payment-config/qr", file);
-      setQrAssetUrl(result.qrAssetUrl);
-      setQrAssetName(result.qrAssetName);
-    } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "Could not upload the QR code.");
-    } finally {
-      setUploadingQr(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  }
-
-  async function handleRemoveQr() {
-    setError(null);
-    try {
-      await apiFetch("/org/payment-config/qr", { method: "DELETE" });
-      setQrAssetUrl(null);
-      setQrAssetName(null);
-    } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "Could not remove the QR code.");
-    }
-  }
-
   if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>;
 
-  const canEnable = Boolean(upiId.trim() || qrAssetUrl);
+  const trimmedUpi = upiId.trim();
+  const canEnable = Boolean(trimmedUpi);
+  // Previewed without an amount — that's the open-amount QR, since what a
+  // student owes differs per student. The portal adds `am=` per payment.
+  const previewUri = trimmedUpi ? buildUpiUri({ upiId: trimmedUpi, payeeName: payeeName.trim() }) : null;
 
   return (
     <form onSubmit={handleSubmit} className="max-w-xl space-y-6">
@@ -103,8 +82,8 @@ export function PaymentsSettingsTab() {
         <div>
           <p className="text-sm font-semibold text-foreground">Accept UPI payments in the portal</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Students see a &quot;Pay fees&quot; button, your UPI details and QR, and can upload proof of payment for
-            you to review.
+            Students see a &quot;Pay fees&quot; button, your UPI details and a QR generated from them, and can upload
+            proof of payment for you to review.
           </p>
         </div>
         <Toggle checked={isEnabled} onChange={setIsEnabled} disabled={!canEnable && !isEnabled} label="Enable UPI payments" />
@@ -112,7 +91,7 @@ export function PaymentsSettingsTab() {
 
       {!canEnable && (
         <p className="rounded-xl border border-warning/30 bg-warning-soft px-3.5 py-2.5 text-sm text-warning">
-          Add a UPI ID or upload a QR code below before turning this on.
+          Add a UPI ID below before turning this on — the QR students scan is generated from it.
         </p>
       )}
 
@@ -127,30 +106,22 @@ export function PaymentsSettingsTab() {
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">QR code (optional)</p>
-        {qrAssetUrl ? (
-          <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qrAssetUrl} alt="Payment QR code" className="h-20 w-20 rounded-lg border border-border object-contain" />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm text-foreground">{qrAssetName}</p>
-              <button type="button" onClick={handleRemoveQr} className="mt-1 text-xs text-danger hover:underline">
-                Remove
-              </button>
+        <p className="text-sm font-medium text-foreground">QR code</p>
+        {previewUri ? (
+          <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4">
+            <UpiQr value={previewUri} size={128} downloadName="payment-qr" className="shrink-0" />
+            <div className="min-w-0 flex-1 text-xs text-muted-foreground">
+              <p className="text-sm font-medium text-foreground">Generated automatically</p>
+              <p className="mt-1">
+                This is exactly what students scan. It updates itself if you change the UPI ID — download it to print
+                or share on WhatsApp.
+              </p>
             </div>
           </div>
         ) : (
-          <label className="flex cursor-pointer items-center justify-center rounded-xl border border-dashed border-border bg-muted px-4 py-6 text-sm text-muted-foreground hover:bg-secondary">
-            {uploadingQr ? "Uploading…" : "Click to upload a QR code image"}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="hidden"
-              disabled={uploadingQr}
-              onChange={(e) => e.target.files?.[0] && handleQrSelected(e.target.files[0])}
-            />
-          </label>
+          <p className="rounded-xl border border-dashed border-border bg-muted px-4 py-6 text-center text-sm text-muted-foreground">
+            Enter a UPI ID above to generate the QR.
+          </p>
         )}
       </div>
 

@@ -259,6 +259,7 @@ model Institute {
   parentMeetings    ParentMeeting[]
   supportTickets    SupportTicket[]
   suspensions       InstituteSuspension[]
+  studyResources    StudyResource[]
 
   @@index([organizationId])
   @@map("institutes")
@@ -317,6 +318,21 @@ model User {
   /// no token blocklist, no per-token bookkeeping. See changes-phase12.md
   /// §12.2.
   tokenVersion       Int       @default(0)
+  /// TOTP secret, encrypted at rest (lib/crypto.ts's encrypt/decrypt — same
+  /// pattern as InstituteWhatsAppConfig.accessToken). Set as soon as setup
+  /// starts, but MFA isn't actually enforced at login until mfaEnabledAt is
+  /// also set — an abandoned, unconfirmed setup does nothing. Opt-in, per
+  /// changes-phase12.md §12.6: OWNER/ADMIN/ACCOUNTANT/FACULTY/RECEPTION only.
+  mfaSecret          String?
+  /// Null = not enabled (default, and true for every role not eligible for
+  /// MFA at all — STUDENT/SUPERADMIN never set this). Set = authenticate at
+  /// login now requires a TOTP code, checked in POST /auth/login.
+  mfaEnabledAt       DateTime?
+  /// One-time-use recovery codes, hashed with the same bcrypt helper as
+  /// passwords — never stored or shown in plaintext after the confirm step
+  /// that generates them. A matched code is removed from this array, not
+  /// just marked used, so the array's length is always "codes remaining".
+  mfaBackupCodes     String[]  @default([])
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -340,6 +356,7 @@ model User {
   supportTicketMessages SupportTicketMessage[]
   suspensionsMade       InstituteSuspension[] @relation("InstituteSuspensionSuspendedBy")
   suspensionsLifted     InstituteSuspension[] @relation("InstituteSuspensionLiftedBy")
+  studyResourcesAdded   StudyResource[]
 
   @@index([instituteId])
   @@map("users")
@@ -785,6 +802,7 @@ model Course {
   tests             Test[]
   distributionItems DistributionItem[]
   parentMeetings    ParentMeeting[]
+  studyResources    StudyResource[]
 
   @@unique([instituteId, code])
   @@index([instituteId])
@@ -807,6 +825,7 @@ model Subject {
   tests             Test[]
   feeStructureLines FeeStructureSubjectLine[]
   studentSubjects   StudentSubject[]
+  studyResources    StudyResource[]
 
   @@unique([instituteId, shortCode])
   @@index([instituteId])
@@ -1467,13 +1486,12 @@ model InstitutePaymentConfig {
   id              String   @id @default(cuid())
   instituteId     String   @unique
   isEnabled       Boolean  @default(false)
+  /// Required to enable payments (changes-phase13.md §13.1). The QR parents
+  /// scan is generated from this on the fly rather than uploaded as an image:
+  /// an uploaded QR can silently outlive the UPI ID it encodes, which is a
+  /// misrouted-payment bug that generating it makes structurally impossible.
   upiId           String?
   payeeName       String?
-  /// Storage handle for the uploaded QR — see services/uploads.ts. Null when
-  /// no QR has been uploaded (UPI ID alone is still a valid configuration).
-  qrAssetUrl      String?
-  qrAssetName     String?
-  qrAssetPublicId String?
   /// Free text shown under the QR/UPI details — e.g. "include your student
   /// code in the payment note".
   instructions    String?
@@ -1887,4 +1905,53 @@ model InstituteSuspension {
 
   @@index([instituteId])
   @@map("institute_suspensions")
+}
+
+enum ResourceKind {
+  FILE
+  LINK
+}
+
+/// Study material — notes, recorded-lecture links, assignment PDFs — shared
+/// with students (changes-phase12.md §12.5).
+///
+/// Scoped to a COURSE, not a batch (the plan originally said batch): the same
+/// "Physics — Chapter 3 notes" is the same material for every batch of that
+/// course, and batch-scoping would mean re-uploading it per batch and having
+/// them drift apart. `subjectId` is optional — course-wide material (a
+/// syllabus, a timetable PDF) genuinely belongs to no single subject, so it
+/// is nullable rather than forced into a catch-all subject row.
+///
+/// Files reuse the exact test-paper upload pattern: `visibility: "public"`,
+/// because this is course material where an unguessable URL is acceptable
+/// exposure — unlike payment proofs, which are financial documents and are
+/// deliberately `authenticated`. See services/uploads.ts.
+model StudyResource {
+  id               String       @id @default(cuid())
+  instituteId      String
+  courseId         String
+  /// Null = material for the whole course rather than one subject.
+  subjectId        String?
+  title            String
+  description      String?
+  kind             ResourceKind
+  /// Set for kind=FILE. publicId is what makes the Cloudinary asset
+  /// deletable later — deleting the row without it would orphan the file.
+  assetUrl         String?
+  assetName        String?
+  assetPublicId    String?
+  /// Set for kind=LINK — a YouTube video, a Drive folder, a Zoom recording.
+  externalUrl      String?
+  uploadedByUserId String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  institute  Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  subject    Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  uploadedBy User      @relation(fields: [uploadedByUserId], references: [id])
+
+  @@index([instituteId, courseId])
+  @@index([subjectId])
+  @@map("study_resources")
 }

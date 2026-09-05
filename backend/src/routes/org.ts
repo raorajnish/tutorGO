@@ -17,8 +17,8 @@ import type { MessageTemplateType } from "../generated/prisma/enums.js";
 import { daysBetween, todayDateOnly } from "../lib/dateOnly.js";
 import multer from "multer";
 import { parse as parseCsv } from "csv-parse/sync";
-import { MAX_UPLOAD_BYTES, deleteAsset, uploadAsset } from "../services/uploads.js";
 import { toCsv } from "../lib/csv.js";
+import { buildInstituteExportArchive } from "../services/instituteExport.js";
 
 export const orgRouter = Router();
 
@@ -47,6 +47,24 @@ orgRouter.get("/", async (req, res, next) => {
       onboardingDone: institute.onboardingDone,
       modules: institute.modules.map((m) => ({ code: m.module.code, isActive: m.isActive })),
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Self-service full data export (changes-phase14.md §14.2) — an owner's own
+ * copy of their institute's records, for their own peace of mind or in case
+ * they ever leave the platform. Read-only, no new write path; reuses
+ * toCsv() the same as every other export in this app, just bundled as a zip
+ * since it's several tables at once rather than one. */
+orgRouter.get("/export", requireRoles("OWNER", "ADMIN"), (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="institute-export-${instituteId}.zip"`);
+    const archive = buildInstituteExportArchive(instituteId);
+    archive.on("error", next);
+    archive.pipe(res);
   } catch (err) {
     next(err);
   }
@@ -636,8 +654,6 @@ orgRouter.get("/payment-config", requireRoles("OWNER", "ADMIN"), async (req, res
       isEnabled: config.isEnabled,
       upiId: config.upiId,
       payeeName: config.payeeName,
-      qrAssetUrl: config.qrAssetUrl,
-      qrAssetName: config.qrAssetName,
       instructions: config.instructions,
       updatedAt: config.updatedAt,
     });
@@ -664,9 +680,10 @@ orgRouter.put(
 
       const existing = await prisma.institutePaymentConfig.findUnique({ where: { instituteId } });
 
-      // Enabling requires at least one way to actually pay — otherwise the
-      // student portal would show a "Pay fees" button that opens an empty
-      // sheet, which is worse than not showing the feature at all.
+      // Enabling requires a UPI ID — it is now the ONLY input to paying:
+      // both the deep link and the QR parents scan are generated from it
+      // (changes-phase13.md §13.1), so without it the portal would show a
+      // "Pay fees" button that opens a sheet with nothing to pay to.
       if (body.isEnabled) {
         // `?? ` alone can't distinguish "the caller omitted upiId, keep the
         // existing value" from "the caller explicitly sent null to clear
@@ -675,10 +692,8 @@ orgRouter.put(
         // makes an explicit clear-and-enable in the same request correctly
         // fail this check instead of silently falling back to the old value.
         const upiValue = body.upiId !== undefined ? body.upiId : existing?.upiId;
-        const hasUpi = Boolean(upiValue);
-        const hasQr = Boolean(existing?.qrAssetUrl);
-        if (!hasUpi && !hasQr) {
-          throw ApiError.badRequest("Add a UPI ID or upload a QR code before enabling this for students.");
+        if (!upiValue) {
+          throw ApiError.badRequest("Add a UPI ID before enabling this for students.");
         }
       }
 
@@ -693,15 +708,13 @@ orgRouter.put(
         instituteId,
         organizationId: req.user!.organizationId,
         userId: req.user!.id,
-        metadata: { isEnabled: config.isEnabled, hasUpi: Boolean(config.upiId), hasQr: Boolean(config.qrAssetUrl) },
+        metadata: { isEnabled: config.isEnabled, hasUpi: Boolean(config.upiId) },
       });
 
       res.json({
         isEnabled: config.isEnabled,
         upiId: config.upiId,
         payeeName: config.payeeName,
-        qrAssetUrl: config.qrAssetUrl,
-        qrAssetName: config.qrAssetName,
         instructions: config.instructions,
         updatedAt: config.updatedAt,
       });
@@ -710,62 +723,6 @@ orgRouter.put(
     }
   }
 );
-
-const qrUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_UPLOAD_BYTES } });
-
-orgRouter.post(
-  "/payment-config/qr",
-  requireRoles("OWNER", "ADMIN"),
-  qrUpload.single("file"),
-  async (req, res, next) => {
-    try {
-      if (!req.file) throw ApiError.badRequest("No file was uploaded.");
-      const instituteId = req.tenantId!;
-
-      // A QR code is the institute's own public payment detail — the same
-      // thing they'd print on a notice board — so it stays `public`, not
-      // `authenticated` like a payment screenshot.
-      const asset = await uploadAsset(req.file, { instituteId, folder: "payment-qr", visibility: "public" });
-
-      const existing = await prisma.institutePaymentConfig.findUnique({ where: { instituteId } });
-      // Replacing an existing QR deletes the old one rather than orphaning it
-      // in storage — see services/uploads.ts.
-      if (existing?.qrAssetPublicId) await deleteAsset(existing.qrAssetPublicId);
-
-      const config = await prisma.institutePaymentConfig.upsert({
-        where: { instituteId },
-        update: { qrAssetUrl: asset.url, qrAssetName: asset.name, qrAssetPublicId: asset.publicId },
-        create: {
-          instituteId,
-          qrAssetUrl: asset.url,
-          qrAssetName: asset.name,
-          qrAssetPublicId: asset.publicId,
-        },
-      });
-
-      res.status(201).json({ qrAssetUrl: config.qrAssetUrl, qrAssetName: config.qrAssetName });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
-
-orgRouter.delete("/payment-config/qr", requireRoles("OWNER", "ADMIN"), async (req, res, next) => {
-  try {
-    const instituteId = req.tenantId!;
-    const existing = await prisma.institutePaymentConfig.findUnique({ where: { instituteId } });
-    if (!existing?.qrAssetPublicId) return res.status(204).send();
-
-    await deleteAsset(existing.qrAssetPublicId);
-    await prisma.institutePaymentConfig.update({
-      where: { instituteId },
-      data: { qrAssetUrl: null, qrAssetName: null, qrAssetPublicId: null },
-    });
-    res.status(204).send();
-  } catch (err) {
-    next(err);
-  }
-});
 
 // ---------------------------------------------------------------------------
 // Reminder broadcasts — an ad-hoc in-app notification to staff

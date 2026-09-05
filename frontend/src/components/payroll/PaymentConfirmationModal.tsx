@@ -14,7 +14,12 @@ interface Props {
   onClose: () => void;
 }
 
-export function PayslipModal({ payment, staffName, pendingAmount, onClose }: Props) {
+/** A copy-to-WhatsApp confirmation for one specific payment transaction —
+ * not a payslip. Kept distinct from the real payslip document
+ * (PayslipDocument.tsx, which documents a full pay period's earnings): this
+ * is the "let them know this payment landed" nudge, useful the moment a
+ * payment is recorded, while the payslip is the formal per-period record. */
+export function PaymentConfirmationModal({ payment, staffName, pendingAmount, onClose }: Props) {
   const { user } = useAuth();
   const template = useMessageTemplate(payment ? "PAYROLL_PAYMENT_RECORDED" : null);
   const instituteName = user?.institute?.name ?? "TutorGO";
@@ -35,7 +40,7 @@ export function PayslipModal({ payment, staffName, pendingAmount, onClose }: Pro
       : null;
 
   return (
-    <Modal open={payment !== null} onClose={onClose} title="Payslip" width="sm">
+    <Modal open={payment !== null} onClose={onClose} title="Payment confirmation" width="sm">
       {!message && <p className="text-sm text-muted-foreground">Loading…</p>}
       {message && <CopyMessageBox message={message} />}
     </Modal>

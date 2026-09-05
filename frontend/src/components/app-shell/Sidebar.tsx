@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Role } from "@/lib/types";
@@ -181,13 +182,64 @@ const ICONS: Record<NavIcon, React.ReactNode> = {
       <path d="M9 12h6M9 16h6M9 8h2" strokeLinecap="round" />
     </svg>
   ),
+  users: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  studyMaterial: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 19.5A2.5 2.5 0 016.5 17H20" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  health: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 };
+
+// Each top-level section (attendance, fees, platform, …) has its own
+// layout.tsx wrapping ProtectedShell separately, so Sidebar itself remounts
+// fresh on every navigation between sections — a normal React state reset
+// wouldn't survive that. Persisting scrollTop outside component state (here,
+// sessionStorage) and restoring it synchronously before paint is what stops
+// a click on a nav item further down the list from visibly snapping back to
+// the top the moment the new page's Sidebar instance mounts.
+const SIDEBAR_SCROLL_KEY = "tg_sidebar_nav_scroll";
+
+function useSidebarScrollRestore<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const saved = sessionStorage.getItem(SIDEBAR_SCROLL_KEY);
+    if (saved) el.scrollTop = Number(saved);
+
+    function onScroll() {
+      sessionStorage.setItem(SIDEBAR_SCROLL_KEY, String(el!.scrollTop));
+    }
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return ref;
+}
 
 export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const activeModules = user?.institute?.activeModules ?? [];
-  const sections = navForRole(role, activeModules);
+  const navRef = useSidebarScrollRestore<HTMLElement>();
+  const sections = navForRole(role, {
+    activeModules: user?.institute?.activeModules ?? [],
+    hasStudyResources: user?.hasStudyResources ?? false,
+  });
 
   // Pick the single most specific (longest) matching href across all items —
   // otherwise a parent route like /platform matches every /platform/* child too.
@@ -230,7 +282,7 @@ export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: 
           </button>
         </div>
 
-        <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-2">
+        <nav ref={navRef} className="flex-1 space-y-6 overflow-y-auto px-4 py-2">
           {sections.map((section) => (
             <div key={section.section || "root"}>
               {section.section && (

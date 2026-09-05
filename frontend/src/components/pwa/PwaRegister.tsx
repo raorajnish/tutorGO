@@ -15,6 +15,14 @@ export function PwaRegister() {
   const [updateReady, setUpdateReady] = useState(false);
 
   useEffect(() => {
+    // Service workers and `next dev`'s Fast Refresh fight each other — the
+    // SW's fetch handler intercepts navigations/assets, which can race with
+    // webpack's dev-only chunk requests and HMR websocket traffic, and Chrome
+    // reports that collision as a vague "ServiceWorker script evaluation
+    // failed" rather than anything pointing at the real cause. Offline
+    // caching and install-ability are meaningless in dev anyway, so this
+    // only ever registers against a production build.
+    if (process.env.NODE_ENV !== "production") return;
     if (!("serviceWorker" in navigator)) return;
 
     let refreshing = false;

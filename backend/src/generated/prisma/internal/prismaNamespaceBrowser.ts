@@ -108,7 +108,8 @@ export const ModelName = {
   DistributionItem: 'DistributionItem',
   DistributionReceipt: 'DistributionReceipt',
   LeaveRequest: 'LeaveRequest',
-  InstituteSuspension: 'InstituteSuspension'
+  InstituteSuspension: 'InstituteSuspension',
+  StudyResource: 'StudyResource'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -228,6 +229,9 @@ export const UserScalarFieldEnum = {
   termsAcceptedAt: 'termsAcceptedAt',
   lastLoginAt: 'lastLoginAt',
   tokenVersion: 'tokenVersion',
+  mfaSecret: 'mfaSecret',
+  mfaEnabledAt: 'mfaEnabledAt',
+  mfaBackupCodes: 'mfaBackupCodes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -806,9 +810,6 @@ export const InstitutePaymentConfigScalarFieldEnum = {
   isEnabled: 'isEnabled',
   upiId: 'upiId',
   payeeName: 'payeeName',
-  qrAssetUrl: 'qrAssetUrl',
-  qrAssetName: 'qrAssetName',
-  qrAssetPublicId: 'qrAssetPublicId',
   instructions: 'instructions',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1040,6 +1041,26 @@ export const InstituteSuspensionScalarFieldEnum = {
 } as const
 
 export type InstituteSuspensionScalarFieldEnum = (typeof InstituteSuspensionScalarFieldEnum)[keyof typeof InstituteSuspensionScalarFieldEnum]
+
+
+export const StudyResourceScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  courseId: 'courseId',
+  subjectId: 'subjectId',
+  title: 'title',
+  description: 'description',
+  kind: 'kind',
+  assetUrl: 'assetUrl',
+  assetName: 'assetName',
+  assetPublicId: 'assetPublicId',
+  externalUrl: 'externalUrl',
+  uploadedByUserId: 'uploadedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StudyResourceScalarFieldEnum = (typeof StudyResourceScalarFieldEnum)[keyof typeof StudyResourceScalarFieldEnum]
 
 
 export const SortOrder = {

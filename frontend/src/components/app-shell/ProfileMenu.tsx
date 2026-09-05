@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
+import { useTheme } from "@/lib/theme-context";
 import type { MeResponse } from "@/lib/types";
 
 interface Props {
@@ -28,12 +29,26 @@ function LogoutIcon() {
   );
 }
 
+function ThemeIcon({ theme }: { theme: "light" | "dark" }) {
+  return theme === "light" ? (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** The header's account menu — avatar trigger, top-right dropdown. Replaces
  * the old always-visible "Log out" button that used to sit at the bottom of
  * the sidebar: logout is now one click behind the profile avatar, alongside
  * a link to the new /profile page, matching where most SaaS apps put
  * account-level actions rather than mixing them into primary navigation. */
 export function ProfileMenu({ user, onLogout }: Props) {
+  const { theme, toggleTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [position, setPosition] = useState<{ top: number; right: number } | null>(null);
@@ -134,6 +149,28 @@ export function ProfileMenu({ user, onLogout }: Props) {
                 <UserIcon />
                 Profile
               </Link>
+              <button
+                type="button"
+                role="menuitemcheckbox"
+                aria-checked={theme === "dark"}
+                onClick={toggleTheme}
+                className="flex w-full items-center justify-between gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+              >
+                <span className="flex items-center gap-2.5">
+                  <ThemeIcon theme={theme} />
+                  Dark mode
+                </span>
+                <span
+                  aria-hidden="true"
+                  className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${theme === "dark" ? "bg-primary" : "bg-muted"}`}
+                >
+                  <span
+                    className={`absolute top-0.5 h-4 w-4 rounded-full bg-card shadow transition-transform ${
+                      theme === "dark" ? "translate-x-4.5" : "translate-x-0.5"
+                    }`}
+                  />
+                </span>
+              </button>
               <button
                 type="button"
                 role="menuitem"

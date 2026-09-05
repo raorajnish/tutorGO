@@ -19,6 +19,7 @@ import {
 import { seedDefaultExpenseCategories } from "../lib/expenseDefaults.js";
 import { instituteCodeSchema } from "./organization.js";
 import { notifyTicketCreatorOfReply } from "./support.js";
+import { buildInstituteExportArchive } from "../services/instituteExport.js";
 import type { Role } from "../generated/prisma/enums.js";
 
 export const platformRouter = Router();
@@ -41,6 +42,119 @@ platformRouter.get("/stats", async (_req, res, next) => {
     ]);
 
     res.json({ organizations, activeOrganizations, institutes, tenantUsers, students, modules });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Platform health — see changes-phase14.md §14.1. Aggregation over
+// OutboundMessage (WhatsApp) and MessageLog (email), both already written on
+// every send attempt elsewhere in the app; no new tracking, no new writes.
+// ---------------------------------------------------------------------------
+
+platformRouter.get("/health", async (req, res, next) => {
+  try {
+    // Defaults to the last 30 days — long enough to see a pattern, short
+    // enough that one bad afternoon three months ago doesn't keep dragging
+    // an institute's numbers down forever.
+    const to = req.query.to && typeof req.query.to === "string" ? new Date(req.query.to) : new Date();
+    const from =
+      req.query.from && typeof req.query.from === "string"
+        ? new Date(req.query.from)
+        : new Date(to.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const range = { createdAt: { gte: from, lte: to } };
+
+    const [whatsappByInstitute, emailByInstitute, institutes] = await Promise.all([
+      prisma.outboundMessage.groupBy({
+        by: ["instituteId", "status"],
+        where: range,
+        _count: { _all: true },
+      }),
+      prisma.messageLog.groupBy({
+        by: ["instituteId", "delivered"],
+        // MessageLog.instituteId is nullable (platform-level mail, e.g. a
+        // support-ticket notice, has none) — those rows have nowhere to
+        // attribute a failure to, so they're excluded from the per-institute
+        // breakdown but would still count toward a true platform-wide total
+        // if this ever needs one. Institute-scoped mail is the case this
+        // dashboard is actually for: "is institute X's email broken."
+        where: { ...range, instituteId: { not: null } },
+        _count: { _all: true },
+      }),
+      prisma.institute.findMany({ select: { id: true, name: true, organization: { select: { name: true } } } }),
+    ]);
+
+    const instituteById = new Map(institutes.map((i) => [i.id, i]));
+
+    // One row per institute that shows up in either channel, folding
+    // WhatsApp's three-way status and email's boolean into the same
+    // sent/failed shape so the two channels compare directly.
+    type Row = { instituteId: string; whatsappSent: number; whatsappFailed: number; emailSent: number; emailFailed: number };
+    const rows = new Map<string, Row>();
+    function rowFor(instituteId: string): Row {
+      let row = rows.get(instituteId);
+      if (!row) {
+        row = { instituteId, whatsappSent: 0, whatsappFailed: 0, emailSent: 0, emailFailed: 0 };
+        rows.set(instituteId, row);
+      }
+      return row;
+    }
+
+    for (const g of whatsappByInstitute) {
+      if (!g.instituteId) continue;
+      const row = rowFor(g.instituteId);
+      if (g.status === "SENT") row.whatsappSent += g._count._all;
+      else if (g.status === "FAILED") row.whatsappFailed += g._count._all;
+      // QUEUED is neither sent nor failed yet — deliberately excluded from
+      // both the numerator and denominator of a failure rate, since a
+      // message still in flight isn't a failure.
+    }
+    for (const g of emailByInstitute) {
+      if (!g.instituteId) continue;
+      const row = rowFor(g.instituteId);
+      if (g.delivered) row.emailSent += g._count._all;
+      else row.emailFailed += g._count._all;
+    }
+
+    const institutesOut = [...rows.values()]
+      .map((r) => {
+        const whatsappTotal = r.whatsappSent + r.whatsappFailed;
+        const emailTotal = r.emailSent + r.emailFailed;
+        return {
+          instituteId: r.instituteId,
+          instituteName: instituteById.get(r.instituteId)?.name ?? "Unknown institute",
+          organizationName: instituteById.get(r.instituteId)?.organization.name ?? null,
+          whatsapp: { sent: r.whatsappSent, failed: r.whatsappFailed, total: whatsappTotal, failureRate: whatsappTotal ? r.whatsappFailed / whatsappTotal : 0 },
+          email: { sent: r.emailSent, failed: r.emailFailed, total: emailTotal, failureRate: emailTotal ? r.emailFailed / emailTotal : 0 },
+        };
+      })
+      // Worst-first by whichever channel is worse for that institute — the
+      // point of this table is "which institute needs a call," not a stable
+      // alphabetical list.
+      .sort((a, b) => Math.max(b.whatsapp.failureRate, b.email.failureRate) - Math.max(a.whatsapp.failureRate, a.email.failureRate));
+
+    const overall = institutesOut.reduce(
+      (acc, i) => ({
+        whatsappSent: acc.whatsappSent + i.whatsapp.sent,
+        whatsappFailed: acc.whatsappFailed + i.whatsapp.failed,
+        emailSent: acc.emailSent + i.email.sent,
+        emailFailed: acc.emailFailed + i.email.failed,
+      }),
+      { whatsappSent: 0, whatsappFailed: 0, emailSent: 0, emailFailed: 0 }
+    );
+    const whatsappTotal = overall.whatsappSent + overall.whatsappFailed;
+    const emailTotal = overall.emailSent + overall.emailFailed;
+
+    res.json({
+      from,
+      to,
+      overall: {
+        whatsapp: { sent: overall.whatsappSent, failed: overall.whatsappFailed, total: whatsappTotal, failureRate: whatsappTotal ? overall.whatsappFailed / whatsappTotal : 0 },
+        email: { sent: overall.emailSent, failed: overall.emailFailed, total: emailTotal, failureRate: emailTotal ? overall.emailFailed / emailTotal : 0 },
+      },
+      institutes: institutesOut,
+    });
   } catch (err) {
     next(err);
   }
@@ -815,6 +929,40 @@ platformRouter.get("/institutes/:id/suspensions", async (req, res, next) => {
   }
 });
 
+/** The SuperAdmin-side twin of GET /org/export (changes-phase14.md §14.2) —
+ * same bundle, for the support/offboarding case where an owner can't or
+ * won't pull their own export (e.g. an institute is being wound down after
+ * suspension). Placed alongside the suspension routes above rather than
+ * elsewhere in this file since that's the actual use case: "this institute
+ * is leaving/being suspended, get a copy of their data first." Audit-logged,
+ * unlike the self-service route — a SuperAdmin reading through every
+ * institute's financial records is exactly the kind of action §12.7's
+ * viewer exists to make visible. */
+platformRouter.get("/institutes/:id/export", async (req, res, next) => {
+  try {
+    const instituteId = req.params.id as string;
+    const institute = await prisma.institute.findUnique({ where: { id: instituteId } });
+    if (!institute) throw ApiError.notFound("Institute not found");
+
+    await auditLog({
+      action: "INSTITUTE_DATA_EXPORTED",
+      organizationId: institute.organizationId,
+      instituteId,
+      userId: req.user!.id,
+      targetType: "Institute",
+      targetId: instituteId,
+    });
+
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="institute-export-${institute.code}.zip"`);
+    const archive = buildInstituteExportArchive(instituteId);
+    archive.on("error", next);
+    archive.pipe(res);
+  } catch (err) {
+    next(err);
+  }
+});
+
 platformRouter.post(
   "/organizations/:orgId/institutes/:instituteId/admins",
   validateBody(personSchema),
@@ -1029,6 +1177,7 @@ platformRouter.get("/users", async (req, res, next) => {
         role: true,
         isActive: true,
         lastLoginAt: true,
+        mfaEnabledAt: true,
         institute: { select: { id: true, name: true, code: true, organization: { select: { id: true, name: true } } } },
         ownedOrganization: { select: { id: true, name: true } },
       },
@@ -1044,6 +1193,7 @@ platformRouter.get("/users", async (req, res, next) => {
         role: u.role,
         isActive: u.isActive,
         lastLoginAt: u.lastLoginAt,
+        mfaEnabled: !!u.mfaEnabledAt,
         instituteId: u.institute?.id ?? null,
         instituteName: u.institute?.name ?? null,
         instituteCode: u.institute?.code ?? null,
@@ -1239,6 +1389,43 @@ platformRouter.post("/users/:id/logout-everywhere", async (req, res, next) => {
       targetType: "User",
       targetId: target.id,
       metadata: { email: target.email },
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** The escape hatch flagged in changes-phase12.md §12.6's risk section: the
+ * "I lost my phone and my backup codes" case, which otherwise has no
+ * recovery path at all — backup codes are the only self-service route, and
+ * once those are also gone the account is genuinely stuck without this.
+ * Requires a reason, same bar as suspending an institute (§12.10), because
+ * this is itself a new attack surface: a compromised SuperAdmin account
+ * could use it to strip any owner's second factor before taking over. */
+const disableMfaSchema = z.object({ reason: z.string().trim().min(1, "A reason is required").max(500) });
+
+platformRouter.post("/users/:id/mfa/disable", validateBody(disableMfaSchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof disableMfaSchema>;
+    const target = await prisma.user.findUnique({ where: { id: req.params.id as string } });
+    if (!target) throw ApiError.notFound("User not found");
+    if (!target.mfaEnabledAt) throw ApiError.badRequest("This account doesn't have two-factor authentication enabled");
+
+    await prisma.user.update({
+      where: { id: target.id },
+      data: { mfaSecret: null, mfaEnabledAt: null, mfaBackupCodes: [] },
+    });
+
+    await auditLog({
+      action: "USER_MFA_DISABLED",
+      organizationId: null,
+      instituteId: target.instituteId,
+      userId: req.user!.id,
+      targetType: "User",
+      targetId: target.id,
+      metadata: { email: target.email, reason: body.reason },
     });
 
     res.json({ ok: true });

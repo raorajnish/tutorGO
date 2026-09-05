@@ -585,10 +585,13 @@ portalRouter.get("/payment-config", async (req, res, next) => {
     const config = await prisma.institutePaymentConfig.findUnique({ where: { instituteId: req.user!.instituteId! } });
     if (!config || !config.isEnabled) return res.json(null);
 
+    // No QR image is sent — the portal generates the QR from upiId/payeeName
+    // (plus whatever amount the student is paying) on the fly, so it can
+    // never disagree with the UPI ID it's meant to encode. See
+    // changes-phase13.md §13.1.
     res.json({
       upiId: config.upiId,
       payeeName: config.payeeName,
-      qrAssetUrl: config.qrAssetUrl,
       instructions: config.instructions,
     });
   } catch (err) {
@@ -718,6 +721,45 @@ portalRouter.post("/payment-proofs", validateBody(submitProofSchema), async (req
     });
 
     res.status(201).json({ id: proof.id, status: proof.status, submittedAt: proof.submittedAt });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Study material — read-only, scoped to the student's own course.
+// See changes-phase12.md §12.5.
+// ---------------------------------------------------------------------------
+
+/** Everything shared with this student's course, newest first. Scoped by the
+ * course on their own Student row (never a courseId from the request), so one
+ * student can never read another course's material. Course-wide resources
+ * (subjectId null) come back alongside subject-specific ones — the portal
+ * groups them for display. */
+portalRouter.get("/study-resources", async (req, res, next) => {
+  try {
+    const student = await prisma.student.findUniqueOrThrow({
+      where: { id: req.user!.studentId! },
+      select: { courseId: true },
+    });
+
+    const resources = await prisma.studyResource.findMany({
+      where: { courseId: student.courseId },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        kind: true,
+        assetUrl: true,
+        assetName: true,
+        externalUrl: true,
+        createdAt: true,
+        subject: { select: { id: true, name: true, shortCode: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(resources);
   } catch (err) {
     next(err);
   }

@@ -34,9 +34,6 @@ export type InstitutePaymentConfigMinAggregateOutputType = {
   isEnabled: boolean | null
   upiId: string | null
   payeeName: string | null
-  qrAssetUrl: string | null
-  qrAssetName: string | null
-  qrAssetPublicId: string | null
   instructions: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -48,9 +45,6 @@ export type InstitutePaymentConfigMaxAggregateOutputType = {
   isEnabled: boolean | null
   upiId: string | null
   payeeName: string | null
-  qrAssetUrl: string | null
-  qrAssetName: string | null
-  qrAssetPublicId: string | null
   instructions: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -62,9 +56,6 @@ export type InstitutePaymentConfigCountAggregateOutputType = {
   isEnabled: number
   upiId: number
   payeeName: number
-  qrAssetUrl: number
-  qrAssetName: number
-  qrAssetPublicId: number
   instructions: number
   createdAt: number
   updatedAt: number
@@ -78,9 +69,6 @@ export type InstitutePaymentConfigMinAggregateInputType = {
   isEnabled?: true
   upiId?: true
   payeeName?: true
-  qrAssetUrl?: true
-  qrAssetName?: true
-  qrAssetPublicId?: true
   instructions?: true
   createdAt?: true
   updatedAt?: true
@@ -92,9 +80,6 @@ export type InstitutePaymentConfigMaxAggregateInputType = {
   isEnabled?: true
   upiId?: true
   payeeName?: true
-  qrAssetUrl?: true
-  qrAssetName?: true
-  qrAssetPublicId?: true
   instructions?: true
   createdAt?: true
   updatedAt?: true
@@ -106,9 +91,6 @@ export type InstitutePaymentConfigCountAggregateInputType = {
   isEnabled?: true
   upiId?: true
   payeeName?: true
-  qrAssetUrl?: true
-  qrAssetName?: true
-  qrAssetPublicId?: true
   instructions?: true
   createdAt?: true
   updatedAt?: true
@@ -193,9 +175,6 @@ export type InstitutePaymentConfigGroupByOutputType = {
   isEnabled: boolean
   upiId: string | null
   payeeName: string | null
-  qrAssetUrl: string | null
-  qrAssetName: string | null
-  qrAssetPublicId: string | null
   instructions: string | null
   createdAt: Date
   updatedAt: Date
@@ -228,9 +207,6 @@ export type InstitutePaymentConfigWhereInput = {
   isEnabled?: Prisma.BoolFilter<"InstitutePaymentConfig"> | boolean
   upiId?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
   payeeName?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetUrl?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetName?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetPublicId?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
   instructions?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
   createdAt?: Prisma.DateTimeFilter<"InstitutePaymentConfig"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"InstitutePaymentConfig"> | Date | string
@@ -243,9 +219,6 @@ export type InstitutePaymentConfigOrderByWithRelationInput = {
   isEnabled?: Prisma.SortOrder
   upiId?: Prisma.SortOrderInput | Prisma.SortOrder
   payeeName?: Prisma.SortOrderInput | Prisma.SortOrder
-  qrAssetUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  qrAssetName?: Prisma.SortOrderInput | Prisma.SortOrder
-  qrAssetPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
   instructions?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -261,9 +234,6 @@ export type InstitutePaymentConfigWhereUniqueInput = Prisma.AtLeast<{
   isEnabled?: Prisma.BoolFilter<"InstitutePaymentConfig"> | boolean
   upiId?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
   payeeName?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetUrl?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetName?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetPublicId?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
   instructions?: Prisma.StringNullableFilter<"InstitutePaymentConfig"> | string | null
   createdAt?: Prisma.DateTimeFilter<"InstitutePaymentConfig"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"InstitutePaymentConfig"> | Date | string
@@ -276,9 +246,6 @@ export type InstitutePaymentConfigOrderByWithAggregationInput = {
   isEnabled?: Prisma.SortOrder
   upiId?: Prisma.SortOrderInput | Prisma.SortOrder
   payeeName?: Prisma.SortOrderInput | Prisma.SortOrder
-  qrAssetUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  qrAssetName?: Prisma.SortOrderInput | Prisma.SortOrder
-  qrAssetPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
   instructions?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -296,9 +263,6 @@ export type InstitutePaymentConfigScalarWhereWithAggregatesInput = {
   isEnabled?: Prisma.BoolWithAggregatesFilter<"InstitutePaymentConfig"> | boolean
   upiId?: Prisma.StringNullableWithAggregatesFilter<"InstitutePaymentConfig"> | string | null
   payeeName?: Prisma.StringNullableWithAggregatesFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetUrl?: Prisma.StringNullableWithAggregatesFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetName?: Prisma.StringNullableWithAggregatesFilter<"InstitutePaymentConfig"> | string | null
-  qrAssetPublicId?: Prisma.StringNullableWithAggregatesFilter<"InstitutePaymentConfig"> | string | null
   instructions?: Prisma.StringNullableWithAggregatesFilter<"InstitutePaymentConfig"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"InstitutePaymentConfig"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"InstitutePaymentConfig"> | Date | string
@@ -309,9 +273,6 @@ export type InstitutePaymentConfigCreateInput = {
   isEnabled?: boolean
   upiId?: string | null
   payeeName?: string | null
-  qrAssetUrl?: string | null
-  qrAssetName?: string | null
-  qrAssetPublicId?: string | null
   instructions?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -324,9 +285,6 @@ export type InstitutePaymentConfigUncheckedCreateInput = {
   isEnabled?: boolean
   upiId?: string | null
   payeeName?: string | null
-  qrAssetUrl?: string | null
-  qrAssetName?: string | null
-  qrAssetPublicId?: string | null
   instructions?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -337,9 +295,6 @@ export type InstitutePaymentConfigUpdateInput = {
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   upiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payeeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -352,9 +307,6 @@ export type InstitutePaymentConfigUncheckedUpdateInput = {
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   upiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payeeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -366,9 +318,6 @@ export type InstitutePaymentConfigCreateManyInput = {
   isEnabled?: boolean
   upiId?: string | null
   payeeName?: string | null
-  qrAssetUrl?: string | null
-  qrAssetName?: string | null
-  qrAssetPublicId?: string | null
   instructions?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -379,9 +328,6 @@ export type InstitutePaymentConfigUpdateManyMutationInput = {
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   upiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payeeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -393,9 +339,6 @@ export type InstitutePaymentConfigUncheckedUpdateManyInput = {
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   upiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payeeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -412,9 +355,6 @@ export type InstitutePaymentConfigCountOrderByAggregateInput = {
   isEnabled?: Prisma.SortOrder
   upiId?: Prisma.SortOrder
   payeeName?: Prisma.SortOrder
-  qrAssetUrl?: Prisma.SortOrder
-  qrAssetName?: Prisma.SortOrder
-  qrAssetPublicId?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -426,9 +366,6 @@ export type InstitutePaymentConfigMaxOrderByAggregateInput = {
   isEnabled?: Prisma.SortOrder
   upiId?: Prisma.SortOrder
   payeeName?: Prisma.SortOrder
-  qrAssetUrl?: Prisma.SortOrder
-  qrAssetName?: Prisma.SortOrder
-  qrAssetPublicId?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -440,9 +377,6 @@ export type InstitutePaymentConfigMinOrderByAggregateInput = {
   isEnabled?: Prisma.SortOrder
   upiId?: Prisma.SortOrder
   payeeName?: Prisma.SortOrder
-  qrAssetUrl?: Prisma.SortOrder
-  qrAssetName?: Prisma.SortOrder
-  qrAssetPublicId?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -485,9 +419,6 @@ export type InstitutePaymentConfigCreateWithoutInstituteInput = {
   isEnabled?: boolean
   upiId?: string | null
   payeeName?: string | null
-  qrAssetUrl?: string | null
-  qrAssetName?: string | null
-  qrAssetPublicId?: string | null
   instructions?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -498,9 +429,6 @@ export type InstitutePaymentConfigUncheckedCreateWithoutInstituteInput = {
   isEnabled?: boolean
   upiId?: string | null
   payeeName?: string | null
-  qrAssetUrl?: string | null
-  qrAssetName?: string | null
-  qrAssetPublicId?: string | null
   instructions?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -527,9 +455,6 @@ export type InstitutePaymentConfigUpdateWithoutInstituteInput = {
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   upiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payeeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -540,9 +465,6 @@ export type InstitutePaymentConfigUncheckedUpdateWithoutInstituteInput = {
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   upiId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payeeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  qrAssetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -556,9 +478,6 @@ export type InstitutePaymentConfigSelect<ExtArgs extends runtime.Types.Extension
   isEnabled?: boolean
   upiId?: boolean
   payeeName?: boolean
-  qrAssetUrl?: boolean
-  qrAssetName?: boolean
-  qrAssetPublicId?: boolean
   instructions?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -571,9 +490,6 @@ export type InstitutePaymentConfigSelectCreateManyAndReturn<ExtArgs extends runt
   isEnabled?: boolean
   upiId?: boolean
   payeeName?: boolean
-  qrAssetUrl?: boolean
-  qrAssetName?: boolean
-  qrAssetPublicId?: boolean
   instructions?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -586,9 +502,6 @@ export type InstitutePaymentConfigSelectUpdateManyAndReturn<ExtArgs extends runt
   isEnabled?: boolean
   upiId?: boolean
   payeeName?: boolean
-  qrAssetUrl?: boolean
-  qrAssetName?: boolean
-  qrAssetPublicId?: boolean
   instructions?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -601,15 +514,12 @@ export type InstitutePaymentConfigSelectScalar = {
   isEnabled?: boolean
   upiId?: boolean
   payeeName?: boolean
-  qrAssetUrl?: boolean
-  qrAssetName?: boolean
-  qrAssetPublicId?: boolean
   instructions?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type InstitutePaymentConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "isEnabled" | "upiId" | "payeeName" | "qrAssetUrl" | "qrAssetName" | "qrAssetPublicId" | "instructions" | "createdAt" | "updatedAt", ExtArgs["result"]["institutePaymentConfig"]>
+export type InstitutePaymentConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "isEnabled" | "upiId" | "payeeName" | "instructions" | "createdAt" | "updatedAt", ExtArgs["result"]["institutePaymentConfig"]>
 export type InstitutePaymentConfigInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
 }
@@ -629,15 +539,14 @@ export type $InstitutePaymentConfigPayload<ExtArgs extends runtime.Types.Extensi
     id: string
     instituteId: string
     isEnabled: boolean
+    /**
+     * Required to enable payments (changes-phase13.md §13.1). The QR parents
+     * scan is generated from this on the fly rather than uploaded as an image:
+     * an uploaded QR can silently outlive the UPI ID it encodes, which is a
+     * misrouted-payment bug that generating it makes structurally impossible.
+     */
     upiId: string | null
     payeeName: string | null
-    /**
-     * Storage handle for the uploaded QR — see services/uploads.ts. Null when
-     * no QR has been uploaded (UPI ID alone is still a valid configuration).
-     */
-    qrAssetUrl: string | null
-    qrAssetName: string | null
-    qrAssetPublicId: string | null
     /**
      * Free text shown under the QR/UPI details — e.g. "include your student
      * code in the payment note".
@@ -1074,9 +983,6 @@ export interface InstitutePaymentConfigFieldRefs {
   readonly isEnabled: Prisma.FieldRef<"InstitutePaymentConfig", 'Boolean'>
   readonly upiId: Prisma.FieldRef<"InstitutePaymentConfig", 'String'>
   readonly payeeName: Prisma.FieldRef<"InstitutePaymentConfig", 'String'>
-  readonly qrAssetUrl: Prisma.FieldRef<"InstitutePaymentConfig", 'String'>
-  readonly qrAssetName: Prisma.FieldRef<"InstitutePaymentConfig", 'String'>
-  readonly qrAssetPublicId: Prisma.FieldRef<"InstitutePaymentConfig", 'String'>
   readonly instructions: Prisma.FieldRef<"InstitutePaymentConfig", 'String'>
   readonly createdAt: Prisma.FieldRef<"InstitutePaymentConfig", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"InstitutePaymentConfig", 'DateTime'>
