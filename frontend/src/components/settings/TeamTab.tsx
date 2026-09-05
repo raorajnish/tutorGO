@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FacultyAssignmentModal } from "@/components/settings/FacultyAssignmentModal";
 import { SendReminderModal } from "@/components/settings/SendReminderModal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
+import { ImportButton } from "@/components/ui/ImportButton";
+import { ImportModal } from "@/components/ui/ImportModal";
 import { useAuth } from "@/lib/auth-context";
 import { TEAM_ROLES, TEAM_ROLE_LABELS, type TeamMember, type TeamRole } from "@/lib/types";
 
@@ -17,6 +20,7 @@ export function TeamTab() {
   const [team, setTeam] = useState<TeamMember[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [assignFaculty, setAssignFaculty] = useState<TeamMember | null>(null);
@@ -50,10 +54,11 @@ export function TeamTab() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">Admins, accountants, faculty and reception for this institute.</p>
         {canManage && (
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex items-center gap-2 sm:flex-row">
             <Button variant="secondary" onClick={() => setReminderOpen(true)}>
               Send announcement
             </Button>
+            <ImportButton title="Bulk import team members from CSV" onClick={() => setImportOpen(true)} />
             <Button onClick={() => setInviteOpen(true)}>Invite team member</Button>
           </div>
         )}
@@ -72,6 +77,14 @@ export function TeamTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
+            {team === null &&
+              Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={4}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
             {team?.map((m) => (
               <tr key={m.id}>
                 <td className="px-4 py-3">
@@ -113,6 +126,19 @@ export function TeamTab() {
       </div>
 
       <InviteTeamModal open={inviteOpen} onClose={() => setInviteOpen(false)} onInvited={load} />
+
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        title="Import team members"
+        description="Upload a CSV to invite many staff accounts at once — nothing is created until you confirm the preview."
+        templatePath="/org/team/import/template.csv"
+        templateFilename="team-import-template.csv"
+        importPath="/org/team/import"
+        onImported={load}
+        extraColumnLabel="Temp password"
+        extraColumnValue={(row) => row.tempPassword ?? ""}
+      />
 
       <SendReminderModal open={reminderOpen} onClose={() => setReminderOpen(false)} />
 

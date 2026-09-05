@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Toggle } from "@/components/ui/Toggle";
+import { SkeletonLine, SkeletonBlock } from "@/components/ui/Skeleton";
 import type { InstituteWhatsAppConfig, WhatsAppTemplate, WhatsAppTemplateStatus } from "@/lib/types";
 
 const STATUS_TONE: Record<WhatsAppTemplateStatus, "neutral" | "warning" | "success" | "danger"> = {
@@ -155,7 +156,21 @@ export function WhatsAppSettingsTab() {
     }
   }
 
-  if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (loading) {
+    return (
+      <div className="max-w-2xl space-y-8">
+        <div className="space-y-4">
+          <SkeletonLine className="w-2/3" />
+          <SkeletonBlock className="h-16 w-full" />
+          <SkeletonBlock className="h-64 w-full" />
+        </div>
+        <div className="space-y-3">
+          <SkeletonLine className="w-1/3" />
+          <SkeletonBlock className="h-40 w-full" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl space-y-8">

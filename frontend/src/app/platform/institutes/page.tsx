@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
@@ -89,7 +90,14 @@ export default function PlatformInstitutesPage() {
               </tr>
             </thead>
             <tbody>
-              {institutes.map((inst) => (
+              {loading && Array.from({ length: 6 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={6}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && institutes.map((inst) => (
                 <tr key={inst.id} onClick={() => goToInstitute(inst)} className="cursor-pointer border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">{inst.name}</p>
@@ -128,7 +136,8 @@ export default function PlatformInstitutesPage() {
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {institutes.map((inst) => (
+          {loading && Array.from({ length: 6 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && institutes.map((inst) => (
             <div key={inst.id} onClick={() => goToInstitute(inst)} className="space-y-1.5 p-4">
               <div className="flex items-start justify-between gap-2">
                 <p className="font-medium text-foreground">{inst.name}</p>

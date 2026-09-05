@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
+import { SkeletonLine, SkeletonBlock } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatMoney } from "@/lib/money";
@@ -132,7 +133,11 @@ export function EditFeeAccountPricingModal({ open, onClose, onSaved, studentId, 
       }
     >
       {loading ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>
+        <div className="space-y-3">
+          <SkeletonLine className="w-1/3" />
+          <SkeletonBlock className="h-32 w-full" />
+          <SkeletonLine className="w-1/2" />
+        </div>
       ) : loadError ? (
         <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{loadError}</div>
       ) : (

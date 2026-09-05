@@ -14,6 +14,7 @@ import { computeFinalFee } from "../lib/feeMath.js";
 import { newPublicToken } from "../lib/receiptPayload.js";
 import { toCsv } from "../lib/csv.js";
 import { notifyStudent } from "../services/studentNotify.js";
+import { deleteAsset, signedAssetUrl } from "../services/uploads.js";
 
 export const feesRouter = Router();
 
@@ -886,129 +887,177 @@ interface CarryForwardEntry {
   removed: boolean;
 }
 
+interface CarryForward {
+  direction: "shortfall" | "overpay";
+  amount: string;
+  entries: CarryForwardEntry[];
+}
+
+/**
+ * Records one payment against an already-locked fee account and cascades the
+ * over/under-payment onto later installments.
+ *
+ * Extracted from POST /payments so that **every** way of taking money runs the
+ * exact same code — receipt numbering, allocation, carry-forward, the lot.
+ * The alternative (a second, simpler write for UPI approvals) is how two
+ * ledgers that disagree get built.
+ *
+ * Takes `tx` rather than opening its own transaction: the caller holds the
+ * fee-account lock, which lets a caller commit additional writes atomically
+ * with the payment — approving a PaymentProof flips its status in the same
+ * transaction that creates the Payment, so a crash can never leave a proof
+ * marked approved with no money recorded, or vice versa.
+ */
+interface ApplyPaymentInput {
+  instituteId: string;
+  account: { id: string; billingDay: number | null };
+  amount: Prisma.Decimal;
+  mode: "UPI" | "CASH" | "CARD" | "BANK_TRANSFER" | "CHEQUE";
+  paidOn: Date;
+  notes?: string;
+  userId: string;
+}
+
+async function applyPayment(
+  tx: Prisma.TransactionClient,
+  input: ApplyPaymentInput
+): Promise<{ paymentId: string; carryForward: CarryForward | null }> {
+  const account = input.account;
+  const instituteId = input.instituteId;
+  const paymentAmount = input.amount;
+  const installments = await tx.feeInstallment.findMany({
+    where: { feeAccountId: account.id, waived: false },
+    orderBy: { seq: "asc" },
+  });
+
+  // A payment always targets exactly ONE installment — the earliest open
+  // one — and closes it at exactly what was paid, whether that's less or
+  // more than its quoted amount. The difference (either direction) shifts
+  // onto the installment(s) after it: a shortfall grows the next one (or
+  // creates one), an overpayment shrinks later ones (removing any that
+  // get fully absorbed). A payment never spans/closes a second installment
+  // on its own — see changes-phase8.md §8a.
+  const target = installments.find((i) => i.paidAmount.lt(i.amount));
+  if (!target) throw ApiError.badRequest("Every installment on this plan is already paid");
+
+  const totalOutstanding = installments.reduce((sum, i) => sum.plus(i.amount.minus(i.paidAmount)), new Prisma.Decimal(0));
+  if (paymentAmount.gt(totalOutstanding)) {
+    throw ApiError.badRequest(
+      `Amount exceeds the remaining balance on this plan — only ₹${money(totalOutstanding)} of ₹${money(paymentAmount)} could be applied`
+    );
+  }
+
+  const targetOutstanding = target.amount.minus(target.paidAmount);
+  const diff = paymentAmount.minus(targetOutstanding); // >0 overpay, <0 shortfall, 0 exact
+  const targetNewPaid = target.paidAmount.plus(paymentAmount);
+  const later = installments.filter((i) => i.seq > target.seq);
+
+  const receiptNumber = await nextReceiptNumber(tx, instituteId, input.paidOn);
+  const created = await tx.payment.create({
+    data: {
+      instituteId,
+      feeAccountId: account.id,
+      amount: paymentAmount,
+      mode: input.mode,
+      paidOn: input.paidOn,
+      receiptNumber,
+      notes: input.notes,
+      createdByUserId: input.userId,
+      publicToken: newPublicToken(),
+    },
+  });
+
+  await tx.paymentAllocation.create({ data: { paymentId: created.id, installmentId: target.id, amount: paymentAmount } });
+  // Always closes: paidAmount === amount from here on, so it reads
+  // "PAID" under the existing derived-status logic, never "PARTIAL".
+  await tx.feeInstallment.update({ where: { id: target.id }, data: { paidAmount: targetNewPaid, amount: targetNewPaid } });
+
+  let carryForward: CarryForward | null = null;
+
+  if (diff.lt(0)) {
+    const shortfall = diff.neg();
+    const next = later[0];
+    if (next) {
+      const updated = await tx.feeInstallment.update({
+        where: { id: next.id },
+        data: { amount: { increment: shortfall }, adjustedFromPrevious: true },
+      });
+      carryForward = {
+        direction: "shortfall",
+        amount: money(shortfall)!,
+        entries: [{ installmentId: updated.id, seq: updated.seq, dueDate: updated.dueDate, amount: money(shortfall)!, created: false, removed: false }],
+      };
+    } else {
+      const lastOverall = installments[installments.length - 1]!;
+      const billingDay = account.billingDay ?? lastOverall.dueDate.getUTCDate();
+      const newDueDate = addMonthsCapped(lastOverall.dueDate, 1, billingDay);
+      const createdInst = await tx.feeInstallment.create({
+        data: { feeAccountId: account.id, seq: lastOverall.seq + 1, dueDate: newDueDate, amount: shortfall, adjustedFromPrevious: true },
+      });
+      carryForward = {
+        direction: "shortfall",
+        amount: money(shortfall)!,
+        entries: [{ installmentId: createdInst.id, seq: createdInst.seq, dueDate: createdInst.dueDate, amount: money(shortfall)!, created: true, removed: false }],
+      };
+    }
+  } else if (diff.gt(0)) {
+    // The totalOutstanding guard above guarantees `later` has enough
+    // combined amount to fully absorb `diff` — never rejects mid-cascade.
+    let remaining = diff;
+    const entries: CarryForwardEntry[] = [];
+    for (const l of later) {
+      if (remaining.lte(0)) break;
+      // Only the UNPAID part of a later installment can be absorbed — its
+      // paidAmount is money already received and must survive untouched.
+      // (totalOutstanding above is computed the same way, so the two
+      // agree and the cascade still can't run out of room mid-loop.)
+      const outstanding = l.amount.minus(l.paidAmount);
+      if (outstanding.lte(0)) continue;
+      const reducible = Prisma.Decimal.min(remaining, outstanding);
+      // Deleting the row would cascade to its PaymentAllocation history
+      // (schema.prisma: onDelete: Cascade) and silently break the
+      // reconciliation between Payment.amount and its allocations. Only a
+      // row that never received money is safe to remove; anything else is
+      // decremented to exactly what was already paid.
+      if (reducible.gte(outstanding) && l.paidAmount.lte(0)) {
+        await tx.feeInstallment.delete({ where: { id: l.id } });
+        entries.push({ installmentId: l.id, seq: l.seq, dueDate: l.dueDate, amount: money(reducible)!, created: false, removed: true });
+      } else {
+        const updated = await tx.feeInstallment.update({
+          where: { id: l.id },
+          data: { amount: { decrement: reducible }, adjustedFromPrevious: true },
+        });
+        entries.push({ installmentId: updated.id, seq: updated.seq, dueDate: updated.dueDate, amount: money(reducible)!, created: false, removed: false });
+      }
+      remaining = remaining.minus(reducible);
+    }
+    carryForward = { direction: "overpay", amount: money(diff)!, entries };
+  }
+
+  return { paymentId: created.id, carryForward };
+}
+
 feesRouter.post("/payments", requireRoles(...MANAGE_ROLES), validateBody(recordPaymentSchema), async (req, res, next) => {
   try {
     const body = req.body as z.infer<typeof recordPaymentSchema>;
     const instituteId = req.tenantId!;
     const account = await loadFeeAccount(body.studentId, instituteId);
-    const paymentAmount = new Prisma.Decimal(body.amount);
 
     // The sharpest case the lock exists for: two clerks saving at the same
     // moment both saw the same open installment, both passed the balance
     // check, and the second `update` overwrote the first — one payment's money
     // vanished from the plan while its Payment row and receipt still existed.
-    const { paymentId, carryForward } = await withFeeAccountLock(account.id, async (tx) => {
-      const installments = await tx.feeInstallment.findMany({
-        where: { feeAccountId: account.id, waived: false },
-        orderBy: { seq: "asc" },
-      });
-
-      // A payment always targets exactly ONE installment — the earliest open
-      // one — and closes it at exactly what was paid, whether that's less or
-      // more than its quoted amount. The difference (either direction) shifts
-      // onto the installment(s) after it: a shortfall grows the next one (or
-      // creates one), an overpayment shrinks later ones (removing any that
-      // get fully absorbed). A payment never spans/closes a second installment
-      // on its own — see changes-phase8.md §8a.
-      const target = installments.find((i) => i.paidAmount.lt(i.amount));
-      if (!target) throw ApiError.badRequest("Every installment on this plan is already paid");
-
-      const totalOutstanding = installments.reduce((sum, i) => sum.plus(i.amount.minus(i.paidAmount)), new Prisma.Decimal(0));
-      if (paymentAmount.gt(totalOutstanding)) {
-        throw ApiError.badRequest(
-          `Amount exceeds the remaining balance on this plan — only ₹${money(totalOutstanding)} of ₹${money(paymentAmount)} could be applied`
-        );
-      }
-
-      const targetOutstanding = target.amount.minus(target.paidAmount);
-      const diff = paymentAmount.minus(targetOutstanding); // >0 overpay, <0 shortfall, 0 exact
-      const targetNewPaid = target.paidAmount.plus(paymentAmount);
-      const later = installments.filter((i) => i.seq > target.seq);
-
-      const receiptNumber = await nextReceiptNumber(tx, instituteId, body.paidOn);
-      const created = await tx.payment.create({
-        data: {
-          instituteId,
-          feeAccountId: account.id,
-          amount: paymentAmount,
-          mode: body.mode,
-          paidOn: body.paidOn,
-          receiptNumber,
-          notes: body.notes,
-          createdByUserId: req.user!.id,
-          publicToken: newPublicToken(),
-        },
-      });
-
-      await tx.paymentAllocation.create({ data: { paymentId: created.id, installmentId: target.id, amount: paymentAmount } });
-      // Always closes: paidAmount === amount from here on, so it reads
-      // "PAID" under the existing derived-status logic, never "PARTIAL".
-      await tx.feeInstallment.update({ where: { id: target.id }, data: { paidAmount: targetNewPaid, amount: targetNewPaid } });
-
-      let carryForward: { direction: "shortfall" | "overpay"; amount: string; entries: CarryForwardEntry[] } | null = null;
-
-      if (diff.lt(0)) {
-        const shortfall = diff.neg();
-        const next = later[0];
-        if (next) {
-          const updated = await tx.feeInstallment.update({
-            where: { id: next.id },
-            data: { amount: { increment: shortfall }, adjustedFromPrevious: true },
-          });
-          carryForward = {
-            direction: "shortfall",
-            amount: money(shortfall)!,
-            entries: [{ installmentId: updated.id, seq: updated.seq, dueDate: updated.dueDate, amount: money(shortfall)!, created: false, removed: false }],
-          };
-        } else {
-          const lastOverall = installments[installments.length - 1]!;
-          const billingDay = account.billingDay ?? lastOverall.dueDate.getUTCDate();
-          const newDueDate = addMonthsCapped(lastOverall.dueDate, 1, billingDay);
-          const createdInst = await tx.feeInstallment.create({
-            data: { feeAccountId: account.id, seq: lastOverall.seq + 1, dueDate: newDueDate, amount: shortfall, adjustedFromPrevious: true },
-          });
-          carryForward = {
-            direction: "shortfall",
-            amount: money(shortfall)!,
-            entries: [{ installmentId: createdInst.id, seq: createdInst.seq, dueDate: createdInst.dueDate, amount: money(shortfall)!, created: true, removed: false }],
-          };
-        }
-      } else if (diff.gt(0)) {
-        // The totalOutstanding guard above guarantees `later` has enough
-        // combined amount to fully absorb `diff` — never rejects mid-cascade.
-        let remaining = diff;
-        const entries: CarryForwardEntry[] = [];
-        for (const l of later) {
-          if (remaining.lte(0)) break;
-          // Only the UNPAID part of a later installment can be absorbed — its
-          // paidAmount is money already received and must survive untouched.
-          // (totalOutstanding above is computed the same way, so the two
-          // agree and the cascade still can't run out of room mid-loop.)
-          const outstanding = l.amount.minus(l.paidAmount);
-          if (outstanding.lte(0)) continue;
-          const reducible = Prisma.Decimal.min(remaining, outstanding);
-          // Deleting the row would cascade to its PaymentAllocation history
-          // (schema.prisma: onDelete: Cascade) and silently break the
-          // reconciliation between Payment.amount and its allocations. Only a
-          // row that never received money is safe to remove; anything else is
-          // decremented to exactly what was already paid.
-          if (reducible.gte(outstanding) && l.paidAmount.lte(0)) {
-            await tx.feeInstallment.delete({ where: { id: l.id } });
-            entries.push({ installmentId: l.id, seq: l.seq, dueDate: l.dueDate, amount: money(reducible)!, created: false, removed: true });
-          } else {
-            const updated = await tx.feeInstallment.update({
-              where: { id: l.id },
-              data: { amount: { decrement: reducible }, adjustedFromPrevious: true },
-            });
-            entries.push({ installmentId: updated.id, seq: updated.seq, dueDate: updated.dueDate, amount: money(reducible)!, created: false, removed: false });
-          }
-          remaining = remaining.minus(reducible);
-        }
-        carryForward = { direction: "overpay", amount: money(diff)!, entries };
-      }
-
-      return { paymentId: created.id, carryForward };
-    });
+    const { paymentId, carryForward } = await withFeeAccountLock(account.id, (tx) =>
+      applyPayment(tx, {
+        instituteId,
+        account,
+        amount: new Prisma.Decimal(body.amount),
+        mode: body.mode,
+        paidOn: body.paidOn,
+        notes: body.notes,
+        userId: req.user!.id,
+      })
+    );
 
     const fullPayment = await prisma.payment.findUnique({ where: { id: paymentId }, include: paymentInclude });
     const createdBy = await prisma.user.findUnique({ where: { id: req.user!.id }, select: { id: true, fullName: true } });
@@ -1356,3 +1405,192 @@ feesRouter.post("/overdue/:installmentId/remind", requireRoles(...MANAGE_ROLES),
     next(err);
   }
 });
+
+// ---------------------------------------------------------------------------
+// UPI/QR proof review — staff side (changes-phase11.md §11.1)
+//
+// Approving a proof runs through applyPayment() — the exact same function
+// POST /payments uses — inside the SAME transaction that flips the proof to
+// APPROVED and stamps its paymentId. That is the one rule this feature can't
+// bend: a screenshot is a claim, not a receipt, so the amount that actually
+// gets recorded is whatever staff type at approval, never trusted blindly
+// from `amountClaimed`. Two ways to create a Payment is how ledgers drift.
+// ---------------------------------------------------------------------------
+
+function serializePaymentProof(p: {
+  id: string;
+  amountClaimed: Prisma.Decimal;
+  referenceNo: string | null;
+  assetUrl: string;
+  assetName: string;
+  assetPublicId: string;
+  status: string;
+  paymentId: string | null;
+  rejectReason: string | null;
+  submittedAt: Date;
+  reviewedAt: Date | null;
+  student: { id: string; name: string; studentCode: string };
+}) {
+  return {
+    id: p.id,
+    amountClaimed: money(p.amountClaimed),
+    referenceNo: p.referenceNo,
+    // Signed fresh on every read — see services/uploads.ts. The stored URL
+    // is inert on its own; a queue viewed days later must still resolve.
+    assetUrl: signedAssetUrl(p.assetPublicId, p.assetUrl),
+    assetName: p.assetName,
+    status: p.status,
+    paymentId: p.paymentId,
+    rejectReason: p.rejectReason,
+    submittedAt: p.submittedAt,
+    reviewedAt: p.reviewedAt,
+    student: p.student,
+  };
+}
+
+const proofInclude = { student: { select: { id: true, name: true, studentCode: true } } } as const;
+
+feesRouter.get("/payment-proofs", requireRoles(...READ_ROLES), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const status = typeof req.query.status === "string" ? req.query.status : undefined;
+    const validStatus = status === "PENDING" || status === "APPROVED" || status === "REJECTED" ? status : undefined;
+
+    const proofs = await prisma.paymentProof.findMany({
+      where: { instituteId, status: validStatus },
+      include: proofInclude,
+      // Pending-first within a queue that also shows history is the useful
+      // default — staff open this to work through the backlog, not to
+      // scroll past everything already handled.
+      orderBy: [{ status: "asc" }, { submittedAt: "desc" }],
+      take: 200,
+    });
+
+    res.json(proofs.map(serializePaymentProof));
+  } catch (err) {
+    next(err);
+  }
+});
+
+async function loadPendingProof(id: string, instituteId: string) {
+  const proof = await prisma.paymentProof.findUnique({
+    where: { id },
+    include: { feeAccount: true, student: { select: { id: true, name: true, studentCode: true } } },
+  });
+  if (!proof || proof.instituteId !== instituteId) throw ApiError.notFound("Payment proof not found");
+  if (proof.status !== "PENDING") {
+    throw ApiError.conflict(`This proof was already ${proof.status.toLowerCase()}.`);
+  }
+  return proof;
+}
+
+const approveProofSchema = z.object({
+  // The amount staff actually confirm — deliberately independent of
+  // amountClaimed. Same shape as recordPaymentSchema so this can share
+  // exactly its validation intent (a real, positive rupee amount).
+  amount: z.number().positive("Amount must be greater than zero"),
+  mode: z.enum(["UPI", "CASH", "CARD", "BANK_TRANSFER", "CHEQUE"]).default("UPI"),
+  paidOn: z.coerce.date().optional(),
+  notes: z.string().max(300).optional(),
+});
+
+feesRouter.post(
+  "/payment-proofs/:id/approve",
+  requireRoles(...MANAGE_ROLES),
+  validateBody(approveProofSchema),
+  async (req, res, next) => {
+    try {
+      const instituteId = req.tenantId!;
+      const body = req.body as z.infer<typeof approveProofSchema>;
+      const proof = await loadPendingProof(req.params.id as string, instituteId);
+
+      const { paymentId, carryForward } = await withFeeAccountLock(proof.feeAccountId, async (tx) => {
+        const applied = await applyPayment(tx, {
+          instituteId,
+          account: proof.feeAccount,
+          amount: new Prisma.Decimal(body.amount),
+          mode: body.mode,
+          paidOn: body.paidOn ?? todayDateOnly(),
+          notes: body.notes ?? `Approved from UPI proof (claimed ₹${money(proof.amountClaimed)})`,
+          userId: req.user!.id,
+        });
+
+        // Same transaction as the payment write itself — a crash between the
+        // two would otherwise either leave a proof PENDING with money already
+        // recorded (double-payable) or APPROVED with none (silently lost).
+        await tx.paymentProof.update({
+          where: { id: proof.id },
+          data: {
+            status: "APPROVED",
+            paymentId: applied.paymentId,
+            reviewedByUserId: req.user!.id,
+            reviewedAt: new Date(),
+          },
+        });
+
+        return applied;
+      });
+
+      await auditLog({
+        action: "PAYMENT_PROOF_APPROVED",
+        instituteId,
+        organizationId: req.user!.organizationId,
+        userId: req.user!.id,
+        targetType: "PaymentProof",
+        targetId: proof.id,
+        metadata: { paymentId, amount: body.amount, studentId: proof.studentId },
+      });
+
+      res.json({ paymentId, carryForward });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+const rejectProofSchema = z.object({
+  reason: z.string().min(1, "A reason is required").max(300),
+});
+
+feesRouter.post(
+  "/payment-proofs/:id/reject",
+  requireRoles(...MANAGE_ROLES),
+  validateBody(rejectProofSchema),
+  async (req, res, next) => {
+    try {
+      const instituteId = req.tenantId!;
+      const body = req.body as z.infer<typeof rejectProofSchema>;
+      const proof = await loadPendingProof(req.params.id as string, instituteId);
+
+      await prisma.paymentProof.update({
+        where: { id: proof.id },
+        data: {
+          status: "REJECTED",
+          rejectReason: body.reason,
+          reviewedByUserId: req.user!.id,
+          reviewedAt: new Date(),
+        },
+      });
+
+      // The screenshot itself has no further use once rejected — the student
+      // has to submit a fresh one anyway, so this keeps the storage account
+      // from accumulating every declined attempt forever. The row (and the
+      // reason) stays, for the audit trail.
+      await deleteAsset(proof.assetPublicId, "authenticated");
+
+      await auditLog({
+        action: "PAYMENT_PROOF_REJECTED",
+        instituteId,
+        organizationId: req.user!.organizationId,
+        userId: req.user!.id,
+        targetType: "PaymentProof",
+        targetId: proof.id,
+        metadata: { reason: body.reason, studentId: proof.studentId },
+      });
+
+      res.json({ id: proof.id, status: "REJECTED" });
+    } catch (err) {
+      next(err);
+    }
+  }
+);

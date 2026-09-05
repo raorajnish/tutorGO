@@ -10,6 +10,7 @@ import { FeeAccountModal } from "@/components/fees/FeeAccountModal";
 import { SetupFeeAccountModal } from "@/components/fees/SetupFeeAccountModal";
 import { DefaultersTab } from "@/components/fees/DefaultersTab";
 import { ReceiptsTab } from "@/components/fees/ReceiptsTab";
+import { PaymentProofsTab } from "@/components/fees/PaymentProofsTab";
 import type { Batch, Course, StudentListItem, StudentsResponse } from "@/lib/types";
 
 const STATUS_OPTIONS = [
@@ -35,6 +36,7 @@ const TABS = [
   { id: "students", label: "Students" },
   { id: "overdue", label: "Defaulters" },
   { id: "receipts", label: "Receipts" },
+  { id: "proofs", label: "Payment proofs" },
 ];
 
 export default function FeesPage() {
@@ -196,6 +198,7 @@ export default function FeesPage() {
       {tab === "overdue" && <DefaultersTab onOpenStudent={setSelectedId} />}
 
       {tab === "receipts" && <ReceiptsTab />}
+      {tab === "proofs" && <PaymentProofsTab />}
 
       <FeeAccountModal studentId={selectedId} onClose={() => setSelectedId(null)} />
 

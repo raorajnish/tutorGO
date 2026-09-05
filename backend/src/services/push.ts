@@ -19,6 +19,15 @@ export interface PushInput {
   userId: string;
   title: string;
   body: string;
+  /** Groups related notifications so the OS collapses them into one instead
+   * of stacking — e.g. every FEE_OVERDUE_REMINDER for the same student uses
+   * the same tag, so a re-send replaces the old banner rather than adding a
+   * second one. Omit for one-off notifications where stacking is fine. */
+  tag?: string;
+  /** Where `notificationclick` should send the user — a path within the app
+   * (e.g. `/portal/tests`), not a full URL. Defaults to the caller's own
+   * fallback in the service worker (see public/sw.js) when omitted. */
+  url?: string;
 }
 
 /** Best-effort — a push failure must never break the caller's real action
@@ -30,13 +39,17 @@ export async function sendPush(input: PushInput): Promise<void> {
   const subscriptions = await prisma.pushSubscription.findMany({ where: { userId: input.userId } });
   if (subscriptions.length === 0) return;
 
+  const payload = JSON.stringify({
+    title: input.title,
+    body: input.body,
+    tag: input.tag,
+    url: input.url,
+  });
+
   await Promise.all(
     subscriptions.map(async (sub) => {
       try {
-        await webpush.sendNotification(
-          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-          JSON.stringify({ title: input.title, body: input.body })
-        );
+        await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
       } catch (err) {
         // 404/410 means the browser has unsubscribed on its end — the
         // subscription is dead and retrying it forever would be pointless.

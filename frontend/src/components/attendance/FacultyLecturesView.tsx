@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { ScheduleLectureModal } from "@/components/attendance/ScheduleLectureModal";
@@ -124,7 +125,14 @@ export function FacultyLecturesView() {
               </tr>
             </thead>
             <tbody>
-              {lectures.map((l) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={6}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && lectures.map((l) => (
                 <tr key={l.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="whitespace-nowrap px-4 py-3 text-foreground">{fmtDate(l.date)}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-foreground">
@@ -207,7 +215,8 @@ export function FacultyLecturesView() {
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {lectures.map((l) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && lectures.map((l) => (
             <div key={l.id} className="space-y-2 p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>

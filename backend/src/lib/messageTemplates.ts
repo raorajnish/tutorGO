@@ -7,6 +7,8 @@ export const MESSAGE_TEMPLATE_TYPES = [
   "FEE_OVERDUE_REMINDER",
   "PAYROLL_PAYMENT_RECORDED",
   "TEST_RESULT_ENTERED",
+  "PTM_SCHEDULED",
+  "PTM_CANCELLED",
 ] as const;
 export type MessageTemplateType = (typeof MESSAGE_TEMPLATE_TYPES)[number];
 
@@ -22,6 +24,10 @@ export const DEFAULT_MESSAGE_TEMPLATES: Record<MessageTemplateType, string> = {
     "💰 *Payment recorded*\nHi {{name}}, ₹{{amount}} was paid to you via {{mode}} on {{paidOn}}.\n\nPending balance: ₹{{pendingAmount}}\n\n— {{instituteName}}",
   TEST_RESULT_ENTERED:
     "📝 *{{testTitle}}* — {{subject}}\n{{studentName}} scored *{{marksObtained}}/{{totalMarks}}* ({{heldOn}}).",
+  PTM_SCHEDULED:
+    "📅 *Parent-Teacher Meeting*\n{{title}} — {{batch}} ({{course}})\n{{date}}, {{startTime}}–{{endTime}}{{venue}}\n\nWe look forward to seeing you there.",
+  PTM_CANCELLED:
+    "⚠️ *Parent-Teacher Meeting Cancelled*\n{{title}} — {{batch}} ({{course}})\nWas scheduled {{date}}, {{startTime}}–{{endTime}}\n\nReason: {{cancelReason}}",
 };
 
 /** Server-side twin of the frontend's renderTemplate (frontend/src/lib/

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { ExpenseCategory } from "@/lib/types";
 
 export function CategoriesTab() {
@@ -62,6 +63,14 @@ export function CategoriesTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
+            {categories === null &&
+              Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={4}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
             {categories?.map((c) => (
               <tr key={c.id}>
                 <td className="px-4 py-3 font-medium text-foreground">{c.name}</td>

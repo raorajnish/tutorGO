@@ -8,6 +8,7 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { Batch, Course } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 import { formatDate as fmtDate } from "@/lib/format";
@@ -106,7 +107,14 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
               </tr>
             </thead>
             <tbody>
-              {visible.map((b) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={8}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && visible.map((b) => (
                 <tr key={b.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3 font-medium text-foreground">{b.name}</td>
                   <td className="px-4 py-3 text-foreground">
@@ -138,7 +146,8 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {visible.map((b) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && visible.map((b) => (
             <div key={b.id} className="space-y-2 p-4" onClick={() => openEdit(b)}>
               <div className="flex items-start justify-between gap-2">
                 <div>

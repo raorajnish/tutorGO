@@ -7,6 +7,7 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { Batch, Course, SelfFillStatusRow } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 
@@ -209,7 +210,14 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {loading && Array.from({ length: 5 }, (_, i) => (
+              <tr key={`sk-${i}`}>
+                <td colSpan={4}>
+                  <SkeletonRow lines={2} />
+                </td>
+              </tr>
+            ))}
+            {!loading && rows.map((r) => (
               <tr key={r.id} className="border-b border-border last:border-0 hover:bg-muted">
                 <td className="px-4 py-3">
                   <p className="font-medium text-foreground">{r.name}</p>
@@ -265,7 +273,8 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
       </div>
 
       <div className="divide-y divide-border sm:hidden">
-        {rows.map((r) => (
+        {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+        {!loading && rows.map((r) => (
           <div key={r.id} className="space-y-2 p-4">
             <div className="flex items-start justify-between gap-2">
               <div>

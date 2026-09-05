@@ -287,6 +287,16 @@ export interface PlatformInstituteDetail {
 /// A bare max-per-role map (no usage counts) — a plan's headline numbers.
 export type RoleLimitValues = Record<CappedRole, number>;
 
+/// One suspend/lift cycle for an institute (changes-phase12.md §12.10).
+export interface InstituteSuspension {
+  id: string;
+  reason: string;
+  suspendedAt: string;
+  liftedAt: string | null;
+  suspendedBy: { id: string; fullName: string };
+  liftedBy: { id: string; fullName: string } | null;
+}
+
 /// One row of the platform-wide user directory (SUPERADMIN only).
 export interface PlatformUser {
   id: string;
@@ -1372,6 +1382,56 @@ export interface AppNotification {
 }
 
 // ---------------------------------------------------------------------------
+// Help & support (changes-phase12.md §12.3)
+// ---------------------------------------------------------------------------
+
+export type SupportTicketStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED";
+export type SupportTicketCategory = "BILLING" | "BUG" | "FEATURE_REQUEST" | "OTHER";
+
+export const SUPPORT_CATEGORIES: SupportTicketCategory[] = ["BILLING", "BUG", "FEATURE_REQUEST", "OTHER"];
+export const SUPPORT_CATEGORY_LABELS: Record<SupportTicketCategory, string> = {
+  BILLING: "Billing",
+  BUG: "Bug report",
+  FEATURE_REQUEST: "Feature request",
+  OTHER: "Other",
+};
+export const SUPPORT_STATUS_LABELS: Record<SupportTicketStatus, string> = {
+  OPEN: "Open",
+  IN_PROGRESS: "In progress",
+  RESOLVED: "Resolved",
+};
+
+export interface SupportTicketMessage {
+  id: string;
+  authorUserId: string;
+  isFromPlatform: boolean;
+  body: string;
+  createdAt: string;
+  author: { id: string; fullName: string };
+}
+
+export interface SupportTicketSummary {
+  id: string;
+  category: SupportTicketCategory;
+  subject: string;
+  status: SupportTicketStatus;
+  instituteId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: { id: string; fullName: string; email?: string };
+  organization?: { id: string; name: string };
+  institute?: { id: string; name: string } | null;
+  _count: { messages: number };
+}
+
+export interface SupportTicketDetail extends SupportTicketSummary {
+  organizationId: string;
+  instituteId: string | null;
+  createdByUserId: string;
+  messages: SupportTicketMessage[];
+}
+
+// ---------------------------------------------------------------------------
 // Distribution tracking (books, bags, T-shirts, digests) — see changes-phase8.md §8e
 // ---------------------------------------------------------------------------
 
@@ -1620,6 +1680,7 @@ export interface PortalDashboard {
 export interface PortalTimetable {
   batch: { id: string; name: string } | null;
   lectures: PortalLecture[];
+  parentMeetings: PortalParentMeeting[];
 }
 
 export interface PortalTestDetail {
@@ -1718,4 +1779,108 @@ export interface PortalProfile {
   course: { name: string; code: string };
   institute: { name: string; phone: string | null; email: string | null; city: string | null };
   currentBatch: { name: string } | null;
+}
+
+// ---------------------------------------------------------------------------
+// Self-serve payment collection (Phase 11.1)
+// ---------------------------------------------------------------------------
+
+export interface InstitutePaymentConfig {
+  isEnabled: boolean;
+  upiId: string | null;
+  payeeName: string | null;
+  qrAssetUrl: string | null;
+  qrAssetName: string | null;
+  instructions: string | null;
+  updatedAt: string;
+}
+
+/// The student's own read of the config — narrower than the staff shape:
+/// null in its entirety when the feature is off, and no `updatedAt` since
+/// nothing on the student side cares when it was last edited.
+export interface PortalPaymentConfig {
+  upiId: string | null;
+  payeeName: string | null;
+  qrAssetUrl: string | null;
+  instructions: string | null;
+}
+
+export type PaymentProofStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export interface PaymentProof {
+  id: string;
+  amountClaimed: string;
+  referenceNo: string | null;
+  assetUrl: string;
+  status: PaymentProofStatus;
+  rejectReason: string | null;
+  submittedAt: string;
+  reviewedAt: string | null;
+}
+
+/// The staff-side row — includes who it's from and (once approved) the
+/// receipt it produced.
+export interface StaffPaymentProof extends PaymentProof {
+  assetName: string;
+  paymentId: string | null;
+  student: { id: string; name: string; studentCode: string };
+}
+
+export interface PaymentProofUploadResult {
+  url: string;
+  name: string;
+  publicId: string;
+}
+
+export interface ApprovePaymentProofResult {
+  paymentId: string;
+  carryForward: {
+    direction: "shortfall" | "overpay";
+    amount: string;
+    entries: { installmentId: string; seq: number; dueDate: string; amount: string; created: boolean; removed: boolean }[];
+  } | null;
+}
+
+// ---------------------------------------------------------------------------
+// Parent-teacher meetings (Phase 11.2)
+// ---------------------------------------------------------------------------
+
+export interface ParentMeeting {
+  id: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue: string | null;
+  note: string | null;
+  cancelled: boolean;
+  cancelReason: string | null;
+  course: { id: string; name: string; code: string };
+  batch: { id: string; name: string };
+}
+
+export interface CreateParentMeetingBatch {
+  batchId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue?: string;
+  note?: string;
+}
+
+export interface CreateParentMeetingPayload {
+  title: string;
+  courseId: string;
+  meetings: CreateParentMeetingBatch[];
+}
+
+/// The student portal's own view of a PTM for their batch — a lighter shape
+/// than the staff one, folded into the timetable response.
+export interface PortalParentMeeting {
+  id: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue: string | null;
 }

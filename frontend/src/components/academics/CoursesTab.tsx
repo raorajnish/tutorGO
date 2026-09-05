@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { Course, CourseFeeMode } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 
@@ -77,7 +78,14 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
               </tr>
             </thead>
             <tbody>
-              {courses.map((c) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={7}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && courses.map((c) => (
                 <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">
@@ -111,7 +119,8 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {courses.map((c) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && courses.map((c) => (
             <div key={c.id} className="space-y-2 p-4" onClick={() => openEdit(c)}>
               <div className="flex items-start justify-between gap-2">
                 <div>

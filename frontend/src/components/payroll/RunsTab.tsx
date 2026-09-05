@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { ExportButton } from "@/components/ui/ExportButton";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import type { PayrollRun, PayrollRunPreview } from "@/lib/types";
@@ -30,6 +31,7 @@ export function RunsTab() {
   const canPay = canManage || user?.role === "ACCOUNTANT";
 
   const [runs, setRuns] = useState<PayrollRun[]>([]);
+  const [runsLoading, setRunsLoading] = useState(true);
   const [period, setPeriod] = useState(currentPeriod());
   const [preview, setPreview] = useState<PayrollRunPreview | null>(null);
   const [activeRun, setActiveRun] = useState<PayrollRun | null>(null);
@@ -40,7 +42,8 @@ export function RunsTab() {
   function loadRuns() {
     apiFetch<PayrollRun[]>("/payroll/runs")
       .then(setRuns)
-      .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load payroll runs."));
+      .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load payroll runs."))
+      .finally(() => setRunsLoading(false));
   }
 
   useEffect(loadRuns, []);
@@ -237,7 +240,15 @@ export function RunsTab() {
                 </tr>
               </thead>
               <tbody>
-                {runs.map((r) => (
+                {runsLoading &&
+                  Array.from({ length: 4 }, (_, i) => (
+                    <tr key={`sk-${i}`}>
+                      <td colSpan={4}>
+                        <SkeletonRow lines={2} />
+                      </td>
+                    </tr>
+                  ))}
+                {!runsLoading && runs.map((r) => (
                   <tr key={r.id} className="cursor-pointer border-b border-border last:border-0 hover:bg-muted" onClick={() => setPeriod(r.periodMonth)}>
                     <td className="px-4 py-3 font-medium text-foreground">{r.label}</td>
                     <td className="px-4 py-3">
@@ -247,7 +258,7 @@ export function RunsTab() {
                     <td className="px-4 py-3 text-foreground">{formatDate(r.paidAt)}</td>
                   </tr>
                 ))}
-                {runs.length === 0 && (
+                {!runsLoading && runs.length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-4 py-8 text-center text-sm text-muted-foreground">
                       No payroll runs yet.

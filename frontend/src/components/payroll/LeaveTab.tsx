@@ -5,6 +5,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Dropdown } from "@/components/ui/Dropdown";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatDate } from "@/lib/format";
 import type { LeaveRequest, LeaveStatus } from "@/lib/types";
 
@@ -94,7 +95,14 @@ export function LeaveTab() {
               </tr>
             </thead>
             <tbody>
-              {requests.map((r) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={6}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && requests.map((r) => (
                 <tr key={r.id} className="border-b border-border last:border-0">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">{r.userName}</p>
@@ -136,7 +144,8 @@ export function LeaveTab() {
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {requests.map((r) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && requests.map((r) => (
             <div key={r.id} className="space-y-2 p-4">
               <div className="flex items-center justify-between gap-2">
                 <div>

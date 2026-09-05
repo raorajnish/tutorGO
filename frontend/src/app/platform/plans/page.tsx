@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
@@ -193,7 +194,14 @@ export default function PlatformPlansPage() {
               </tr>
             </thead>
             <tbody>
-              {plans.map((plan) => (
+              {loading && Array.from({ length: 4 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={9}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && plans.map((plan) => (
                 <tr key={plan.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">
@@ -238,7 +246,8 @@ export default function PlatformPlansPage() {
 
         {/* Mobile cards */}
         <div className="divide-y divide-border sm:hidden">
-          {plans.map((plan) => (
+          {loading && Array.from({ length: 4 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && plans.map((plan) => (
             <div key={plan.id} className="space-y-2 p-4" onClick={() => openEdit(plan)}>
               <div className="flex items-start justify-between gap-2">
                 <div>

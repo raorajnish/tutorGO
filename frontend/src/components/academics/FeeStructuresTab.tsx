@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatMoney } from "@/lib/money";
 import type { Course, FeeStructure, FeePlanType, Subject } from "@/lib/types";
 import { FEE_PLAN_TYPE_LABELS } from "@/lib/types";
@@ -100,7 +101,14 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
               </tr>
             </thead>
             <tbody>
-              {structures.map((s) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={6}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && structures.map((s) => (
                 <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3 font-medium text-foreground">{s.name}</td>
                   <td className="px-4 py-3 text-foreground">
@@ -141,7 +149,8 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
 
         {/* Mobile: cards */}
         <div className="divide-y divide-border sm:hidden">
-          {structures.map((s) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && structures.map((s) => (
             <div key={s.id} className="p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">

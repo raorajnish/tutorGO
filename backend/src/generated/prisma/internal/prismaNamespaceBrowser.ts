@@ -57,6 +57,8 @@ export const ModelName = {
   Module: 'Module',
   InstituteModule: 'InstituteModule',
   User: 'User',
+  SupportTicket: 'SupportTicket',
+  SupportTicketMessage: 'SupportTicketMessage',
   PushSubscription: 'PushSubscription',
   PasswordResetOtp: 'PasswordResetOtp',
   EmailConfig: 'EmailConfig',
@@ -72,6 +74,7 @@ export const ModelName = {
   Subject: 'Subject',
   CourseSubject: 'CourseSubject',
   Batch: 'Batch',
+  ParentMeeting: 'ParentMeeting',
   Enquiry: 'Enquiry',
   EnquiryActivity: 'EnquiryActivity',
   StudentCodeCounter: 'StudentCodeCounter',
@@ -90,6 +93,8 @@ export const ModelName = {
   FeeInstallment: 'FeeInstallment',
   Payment: 'Payment',
   PaymentAllocation: 'PaymentAllocation',
+  InstitutePaymentConfig: 'InstitutePaymentConfig',
+  PaymentProof: 'PaymentProof',
   ReceiptCounter: 'ReceiptCounter',
   SalaryProfile: 'SalaryProfile',
   PayrollLineItem: 'PayrollLineItem',
@@ -102,7 +107,8 @@ export const ModelName = {
   FinanceEntry: 'FinanceEntry',
   DistributionItem: 'DistributionItem',
   DistributionReceipt: 'DistributionReceipt',
-  LeaveRequest: 'LeaveRequest'
+  LeaveRequest: 'LeaveRequest',
+  InstituteSuspension: 'InstituteSuspension'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -221,11 +227,39 @@ export const UserScalarFieldEnum = {
   mustChangePassword: 'mustChangePassword',
   termsAcceptedAt: 'termsAcceptedAt',
   lastLoginAt: 'lastLoginAt',
+  tokenVersion: 'tokenVersion',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const SupportTicketScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  instituteId: 'instituteId',
+  createdByUserId: 'createdByUserId',
+  category: 'category',
+  subject: 'subject',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupportTicketScalarFieldEnum = (typeof SupportTicketScalarFieldEnum)[keyof typeof SupportTicketScalarFieldEnum]
+
+
+export const SupportTicketMessageScalarFieldEnum = {
+  id: 'id',
+  ticketId: 'ticketId',
+  authorUserId: 'authorUserId',
+  isFromPlatform: 'isFromPlatform',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportTicketMessageScalarFieldEnum = (typeof SupportTicketMessageScalarFieldEnum)[keyof typeof SupportTicketMessageScalarFieldEnum]
 
 
 export const PushSubscriptionScalarFieldEnum = {
@@ -458,6 +492,29 @@ export const BatchScalarFieldEnum = {
 } as const
 
 export type BatchScalarFieldEnum = (typeof BatchScalarFieldEnum)[keyof typeof BatchScalarFieldEnum]
+
+
+export const ParentMeetingScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  title: 'title',
+  courseId: 'courseId',
+  batchId: 'batchId',
+  date: 'date',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  venue: 'venue',
+  note: 'note',
+  createdByUserId: 'createdByUserId',
+  cancelledAt: 'cancelledAt',
+  cancelReason: 'cancelReason',
+  dayBeforeRemindedAt: 'dayBeforeRemindedAt',
+  hourBeforeRemindedAt: 'hourBeforeRemindedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ParentMeetingScalarFieldEnum = (typeof ParentMeetingScalarFieldEnum)[keyof typeof ParentMeetingScalarFieldEnum]
 
 
 export const EnquiryScalarFieldEnum = {
@@ -743,6 +800,44 @@ export const PaymentAllocationScalarFieldEnum = {
 export type PaymentAllocationScalarFieldEnum = (typeof PaymentAllocationScalarFieldEnum)[keyof typeof PaymentAllocationScalarFieldEnum]
 
 
+export const InstitutePaymentConfigScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  isEnabled: 'isEnabled',
+  upiId: 'upiId',
+  payeeName: 'payeeName',
+  qrAssetUrl: 'qrAssetUrl',
+  qrAssetName: 'qrAssetName',
+  qrAssetPublicId: 'qrAssetPublicId',
+  instructions: 'instructions',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InstitutePaymentConfigScalarFieldEnum = (typeof InstitutePaymentConfigScalarFieldEnum)[keyof typeof InstitutePaymentConfigScalarFieldEnum]
+
+
+export const PaymentProofScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  studentId: 'studentId',
+  feeAccountId: 'feeAccountId',
+  amountClaimed: 'amountClaimed',
+  referenceNo: 'referenceNo',
+  assetUrl: 'assetUrl',
+  assetName: 'assetName',
+  assetPublicId: 'assetPublicId',
+  status: 'status',
+  paymentId: 'paymentId',
+  reviewedByUserId: 'reviewedByUserId',
+  reviewedAt: 'reviewedAt',
+  rejectReason: 'rejectReason',
+  submittedAt: 'submittedAt'
+} as const
+
+export type PaymentProofScalarFieldEnum = (typeof PaymentProofScalarFieldEnum)[keyof typeof PaymentProofScalarFieldEnum]
+
+
 export const ReceiptCounterScalarFieldEnum = {
   id: 'id',
   instituteId: 'instituteId',
@@ -932,6 +1027,19 @@ export const LeaveRequestScalarFieldEnum = {
 } as const
 
 export type LeaveRequestScalarFieldEnum = (typeof LeaveRequestScalarFieldEnum)[keyof typeof LeaveRequestScalarFieldEnum]
+
+
+export const InstituteSuspensionScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  reason: 'reason',
+  suspendedByUserId: 'suspendedByUserId',
+  suspendedAt: 'suspendedAt',
+  liftedAt: 'liftedAt',
+  liftedByUserId: 'liftedByUserId'
+} as const
+
+export type InstituteSuspensionScalarFieldEnum = (typeof InstituteSuspensionScalarFieldEnum)[keyof typeof InstituteSuspensionScalarFieldEnum]
 
 
 export const SortOrder = {

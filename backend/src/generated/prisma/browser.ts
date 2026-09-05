@@ -56,6 +56,16 @@ export type InstituteModule = Prisma.InstituteModuleModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model SupportTicket
+ * 
+ */
+export type SupportTicket = Prisma.SupportTicketModel
+/**
+ * Model SupportTicketMessage
+ * 
+ */
+export type SupportTicketMessage = Prisma.SupportTicketMessageModel
+/**
  * Model PushSubscription
  * One browser/device registration for web push. A user can have several
  * (phone, laptop, ...); each is pushed to independently, and a subscription
@@ -159,6 +169,18 @@ export type CourseSubject = Prisma.CourseSubjectModel
  * 
  */
 export type Batch = Prisma.BatchModel
+/**
+ * Model ParentMeeting
+ * A parent–teacher meeting, scheduled per batch (changes-phase11.md §11.2).
+ * Deliberately one row per batch rather than per course/standard: two
+ * batches of the same standard almost never meet in the same slot, so a
+ * single course-wide time would be wrong for most of the people it
+ * notifies. Scheduling a whole standard's PTM is a UI concern — the create
+ * flow picks a course, lists its batches, and writes one row per batch
+ * selected — not a model one; each row stays independently reschedulable
+ * and cancellable.
+ */
+export type ParentMeeting = Prisma.ParentMeetingModel
 /**
  * Model Enquiry
  * 
@@ -328,6 +350,26 @@ export type Payment = Prisma.PaymentModel
  */
 export type PaymentAllocation = Prisma.PaymentAllocationModel
 /**
+ * Model InstitutePaymentConfig
+ * Per-institute self-serve payment collection config (changes-phase11.md
+ * §11.1) — same shape as InstituteEmailConfig/InstituteWhatsAppConfig: one
+ * row per institute, a master `isEnabled` switch, everything else optional
+ * underneath it. Off means the student portal never renders a "Pay fees"
+ * button, whatever else is filled in here.
+ */
+export type InstitutePaymentConfig = Prisma.InstitutePaymentConfigModel
+/**
+ * Model PaymentProof
+ * A student's claim of having paid outside the app (UPI/bank transfer),
+ * evidenced by an uploaded screenshot. Deliberately NOT itself a payment —
+ * see fees.ts's applyPayment() and the approve route below: approving a
+ * proof calls the exact same money-writing path a manually recorded payment
+ * does, with the amount staff confirm, never `amountClaimed` blindly. A
+ * screenshot is a claim, not a receipt: it can be stale, edited, or someone
+ * else's transfer, so nothing here ever touches FeeInstallment on its own.
+ */
+export type PaymentProof = Prisma.PaymentProofModel
+/**
  * Model ReceiptCounter
  * Same atomic-upsert pattern as StudentCodeCounter — one gapless sequence
  * per (institute, year+month), used to generate Payment.receiptNumber
@@ -431,3 +473,13 @@ export type DistributionReceipt = Prisma.DistributionReceiptModel
  * for a follow-up once an institute actually asks for it — see phase10 doc.
  */
 export type LeaveRequest = Prisma.LeaveRequestModel
+/**
+ * Model InstituteSuspension
+ * One row per suspend/lift cycle (changes-phase12.md §12.10) — turns
+ * "why is this institute suspended" from tribal knowledge into a real
+ * answer. Institute.isActive stays the single source of truth for whether
+ * access is actually blocked (authenticate() only ever reads that boolean);
+ * this table is purely a record of who did it, when, and why, and is never
+ * itself read by any access-control check.
+ */
+export type InstituteSuspension = Prisma.InstituteSuspensionModel

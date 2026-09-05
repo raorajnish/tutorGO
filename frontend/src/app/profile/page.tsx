@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
@@ -53,9 +54,54 @@ export default function ProfilePage() {
         <p className="mb-3 text-sm font-semibold text-foreground">Security</p>
         <div className="space-y-3">
           <ChangePasswordCard />
+          <SignOutEverywhereCard />
           <TwoFactorCard />
         </div>
       </div>
+    </div>
+  );
+}
+
+function SignOutEverywhereCard() {
+  const { logout } = useAuth();
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleClick() {
+    if (
+      !window.confirm(
+        "Sign out of all devices? This immediately signs out every session on this account, including this one — you'll need to log in again here too."
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await apiFetch("/auth/logout-everywhere", { method: "POST" });
+      logout();
+      router.replace("/login");
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not sign out other sessions.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium text-foreground">Sessions</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">Signed in somewhere you don&apos;t recognise? Sign out everywhere at once.</p>
+        </div>
+        <Button variant="secondary" onClick={handleClick} disabled={busy}>
+          {busy ? "Signing out…" : "Sign out of all devices"}
+        </Button>
+      </div>
+      {error && (
+        <div className="mt-3 rounded-lg border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>
+      )}
     </div>
   );
 }

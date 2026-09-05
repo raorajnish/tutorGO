@@ -90,7 +90,9 @@ export const MessageTemplateType = {
   ATTENDANCE_MARKED: 'ATTENDANCE_MARKED',
   FEE_OVERDUE_REMINDER: 'FEE_OVERDUE_REMINDER',
   PAYROLL_PAYMENT_RECORDED: 'PAYROLL_PAYMENT_RECORDED',
-  TEST_RESULT_ENTERED: 'TEST_RESULT_ENTERED'
+  TEST_RESULT_ENTERED: 'TEST_RESULT_ENTERED',
+  PTM_SCHEDULED: 'PTM_SCHEDULED',
+  PTM_CANCELLED: 'PTM_CANCELLED'
 } as const
 
 export type MessageTemplateType = (typeof MessageTemplateType)[keyof typeof MessageTemplateType]
@@ -156,6 +158,25 @@ export const PayrollRunStatus = {
 export type PayrollRunStatus = (typeof PayrollRunStatus)[keyof typeof PayrollRunStatus]
 
 
+export const SupportTicketStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED'
+} as const
+
+export type SupportTicketStatus = (typeof SupportTicketStatus)[keyof typeof SupportTicketStatus]
+
+
+export const SupportTicketCategory = {
+  BILLING: 'BILLING',
+  BUG: 'BUG',
+  FEATURE_REQUEST: 'FEATURE_REQUEST',
+  OTHER: 'OTHER'
+} as const
+
+export type SupportTicketCategory = (typeof SupportTicketCategory)[keyof typeof SupportTicketCategory]
+
+
 export const WhatsAppTemplateStatus = {
   DRAFT: 'DRAFT',
   PENDING: 'PENDING',
@@ -219,6 +240,15 @@ export const CourseFeeMode = {
 } as const
 
 export type CourseFeeMode = (typeof CourseFeeMode)[keyof typeof CourseFeeMode]
+
+
+export const PaymentProofStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type PaymentProofStatus = (typeof PaymentProofStatus)[keyof typeof PaymentProofStatus]
 
 
 export const LeaveStatus = {

@@ -7,6 +7,8 @@ import { SkeletonBlock } from "@/components/ui/Skeleton";
 import { ICONS, IconChip, StaggerGrid, StaggerItem, StaggerList, PortalEmpty, PortalHeader, PortalStat, SectionTitle } from "@/components/portal/PortalPieces";
 import { formatDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
+import { Button } from "@/components/ui/Button";
+import { PayFeesSheet } from "@/components/portal/PayFeesSheet";
 import type { PortalFees, PortalInstallment } from "@/lib/types";
 
 const STATUS: Record<PortalInstallment["status"], { label: string; tone: "success" | "danger" | "warning" | "neutral" }> = {
@@ -27,18 +29,28 @@ const RECEIPT_ICON = (
 export default function PortalFeesPage() {
   const [data, setData] = useState<PortalFees | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [payOpen, setPayOpen] = useState(false);
 
-  useEffect(() => {
+  function load() {
     apiFetch<PortalFees>("/portal/fees")
       .then(setData)
       .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load your fees."));
-  }, []);
+  }
+
+  useEffect(load, []);
 
   const summary = data?.summary;
 
   return (
     <div className="space-y-6">
-      <PortalHeader eyebrow="My learning" title="Fees" subtitle="What's paid, what's due, and every receipt." />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <PortalHeader eyebrow="My learning" title="Fees" subtitle="What's paid, what's due, and every receipt." />
+        {summary && summary.balance !== "0.00" && (
+          <Button onClick={() => setPayOpen(true)} className="shrink-0">
+            Pay fees
+          </Button>
+        )}
+      </div>
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
@@ -161,6 +173,13 @@ export default function PortalFeesPage() {
           </section>
         </>
       )}
+
+      <PayFeesSheet
+        open={payOpen}
+        onClose={() => setPayOpen(false)}
+        nextDueAmount={summary?.nextDueAmount ?? null}
+        onSubmitted={load}
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { SkeletonLine } from "@/components/ui/Skeleton";
 import { formatMoney, parseMoney } from "@/lib/money";
 import { SALARY_TYPE_LABELS, type RateHistoryEntry, type SalaryProfileListItem } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
@@ -24,6 +25,7 @@ export function EditSalaryProfileModal({ profile, onClose, onSaved, onDeleted }:
   const [rate, setRate] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [history, setHistory] = useState<RateHistoryEntry[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deactivateConfirmOpen, setDeactivateConfirmOpen] = useState(false);
@@ -40,9 +42,11 @@ export function EditSalaryProfileModal({ profile, onClose, onSaved, onDeleted }:
     setRate(profile.salaryType === "FIXED" ? (profile.monthlyRate ?? "") : (profile.perLectureRate ?? ""));
     setIsActive(profile.isActive);
     setError(null);
+    setHistoryLoading(true);
     apiFetch<RateHistoryEntry[]>(`/payroll/staff/${profile.id}/rate-history`)
       .then(setHistory)
-      .catch(() => setHistory([]));
+      .catch(() => setHistory([]))
+      .finally(() => setHistoryLoading(false));
   }, [profile]);
 
   async function save(overrides?: { isActive?: boolean }) {
@@ -132,7 +136,18 @@ export function EditSalaryProfileModal({ profile, onClose, onSaved, onDeleted }:
               <p className="text-xs text-warning">Still owed {formatMoney(pending)} — deactivating drops them from future run previews/sweeps, but this balance stays visible and payable here.</p>
             )}
 
-            {history.length > 0 && (
+            {historyLoading && (
+              <div>
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Rate history</p>
+                <div className="space-y-1.5 rounded-lg border border-border p-2.5">
+                  {Array.from({ length: 2 }, (_, i) => (
+                    <SkeletonLine key={i} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {!historyLoading && history.length > 0 && (
               <div>
                 <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Rate history</p>
                 <div className="max-h-32 space-y-1.5 overflow-y-auto rounded-lg border border-border p-2.5 text-xs">

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { StatCard } from "@/components/ui/StatCard";
 import { DistributionRosterModal } from "@/components/distribution/DistributionRosterModal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { Course, DistributionItem } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 
@@ -99,7 +100,14 @@ export default function DistributionPage() {
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={5}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && items.map((item) => (
                 <tr
                   key={item.id}
                   className="cursor-pointer border-b border-border last:border-0 hover:bg-muted"
@@ -132,7 +140,8 @@ export default function DistributionPage() {
 
         {/* Mobile: cards */}
         <div className="divide-y divide-border sm:hidden">
-          {items.map((item) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && items.map((item) => (
             <button
               key={item.id}
               type="button"

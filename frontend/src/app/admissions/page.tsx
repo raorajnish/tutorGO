@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { AdmitModal } from "@/components/admissions/AdmitModal";
 import { SelfFillTab } from "@/components/admissions/SelfFillTab";
+import { SkeletonRow } from "@/components/ui/Skeleton";
+import { ImportButton } from "@/components/ui/ImportButton";
+import { ImportModal } from "@/components/ui/ImportModal";
 import { ENQUIRY_SOURCE_LABELS, type Course, type Enquiry, type StudentListItem } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 
@@ -51,6 +54,7 @@ function AdmissionsContent() {
 
   const [admitOpen, setAdmitOpen] = useState(false);
   const [admitEnquiry, setAdmitEnquiry] = useState<Enquiry | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -105,7 +109,10 @@ function AdmissionsContent() {
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Admissions</h1>
           <p className="mt-1 text-sm text-muted-foreground">Admit directly, or convert an open enquiry into a student.</p>
         </div>
-        <Button onClick={openAdmitDirect}>Admit directly</Button>
+        <div className="flex items-center gap-2">
+          <ImportButton title="Bulk import students from CSV" onClick={() => setImportOpen(true)} />
+          <Button onClick={openAdmitDirect}>Admit directly</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -181,7 +188,14 @@ function AdmissionsContent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pipeline.map((e) => (
+                  {loading && Array.from({ length: 5 }, (_, i) => (
+                    <tr key={`sk-${i}`}>
+                      <td colSpan={5}>
+                        <SkeletonRow lines={2} />
+                      </td>
+                    </tr>
+                  ))}
+                  {!loading && pipeline.map((e) => (
                     <tr key={e.id} className="border-b border-border last:border-0 hover:bg-muted">
                       <td className="px-4 py-3">
                         <p className="font-medium text-foreground">{e.name}</p>
@@ -211,7 +225,8 @@ function AdmissionsContent() {
             </div>
 
             <div className="divide-y divide-border sm:hidden">
-              {pipeline.map((e) => (
+              {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+              {!loading && pipeline.map((e) => (
                 <div key={e.id} className="space-y-2 p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -247,7 +262,14 @@ function AdmissionsContent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {admitted.map((s) => (
+                  {loading && Array.from({ length: 5 }, (_, i) => (
+                    <tr key={`sk-${i}`}>
+                      <td colSpan={5}>
+                        <SkeletonRow avatar lines={2} />
+                      </td>
+                    </tr>
+                  ))}
+                  {!loading && admitted.map((s) => (
                     <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted">
                       <td className="px-4 py-3">
                         <p className="font-medium text-foreground">{s.name}</p>
@@ -273,7 +295,8 @@ function AdmissionsContent() {
             </div>
 
             <div className="divide-y divide-border sm:hidden">
-              {admitted.map((s) => (
+              {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} avatar lines={2} />)}
+              {!loading && admitted.map((s) => (
                 <div key={s.id} className="space-y-1.5 p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -301,6 +324,19 @@ function AdmissionsContent() {
         onAdmitted={load}
         courses={courses}
         enquiry={admitEnquiry}
+      />
+
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        title="Import students"
+        description="Upload a CSV to admit many students at once — nothing is created until you confirm the preview."
+        templatePath="/students/import/template.csv"
+        templateFilename="student-import-template.csv"
+        importPath="/students/import"
+        onImported={load}
+        extraColumnLabel="Student ID"
+        extraColumnValue={(row) => row.studentCode ?? ""}
       />
     </div>
   );

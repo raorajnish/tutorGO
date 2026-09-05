@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { StudentProfileModal } from "@/components/students/StudentProfileModal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { ExportButton } from "@/components/ui/ExportButton";
 import type { Batch, Course, StudentsResponse } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
@@ -153,52 +154,68 @@ export default function StudentsPage() {
               </tr>
             </thead>
             <tbody>
-              {students.map((s) => (
-                <tr
-                  key={s.id}
-                  onClick={() => setSelectedId(s.id)}
-                  className="cursor-pointer border-b border-border last:border-0 hover:bg-muted"
-                >
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-foreground">{s.name}</p>
-                    <p className="text-xs text-muted-foreground">{s.studentCode}</p>
-                  </td>
-                  <td className="px-4 py-3 text-foreground">{s.course.name} ({s.course.code})</td>
-                  <td className="px-4 py-3 text-foreground">{s.currentBatch?.name ?? "—"}</td>
-                  <td className="px-4 py-3 text-foreground">{fmtDate(s.admissionDate)}</td>
-                  <td className="px-4 py-3">
-                    <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
-                  </td>
-                </tr>
-              ))}
-              {!loading && students.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    No students found.
-                  </td>
-                </tr>
+              {loading ? (
+                Array.from({ length: 6 }, (_, i) => (
+                  <tr key={i}>
+                    <td colSpan={5}>
+                      <SkeletonRow avatar lines={2} />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <>
+                  {students.map((s) => (
+                    <tr
+                      key={s.id}
+                      onClick={() => setSelectedId(s.id)}
+                      className="cursor-pointer border-b border-border last:border-0 hover:bg-muted"
+                    >
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-foreground">{s.name}</p>
+                        <p className="text-xs text-muted-foreground">{s.studentCode}</p>
+                      </td>
+                      <td className="px-4 py-3 text-foreground">{s.course.name} ({s.course.code})</td>
+                      <td className="px-4 py-3 text-foreground">{s.currentBatch?.name ?? "—"}</td>
+                      <td className="px-4 py-3 text-foreground">{fmtDate(s.admissionDate)}</td>
+                      <td className="px-4 py-3">
+                        <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
+                      </td>
+                    </tr>
+                  ))}
+                  {students.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                        No students found.
+                      </td>
+                    </tr>
+                  )}
+                </>
               )}
             </tbody>
           </table>
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {students.map((s) => (
-            <div key={s.id} className="space-y-2 p-4" onClick={() => setSelectedId(s.id)}>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-medium text-foreground">{s.name}</p>
-                  <p className="text-xs text-muted-foreground">{s.studentCode}</p>
+          {loading ? (
+            Array.from({ length: 6 }, (_, i) => <SkeletonRow key={i} avatar lines={2} />)
+          ) : (
+            <>
+              {students.map((s) => (
+                <div key={s.id} className="space-y-2 p-4" onClick={() => setSelectedId(s.id)}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-medium text-foreground">{s.name}</p>
+                      <p className="text-xs text-muted-foreground">{s.studentCode}</p>
+                    </div>
+                    <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {s.course.name} ({s.course.code}) · {s.currentBatch?.name ?? "No batch"}
+                  </p>
                 </div>
-                <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {s.course.name} ({s.course.code}) · {s.currentBatch?.name ?? "No batch"}
-              </p>
-            </div>
-          ))}
-          {!loading && students.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">No students found.</p>
+              ))}
+              {students.length === 0 && <p className="p-6 text-center text-sm text-muted-foreground">No students found.</p>}
+            </>
           )}
         </div>
       </div>

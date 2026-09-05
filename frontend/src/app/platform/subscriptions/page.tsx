@@ -9,6 +9,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Modal } from "@/components/ui/Modal";
 import { Toggle } from "@/components/ui/Toggle";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import {
   CAPPED_ROLES,
   CAPPED_ROLE_LABELS,
@@ -105,6 +106,14 @@ export default function SubscriptionsPage() {
               </tr>
             </thead>
             <tbody>
+              {rows === null &&
+                Array.from({ length: 6 }, (_, i) => (
+                  <tr key={`sk-${i}`}>
+                    <td colSpan={7}>
+                      <SkeletonRow lines={2} />
+                    </td>
+                  </tr>
+                ))}
               {rows?.map((row) => (
                 <tr key={row.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
@@ -170,6 +179,7 @@ export default function SubscriptionsPage() {
 
         {/* Mobile / tablet cards */}
         <div className="divide-y divide-border lg:hidden">
+          {rows === null && Array.from({ length: 6 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
           {rows?.map((row) => (
             <div key={row.id} className="space-y-2.5 p-4">
               <div className="flex items-start justify-between gap-2">
@@ -294,7 +304,15 @@ function InstituteUsersModal({ row, onClose }: { row: SubscriptionRow; onClose: 
         <div className="rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{error}</div>
       )}
 
-      {!users && !error && <p className="py-6 text-center text-sm text-muted-foreground">Loading…</p>}
+      {!users && !error && (
+        <ul className="divide-y divide-border rounded-xl border border-border">
+          {Array.from({ length: 4 }, (_, i) => (
+            <li key={i}>
+              <SkeletonRow lines={2} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {users && users.length === 0 && (
         <p className="py-6 text-center text-sm text-muted-foreground">

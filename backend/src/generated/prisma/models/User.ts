@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  tokenVersion: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  tokenVersion: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -36,6 +46,7 @@ export type UserMinAggregateOutputType = {
   mustChangePassword: boolean | null
   termsAcceptedAt: Date | null
   lastLoginAt: Date | null
+  tokenVersion: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +63,7 @@ export type UserMaxAggregateOutputType = {
   mustChangePassword: boolean | null
   termsAcceptedAt: Date | null
   lastLoginAt: Date | null
+  tokenVersion: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -68,11 +80,20 @@ export type UserCountAggregateOutputType = {
   mustChangePassword: number
   termsAcceptedAt: number
   lastLoginAt: number
+  tokenVersion: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  tokenVersion?: true
+}
+
+export type UserSumAggregateInputType = {
+  tokenVersion?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -86,6 +107,7 @@ export type UserMinAggregateInputType = {
   mustChangePassword?: true
   termsAcceptedAt?: true
   lastLoginAt?: true
+  tokenVersion?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -102,6 +124,7 @@ export type UserMaxAggregateInputType = {
   mustChangePassword?: true
   termsAcceptedAt?: true
   lastLoginAt?: true
+  tokenVersion?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +141,7 @@ export type UserCountAggregateInputType = {
   mustChangePassword?: true
   termsAcceptedAt?: true
   lastLoginAt?: true
+  tokenVersion?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -161,6 +185,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -191,6 +227,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -207,9 +245,12 @@ export type UserGroupByOutputType = {
   mustChangePassword: boolean
   termsAcceptedAt: Date | null
   lastLoginAt: Date | null
+  tokenVersion: number
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -244,6 +285,7 @@ export type UserWhereInput = {
   mustChangePassword?: Prisma.BoolFilter<"User"> | boolean
   termsAcceptedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  tokenVersion?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   institute?: Prisma.XOR<Prisma.InstituteNullableScalarRelationFilter, Prisma.InstituteWhereInput> | null
@@ -260,6 +302,11 @@ export type UserWhereInput = {
   leaveRequests?: Prisma.LeaveRequestListRelationFilter
   leaveReviews?: Prisma.LeaveRequestListRelationFilter
   portalStudent?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null
+  parentMeetingsCreated?: Prisma.ParentMeetingListRelationFilter
+  supportTicketsCreated?: Prisma.SupportTicketListRelationFilter
+  supportTicketMessages?: Prisma.SupportTicketMessageListRelationFilter
+  suspensionsMade?: Prisma.InstituteSuspensionListRelationFilter
+  suspensionsLifted?: Prisma.InstituteSuspensionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -274,6 +321,7 @@ export type UserOrderByWithRelationInput = {
   mustChangePassword?: Prisma.SortOrder
   termsAcceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   institute?: Prisma.InstituteOrderByWithRelationInput
@@ -290,6 +338,11 @@ export type UserOrderByWithRelationInput = {
   leaveRequests?: Prisma.LeaveRequestOrderByRelationAggregateInput
   leaveReviews?: Prisma.LeaveRequestOrderByRelationAggregateInput
   portalStudent?: Prisma.StudentOrderByWithRelationInput
+  parentMeetingsCreated?: Prisma.ParentMeetingOrderByRelationAggregateInput
+  supportTicketsCreated?: Prisma.SupportTicketOrderByRelationAggregateInput
+  supportTicketMessages?: Prisma.SupportTicketMessageOrderByRelationAggregateInput
+  suspensionsMade?: Prisma.InstituteSuspensionOrderByRelationAggregateInput
+  suspensionsLifted?: Prisma.InstituteSuspensionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -307,6 +360,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   mustChangePassword?: Prisma.BoolFilter<"User"> | boolean
   termsAcceptedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  tokenVersion?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   institute?: Prisma.XOR<Prisma.InstituteNullableScalarRelationFilter, Prisma.InstituteWhereInput> | null
@@ -323,6 +377,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   leaveRequests?: Prisma.LeaveRequestListRelationFilter
   leaveReviews?: Prisma.LeaveRequestListRelationFilter
   portalStudent?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null
+  parentMeetingsCreated?: Prisma.ParentMeetingListRelationFilter
+  supportTicketsCreated?: Prisma.SupportTicketListRelationFilter
+  supportTicketMessages?: Prisma.SupportTicketMessageListRelationFilter
+  suspensionsMade?: Prisma.InstituteSuspensionListRelationFilter
+  suspensionsLifted?: Prisma.InstituteSuspensionListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -337,11 +396,14 @@ export type UserOrderByWithAggregationInput = {
   mustChangePassword?: Prisma.SortOrder
   termsAcceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -359,6 +421,7 @@ export type UserScalarWhereWithAggregatesInput = {
   mustChangePassword?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   termsAcceptedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  tokenVersion?: Prisma.IntWithAggregatesFilter<"User"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -374,6 +437,7 @@ export type UserCreateInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -390,6 +454,11 @@ export type UserCreateInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -404,6 +473,7 @@ export type UserUncheckedCreateInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -419,6 +489,11 @@ export type UserUncheckedCreateInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUpdateInput = {
@@ -432,6 +507,7 @@ export type UserUpdateInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -448,6 +524,11 @@ export type UserUpdateInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -462,6 +543,7 @@ export type UserUncheckedUpdateInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -477,6 +559,11 @@ export type UserUncheckedUpdateInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -491,6 +578,7 @@ export type UserCreateManyInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -506,6 +594,7 @@ export type UserUpdateManyMutationInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -522,6 +611,7 @@ export type UserUncheckedUpdateManyInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -553,8 +643,13 @@ export type UserCountOrderByAggregateInput = {
   mustChangePassword?: Prisma.SortOrder
   termsAcceptedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  tokenVersion?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -569,6 +664,7 @@ export type UserMaxOrderByAggregateInput = {
   mustChangePassword?: Prisma.SortOrder
   termsAcceptedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -585,8 +681,13 @@ export type UserMinOrderByAggregateInput = {
   mustChangePassword?: Prisma.SortOrder
   termsAcceptedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  tokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  tokenVersion?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -656,6 +757,34 @@ export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
 }
 
+export type UserCreateNestedOneWithoutSupportTicketsCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsCreatedInput, Prisma.UserUncheckedCreateWithoutSupportTicketsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSupportTicketsCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsCreatedInput, Prisma.UserUncheckedCreateWithoutSupportTicketsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsCreatedInput
+  upsert?: Prisma.UserUpsertWithoutSupportTicketsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportTicketsCreatedInput, Prisma.UserUpdateWithoutSupportTicketsCreatedInput>, Prisma.UserUncheckedUpdateWithoutSupportTicketsCreatedInput>
+}
+
+export type UserCreateNestedOneWithoutSupportTicketMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketMessagesInput, Prisma.UserUncheckedCreateWithoutSupportTicketMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSupportTicketMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketMessagesInput, Prisma.UserUncheckedCreateWithoutSupportTicketMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketMessagesInput
+  upsert?: Prisma.UserUpsertWithoutSupportTicketMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportTicketMessagesInput, Prisma.UserUpdateWithoutSupportTicketMessagesInput>, Prisma.UserUncheckedUpdateWithoutSupportTicketMessagesInput>
+}
+
 export type UserCreateNestedOneWithoutPushSubscriptionsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutPushSubscriptionsInput, Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushSubscriptionsInput
@@ -696,6 +825,20 @@ export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
   upsert?: Prisma.UserUpsertWithoutNotificationsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type UserCreateNestedOneWithoutParentMeetingsCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutParentMeetingsCreatedInput, Prisma.UserUncheckedCreateWithoutParentMeetingsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutParentMeetingsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutParentMeetingsCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutParentMeetingsCreatedInput, Prisma.UserUncheckedCreateWithoutParentMeetingsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutParentMeetingsCreatedInput
+  upsert?: Prisma.UserUpsertWithoutParentMeetingsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutParentMeetingsCreatedInput, Prisma.UserUpdateWithoutParentMeetingsCreatedInput>, Prisma.UserUncheckedUpdateWithoutParentMeetingsCreatedInput>
 }
 
 export type UserCreateNestedOneWithoutPortalStudentInput = {
@@ -830,6 +973,36 @@ export type UserUpdateOneWithoutLeaveReviewsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLeaveReviewsInput, Prisma.UserUpdateWithoutLeaveReviewsInput>, Prisma.UserUncheckedUpdateWithoutLeaveReviewsInput>
 }
 
+export type UserCreateNestedOneWithoutSuspensionsMadeInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsMadeInput, Prisma.UserUncheckedCreateWithoutSuspensionsMadeInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSuspensionsMadeInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutSuspensionsLiftedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsLiftedInput, Prisma.UserUncheckedCreateWithoutSuspensionsLiftedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSuspensionsLiftedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSuspensionsMadeNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsMadeInput, Prisma.UserUncheckedCreateWithoutSuspensionsMadeInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSuspensionsMadeInput
+  upsert?: Prisma.UserUpsertWithoutSuspensionsMadeInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSuspensionsMadeInput, Prisma.UserUpdateWithoutSuspensionsMadeInput>, Prisma.UserUncheckedUpdateWithoutSuspensionsMadeInput>
+}
+
+export type UserUpdateOneWithoutSuspensionsLiftedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsLiftedInput, Prisma.UserUncheckedCreateWithoutSuspensionsLiftedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSuspensionsLiftedInput
+  upsert?: Prisma.UserUpsertWithoutSuspensionsLiftedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSuspensionsLiftedInput, Prisma.UserUpdateWithoutSuspensionsLiftedInput>, Prisma.UserUncheckedUpdateWithoutSuspensionsLiftedInput>
+}
+
 export type UserCreateWithoutOwnedOrganizationInput = {
   id?: string
   email: string
@@ -841,6 +1014,7 @@ export type UserCreateWithoutOwnedOrganizationInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -856,6 +1030,11 @@ export type UserCreateWithoutOwnedOrganizationInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutOwnedOrganizationInput = {
@@ -870,6 +1049,7 @@ export type UserUncheckedCreateWithoutOwnedOrganizationInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
@@ -884,6 +1064,11 @@ export type UserUncheckedCreateWithoutOwnedOrganizationInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutOwnedOrganizationInput = {
@@ -913,6 +1098,7 @@ export type UserUpdateWithoutOwnedOrganizationInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -928,6 +1114,11 @@ export type UserUpdateWithoutOwnedOrganizationInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedOrganizationInput = {
@@ -942,6 +1133,7 @@ export type UserUncheckedUpdateWithoutOwnedOrganizationInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
@@ -956,6 +1148,11 @@ export type UserUncheckedUpdateWithoutOwnedOrganizationInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutInstituteInput = {
@@ -969,6 +1166,7 @@ export type UserCreateWithoutInstituteInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
@@ -984,6 +1182,11 @@ export type UserCreateWithoutInstituteInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutInstituteInput = {
@@ -997,6 +1200,7 @@ export type UserUncheckedCreateWithoutInstituteInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -1012,6 +1216,11 @@ export type UserUncheckedCreateWithoutInstituteInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutInstituteInput = {
@@ -1055,8 +1264,313 @@ export type UserScalarWhereInput = {
   mustChangePassword?: Prisma.BoolFilter<"User"> | boolean
   termsAcceptedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  tokenVersion?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+}
+
+export type UserCreateWithoutSupportTicketsCreatedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
+  ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
+}
+
+export type UserUncheckedCreateWithoutSupportTicketsCreatedInput = {
+  id?: string
+  instituteId?: string | null
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestUncheckedCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultUncheckedCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
+}
+
+export type UserCreateOrConnectWithoutSupportTicketsCreatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsCreatedInput, Prisma.UserUncheckedCreateWithoutSupportTicketsCreatedInput>
+}
+
+export type UserUpsertWithoutSupportTicketsCreatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketsCreatedInput, Prisma.UserUncheckedUpdateWithoutSupportTicketsCreatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsCreatedInput, Prisma.UserUncheckedCreateWithoutSupportTicketsCreatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSupportTicketsCreatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketsCreatedInput, Prisma.UserUncheckedUpdateWithoutSupportTicketsCreatedInput>
+}
+
+export type UserUpdateWithoutSupportTicketsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
+  ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSupportTicketsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUncheckedUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUncheckedUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
+}
+
+export type UserCreateWithoutSupportTicketMessagesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
+  ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
+}
+
+export type UserUncheckedCreateWithoutSupportTicketMessagesInput = {
+  id?: string
+  instituteId?: string | null
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestUncheckedCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultUncheckedCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
+}
+
+export type UserCreateOrConnectWithoutSupportTicketMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketMessagesInput, Prisma.UserUncheckedCreateWithoutSupportTicketMessagesInput>
+}
+
+export type UserUpsertWithoutSupportTicketMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketMessagesInput, Prisma.UserUncheckedUpdateWithoutSupportTicketMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketMessagesInput, Prisma.UserUncheckedCreateWithoutSupportTicketMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSupportTicketMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketMessagesInput, Prisma.UserUncheckedUpdateWithoutSupportTicketMessagesInput>
+}
+
+export type UserUpdateWithoutSupportTicketMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
+  ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSupportTicketMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUncheckedUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUncheckedUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutPushSubscriptionsInput = {
@@ -1070,6 +1584,7 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -1085,6 +1600,11 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
@@ -1099,6 +1619,7 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -1113,6 +1634,11 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutPushSubscriptionsInput = {
@@ -1142,6 +1668,7 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -1157,6 +1684,11 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
@@ -1171,6 +1703,7 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -1185,6 +1718,11 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutPasswordResetOtpsInput = {
@@ -1198,6 +1736,7 @@ export type UserCreateWithoutPasswordResetOtpsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -1213,6 +1752,11 @@ export type UserCreateWithoutPasswordResetOtpsInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetOtpsInput = {
@@ -1227,6 +1771,7 @@ export type UserUncheckedCreateWithoutPasswordResetOtpsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -1241,6 +1786,11 @@ export type UserUncheckedCreateWithoutPasswordResetOtpsInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetOtpsInput = {
@@ -1270,6 +1820,7 @@ export type UserUpdateWithoutPasswordResetOtpsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -1285,6 +1836,11 @@ export type UserUpdateWithoutPasswordResetOtpsInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetOtpsInput = {
@@ -1299,6 +1855,7 @@ export type UserUncheckedUpdateWithoutPasswordResetOtpsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -1313,6 +1870,11 @@ export type UserUncheckedUpdateWithoutPasswordResetOtpsInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -1326,6 +1888,7 @@ export type UserCreateWithoutNotificationsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -1341,6 +1904,11 @@ export type UserCreateWithoutNotificationsInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -1355,6 +1923,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -1369,6 +1938,11 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -1398,6 +1972,7 @@ export type UserUpdateWithoutNotificationsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -1413,6 +1988,11 @@ export type UserUpdateWithoutNotificationsInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -1427,6 +2007,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -1441,9 +2022,14 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
-export type UserCreateWithoutPortalStudentInput = {
+export type UserCreateWithoutParentMeetingsCreatedInput = {
   id?: string
   email: string
   passwordHash: string
@@ -1454,6 +2040,7 @@ export type UserCreateWithoutPortalStudentInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -1469,9 +2056,14 @@ export type UserCreateWithoutPortalStudentInput = {
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
-export type UserUncheckedCreateWithoutPortalStudentInput = {
+export type UserUncheckedCreateWithoutParentMeetingsCreatedInput = {
   id?: string
   instituteId?: string | null
   email: string
@@ -1483,6 +2075,7 @@ export type UserUncheckedCreateWithoutPortalStudentInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -1497,6 +2090,163 @@ export type UserUncheckedCreateWithoutPortalStudentInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
+}
+
+export type UserCreateOrConnectWithoutParentMeetingsCreatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutParentMeetingsCreatedInput, Prisma.UserUncheckedCreateWithoutParentMeetingsCreatedInput>
+}
+
+export type UserUpsertWithoutParentMeetingsCreatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutParentMeetingsCreatedInput, Prisma.UserUncheckedUpdateWithoutParentMeetingsCreatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutParentMeetingsCreatedInput, Prisma.UserUncheckedCreateWithoutParentMeetingsCreatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutParentMeetingsCreatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutParentMeetingsCreatedInput, Prisma.UserUncheckedUpdateWithoutParentMeetingsCreatedInput>
+}
+
+export type UserUpdateWithoutParentMeetingsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
+  ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutParentMeetingsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUncheckedUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUncheckedUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
+}
+
+export type UserCreateWithoutPortalStudentInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
+  ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
+}
+
+export type UserUncheckedCreateWithoutPortalStudentInput = {
+  id?: string
+  instituteId?: string | null
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestUncheckedCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultUncheckedCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutPortalStudentInput = {
@@ -1526,6 +2276,7 @@ export type UserUpdateWithoutPortalStudentInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -1541,6 +2292,11 @@ export type UserUpdateWithoutPortalStudentInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPortalStudentInput = {
@@ -1555,6 +2311,7 @@ export type UserUncheckedUpdateWithoutPortalStudentInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -1569,6 +2326,11 @@ export type UserUncheckedUpdateWithoutPortalStudentInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutLecturesTaughtInput = {
@@ -1582,6 +2344,7 @@ export type UserCreateWithoutLecturesTaughtInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -1597,6 +2360,11 @@ export type UserCreateWithoutLecturesTaughtInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutLecturesTaughtInput = {
@@ -1611,6 +2379,7 @@ export type UserUncheckedCreateWithoutLecturesTaughtInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -1625,6 +2394,11 @@ export type UserUncheckedCreateWithoutLecturesTaughtInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutLecturesTaughtInput = {
@@ -1654,6 +2428,7 @@ export type UserUpdateWithoutLecturesTaughtInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -1669,6 +2444,11 @@ export type UserUpdateWithoutLecturesTaughtInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLecturesTaughtInput = {
@@ -1683,6 +2463,7 @@ export type UserUncheckedUpdateWithoutLecturesTaughtInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -1697,6 +2478,11 @@ export type UserUncheckedUpdateWithoutLecturesTaughtInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutTestsAuthoredInput = {
@@ -1710,6 +2496,7 @@ export type UserCreateWithoutTestsAuthoredInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -1725,6 +2512,11 @@ export type UserCreateWithoutTestsAuthoredInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutTestsAuthoredInput = {
@@ -1739,6 +2531,7 @@ export type UserUncheckedCreateWithoutTestsAuthoredInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -1753,6 +2546,11 @@ export type UserUncheckedCreateWithoutTestsAuthoredInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutTestsAuthoredInput = {
@@ -1782,6 +2580,7 @@ export type UserUpdateWithoutTestsAuthoredInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -1797,6 +2596,11 @@ export type UserUpdateWithoutTestsAuthoredInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTestsAuthoredInput = {
@@ -1811,6 +2615,7 @@ export type UserUncheckedUpdateWithoutTestsAuthoredInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -1825,6 +2630,11 @@ export type UserUncheckedUpdateWithoutTestsAuthoredInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutTestResultsEnteredInput = {
@@ -1838,6 +2648,7 @@ export type UserCreateWithoutTestResultsEnteredInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -1853,6 +2664,11 @@ export type UserCreateWithoutTestResultsEnteredInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutTestResultsEnteredInput = {
@@ -1867,6 +2683,7 @@ export type UserUncheckedCreateWithoutTestResultsEnteredInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -1881,6 +2698,11 @@ export type UserUncheckedCreateWithoutTestResultsEnteredInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutTestResultsEnteredInput = {
@@ -1910,6 +2732,7 @@ export type UserUpdateWithoutTestResultsEnteredInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -1925,6 +2748,11 @@ export type UserUpdateWithoutTestResultsEnteredInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTestResultsEnteredInput = {
@@ -1939,6 +2767,7 @@ export type UserUncheckedUpdateWithoutTestResultsEnteredInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -1953,6 +2782,11 @@ export type UserUncheckedUpdateWithoutTestResultsEnteredInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutTeachingAssignmentsInput = {
@@ -1966,6 +2800,7 @@ export type UserCreateWithoutTeachingAssignmentsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -1981,6 +2816,11 @@ export type UserCreateWithoutTeachingAssignmentsInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutTeachingAssignmentsInput = {
@@ -1995,6 +2835,7 @@ export type UserUncheckedCreateWithoutTeachingAssignmentsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -2009,6 +2850,11 @@ export type UserUncheckedCreateWithoutTeachingAssignmentsInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutTeachingAssignmentsInput = {
@@ -2038,6 +2884,7 @@ export type UserUpdateWithoutTeachingAssignmentsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -2053,6 +2900,11 @@ export type UserUpdateWithoutTeachingAssignmentsInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeachingAssignmentsInput = {
@@ -2067,6 +2919,7 @@ export type UserUncheckedUpdateWithoutTeachingAssignmentsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -2081,6 +2934,11 @@ export type UserUncheckedUpdateWithoutTeachingAssignmentsInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutSalaryProfileInput = {
@@ -2094,6 +2952,7 @@ export type UserCreateWithoutSalaryProfileInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -2109,6 +2968,11 @@ export type UserCreateWithoutSalaryProfileInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutSalaryProfileInput = {
@@ -2123,6 +2987,7 @@ export type UserUncheckedCreateWithoutSalaryProfileInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -2137,6 +3002,11 @@ export type UserUncheckedCreateWithoutSalaryProfileInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutSalaryProfileInput = {
@@ -2166,6 +3036,7 @@ export type UserUpdateWithoutSalaryProfileInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -2181,6 +3052,11 @@ export type UserUpdateWithoutSalaryProfileInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSalaryProfileInput = {
@@ -2195,6 +3071,7 @@ export type UserUncheckedUpdateWithoutSalaryProfileInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -2209,6 +3086,11 @@ export type UserUncheckedUpdateWithoutSalaryProfileInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutExpensesRecordedInput = {
@@ -2222,6 +3104,7 @@ export type UserCreateWithoutExpensesRecordedInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -2237,6 +3120,11 @@ export type UserCreateWithoutExpensesRecordedInput = {
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutExpensesRecordedInput = {
@@ -2251,6 +3139,7 @@ export type UserUncheckedCreateWithoutExpensesRecordedInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -2265,6 +3154,11 @@ export type UserUncheckedCreateWithoutExpensesRecordedInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutExpensesRecordedInput = {
@@ -2294,6 +3188,7 @@ export type UserUpdateWithoutExpensesRecordedInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -2309,6 +3204,11 @@ export type UserUpdateWithoutExpensesRecordedInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExpensesRecordedInput = {
@@ -2323,6 +3223,7 @@ export type UserUncheckedUpdateWithoutExpensesRecordedInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -2337,6 +3238,11 @@ export type UserUncheckedUpdateWithoutExpensesRecordedInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserCreateWithoutLeaveRequestsInput = {
@@ -2350,6 +3256,7 @@ export type UserCreateWithoutLeaveRequestsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -2365,6 +3272,11 @@ export type UserCreateWithoutLeaveRequestsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutLeaveRequestsInput = {
@@ -2379,6 +3291,7 @@ export type UserUncheckedCreateWithoutLeaveRequestsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -2393,6 +3306,11 @@ export type UserUncheckedCreateWithoutLeaveRequestsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
   leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutLeaveRequestsInput = {
@@ -2411,6 +3329,7 @@ export type UserCreateWithoutLeaveReviewsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
@@ -2426,6 +3345,11 @@ export type UserCreateWithoutLeaveReviewsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
   leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
   portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserUncheckedCreateWithoutLeaveReviewsInput = {
@@ -2440,6 +3364,7 @@ export type UserUncheckedCreateWithoutLeaveReviewsInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
@@ -2454,6 +3379,11 @@ export type UserUncheckedCreateWithoutLeaveReviewsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
   leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
   portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
 }
 
 export type UserCreateOrConnectWithoutLeaveReviewsInput = {
@@ -2483,6 +3413,7 @@ export type UserUpdateWithoutLeaveRequestsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -2498,6 +3429,11 @@ export type UserUpdateWithoutLeaveRequestsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeaveRequestsInput = {
@@ -2512,6 +3448,7 @@ export type UserUncheckedUpdateWithoutLeaveRequestsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -2526,6 +3463,11 @@ export type UserUncheckedUpdateWithoutLeaveRequestsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUpsertWithoutLeaveReviewsInput = {
@@ -2550,6 +3492,7 @@ export type UserUpdateWithoutLeaveReviewsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
@@ -2565,6 +3508,11 @@ export type UserUpdateWithoutLeaveReviewsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeaveReviewsInput = {
@@ -2579,6 +3527,7 @@ export type UserUncheckedUpdateWithoutLeaveReviewsInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -2593,9 +3542,14 @@ export type UserUncheckedUpdateWithoutLeaveReviewsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
-export type UserCreateManyInstituteInput = {
+export type UserCreateWithoutSuspensionsMadeInput = {
   id?: string
   email: string
   passwordHash: string
@@ -2606,11 +3560,153 @@ export type UserCreateManyInstituteInput = {
   mustChangePassword?: boolean
   termsAcceptedAt?: Date | string | null
   lastLoginAt?: Date | string | null
+  tokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
+  ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
 }
 
-export type UserUpdateWithoutInstituteInput = {
+export type UserUncheckedCreateWithoutSuspensionsMadeInput = {
+  id?: string
+  instituteId?: string | null
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestUncheckedCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultUncheckedCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
+}
+
+export type UserCreateOrConnectWithoutSuspensionsMadeInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsMadeInput, Prisma.UserUncheckedCreateWithoutSuspensionsMadeInput>
+}
+
+export type UserCreateWithoutSuspensionsLiftedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
+  ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+}
+
+export type UserUncheckedCreateWithoutSuspensionsLiftedInput = {
+  id?: string
+  instituteId?: string | null
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestUncheckedCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultUncheckedCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+}
+
+export type UserCreateOrConnectWithoutSuspensionsLiftedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsLiftedInput, Prisma.UserUncheckedCreateWithoutSuspensionsLiftedInput>
+}
+
+export type UserUpsertWithoutSuspensionsMadeInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSuspensionsMadeInput, Prisma.UserUncheckedUpdateWithoutSuspensionsMadeInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsMadeInput, Prisma.UserUncheckedCreateWithoutSuspensionsMadeInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSuspensionsMadeInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSuspensionsMadeInput, Prisma.UserUncheckedUpdateWithoutSuspensionsMadeInput>
+}
+
+export type UserUpdateWithoutSuspensionsMadeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2621,8 +3717,10 @@ export type UserUpdateWithoutInstituteInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
@@ -2636,10 +3734,15 @@ export type UserUpdateWithoutInstituteInput = {
   leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
 }
 
-export type UserUncheckedUpdateWithoutInstituteInput = {
+export type UserUncheckedUpdateWithoutSuspensionsMadeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2649,6 +3752,7 @@ export type UserUncheckedUpdateWithoutInstituteInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
@@ -2664,6 +3768,173 @@ export type UserUncheckedUpdateWithoutInstituteInput = {
   leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
   leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
+}
+
+export type UserUpsertWithoutSuspensionsLiftedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSuspensionsLiftedInput, Prisma.UserUncheckedUpdateWithoutSuspensionsLiftedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSuspensionsLiftedInput, Prisma.UserUncheckedCreateWithoutSuspensionsLiftedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSuspensionsLiftedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSuspensionsLiftedInput, Prisma.UserUncheckedUpdateWithoutSuspensionsLiftedInput>
+}
+
+export type UserUpdateWithoutSuspensionsLiftedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
+  ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSuspensionsLiftedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUncheckedUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUncheckedUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+}
+
+export type UserCreateManyInstituteInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserUpdateWithoutInstituteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutInstituteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUncheckedUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUncheckedUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutInstituteInput = {
@@ -2677,6 +3948,7 @@ export type UserUncheckedUpdateManyWithoutInstituteInput = {
   mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
   termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -2697,6 +3969,11 @@ export type UserCountOutputType = {
   pushSubscriptions: number
   leaveRequests: number
   leaveReviews: number
+  parentMeetingsCreated: number
+  supportTicketsCreated: number
+  supportTicketMessages: number
+  suspensionsMade: number
+  suspensionsLifted: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2710,6 +3987,11 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   pushSubscriptions?: boolean | UserCountOutputTypeCountPushSubscriptionsArgs
   leaveRequests?: boolean | UserCountOutputTypeCountLeaveRequestsArgs
   leaveReviews?: boolean | UserCountOutputTypeCountLeaveReviewsArgs
+  parentMeetingsCreated?: boolean | UserCountOutputTypeCountParentMeetingsCreatedArgs
+  supportTicketsCreated?: boolean | UserCountOutputTypeCountSupportTicketsCreatedArgs
+  supportTicketMessages?: boolean | UserCountOutputTypeCountSupportTicketMessagesArgs
+  suspensionsMade?: boolean | UserCountOutputTypeCountSuspensionsMadeArgs
+  suspensionsLifted?: boolean | UserCountOutputTypeCountSuspensionsLiftedArgs
 }
 
 /**
@@ -2792,6 +4074,41 @@ export type UserCountOutputTypeCountLeaveReviewsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.LeaveRequestWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountParentMeetingsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ParentMeetingWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSupportTicketsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportTicketWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSupportTicketMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportTicketMessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSuspensionsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InstituteSuspensionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSuspensionsLiftedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InstituteSuspensionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2805,6 +4122,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   mustChangePassword?: boolean
   termsAcceptedAt?: boolean
   lastLoginAt?: boolean
+  tokenVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.User$instituteArgs<ExtArgs>
@@ -2821,6 +4139,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   leaveRequests?: boolean | Prisma.User$leaveRequestsArgs<ExtArgs>
   leaveReviews?: boolean | Prisma.User$leaveReviewsArgs<ExtArgs>
   portalStudent?: boolean | Prisma.User$portalStudentArgs<ExtArgs>
+  parentMeetingsCreated?: boolean | Prisma.User$parentMeetingsCreatedArgs<ExtArgs>
+  supportTicketsCreated?: boolean | Prisma.User$supportTicketsCreatedArgs<ExtArgs>
+  supportTicketMessages?: boolean | Prisma.User$supportTicketMessagesArgs<ExtArgs>
+  suspensionsMade?: boolean | Prisma.User$suspensionsMadeArgs<ExtArgs>
+  suspensionsLifted?: boolean | Prisma.User$suspensionsLiftedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2836,6 +4159,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   mustChangePassword?: boolean
   termsAcceptedAt?: boolean
   lastLoginAt?: boolean
+  tokenVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.User$instituteArgs<ExtArgs>
@@ -2853,6 +4177,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   mustChangePassword?: boolean
   termsAcceptedAt?: boolean
   lastLoginAt?: boolean
+  tokenVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.User$instituteArgs<ExtArgs>
@@ -2870,11 +4195,12 @@ export type UserSelectScalar = {
   mustChangePassword?: boolean
   termsAcceptedAt?: boolean
   lastLoginAt?: boolean
+  tokenVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "email" | "passwordHash" | "fullName" | "phone" | "role" | "isActive" | "mustChangePassword" | "termsAcceptedAt" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "email" | "passwordHash" | "fullName" | "phone" | "role" | "isActive" | "mustChangePassword" | "termsAcceptedAt" | "lastLoginAt" | "tokenVersion" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.User$instituteArgs<ExtArgs>
   ownedOrganization?: boolean | Prisma.User$ownedOrganizationArgs<ExtArgs>
@@ -2890,6 +4216,11 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   leaveRequests?: boolean | Prisma.User$leaveRequestsArgs<ExtArgs>
   leaveReviews?: boolean | Prisma.User$leaveReviewsArgs<ExtArgs>
   portalStudent?: boolean | Prisma.User$portalStudentArgs<ExtArgs>
+  parentMeetingsCreated?: boolean | Prisma.User$parentMeetingsCreatedArgs<ExtArgs>
+  supportTicketsCreated?: boolean | Prisma.User$supportTicketsCreatedArgs<ExtArgs>
+  supportTicketMessages?: boolean | Prisma.User$supportTicketMessagesArgs<ExtArgs>
+  suspensionsMade?: boolean | Prisma.User$suspensionsMadeArgs<ExtArgs>
+  suspensionsLifted?: boolean | Prisma.User$suspensionsLiftedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2919,6 +4250,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
      * Set only on a role=STUDENT login — the student row it grants access to.
      */
     portalStudent: Prisma.$StudentPayload<ExtArgs> | null
+    parentMeetingsCreated: Prisma.$ParentMeetingPayload<ExtArgs>[]
+    supportTicketsCreated: Prisma.$SupportTicketPayload<ExtArgs>[]
+    supportTicketMessages: Prisma.$SupportTicketMessagePayload<ExtArgs>[]
+    suspensionsMade: Prisma.$InstituteSuspensionPayload<ExtArgs>[]
+    suspensionsLifted: Prisma.$InstituteSuspensionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2937,6 +4273,15 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     mustChangePassword: boolean
     termsAcceptedAt: Date | null
     lastLoginAt: Date | null
+    /**
+     * Bumped by /auth/logout-everywhere, a SuperAdmin's forced-logout lever,
+     * and any password change — every JWT carries the value live at sign
+     * time, and authenticate() rejects a token whose value no longer matches
+     * this column. The entire revocation mechanism is this one comparison;
+     * no token blocklist, no per-token bookkeeping. See changes-phase12.md
+     * §12.2.
+     */
+    tokenVersion: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -3347,6 +4692,11 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   leaveRequests<T extends Prisma.User$leaveRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$leaveRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   leaveReviews<T extends Prisma.User$leaveReviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$leaveReviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   portalStudent<T extends Prisma.User$portalStudentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$portalStudentArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  parentMeetingsCreated<T extends Prisma.User$parentMeetingsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$parentMeetingsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParentMeetingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportTicketsCreated<T extends Prisma.User$supportTicketsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportTicketsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportTicketMessages<T extends Prisma.User$supportTicketMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportTicketMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  suspensionsMade<T extends Prisma.User$suspensionsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$suspensionsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InstituteSuspensionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  suspensionsLifted<T extends Prisma.User$suspensionsLiftedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$suspensionsLiftedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InstituteSuspensionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3387,6 +4737,7 @@ export interface UserFieldRefs {
   readonly mustChangePassword: Prisma.FieldRef<"User", 'Boolean'>
   readonly termsAcceptedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly tokenVersion: Prisma.FieldRef<"User", 'Int'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -4103,6 +5454,126 @@ export type User$portalStudentArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.StudentInclude<ExtArgs> | null
   where?: Prisma.StudentWhereInput
+}
+
+/**
+ * User.parentMeetingsCreated
+ */
+export type User$parentMeetingsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ParentMeeting
+   */
+  select?: Prisma.ParentMeetingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ParentMeeting
+   */
+  omit?: Prisma.ParentMeetingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ParentMeetingInclude<ExtArgs> | null
+  where?: Prisma.ParentMeetingWhereInput
+  orderBy?: Prisma.ParentMeetingOrderByWithRelationInput | Prisma.ParentMeetingOrderByWithRelationInput[]
+  cursor?: Prisma.ParentMeetingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ParentMeetingScalarFieldEnum | Prisma.ParentMeetingScalarFieldEnum[]
+}
+
+/**
+ * User.supportTicketsCreated
+ */
+export type User$supportTicketsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportTicket
+   */
+  select?: Prisma.SupportTicketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportTicket
+   */
+  omit?: Prisma.SupportTicketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportTicketInclude<ExtArgs> | null
+  where?: Prisma.SupportTicketWhereInput
+  orderBy?: Prisma.SupportTicketOrderByWithRelationInput | Prisma.SupportTicketOrderByWithRelationInput[]
+  cursor?: Prisma.SupportTicketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportTicketScalarFieldEnum | Prisma.SupportTicketScalarFieldEnum[]
+}
+
+/**
+ * User.supportTicketMessages
+ */
+export type User$supportTicketMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportTicketMessage
+   */
+  select?: Prisma.SupportTicketMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportTicketMessage
+   */
+  omit?: Prisma.SupportTicketMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportTicketMessageInclude<ExtArgs> | null
+  where?: Prisma.SupportTicketMessageWhereInput
+  orderBy?: Prisma.SupportTicketMessageOrderByWithRelationInput | Prisma.SupportTicketMessageOrderByWithRelationInput[]
+  cursor?: Prisma.SupportTicketMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportTicketMessageScalarFieldEnum | Prisma.SupportTicketMessageScalarFieldEnum[]
+}
+
+/**
+ * User.suspensionsMade
+ */
+export type User$suspensionsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InstituteSuspension
+   */
+  select?: Prisma.InstituteSuspensionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InstituteSuspension
+   */
+  omit?: Prisma.InstituteSuspensionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InstituteSuspensionInclude<ExtArgs> | null
+  where?: Prisma.InstituteSuspensionWhereInput
+  orderBy?: Prisma.InstituteSuspensionOrderByWithRelationInput | Prisma.InstituteSuspensionOrderByWithRelationInput[]
+  cursor?: Prisma.InstituteSuspensionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InstituteSuspensionScalarFieldEnum | Prisma.InstituteSuspensionScalarFieldEnum[]
+}
+
+/**
+ * User.suspensionsLifted
+ */
+export type User$suspensionsLiftedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InstituteSuspension
+   */
+  select?: Prisma.InstituteSuspensionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InstituteSuspension
+   */
+  omit?: Prisma.InstituteSuspensionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InstituteSuspensionInclude<ExtArgs> | null
+  where?: Prisma.InstituteSuspensionWhereInput
+  orderBy?: Prisma.InstituteSuspensionOrderByWithRelationInput | Prisma.InstituteSuspensionOrderByWithRelationInput[]
+  cursor?: Prisma.InstituteSuspensionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InstituteSuspensionScalarFieldEnum | Prisma.InstituteSuspensionScalarFieldEnum[]
 }
 
 /**

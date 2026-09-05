@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { ScheduleTestModal } from "@/components/tests/ScheduleTestModal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { TestListItem } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 
@@ -64,6 +65,14 @@ export default function TestsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
+              {tests === null &&
+                Array.from({ length: 6 }, (_, i) => (
+                  <tr key={`sk-${i}`}>
+                    <td colSpan={6}>
+                      <SkeletonRow lines={2} />
+                    </td>
+                  </tr>
+                ))}
               {tests?.map((t) => (
                 <tr
                   key={t.id}
@@ -98,6 +107,7 @@ export default function TestsPage() {
         </div>
 
         <div className="divide-y divide-border sm:hidden">
+          {tests === null && Array.from({ length: 6 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
           {tests?.map((t) => (
             <button
               key={t.id}

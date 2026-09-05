@@ -11,6 +11,7 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { ActionMenu } from "@/components/ui/ActionMenu";
 import { EnquiryModal } from "@/components/enquiries/EnquiryModal";
 import { MarkContactedModal } from "@/components/enquiries/MarkContactedModal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, type Course, type Enquiry, type EnquiryStatus } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 
@@ -182,7 +183,14 @@ export default function EnquiriesPage() {
               </tr>
             </thead>
             <tbody>
-              {visible.map((e) => (
+              {loading && Array.from({ length: 6 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={6}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && visible.map((e) => (
                 <tr key={e.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">{e.name}</p>
@@ -241,7 +249,8 @@ export default function EnquiriesPage() {
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {visible.map((e) => (
+          {loading && Array.from({ length: 6 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && visible.map((e) => (
             <div key={e.id} className="space-y-2 p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>

@@ -304,6 +304,7 @@ export type PaymentWhereInput = {
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   feeAccount?: Prisma.XOR<Prisma.FeeAccountScalarRelationFilter, Prisma.FeeAccountWhereInput>
   allocations?: Prisma.PaymentAllocationListRelationFilter
+  fromProof?: Prisma.XOR<Prisma.PaymentProofNullableScalarRelationFilter, Prisma.PaymentProofWhereInput> | null
 }
 
 export type PaymentOrderByWithRelationInput = {
@@ -325,6 +326,7 @@ export type PaymentOrderByWithRelationInput = {
   institute?: Prisma.InstituteOrderByWithRelationInput
   feeAccount?: Prisma.FeeAccountOrderByWithRelationInput
   allocations?: Prisma.PaymentAllocationOrderByRelationAggregateInput
+  fromProof?: Prisma.PaymentProofOrderByWithRelationInput
 }
 
 export type PaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -350,6 +352,7 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   feeAccount?: Prisma.XOR<Prisma.FeeAccountScalarRelationFilter, Prisma.FeeAccountWhereInput>
   allocations?: Prisma.PaymentAllocationListRelationFilter
+  fromProof?: Prisma.XOR<Prisma.PaymentProofNullableScalarRelationFilter, Prisma.PaymentProofWhereInput> | null
 }, "id" | "publicToken" | "instituteId_receiptNumber">
 
 export type PaymentOrderByWithAggregationInput = {
@@ -413,6 +416,7 @@ export type PaymentCreateInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutPaymentsInput
   feeAccount: Prisma.FeeAccountCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
+  fromProof?: Prisma.PaymentProofCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateInput = {
@@ -432,6 +436,7 @@ export type PaymentUncheckedCreateInput = {
   publicToken?: string | null
   publicTokenRevokedAt?: Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
+  fromProof?: Prisma.PaymentProofUncheckedCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentUpdateInput = {
@@ -451,6 +456,7 @@ export type PaymentUpdateInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutPaymentsNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
+  fromProof?: Prisma.PaymentProofUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateInput = {
@@ -470,6 +476,7 @@ export type PaymentUncheckedUpdateInput = {
   publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
+  fromProof?: Prisma.PaymentProofUncheckedUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentCreateManyInput = {
@@ -606,6 +613,11 @@ export type PaymentScalarRelationFilter = {
   isNot?: Prisma.PaymentWhereInput
 }
 
+export type PaymentNullableScalarRelationFilter = {
+  is?: Prisma.PaymentWhereInput | null
+  isNot?: Prisma.PaymentWhereInput | null
+}
+
 export type PaymentCreateNestedManyWithoutInstituteInput = {
   create?: Prisma.XOR<Prisma.PaymentCreateWithoutInstituteInput, Prisma.PaymentUncheckedCreateWithoutInstituteInput> | Prisma.PaymentCreateWithoutInstituteInput[] | Prisma.PaymentUncheckedCreateWithoutInstituteInput[]
   connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutInstituteInput | Prisma.PaymentCreateOrConnectWithoutInstituteInput[]
@@ -708,6 +720,22 @@ export type PaymentUpdateOneRequiredWithoutAllocationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutAllocationsInput, Prisma.PaymentUpdateWithoutAllocationsInput>, Prisma.PaymentUncheckedUpdateWithoutAllocationsInput>
 }
 
+export type PaymentCreateNestedOneWithoutFromProofInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutFromProofInput, Prisma.PaymentUncheckedCreateWithoutFromProofInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutFromProofInput
+  connect?: Prisma.PaymentWhereUniqueInput
+}
+
+export type PaymentUpdateOneWithoutFromProofNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutFromProofInput, Prisma.PaymentUncheckedCreateWithoutFromProofInput>
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutFromProofInput
+  upsert?: Prisma.PaymentUpsertWithoutFromProofInput
+  disconnect?: Prisma.PaymentWhereInput | boolean
+  delete?: Prisma.PaymentWhereInput | boolean
+  connect?: Prisma.PaymentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentUpdateToOneWithWhereWithoutFromProofInput, Prisma.PaymentUpdateWithoutFromProofInput>, Prisma.PaymentUncheckedUpdateWithoutFromProofInput>
+}
+
 export type PaymentCreateWithoutInstituteInput = {
   id?: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -724,6 +752,7 @@ export type PaymentCreateWithoutInstituteInput = {
   publicTokenRevokedAt?: Date | string | null
   feeAccount: Prisma.FeeAccountCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
+  fromProof?: Prisma.PaymentProofCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateWithoutInstituteInput = {
@@ -742,6 +771,7 @@ export type PaymentUncheckedCreateWithoutInstituteInput = {
   publicToken?: string | null
   publicTokenRevokedAt?: Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
+  fromProof?: Prisma.PaymentProofUncheckedCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentCreateOrConnectWithoutInstituteInput = {
@@ -807,6 +837,7 @@ export type PaymentCreateWithoutFeeAccountInput = {
   publicTokenRevokedAt?: Date | string | null
   institute: Prisma.InstituteCreateNestedOneWithoutPaymentsInput
   allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
+  fromProof?: Prisma.PaymentProofCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateWithoutFeeAccountInput = {
@@ -825,6 +856,7 @@ export type PaymentUncheckedCreateWithoutFeeAccountInput = {
   publicToken?: string | null
   publicTokenRevokedAt?: Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
+  fromProof?: Prisma.PaymentProofUncheckedCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentCreateOrConnectWithoutFeeAccountInput = {
@@ -869,6 +901,7 @@ export type PaymentCreateWithoutAllocationsInput = {
   publicTokenRevokedAt?: Date | string | null
   institute: Prisma.InstituteCreateNestedOneWithoutPaymentsInput
   feeAccount: Prisma.FeeAccountCreateNestedOneWithoutPaymentsInput
+  fromProof?: Prisma.PaymentProofCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentUncheckedCreateWithoutAllocationsInput = {
@@ -887,6 +920,7 @@ export type PaymentUncheckedCreateWithoutAllocationsInput = {
   createdAt?: Date | string
   publicToken?: string | null
   publicTokenRevokedAt?: Date | string | null
+  fromProof?: Prisma.PaymentProofUncheckedCreateNestedOneWithoutPaymentInput
 }
 
 export type PaymentCreateOrConnectWithoutAllocationsInput = {
@@ -921,6 +955,7 @@ export type PaymentUpdateWithoutAllocationsInput = {
   publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   institute?: Prisma.InstituteUpdateOneRequiredWithoutPaymentsNestedInput
   feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutPaymentsNestedInput
+  fromProof?: Prisma.PaymentProofUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateWithoutAllocationsInput = {
@@ -939,6 +974,99 @@ export type PaymentUncheckedUpdateWithoutAllocationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fromProof?: Prisma.PaymentProofUncheckedUpdateOneWithoutPaymentNestedInput
+}
+
+export type PaymentCreateWithoutFromProofInput = {
+  id?: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  mode: $Enums.PaymentMode
+  paidOn: Date | string
+  receiptNumber: string
+  notes?: string | null
+  createdByUserId?: string | null
+  voidedAt?: Date | string | null
+  voidReason?: string | null
+  voidedByUserId?: string | null
+  createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
+  institute: Prisma.InstituteCreateNestedOneWithoutPaymentsInput
+  feeAccount: Prisma.FeeAccountCreateNestedOneWithoutPaymentsInput
+  allocations?: Prisma.PaymentAllocationCreateNestedManyWithoutPaymentInput
+}
+
+export type PaymentUncheckedCreateWithoutFromProofInput = {
+  id?: string
+  instituteId: string
+  feeAccountId: string
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  mode: $Enums.PaymentMode
+  paidOn: Date | string
+  receiptNumber: string
+  notes?: string | null
+  createdByUserId?: string | null
+  voidedAt?: Date | string | null
+  voidReason?: string | null
+  voidedByUserId?: string | null
+  createdAt?: Date | string
+  publicToken?: string | null
+  publicTokenRevokedAt?: Date | string | null
+  allocations?: Prisma.PaymentAllocationUncheckedCreateNestedManyWithoutPaymentInput
+}
+
+export type PaymentCreateOrConnectWithoutFromProofInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutFromProofInput, Prisma.PaymentUncheckedCreateWithoutFromProofInput>
+}
+
+export type PaymentUpsertWithoutFromProofInput = {
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutFromProofInput, Prisma.PaymentUncheckedUpdateWithoutFromProofInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutFromProofInput, Prisma.PaymentUncheckedCreateWithoutFromProofInput>
+  where?: Prisma.PaymentWhereInput
+}
+
+export type PaymentUpdateToOneWithWhereWithoutFromProofInput = {
+  where?: Prisma.PaymentWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutFromProofInput, Prisma.PaymentUncheckedUpdateWithoutFromProofInput>
+}
+
+export type PaymentUpdateWithoutFromProofInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  mode?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
+  paidOn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  receiptNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutPaymentsNestedInput
+  feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutPaymentsNestedInput
+  allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutFromProofInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  feeAccountId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  mode?: Prisma.EnumPaymentModeFieldUpdateOperationsInput | $Enums.PaymentMode
+  paidOn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  receiptNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  voidReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  voidedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
 }
 
 export type PaymentCreateManyInstituteInput = {
@@ -974,6 +1102,7 @@ export type PaymentUpdateWithoutInstituteInput = {
   publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   feeAccount?: Prisma.FeeAccountUpdateOneRequiredWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
+  fromProof?: Prisma.PaymentProofUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateWithoutInstituteInput = {
@@ -992,6 +1121,7 @@ export type PaymentUncheckedUpdateWithoutInstituteInput = {
   publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
+  fromProof?: Prisma.PaymentProofUncheckedUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateManyWithoutInstituteInput = {
@@ -1044,6 +1174,7 @@ export type PaymentUpdateWithoutFeeAccountInput = {
   publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   institute?: Prisma.InstituteUpdateOneRequiredWithoutPaymentsNestedInput
   allocations?: Prisma.PaymentAllocationUpdateManyWithoutPaymentNestedInput
+  fromProof?: Prisma.PaymentProofUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateWithoutFeeAccountInput = {
@@ -1062,6 +1193,7 @@ export type PaymentUncheckedUpdateWithoutFeeAccountInput = {
   publicToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicTokenRevokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allocations?: Prisma.PaymentAllocationUncheckedUpdateManyWithoutPaymentNestedInput
+  fromProof?: Prisma.PaymentProofUncheckedUpdateOneWithoutPaymentNestedInput
 }
 
 export type PaymentUncheckedUpdateManyWithoutFeeAccountInput = {
@@ -1131,6 +1263,7 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
   allocations?: boolean | Prisma.Payment$allocationsArgs<ExtArgs>
+  fromProof?: boolean | Prisma.Payment$fromProofArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
@@ -1197,6 +1330,7 @@ export type PaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   feeAccount?: boolean | Prisma.FeeAccountDefaultArgs<ExtArgs>
   allocations?: boolean | Prisma.Payment$allocationsArgs<ExtArgs>
+  fromProof?: boolean | Prisma.Payment$fromProofArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PaymentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1214,6 +1348,12 @@ export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     institute: Prisma.$InstitutePayload<ExtArgs>
     feeAccount: Prisma.$FeeAccountPayload<ExtArgs>
     allocations: Prisma.$PaymentAllocationPayload<ExtArgs>[]
+    /**
+     * Set only when this Payment was produced by approving a PaymentProof —
+     * the reverse side of PaymentProof.paymentId, present here purely so a
+     * payment can show "via UPI proof" in the UI without a second query.
+     */
+    fromProof: Prisma.$PaymentProofPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1640,6 +1780,7 @@ export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends runtime.
   institute<T extends Prisma.InstituteDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InstituteDefaultArgs<ExtArgs>>): Prisma.Prisma__InstituteClient<runtime.Types.Result.GetResult<Prisma.$InstitutePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   feeAccount<T extends Prisma.FeeAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FeeAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__FeeAccountClient<runtime.Types.Result.GetResult<Prisma.$FeeAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   allocations<T extends Prisma.Payment$allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  fromProof<T extends Prisma.Payment$fromProofArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Payment$fromProofArgs<ExtArgs>>): Prisma.Prisma__PaymentProofClient<runtime.Types.Result.GetResult<Prisma.$PaymentProofPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2106,6 +2247,25 @@ export type Payment$allocationsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.PaymentAllocationScalarFieldEnum | Prisma.PaymentAllocationScalarFieldEnum[]
+}
+
+/**
+ * Payment.fromProof
+ */
+export type Payment$fromProofArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentProof
+   */
+  select?: Prisma.PaymentProofSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentProof
+   */
+  omit?: Prisma.PaymentProofOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentProofInclude<ExtArgs> | null
+  where?: Prisma.PaymentProofWhereInput
 }
 
 /**

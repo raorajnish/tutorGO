@@ -5,6 +5,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatDate, todayInput } from "@/lib/format";
 import type { CreateLeaveRequestResult, LeaveRequest, LeaveStatus } from "@/lib/types";
 
@@ -124,7 +125,14 @@ export function MyLeaveTab() {
               </tr>
             </thead>
             <tbody>
-              {requests.map((r) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={6}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && requests.map((r) => (
                 <tr key={r.id} className="border-b border-border last:border-0">
                   <td className="px-4 py-3 text-foreground">
                     {formatDate(r.startDate)}
@@ -158,7 +166,8 @@ export function MyLeaveTab() {
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {requests.map((r) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && requests.map((r) => (
             <div key={r.id} className="space-y-1.5 p-4">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-medium text-foreground">

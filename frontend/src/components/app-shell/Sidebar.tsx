@@ -160,6 +160,27 @@ const ICONS: Record<NavIcon, React.ReactNode> = {
       <path d="M13.7 20a2 2 0 01-3.4 0" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  ptm: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="8" cy="8" r="3.2" />
+      <circle cx="17" cy="8" r="3.2" />
+      <path d="M2.5 20v-1c0-2.5 2.2-4.3 5.5-4.3s5.5 1.8 5.5 4.3v1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 15c.9-.5 1.9-.7 2.5-.7 3.3 0 5.5 1.8 5.5 4.3v1" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  support: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2 1.75-2 3.25" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 17h.01" strokeLinecap="round" />
+    </svg>
+  ),
+  auditLog: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M9 2h6l5 5v13a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 12h6M9 16h6M9 8h2" strokeLinecap="round" />
+    </svg>
+  ),
 };
 
 export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: SidebarProps) {

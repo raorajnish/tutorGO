@@ -21,6 +21,8 @@ import { analyticsRouter } from "./routes/analytics.js";
 import { whatsappRouter } from "./routes/whatsapp.js";
 import { portalAccessRouter } from "./routes/portalAccess.js";
 import { portalRouter } from "./routes/portal.js";
+import { ptmRouter } from "./routes/ptm.js";
+import { supportRouter } from "./routes/support.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import { UPLOAD_ROOT, UPLOAD_URL_PREFIX } from "./services/uploads.js";
 
@@ -93,6 +95,8 @@ app.use("/api/org/whatsapp", whatsappRouter);
 // the STUDENT login itself. See changes-phase10.md §10.6.
 app.use("/api/portal-access", portalAccessRouter);
 app.use("/api/portal", portalRouter);
+app.use("/api/ptm", ptmRouter);
+app.use("/api/support", supportRouter);
 // Deliberately outside authenticate/requireInstitute — the one unauthenticated
 // public surface in the app (now also the WhatsApp webhook — see
 // routes/public.ts's header comment).

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
@@ -104,7 +105,14 @@ export default function OrganizationsPage() {
               </tr>
             </thead>
             <tbody>
-              {organizations.map((org) => (
+              {loading && Array.from({ length: 6 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={5}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && organizations.map((org) => (
                 <tr
                   key={org.id}
                   onClick={() => setDetailId(org.id)}
@@ -164,7 +172,8 @@ export default function OrganizationsPage() {
 
         {/* Mobile cards */}
         <div className="divide-y divide-border sm:hidden">
-          {organizations.map((org) => (
+          {loading && Array.from({ length: 6 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && organizations.map((org) => (
             <div key={org.id} className="space-y-2 p-4" onClick={() => setDetailId(org.id)}>
               <div className="flex items-start justify-between gap-2">
                 <div>

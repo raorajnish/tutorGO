@@ -16,6 +16,7 @@ import {
   MODULE_CODES,
   MODULE_LABELS,
   type CappedRole,
+  type InstituteSuspension,
   type ModuleCode,
   type PlanLimits,
   type PlatformInstituteDetail,
@@ -38,6 +39,7 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
   const [limitsOpen, setLimitsOpen] = useState(false);
   const [suspendOpen, setSuspendOpen] = useState(false);
   const [suspending, setSuspending] = useState(false);
+  const [logoutTarget, setLogoutTarget] = useState<{ id: string; fullName: string } | null>(null);
 
   function load() {
     apiFetch<PlatformInstituteDetail>(`/platform/organizations/${orgId}/institutes/${instituteId}`)
@@ -79,22 +81,33 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
     }
   }
 
-  async function setSuspended(isActive: boolean) {
+  async function setSuspended(isActive: boolean, reason?: string) {
     setSuspending(true);
     setError(null);
     try {
       await apiFetch(`/platform/organizations/${orgId}/institutes/${instituteId}`, {
         method: "PATCH",
-        body: JSON.stringify({ isActive }),
+        body: JSON.stringify({ isActive, reason }),
       });
       setSuspendOpen(false);
       load();
+      loadSuspensions();
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Could not update this institute.");
     } finally {
       setSuspending(false);
     }
   }
+
+  const [suspensions, setSuspensions] = useState<InstituteSuspension[] | null>(null);
+
+  function loadSuspensions() {
+    apiFetch<InstituteSuspension[]>(`/platform/institutes/${instituteId}/suspensions`)
+      .then(setSuspensions)
+      .catch(() => setSuspensions([]));
+  }
+
+  useEffect(loadSuspensions, [instituteId]);
 
   const activeByCode = new Map(detail?.modules.map((m) => [m.code, m.isActive]) ?? []);
 
@@ -145,8 +158,8 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
               </div>
 
               <div className="mt-4 space-y-4">
-                <TeamList title="Admins" members={detail.admins} />
-                <TeamList title="Accountants" members={detail.accountants} />
+                <TeamList title="Admins" members={detail.admins} onLogoutEverywhere={setLogoutTarget} />
+                <TeamList title="Accountants" members={detail.accountants} onLogoutEverywhere={setLogoutTarget} />
               </div>
             </div>
           </div>
@@ -232,6 +245,27 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
               >
                 {detail.isActive ? "Suspend institute" : "Reactivate institute"}
               </Button>
+
+              {suspensions && suspensions.length > 0 && (
+                <div className="mt-5 border-t border-border pt-4">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Suspension history</p>
+                  <ul className="space-y-2.5">
+                    {suspensions.map((s) => (
+                      <li key={s.id} className="rounded-lg border border-border px-3 py-2.5 text-sm">
+                        <p className="text-foreground">{s.reason}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Suspended by {s.suspendedBy.fullName} on {formatDate(s.suspendedAt)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {s.liftedAt
+                            ? `Lifted by ${s.liftedBy?.fullName ?? "—"} on ${formatDate(s.liftedAt)}`
+                            : "Still in effect"}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -259,16 +293,80 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
         />
       )}
 
-      <ConfirmModal
+      <SuspendModal
         open={suspendOpen}
         onClose={() => setSuspendOpen(false)}
-        onConfirm={() => setSuspended(false)}
-        title={`Suspend ${detail?.name ?? "this institute"}?`}
-        confirmLabel={suspending ? "Suspending…" : "Suspend"}
+        onConfirm={(reason) => setSuspended(false, reason)}
+        instituteName={detail?.name ?? "this institute"}
+        submitting={suspending}
+      />
+
+      <ConfirmModal
+        open={!!logoutTarget}
+        onClose={() => setLogoutTarget(null)}
+        onConfirm={async () => {
+          await apiFetch(`/platform/users/${logoutTarget!.id}/logout-everywhere`, { method: "POST" });
+        }}
+        title={`Sign out ${logoutTarget?.fullName ?? "this user"} everywhere?`}
+        confirmLabel="Sign out everywhere"
         destructive
-        description="Everyone at this institute is signed out immediately and cannot sign back in. Fees, payroll, attendance and every other record are kept intact, and you can reactivate at any time."
+        description="Every session on this account is signed out immediately, on their next request. Their account and data are untouched — they can sign back in right away."
       />
     </div>
+  );
+}
+
+/** Suspending requires a reason (changes-phase12.md §12.10) — ConfirmModal
+ * has no field slot for one, so this is its own small modal rather than a
+ * shoehorned prop onto that shared component. */
+function SuspendModal({
+  open,
+  onClose,
+  onConfirm,
+  instituteName,
+  submitting,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+  instituteName: string;
+  submitting: boolean;
+}) {
+  const [reason, setReason] = useState("");
+
+  function handleClose() {
+    setReason("");
+    onClose();
+  }
+
+  return (
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title={`Suspend ${instituteName}?`}
+      description="Everyone at this institute is signed out immediately and cannot sign back in. Fees, payroll, attendance and every other record are kept intact, and you can reactivate at any time."
+      width="sm"
+      footer={
+        <>
+          <Button variant="ghost" onClick={handleClose} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={() => onConfirm(reason)} disabled={submitting || !reason.trim()}>
+            {submitting ? "Suspending…" : "Suspend"}
+          </Button>
+        </>
+      }
+    >
+      <label className="mb-1.5 block text-sm font-medium text-foreground">Reason</label>
+      <textarea
+        value={reason}
+        onChange={(e) => setReason(e.target.value)}
+        rows={3}
+        maxLength={500}
+        placeholder="Why is this institute being suspended? Shown in its suspension history."
+        className="w-full resize-none rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+      />
+    </Modal>
   );
 }
 
@@ -390,7 +488,15 @@ function EditLimitsModal({
   );
 }
 
-function TeamList({ title, members }: { title: string; members: PlatformInstituteDetail["admins"] }) {
+function TeamList({
+  title,
+  members,
+  onLogoutEverywhere,
+}: {
+  title: string;
+  members: PlatformInstituteDetail["admins"];
+  onLogoutEverywhere: (member: { id: string; fullName: string }) => void;
+}) {
   return (
     <div>
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
@@ -404,7 +510,18 @@ function TeamList({ title, members }: { title: string; members: PlatformInstitut
                 <p className="font-medium text-foreground">{m.fullName}</p>
                 <p className="text-xs text-muted-foreground">{m.email}</p>
               </div>
-              <Badge tone={m.isActive ? "success" : "danger"}>{m.isActive ? "Active" : "Inactive"}</Badge>
+              <div className="flex items-center gap-3">
+                <Badge tone={m.isActive ? "success" : "danger"}>{m.isActive ? "Active" : "Inactive"}</Badge>
+                {m.isActive && (
+                  <button
+                    type="button"
+                    onClick={() => onLogoutEverywhere({ id: m.id, fullName: m.fullName })}
+                    className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    Sign out everywhere
+                  </button>
+                )}
+              </div>
             </li>
           ))}
         </ul>

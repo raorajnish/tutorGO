@@ -5,6 +5,8 @@ import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { Button } from "@/components/ui/Button";
 import { NotificationDrawer } from "@/components/app-shell/NotificationDrawer";
+import { HelpDrawer } from "@/components/app-shell/HelpDrawer";
+import { PlatformSearch } from "@/components/app-shell/PlatformSearch";
 import { ProfileMenu } from "@/components/app-shell/ProfileMenu";
 
 interface HeaderProps {
@@ -18,11 +20,16 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [search, setSearch] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const showBackToOrg = user?.role === "OWNER" && !!user.currentInstituteId;
   // A student has no directory to search — the box would only ever return
   // things they cannot see.
   const showSearch = user?.role !== "STUDENT";
+  // Help & support is the staff-to-SuperAdmin channel — a SuperAdmin files no
+  // tickets (they triage them from /platform/support instead), and a student
+  // has no institute-level support relationship of their own.
+  const showHelp = user?.role !== "STUDENT" && user?.role !== "SUPERADMIN";
 
   async function handleExit() {
     setExiting(true);
@@ -55,7 +62,9 @@ export function Header({ onMenuClick }: HeaderProps) {
         </Button>
       )}
 
-      {showSearch ? (
+      {user?.role === "SUPERADMIN" ? (
+        <PlatformSearch />
+      ) : showSearch ? (
       <div className="relative hidden min-w-0 flex-1 sm:block">
         <svg
           width="16"
@@ -94,6 +103,21 @@ export function Header({ onMenuClick }: HeaderProps) {
           </svg>
           {unreadCount > 0 && <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-accent" />}
         </button>
+        {showHelp && (
+          <button
+            type="button"
+            onClick={() => setHelpOpen(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors duration-150 hover:bg-secondary"
+            aria-label="Open help & support"
+            title="Help & support"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2 1.75-2 3.25" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 17h.01" strokeLinecap="round" />
+            </svg>
+          </button>
+        )}
         <button
           type="button"
           onClick={toggleTheme}
@@ -116,6 +140,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       </div>
 
       <NotificationDrawer open={notificationsOpen} onClose={() => setNotificationsOpen(false)} onUnreadCountChange={setUnreadCount} />
+      {showHelp && <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />}
     </header>
   );
 }

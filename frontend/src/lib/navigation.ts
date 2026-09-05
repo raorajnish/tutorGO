@@ -22,7 +22,10 @@ export type NavIcon =
   | "analytics"
   | "portalAccess"
   | "timetable"
-  | "notifications";
+  | "notifications"
+  | "ptm"
+  | "support"
+  | "auditLog";
 
 export interface NavItem {
   label: string;
@@ -115,6 +118,14 @@ export const NAV_SECTIONS: NavSection[] = [
         // it draws from whichever modules are actually active.
         roles: ["OWNER", "ADMIN"],
       },
+      {
+        label: "PTM",
+        href: "/ptm",
+        icon: "ptm",
+        // Same scheduling roles as lectures (attendance.ts's SCHEDULE_ROLES).
+        // Not module-gated — same reasoning as Distribution.
+        roles: ["OWNER", "ADMIN", "RECEPTION"],
+      },
     ],
   },
   {
@@ -151,6 +162,8 @@ export const NAV_SECTIONS: NavSection[] = [
       { label: "Plans", href: "/platform/plans", icon: "plans", roles: ["SUPERADMIN"] },
       { label: "Subscriptions", href: "/platform/subscriptions", icon: "subscriptions", roles: ["SUPERADMIN"] },
       { label: "Email settings", href: "/platform/email-settings", icon: "mail", roles: ["SUPERADMIN"] },
+      { label: "Support", href: "/platform/support", icon: "support", roles: ["SUPERADMIN"] },
+      { label: "Audit log", href: "/platform/audit-log", icon: "auditLog", roles: ["SUPERADMIN"] },
     ],
   },
 ];

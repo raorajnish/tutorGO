@@ -58,7 +58,7 @@ authRouter.post("/login", loginLimiter, validateBody(loginSchema), async (req, r
 
     await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
-    const token = signToken({ sub: user.id, role: user.role, instituteId, organizationId });
+    const token = signToken({ sub: user.id, role: user.role, instituteId, organizationId, tokenVersion: user.tokenVersion });
 
     res.json({
       token,
@@ -190,6 +190,8 @@ authRouter.post("/enter-institute", authenticate, requireRoles("OWNER"), async (
       role: "OWNER",
       instituteId: institute.id,
       organizationId: authUser.organizationId,
+      sessionStart: authUser.sessionStart,
+      tokenVersion: authUser.tokenVersion,
     });
 
     res.json({ token });
@@ -206,6 +208,8 @@ authRouter.post("/exit-institute", authenticate, requireRoles("OWNER"), async (r
       role: "OWNER",
       instituteId: null,
       organizationId: authUser.organizationId,
+      sessionStart: authUser.sessionStart,
+      tokenVersion: authUser.tokenVersion,
     });
     res.json({ token });
   } catch (err) {
@@ -237,10 +241,27 @@ authRouter.post("/change-password", authenticate, validateBody(changePasswordSch
     }
 
     const passwordHash = await hashPassword(newPassword);
-    await prisma.user.update({
+    // A changed password is exactly the "my password may have leaked"
+    // moment §12.2 exists for — bumping tokenVersion here signs every OTHER
+    // session out immediately. The request making this call keeps working:
+    // a fresh token (carrying the new version) goes out via the same silent
+    // X-Refreshed-Token header authenticate() already uses for renewal, so
+    // this session doesn't have to re-authenticate just because it changed
+    // its own password.
+    const updated = await prisma.user.update({
       where: { id: user.id },
-      data: { passwordHash, mustChangePassword: false },
+      data: { passwordHash, mustChangePassword: false, tokenVersion: { increment: 1 } },
     });
+
+    const refreshed = signToken({
+      sub: authUser.id,
+      role: authUser.role,
+      instituteId: authUser.instituteId,
+      organizationId: authUser.organizationId,
+      sessionStart: authUser.sessionStart,
+      tokenVersion: updated.tokenVersion,
+    });
+    res.setHeader("X-Refreshed-Token", refreshed);
 
     res.json({ ok: true });
   } catch (err) {
@@ -364,9 +385,14 @@ authRouter.post("/reset-password", resetLimiter, validateBody(resetPasswordSchem
     if (!user || !user.isActive) throw ApiError.badRequest("This reset link is invalid or has expired.", "INVALID_RESET_TOKEN");
 
     const passwordHash = await hashPassword(newPassword);
-    await prisma.user.update({
+    // Same reasoning as /auth/change-password: a reset password is exactly
+    // the "leaked credential" case §12.2 exists for, so every session issued
+    // before this reset dies. Unlike change-password there's no "current
+    // session" to preserve here — the caller wasn't authenticated, they're
+    // about to be signed in fresh below with the new version already baked in.
+    const bumped = await prisma.user.update({
       where: { id: user.id },
-      data: { passwordHash, mustChangePassword: false },
+      data: { passwordHash, mustChangePassword: false, tokenVersion: { increment: 1 } },
     });
 
     let instituteId: string | null = null;
@@ -381,12 +407,30 @@ authRouter.post("/reset-password", resetLimiter, validateBody(resetPasswordSchem
     }
 
     await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
-    const token = signToken({ sub: user.id, role: user.role, instituteId, organizationId });
+    const token = signToken({ sub: user.id, role: user.role, instituteId, organizationId, tokenVersion: bumped.tokenVersion });
 
     res.json({
       token,
       user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role, instituteId, organizationId },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Session revocation — see changes-phase12.md §12.2. Bumping tokenVersion is
+// the entire mechanism: authenticate() rejects any token signed with the old
+// value on its very next request. No token blocklist, no per-token rows.
+// ---------------------------------------------------------------------------
+
+authRouter.post("/logout-everywhere", authenticate, async (req, res, next) => {
+  try {
+    // Deliberately no new token here — the caller's own current session is
+    // signed with the version about to be superseded, so it goes out with
+    // everything else. The frontend's confirm dialog says so up front.
+    await prisma.user.update({ where: { id: req.user!.id }, data: { tokenVersion: { increment: 1 } } });
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }

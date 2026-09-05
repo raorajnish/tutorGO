@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AttendanceToggleGroup } from "@/components/attendance/ToggleGroup";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { useMessageTemplate } from "@/lib/useMessageTemplate";
 import { attendanceMarkedVars, renderTemplate } from "@/lib/messageTemplates";
 import type { AttendanceStatus, Lecture, RosterEntry } from "@/lib/types";
@@ -153,7 +154,13 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
     >
       {error && <div className="mb-4 rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
-      {loading && <p className="text-sm text-muted-foreground">Loading roster…</p>}
+      {loading && (
+        <div className="divide-y divide-border rounded-xl border border-border">
+          {Array.from({ length: 6 }, (_, i) => (
+            <SkeletonRow key={i} lines={2} />
+          ))}
+        </div>
+      )}
 
       {!loading && roster && roster.length === 0 && (
         <p className="rounded-xl border border-dashed border-border px-3.5 py-6 text-center text-sm text-muted-foreground">

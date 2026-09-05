@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { ENQUIRY_ACTIVITY_LABELS, type EnquiryActivity } from "@/lib/types";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatDate as fmtDate, formatDateTime as fmtDateTime } from "@/lib/format";
 
 const DOT_TONE: Record<EnquiryActivity["type"], string> = {
@@ -34,7 +35,15 @@ export function ActivityTimeline({ enquiryId }: { enquiryId: string }) {
     };
   }, [enquiryId]);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Loading history…</p>;
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 3 }, (_, i) => (
+          <SkeletonRow key={i} avatar lines={2} />
+        ))}
+      </div>
+    );
+  }
   if (error) return <p className="text-sm text-danger">{error}</p>;
   if (activities.length === 0) return <p className="text-sm text-muted-foreground">No follow-up activity yet.</p>;
 

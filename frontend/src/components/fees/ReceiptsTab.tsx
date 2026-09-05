@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { ExportButton } from "@/components/ui/ExportButton";
 import { ReceiptModal } from "@/components/fees/ReceiptModal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatMoney } from "@/lib/money";
 import { PAYMENT_MODE_LABELS, type ReceiptListItem } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
@@ -62,7 +63,15 @@ export function ReceiptsTab() {
               </tr>
             </thead>
             <tbody>
-              {(receipts ?? []).map((r) => (
+              {receipts === null &&
+                Array.from({ length: 6 }, (_, i) => (
+                  <tr key={`sk-${i}`}>
+                    <td colSpan={6}>
+                      <SkeletonRow lines={2} />
+                    </td>
+                  </tr>
+                ))}
+              {receipts !== null && receipts.map((r) => (
                 <tr
                   key={r.id}
                   className="cursor-pointer border-b border-border last:border-0 hover:bg-muted"

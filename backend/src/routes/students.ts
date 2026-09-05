@@ -1,6 +1,8 @@
 import { randomInt } from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
+import multer from "multer";
+import { parse as parseCsv } from "csv-parse/sync";
 import { Prisma } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../lib/http.js";
@@ -821,3 +823,338 @@ studentsRouter.patch("/:id/subjects/:subjectId", validateBody(setSubjectActiveSc
     next(err);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Bulk CSV import — see changes-phase12.md §12.1. Validate-then-commit: every
+// row is checked (and course/batch/duplicate-email resolved) before any
+// database write happens, so a file with 195 good rows and 5 bad ones never
+// partially applies — the report always accounts for all 200 outcomes from
+// one pass. Same creation shape as POST /admission (admission.ts), minus
+// enquiry conversion, which only makes sense for one-at-a-time admits.
+// ---------------------------------------------------------------------------
+
+const IMPORT_MAX_ROWS = 2000;
+const IMPORT_MAX_BYTES = 2 * 1024 * 1024; // a 2,000-row CSV is nowhere near this
+const importUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: IMPORT_MAX_BYTES } });
+
+const STUDENT_IMPORT_COLUMNS = [
+  "name",
+  "email",
+  "phone",
+  "parentPhone",
+  "courseCode",
+  "batchName",
+  "dob",
+  "fatherName",
+  "motherName",
+  "school",
+  "admissionDate",
+  "fingerprintId",
+] as const;
+
+const studentImportRowSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
+  email: z.string().trim().toLowerCase().pipe(z.union([z.literal(""), z.string().email("Invalid email")])),
+  phone: z.string().trim().min(1, "Phone is required"),
+  parentPhone: z.string().trim().optional().default(""),
+  courseCode: z.string().trim().min(1, "Course code is required"),
+  batchName: z.string().trim().min(1, "Batch name is required"),
+  dob: z.string().trim().optional().default(""),
+  fatherName: z.string().trim().optional().default(""),
+  motherName: z.string().trim().optional().default(""),
+  school: z.string().trim().optional().default(""),
+  admissionDate: z.string().trim().optional().default(""),
+  fingerprintId: z.string().trim().optional().default(""),
+});
+
+interface ImportRowResult {
+  line: number;
+  status: "CREATED" | "SKIPPED" | "ERROR";
+  name?: string;
+  reason?: string;
+  studentCode?: string;
+}
+
+/** Parses a `date` (or blank) form field into a UTC date-only `Date`. Returns
+ * `undefined` for blank, `null` for unparseable — callers distinguish the two
+ * so "field omitted" and "field can't be read" get different row outcomes. */
+function parseDateOnlyField(value: string): Date | null | undefined {
+  if (!value) return undefined;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+}
+
+function parseImportCsv(buffer: Buffer): Record<string, string>[] {
+  let records: Record<string, string>[];
+  try {
+    records = parseCsv(buffer, {
+      columns: (header: string[]) => header.map((h) => h.trim()),
+      skip_empty_lines: true,
+      trim: true,
+    }) as Record<string, string>[];
+  } catch {
+    throw ApiError.badRequest("Could not parse this file — make sure it's a valid CSV with a header row.");
+  }
+  if (records.length === 0) throw ApiError.badRequest("This file has no data rows.");
+  if (records.length > IMPORT_MAX_ROWS) {
+    throw ApiError.badRequest(
+      `This file has ${records.length} rows — the limit per import is ${IMPORT_MAX_ROWS}. Split it into smaller batches.`
+    );
+  }
+  return records;
+}
+
+studentsRouter.get("/import/template.csv", requireModule("ADMISSION"), (req, res) => {
+  const csv = toCsv([
+    [...STUDENT_IMPORT_COLUMNS],
+    [
+      "Asha Verma",
+      "asha.verma@example.com",
+      "9876543210",
+      "9876500000",
+      "JEE25",
+      "Batch A",
+      "2008-04-12",
+      "Ramesh Verma",
+      "Sunita Verma",
+      "Delhi Public School",
+      "2026-06-01",
+      "",
+    ],
+  ]);
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", 'attachment; filename="student-import-template.csv"');
+  res.send(csv);
+});
+
+studentsRouter.post(
+  "/import",
+  requireModule("ADMISSION"),
+  importUpload.single("file"),
+  async (req, res, next) => {
+    try {
+      if (!req.file) throw ApiError.badRequest("No file was uploaded.");
+      const instituteId = req.tenantId!;
+      const institute = await prisma.institute.findUniqueOrThrow({ where: { id: instituteId } });
+
+      const records = parseImportCsv(req.file.buffer);
+
+      // Preloaded once, not per row — a 2,000-row file for one institute
+      // realistically touches a handful of courses/batches, not thousands.
+      const [courses, batches] = await Promise.all([
+        prisma.course.findMany({ where: { instituteId }, select: { id: true, code: true } }),
+        prisma.batch.findMany({ where: { instituteId }, select: { id: true, name: true, courseId: true } }),
+      ]);
+      const courseByCode = new Map(courses.map((c) => [c.code.trim().toLowerCase(), c]));
+      const batchByKey = new Map(batches.map((b) => [`${b.courseId}::${b.name.trim().toLowerCase()}`, b]));
+
+      type PendingRow = {
+        line: number;
+        row: z.infer<typeof studentImportRowSchema>;
+        courseId: string;
+        courseCode: string;
+        batchId: string;
+        admissionDate: Date;
+        dob: Date | undefined;
+      };
+      const pending: PendingRow[] = [];
+      const results: ImportRowResult[] = [];
+      const today = todayDateOnly();
+
+      for (let i = 0; i < records.length; i++) {
+        const line = i + 2; // header is line 1, data starts at line 2
+        const raw = records[i]!;
+        const parsed = studentImportRowSchema.safeParse(raw);
+        if (!parsed.success) {
+          results.push({ line, status: "ERROR", name: raw.name, reason: parsed.error.issues[0]?.message ?? "Invalid row" });
+          continue;
+        }
+        const row = parsed.data;
+
+        const course = courseByCode.get(row.courseCode.toLowerCase());
+        if (!course) {
+          results.push({ line, status: "ERROR", name: row.name, reason: `Course code "${row.courseCode}" not found` });
+          continue;
+        }
+        const batch = batchByKey.get(`${course.id}::${row.batchName.toLowerCase()}`);
+        if (!batch) {
+          results.push({ line, status: "ERROR", name: row.name, reason: `Batch "${row.batchName}" not found on course "${row.courseCode}"` });
+          continue;
+        }
+
+        const dob = parseDateOnlyField(row.dob);
+        if (dob === null) {
+          results.push({ line, status: "ERROR", name: row.name, reason: `Could not read date of birth "${row.dob}"` });
+          continue;
+        }
+        const admissionDateParsed = parseDateOnlyField(row.admissionDate);
+        if (admissionDateParsed === null) {
+          results.push({ line, status: "ERROR", name: row.name, reason: `Could not read admission date "${row.admissionDate}"` });
+          continue;
+        }
+
+        pending.push({
+          line,
+          row,
+          courseId: course.id,
+          courseCode: course.code,
+          batchId: batch.id,
+          admissionDate: admissionDateParsed ?? today,
+          dob,
+        });
+      }
+
+      // Duplicate check, batched in one query rather than per row — and
+      // against rows already seen earlier in this same file, since a
+      // re-uploaded (partially fixed) CSV must not create the first 195 rows
+      // twice. Rows with an explicit email dedupe on it directly. Rows with
+      // no email get a fresh, guaranteed-unique {studentCode}@tutorgo.in
+      // address at creation time — which is exactly why email can't be the
+      // key for them: it's different on every single run. (courseId, phone)
+      // is the fallback key instead, since phone is required on every row
+      // and stable per student — caught by re-uploading the same file twice
+      // during verification, which recreated a blank-email row as a genuine
+      // duplicate before this fallback existed.
+      const explicitEmails = pending.filter((p) => p.row.email !== "").map((p) => p.row.email);
+      const blankEmailRows = pending.filter((p) => p.row.email === "");
+      const [existingByEmail, existingByPhone] = await Promise.all([
+        explicitEmails.length
+          ? prisma.student.findMany({ where: { email: { in: explicitEmails } }, select: { email: true } })
+          : Promise.resolve([]),
+        blankEmailRows.length
+          ? prisma.student.findMany({
+              where: { OR: blankEmailRows.map((p) => ({ courseId: p.courseId, phone: p.row.phone })) },
+              select: { courseId: true, phone: true },
+            })
+          : Promise.resolve([]),
+      ]);
+      const existingEmails = new Set(existingByEmail.map((s) => s.email.toLowerCase()));
+      const existingPhoneKeys = new Set(existingByPhone.map((s) => `${s.courseId}::${s.phone}`));
+
+      const seenEmails = new Set<string>();
+      const seenPhoneKeys = new Set<string>();
+      const toCreate: PendingRow[] = [];
+      for (const p of pending) {
+        if (p.row.email !== "") {
+          if (existingEmails.has(p.row.email) || seenEmails.has(p.row.email)) {
+            results.push({ line: p.line, status: "SKIPPED", name: p.row.name, reason: "A student with this email already exists" });
+            continue;
+          }
+          seenEmails.add(p.row.email);
+        } else {
+          const phoneKey = `${p.courseId}::${p.row.phone}`;
+          if (existingPhoneKeys.has(phoneKey) || seenPhoneKeys.has(phoneKey)) {
+            results.push({
+              line: p.line,
+              status: "SKIPPED",
+              name: p.row.name,
+              reason: "A student with this phone number already exists on this course",
+            });
+            continue;
+          }
+          seenPhoneKeys.add(phoneKey);
+        }
+        toCreate.push(p);
+      }
+
+      // Preview mode — the frontend calls this first with everything above
+      // already run (course/batch resolution, duplicate detection) and shows
+      // it to staff before anything is written. Rows that would succeed are
+      // reported as "CREATED" here too (there's no separate "will create"
+      // status) since nothing has actually happened yet either way — the
+      // response as a whole is what tells the caller this was a preview.
+      if (req.body?.dryRun === "true") {
+        for (const p of toCreate) {
+          results.push({ line: p.line, status: "CREATED", name: p.row.name });
+        }
+        results.sort((a, b) => a.line - b.line);
+        res.json({
+          dryRun: true,
+          created: toCreate.length,
+          skipped: results.filter((r) => r.status === "SKIPPED").length,
+          errors: results.filter((r) => r.status === "ERROR").length,
+          rows: results,
+        });
+        return;
+      }
+
+      // A large batch is one confirmation step, not 2,000 — the default
+      // interactive-transaction timeout would cut this off well before a
+      // full 2,000-row file finishes, so it's raised explicitly here rather
+      // than relying on the client-wide default used by small transactions
+      // elsewhere in this file.
+      const created = await prisma.$transaction(
+        async (tx) => {
+          const rows: { line: number; name: string; studentCode: string }[] = [];
+          for (const p of toCreate) {
+            try {
+              const studentCode = await nextStudentCode(tx, instituteId, institute.code, p.admissionDate, p.courseCode);
+              const email = p.row.email !== "" ? p.row.email : `${studentCode}@tutorgo.in`.toLowerCase();
+
+              const student = await tx.student.create({
+                data: {
+                  instituteId,
+                  studentCode,
+                  courseId: p.courseId,
+                  name: p.row.name,
+                  email,
+                  phone: p.row.phone,
+                  parentPhone: p.row.parentPhone || undefined,
+                  dob: p.dob,
+                  fatherName: p.row.fatherName || undefined,
+                  motherName: p.row.motherName || undefined,
+                  school: p.row.school || undefined,
+                  admissionDate: p.admissionDate,
+                  fingerprintId: p.row.fingerprintId || undefined,
+                },
+              });
+              await tx.studentBatch.create({ data: { studentId: student.id, batchId: p.batchId, joinedAt: p.admissionDate } });
+              await createDistributionReceiptsForNewStudent(tx, instituteId, student.id, p.courseId);
+
+              rows.push({ line: p.line, name: student.name, studentCode: student.studentCode });
+            } catch (err) {
+              // One row's failure (e.g. a race on a uniqueness constraint) must
+              // not roll back every other already-committed row in this batch.
+              results.push({
+                line: p.line,
+                status: "ERROR",
+                name: p.row.name,
+                reason: err instanceof ApiError ? err.message : "Could not create this student",
+              });
+            }
+          }
+          return rows;
+        },
+        { maxWait: 10_000, timeout: 120_000 }
+      );
+
+      for (const c of created) {
+        results.push({ line: c.line, status: "CREATED", name: c.name, studentCode: c.studentCode });
+      }
+      results.sort((a, b) => a.line - b.line);
+
+      if (created.length > 0) {
+        await auditLog({
+          action: "STUDENTS_BULK_IMPORTED",
+          instituteId,
+          organizationId: req.user!.organizationId,
+          userId: req.user!.id,
+          targetType: "Institute",
+          targetId: instituteId,
+          metadata: { count: created.length, totalRows: records.length },
+        });
+      }
+
+      res.status(201).json({
+        dryRun: false,
+        created: created.length,
+        skipped: results.filter((r) => r.status === "SKIPPED").length,
+        errors: results.filter((r) => r.status === "ERROR").length,
+        rows: results,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);

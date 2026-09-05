@@ -77,6 +77,10 @@ enum MessageTemplateType {
   /// the student's own portal notification and the parent's WhatsApp copy
   /// come from the same dispatch call. See changes-phase10.md §10.6.
   TEST_RESULT_ENTERED
+  /// Fires when a ParentMeeting is created or cancelled — see
+  /// changes-phase11.md §11.2.
+  PTM_SCHEDULED
+  PTM_CANCELLED
 }
 
 enum PaymentMode {
@@ -173,7 +177,8 @@ model Organization {
   ownerId String? @unique
   owner   User?   @relation("OrganizationOwner", fields: [ownerId], references: [id])
 
-  institutes Institute[]
+  institutes     Institute[]
+  supportTickets SupportTicket[]
 
   @@map("organizations")
 }
@@ -249,6 +254,11 @@ model Institute {
   reminders         ScheduledReminder[]
   distributionItems DistributionItem[]
   leaveRequests     LeaveRequest[]
+  paymentConfig     InstitutePaymentConfig?
+  paymentProofs     PaymentProof[]
+  parentMeetings    ParentMeeting[]
+  supportTickets    SupportTicket[]
+  suspensions       InstituteSuspension[]
 
   @@index([organizationId])
   @@map("institutes")
@@ -300,27 +310,100 @@ model User {
   mustChangePassword Boolean   @default(false)
   termsAcceptedAt    DateTime?
   lastLoginAt        DateTime?
+  /// Bumped by /auth/logout-everywhere, a SuperAdmin's forced-logout lever,
+  /// and any password change — every JWT carries the value live at sign
+  /// time, and authenticate() rejects a token whose value no longer matches
+  /// this column. The entire revocation mechanism is this one comparison;
+  /// no token blocklist, no per-token bookkeeping. See changes-phase12.md
+  /// §12.2.
+  tokenVersion       Int       @default(0)
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  institute           Institute?          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  ownedOrganization   Organization?       @relation("OrganizationOwner")
-  lecturesTaught      Lecture[]
-  teachingAssignments FacultyAssignment[]
-  notifications       Notification[]
-  salaryProfile       SalaryProfile?
-  passwordResetOtps   PasswordResetOtp[]
-  expensesRecorded    Expense[]
-  testsAuthored       Test[]              @relation("TestAuthor")
-  testResultsEntered  TestResult[]        @relation("TestResultAuthor")
-  pushSubscriptions   PushSubscription[]
-  leaveRequests       LeaveRequest[]      @relation("LeaveRequester")
-  leaveReviews        LeaveRequest[]      @relation("LeaveReviewer")
+  institute             Institute?          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  ownedOrganization     Organization?       @relation("OrganizationOwner")
+  lecturesTaught        Lecture[]
+  teachingAssignments   FacultyAssignment[]
+  notifications         Notification[]
+  salaryProfile         SalaryProfile?
+  passwordResetOtps     PasswordResetOtp[]
+  expensesRecorded      Expense[]
+  testsAuthored         Test[]              @relation("TestAuthor")
+  testResultsEntered    TestResult[]        @relation("TestResultAuthor")
+  pushSubscriptions     PushSubscription[]
+  leaveRequests         LeaveRequest[]      @relation("LeaveRequester")
+  leaveReviews          LeaveRequest[]      @relation("LeaveReviewer")
   /// Set only on a role=STUDENT login — the student row it grants access to.
-  portalStudent       Student?            @relation("StudentPortalLogin")
+  portalStudent         Student?            @relation("StudentPortalLogin")
+  parentMeetingsCreated ParentMeeting[]     @relation("ParentMeetingAuthor")
+  supportTicketsCreated SupportTicket[]
+  supportTicketMessages SupportTicketMessage[]
+  suspensionsMade       InstituteSuspension[] @relation("InstituteSuspensionSuspendedBy")
+  suspensionsLifted     InstituteSuspension[] @relation("InstituteSuspensionLiftedBy")
 
   @@index([instituteId])
   @@map("users")
+}
+
+// -----------------------------------------------------------------------
+// Help & support (changes-phase12.md §12.3) — staff-to-SuperAdmin support
+// tickets. Scoped by organizationId (not instituteId): an OWNER files and
+// reads tickets before ever "entering" a specific institute, and everyone
+// at the same organization sees the same conversation with the platform —
+// tenant isolation here is the organization boundary, not the institute one.
+// -----------------------------------------------------------------------
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum SupportTicketCategory {
+  BILLING
+  BUG
+  FEATURE_REQUEST
+  OTHER
+}
+
+model SupportTicket {
+  id              String                @id @default(cuid())
+  organizationId  String
+  /// Context only (which branch this is about), never the scoping key for
+  /// who can see the ticket — see the block comment above.
+  instituteId     String?
+  createdByUserId String
+  category        SupportTicketCategory @default(OTHER)
+  subject         String
+  status          SupportTicketStatus   @default(OPEN)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  institute    Institute?              @relation(fields: [instituteId], references: [id], onDelete: SetNull)
+  createdBy    User                    @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  messages     SupportTicketMessage[]
+
+  @@index([organizationId, status])
+  @@index([instituteId])
+  @@map("support_tickets")
+}
+
+model SupportTicketMessage {
+  id           String   @id @default(cuid())
+  ticketId     String
+  authorUserId String
+  /// True when written by a SuperAdmin — lets the thread render "You" vs
+  /// "Support" without a second lookup or a role join.
+  isFromPlatform Boolean
+  body         String
+  createdAt    DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User          @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("support_ticket_messages")
 }
 
 /// One browser/device registration for web push. A user can have several
@@ -701,6 +784,7 @@ model Course {
   feeStructures     FeeStructure[]
   tests             Test[]
   distributionItems DistributionItem[]
+  parentMeetings    ParentMeeting[]
 
   @@unique([instituteId, code])
   @@index([instituteId])
@@ -755,14 +839,60 @@ model Batch {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  institute Institute      @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  course    Course         @relation(fields: [courseId], references: [id])
-  students  StudentBatch[]
-  lectures  Lecture[]
+  institute      Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course         Course          @relation(fields: [courseId], references: [id])
+  students       StudentBatch[]
+  lectures       Lecture[]
+  parentMeetings ParentMeeting[]
 
   @@index([instituteId])
   @@index([courseId])
   @@map("batches")
+}
+
+/// A parent–teacher meeting, scheduled per batch (changes-phase11.md §11.2).
+/// Deliberately one row per batch rather than per course/standard: two
+/// batches of the same standard almost never meet in the same slot, so a
+/// single course-wide time would be wrong for most of the people it
+/// notifies. Scheduling a whole standard's PTM is a UI concern — the create
+/// flow picks a course, lists its batches, and writes one row per batch
+/// selected — not a model one; each row stays independently reschedulable
+/// and cancellable.
+model ParentMeeting {
+  id              String    @id @default(cuid())
+  instituteId     String
+  title           String
+  courseId        String
+  batchId         String
+  date            DateTime  @db.Date
+  startTime       DateTime  @db.Time
+  endTime         DateTime  @db.Time
+  venue           String?
+  note            String?
+  createdByUserId String
+  cancelledAt     DateTime?
+  cancelReason    String?
+
+  // --- Pre-meeting reminders -------------------------------------------------
+  // Two fixed lead times (1 day, 2 hours before) rather than the configurable
+  // leadDays[] on ScheduledReminder — that machinery exists for arbitrary
+  // staff-defined schedules; a PTM only ever needs these two, so a plain
+  // "has this fired yet" timestamp per lead is simpler and needs no cursor.
+  // Set by services/ptmReminders.ts; null means "not fired yet".
+  dayBeforeRemindedAt  DateTime?
+  hourBeforeRemindedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  course    Course    @relation(fields: [courseId], references: [id])
+  batch     Batch     @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  createdBy User      @relation("ParentMeetingAuthor", fields: [createdByUserId], references: [id])
+
+  @@index([instituteId, date])
+  @@index([batchId, date])
+  @@map("parent_meetings")
 }
 
 // ---------------------------------------------------------------------------
@@ -896,6 +1026,7 @@ model Student {
   feeAccount           FeeAccount?
   distributionReceipts DistributionReceipt[]
   outboundMessages     OutboundMessage[]
+  paymentProofs        PaymentProof[]
 
   @@index([instituteId, isActive])
   @@index([courseId])
@@ -1008,14 +1139,14 @@ model Lecture {
 /// scheduled into one Lecture row (kind = TEST) per batch it's held for, so
 /// one Test can span several batches on different dates/slots.
 model Test {
-  id              String   @id @default(cuid())
-  instituteId     String
-  courseId        String
-  subjectId       String
-  title           String
-  totalMarks      Int
-  passingMarks    Int?
-  instructions    String?
+  id                 String   @id @default(cuid())
+  instituteId        String
+  courseId           String
+  subjectId          String
+  title              String
+  totalMarks         Int
+  passingMarks       Int?
+  instructions       String?
   /// URL of the question paper. Optional — a test can be scheduled with no
   /// paper attached at all. Served from Cloudinary when configured, else from
   /// local disk (see services/uploads.ts).
@@ -1026,9 +1157,9 @@ model Test {
   /// column existed — those keep working, they just can't be cleaned up
   /// automatically, so no backfill is needed.
   paperAssetPublicId String?
-  createdByUserId String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdByUserId    String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   institute Institute    @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   course    Course       @relation(fields: [courseId], references: [id])
@@ -1212,11 +1343,12 @@ model FeeAccount {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
-  institute    Institute        @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  student      Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  feeStructure FeeStructure?    @relation(fields: [feeStructureId], references: [id], onDelete: SetNull)
-  installments FeeInstallment[]
-  payments     Payment[]
+  institute     Institute        @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  student       Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feeStructure  FeeStructure?    @relation(fields: [feeStructureId], references: [id], onDelete: SetNull)
+  installments  FeeInstallment[]
+  payments      Payment[]
+  paymentProofs PaymentProof[]
 
   @@index([instituteId])
   @@index([feeStructureId])
@@ -1289,6 +1421,10 @@ model Payment {
   institute   Institute           @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   feeAccount  FeeAccount          @relation(fields: [feeAccountId], references: [id], onDelete: Cascade)
   allocations PaymentAllocation[]
+  /// Set only when this Payment was produced by approving a PaymentProof —
+  /// the reverse side of PaymentProof.paymentId, present here purely so a
+  /// payment can show "via UPI proof" in the UI without a second query.
+  fromProof   PaymentProof?
 
   // Receipt numbers are only meant to be unique per institute (ReceiptCounter
   // is scoped [instituteId, yearMonth] already) — a bare @unique here was
@@ -1320,6 +1456,80 @@ model PaymentAllocation {
   @@index([paymentId])
   @@index([installmentId])
   @@map("payment_allocations")
+}
+
+/// Per-institute self-serve payment collection config (changes-phase11.md
+/// §11.1) — same shape as InstituteEmailConfig/InstituteWhatsAppConfig: one
+/// row per institute, a master `isEnabled` switch, everything else optional
+/// underneath it. Off means the student portal never renders a "Pay fees"
+/// button, whatever else is filled in here.
+model InstitutePaymentConfig {
+  id              String   @id @default(cuid())
+  instituteId     String   @unique
+  isEnabled       Boolean  @default(false)
+  upiId           String?
+  payeeName       String?
+  /// Storage handle for the uploaded QR — see services/uploads.ts. Null when
+  /// no QR has been uploaded (UPI ID alone is still a valid configuration).
+  qrAssetUrl      String?
+  qrAssetName     String?
+  qrAssetPublicId String?
+  /// Free text shown under the QR/UPI details — e.g. "include your student
+  /// code in the payment note".
+  instructions    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@map("institute_payment_configs")
+}
+
+enum PaymentProofStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// A student's claim of having paid outside the app (UPI/bank transfer),
+/// evidenced by an uploaded screenshot. Deliberately NOT itself a payment —
+/// see fees.ts's applyPayment() and the approve route below: approving a
+/// proof calls the exact same money-writing path a manually recorded payment
+/// does, with the amount staff confirm, never `amountClaimed` blindly. A
+/// screenshot is a claim, not a receipt: it can be stale, edited, or someone
+/// else's transfer, so nothing here ever touches FeeInstallment on its own.
+model PaymentProof {
+  id               String             @id @default(cuid())
+  instituteId      String
+  studentId        String
+  feeAccountId     String
+  /// What the student says they sent. Shown to staff as a starting point;
+  /// never trusted as the amount actually recorded.
+  amountClaimed    Decimal            @db.Decimal(10, 2)
+  /// UPI reference/UTR the student can optionally type in, to make matching
+  /// against the bank statement easier for staff.
+  referenceNo      String?
+  assetUrl         String
+  assetName        String
+  assetPublicId    String
+  status           PaymentProofStatus @default(PENDING)
+  /// Set once approved — the Payment this proof produced. @unique is what
+  /// makes double-approval structurally impossible: a second approve attempt
+  /// on the same proof has nowhere to write a second link.
+  paymentId        String?            @unique
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  rejectReason     String?
+  submittedAt      DateTime           @default(now())
+
+  institute  Institute  @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feeAccount FeeAccount @relation(fields: [feeAccountId], references: [id], onDelete: Cascade)
+  payment    Payment?   @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([instituteId, status])
+  @@index([studentId])
+  @@map("payment_proofs")
 }
 
 /// Same atomic-upsert pattern as StudentCodeCounter — one gapless sequence
@@ -1654,4 +1864,27 @@ model LeaveRequest {
   @@index([instituteId, userId])
   @@index([instituteId, status])
   @@map("leave_requests")
+}
+
+/// One row per suspend/lift cycle (changes-phase12.md §12.10) — turns
+/// "why is this institute suspended" from tribal knowledge into a real
+/// answer. Institute.isActive stays the single source of truth for whether
+/// access is actually blocked (authenticate() only ever reads that boolean);
+/// this table is purely a record of who did it, when, and why, and is never
+/// itself read by any access-control check.
+model InstituteSuspension {
+  id                String    @id @default(cuid())
+  instituteId       String
+  reason            String
+  suspendedByUserId String
+  suspendedAt       DateTime  @default(now())
+  liftedAt          DateTime?
+  liftedByUserId    String?
+
+  institute    Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  suspendedBy  User      @relation("InstituteSuspensionSuspendedBy", fields: [suspendedByUserId], references: [id])
+  liftedBy     User?     @relation("InstituteSuspensionLiftedBy", fields: [liftedByUserId], references: [id])
+
+  @@index([instituteId])
+  @@map("institute_suspensions")
 }

@@ -64,4 +64,20 @@ export const WHATSAPP_TEMPLATE_SUGGESTIONS: Record<MessageTemplateType, WhatsApp
     bodyText: "{{1}} scored {{2}} out of {{3}} in {{4}} ({{5}}), held on {{6}}.",
     sampleValues: ["Rohan Mehta", "42", "50", "Unit Test 2", "Physics", "12 Mar"],
   },
+  PTM_SCHEDULED: {
+    mappedType: "PTM_SCHEDULED",
+    name: "ptm_scheduled",
+    language: "en",
+    category: "UTILITY",
+    bodyText: "A Parent-Teacher Meeting — {{1}} — for {{2}} ({{3}}) is scheduled on {{4}} from {{5}} to {{6}}.",
+    sampleValues: ["Term 1 PTM", "Batch A", "NEET 2026", "12 Mar", "4:00 PM", "5:30 PM"],
+  },
+  PTM_CANCELLED: {
+    mappedType: "PTM_CANCELLED",
+    name: "ptm_cancelled",
+    language: "en",
+    category: "UTILITY",
+    bodyText: "The Parent-Teacher Meeting — {{1}} — for {{2}} ({{3}}) on {{4}} has been cancelled. Reason: {{5}}.",
+    sampleValues: ["Term 1 PTM", "Batch A", "NEET 2026", "12 Mar", "Faculty unavailable"],
+  },
 };

@@ -8,6 +8,9 @@ import { money } from "../lib/money.js";
 import { todayDateOnly } from "../lib/dateOnly.js";
 import { toTimeString } from "../lib/lectureShared.js";
 import { validateBody } from "../middleware/validate.js";
+import multer from "multer";
+import { MAX_UPLOAD_BYTES, uploadAsset, signedAssetUrl } from "../services/uploads.js";
+import { rateLimit } from "../middleware/rateLimit.js";
 
 /**
  * The student's own read-only view of their record (changes-phase10.md §10.6).
@@ -227,7 +230,7 @@ portalRouter.get("/timetable", async (req, res, next) => {
     const to = new Date(today);
     to.setUTCDate(to.getUTCDate() + 21);
 
-    const [batch, lectures] = await Promise.all([
+    const [batch, lectures, parentMeetings] = await Promise.all([
       prisma.batch.findUnique({ where: { id: batchId }, select: { id: true, name: true } }),
       prisma.lecture.findMany({
         where: { batchId, date: { gte: from, lte: to } },
@@ -250,6 +253,14 @@ portalRouter.get("/timetable", async (req, res, next) => {
         },
         orderBy: [{ date: "asc" }, { startTime: "asc" }],
       }),
+      // Surfaced on the timetable rather than a separate screen — a parent
+      // opening this wants "what's happening with my kid's batch", and a PTM
+      // is exactly that, same as a lecture is.
+      prisma.parentMeeting.findMany({
+        where: { batchId, date: { gte: from, lte: to }, cancelledAt: null },
+        select: { id: true, title: true, date: true, startTime: true, endTime: true, venue: true },
+        orderBy: [{ date: "asc" }, { startTime: "asc" }],
+      }),
     ]);
 
     res.json({
@@ -267,6 +278,14 @@ portalRouter.get("/timetable", async (req, res, next) => {
         faculty: l.faculty.fullName,
         test: l.test,
         attendanceStatus: l.attendance[0]?.status ?? null,
+      })),
+      parentMeetings: parentMeetings.map((m) => ({
+        id: m.id,
+        title: m.title,
+        date: m.date,
+        startTime: toTimeString(m.startTime),
+        endTime: toTimeString(m.endTime),
+        venue: m.venue,
       })),
     });
   } catch (err) {
@@ -549,6 +568,156 @@ portalRouter.get("/profile", async (req, res, next) => {
       currentBatch: student.batches[0]?.batch ?? null,
       batches: undefined,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Self-serve payment collection — the student's side (changes-phase11.md §11.1)
+// ---------------------------------------------------------------------------
+
+/** Read-only view of the institute's payment config. Returns `null` when the
+ * feature is off or never configured, so the frontend can render "no Pay fees
+ * button" with one falsy check rather than inspecting individual fields. */
+portalRouter.get("/payment-config", async (req, res, next) => {
+  try {
+    const config = await prisma.institutePaymentConfig.findUnique({ where: { instituteId: req.user!.instituteId! } });
+    if (!config || !config.isEnabled) return res.json(null);
+
+    res.json({
+      upiId: config.upiId,
+      payeeName: config.payeeName,
+      qrAssetUrl: config.qrAssetUrl,
+      instructions: config.instructions,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** The student's own submitted proofs, newest first — powers the "Waiting for
+ * confirmation" / "Rejected, try again" states on the Fees screen. */
+portalRouter.get("/payment-proofs", async (req, res, next) => {
+  try {
+    const proofs = await prisma.paymentProof.findMany({
+      where: { studentId: req.user!.studentId! },
+      select: {
+        id: true,
+        amountClaimed: true,
+        referenceNo: true,
+        assetUrl: true,
+        assetPublicId: true,
+        status: true,
+        rejectReason: true,
+        submittedAt: true,
+        reviewedAt: true,
+      },
+      orderBy: { submittedAt: "desc" },
+      take: 20,
+    });
+
+    res.json(
+      proofs.map((p) => ({
+        id: p.id,
+        amountClaimed: money(p.amountClaimed),
+        referenceNo: p.referenceNo,
+        // Signed fresh on every read — the stored URL is inert on its own
+        // (see services/uploads.ts), so a student re-opening this screen a
+        // week later still gets a link that actually works.
+        assetUrl: signedAssetUrl(p.assetPublicId, p.assetUrl),
+        status: p.status,
+        rejectReason: p.rejectReason,
+        submittedAt: p.submittedAt,
+        reviewedAt: p.reviewedAt,
+      }))
+    );
+  } catch (err) {
+    next(err);
+  }
+});
+
+const proofUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_UPLOAD_BYTES } });
+// Burst guard on top of the one-PENDING-proof rule above — that rule stops a
+// flood of *accepted* submissions, this stops a flood of upload attempts
+// (rejected ones included) from one source in a short window.
+const proofUploadLimiter = rateLimit({ max: 10, windowMs: 15 * 60_000, keyPrefix: "payment-proof-upload" });
+
+/** Uploads the screenshot itself. Kept separate from POST /payment-proofs so
+ * a student can upload once and see the image before committing to submit —
+ * and so the upload step, which touches Cloudinary, can be retried on its own
+ * without re-typing the amount. */
+portalRouter.post(
+  "/payment-proofs/upload",
+  proofUploadLimiter,
+  proofUpload.single("file"),
+  async (req, res, next) => {
+    try {
+      if (!req.file) throw ApiError.badRequest("No file was uploaded.");
+      const instituteId = req.user!.instituteId!;
+
+      // Payment screenshots are financial records, not course material — see
+      // services/uploads.ts's AssetVisibility doc — so they're stored
+      // `authenticated` rather than `public` like a QR or test paper.
+      const asset = await uploadAsset(req.file, { instituteId, folder: "payment-proofs", visibility: "authenticated" });
+
+      res.status(201).json({ url: asset.url, name: asset.name, publicId: asset.publicId });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+const submitProofSchema = z.object({
+  amountClaimed: z.number().positive("Enter the amount you paid"),
+  referenceNo: z.string().max(50).optional(),
+  assetUrl: z.string().url(),
+  assetName: z.string().max(255),
+  assetPublicId: z.string().max(255),
+});
+
+/**
+ * Records a student's claim of having paid outside the app. The screenshot
+ * itself is uploaded separately via POST /portal/payment-proofs/upload (below)
+ * — this route only ever receives the resulting URL/publicId, never a raw
+ * file, so the compression the client already did is never redone or undone
+ * on the way in.
+ */
+portalRouter.post("/payment-proofs", validateBody(submitProofSchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof submitProofSchema>;
+    const studentId = req.user!.studentId!;
+    const instituteId = req.user!.instituteId!;
+
+    const config = await prisma.institutePaymentConfig.findUnique({ where: { instituteId } });
+    if (!config?.isEnabled) throw ApiError.badRequest("Online payment isn't available for your institute right now.");
+
+    const account = await prisma.feeAccount.findUnique({ where: { studentId } });
+    if (!account) throw ApiError.badRequest("No fee account was found for you.");
+
+    // One pending proof at a time — otherwise the review queue can be flooded
+    // by resubmitting before staff ever look at the first one.
+    const pending = await prisma.paymentProof.findFirst({ where: { studentId, status: "PENDING" } });
+    if (pending) {
+      throw ApiError.conflict(
+        "You already have a payment awaiting confirmation. Wait for it to be reviewed before submitting another."
+      );
+    }
+
+    const proof = await prisma.paymentProof.create({
+      data: {
+        instituteId,
+        studentId,
+        feeAccountId: account.id,
+        amountClaimed: new Prisma.Decimal(body.amountClaimed),
+        referenceNo: body.referenceNo,
+        assetUrl: body.assetUrl,
+        assetName: body.assetName,
+        assetPublicId: body.assetPublicId,
+      },
+    });
+
+    res.status(201).json({ id: proof.id, status: proof.status, submittedAt: proof.submittedAt });
   } catch (err) {
     next(err);
   }

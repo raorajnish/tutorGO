@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import { ExportButton } from "@/components/ui/ExportButton";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatMoney, parseMoney } from "@/lib/money";
 import { renderTemplate, feeOverdueReminderVars } from "@/lib/messageTemplates";
 import { resolveMessageTemplate } from "@/lib/useMessageTemplate";
@@ -96,7 +97,15 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
               </tr>
             </thead>
             <tbody>
-              {(entries ?? []).map((e) => (
+              {entries === null &&
+                Array.from({ length: 6 }, (_, i) => (
+                  <tr key={`sk-${i}`}>
+                    <td colSpan={6}>
+                      <SkeletonRow lines={2} />
+                    </td>
+                  </tr>
+                ))}
+              {entries !== null && entries.map((e) => (
                 <tr key={e.installment.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <button type="button" className="font-medium text-foreground hover:underline" onClick={() => onOpenStudent(e.student.id)}>

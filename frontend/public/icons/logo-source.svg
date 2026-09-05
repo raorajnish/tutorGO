@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!--
+    TutorGO mark — a monogram, not a placeholder.
+
+    Reads as a "T" (the stem) whose crossbar has been bent upward into a
+    rising chevron: the letter and the idea of forward/upward progress
+    ("GO") in one shape, rather than a literal wordmark. Colours are the
+    app's own palette (backend/src/lib/emailTemplates.ts COLORS), not
+    invented for this file.
+
+    Everything meaningful sits inside the center ~78% of the canvas (the
+    "maskable safe zone") so Android can crop this into a circle/squircle
+    without cutting off the mark — the same file works for the plain and
+    maskable manifest icons.
+  -->
+  <rect width="512" height="512" rx="112" fill="#132238" />
+  <path
+    d="M150 272 L256 172 L362 272"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="42"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <rect x="234" y="268" width="44" height="124" rx="22" fill="#f26a36" />
+</svg>

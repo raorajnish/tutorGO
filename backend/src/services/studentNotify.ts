@@ -1,8 +1,24 @@
 import { prisma } from "../lib/prisma.js";
 import { notify } from "./notify.js";
+import { sendPush } from "./push.js";
 import { dispatchMessage, renderMessageBody } from "./dispatch.js";
 import { derivePortalStatus } from "../lib/portalAccess.js";
 import type { MessageTemplateType } from "../lib/messageTemplates.js";
+
+/** Where `notificationclick` should land for each event type — without this
+ * every push notification opens `/dashboard`, a page a STUDENT login can't
+ * even reach. Doubles as the push `tag`, so e.g. a second FEE_OVERDUE_REMINDER
+ * before the first is read replaces it instead of stacking a duplicate. */
+const PORTAL_ROUTE_FOR_TYPE: Record<MessageTemplateType, string> = {
+  LECTURE_SCHEDULED: "/portal/timetable",
+  LECTURE_CANCELLED: "/portal/timetable",
+  ATTENDANCE_MARKED: "/portal/attendance",
+  FEE_OVERDUE_REMINDER: "/portal/fees",
+  PAYROLL_PAYMENT_RECORDED: "/portal", // staff-only in practice; never actually dispatched to a student
+  TEST_RESULT_ENTERED: "/portal/tests",
+  PTM_SCHEDULED: "/portal/timetable",
+  PTM_CANCELLED: "/portal/timetable",
+};
 
 /**
  * One fan-out for everything a student or their parent should hear about
@@ -85,11 +101,12 @@ export async function notifyStudent(input: StudentNotifyInput): Promise<StudentN
 
   let inApp: StudentNotifyResult["inApp"] = "SKIPPED";
   if (status === "ACTIVE" && student.userId) {
+    // Rendered once and reused for both channels — in-app and push must show
+    // the same wording, and rendering twice risked the two silently
+    // disagreeing if the template lookup behaved differently between calls.
+    const body = await renderMessageBody(input.instituteId, input.type, input.vars).catch(() => input.title);
+
     try {
-      // Rendered through the institute's own template body, so the message a
-      // student reads in the portal is the same wording the institute chose
-      // for WhatsApp rather than a second hard-coded string.
-      const body = await renderMessageBody(input.instituteId, input.type, input.vars);
       await notify({
         instituteId: input.instituteId,
         userId: student.userId,
@@ -102,6 +119,21 @@ export async function notifyStudent(input: StudentNotifyInput): Promise<StudentN
     } catch {
       inApp = "FAILED";
     }
+
+    // Paired with notify() rather than a second independent send — every
+    // other trigger in the app (org.ts, payroll.ts, reminderScheduler.ts)
+    // calls notify()+sendPush() together; this one only ever called notify(),
+    // so a student got the in-app row but nothing on their lock screen. Fired
+    // regardless of whether the in-app write above succeeded: a push is a
+    // nudge to go check the app, and losing it because of an unrelated in-app
+    // write failure would be worse than the (rare) duplicate.
+    await sendPush({
+      userId: student.userId,
+      title: input.title,
+      body,
+      tag: input.type,
+      url: PORTAL_ROUTE_FOR_TYPE[input.type],
+    }).catch(() => {});
   }
 
   let whatsapp: StudentNotifyResult["whatsapp"] = "SKIPPED";

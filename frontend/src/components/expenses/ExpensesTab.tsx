@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type Expense, type ExpenseCategory, type ExpenseEvent, type PaymentMode } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
@@ -106,6 +107,14 @@ export function ExpensesTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
+            {expenses === null &&
+              Array.from({ length: 6 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={7}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
             {expenses?.map((e) => (
               <tr key={e.id}>
                 <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{formatDate(e.date)}</td>

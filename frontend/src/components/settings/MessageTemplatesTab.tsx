@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { SkeletonLine, SkeletonBlock } from "@/components/ui/Skeleton";
 import { Textarea } from "@/components/ui/Textarea";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import { renderTemplate } from "@/lib/messageTemplates";
@@ -135,7 +136,13 @@ export function MessageTemplatesTab() {
 
       {error && <div className="rounded-md border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{error}</div>}
 
-      {!templates && <p className="text-sm text-muted-foreground">Loading…</p>}
+      {!templates &&
+        Array.from({ length: 3 }, (_, i) => (
+          <div key={i} className="space-y-3 rounded-xl border border-border p-4">
+            <SkeletonLine className="w-1/3" />
+            <SkeletonBlock className="h-24 w-full" />
+          </div>
+        ))}
 
       {templates &&
         MESSAGE_TEMPLATE_TYPES.map((type) => {

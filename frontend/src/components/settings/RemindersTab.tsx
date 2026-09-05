@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { ActionMenu } from "@/components/ui/ActionMenu";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import {
   REMINDER_AUDIENCES,
   REMINDER_AUDIENCE_LABELS,
@@ -146,7 +147,14 @@ export function RemindersTab() {
               </tr>
             </thead>
             <tbody>
-              {reminders.map((r) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={6}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && reminders.map((r) => (
                 <tr key={r.id} className={`border-b border-border last:border-0 ${r.isActive ? "" : "opacity-55"}`}>
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">{r.title}</p>
@@ -195,7 +203,8 @@ export function RemindersTab() {
 
         {/* Mobile: cards */}
         <div className="divide-y divide-border sm:hidden">
-          {reminders.map((r) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && reminders.map((r) => (
             <div key={r.id} className={`space-y-2 p-4 ${r.isActive ? "" : "opacity-55"}`}>
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">

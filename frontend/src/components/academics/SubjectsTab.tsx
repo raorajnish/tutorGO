@@ -8,6 +8,7 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { Course, Subject } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 
@@ -93,7 +94,14 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
               </tr>
             </thead>
             <tbody>
-              {visible.map((s) => (
+              {loading && Array.from({ length: 5 }, (_, i) => (
+                <tr key={`sk-${i}`}>
+                  <td colSpan={4}>
+                    <SkeletonRow lines={2} />
+                  </td>
+                </tr>
+              ))}
+              {!loading && visible.map((s) => (
                 <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">
@@ -132,7 +140,8 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
         </div>
 
         <div className="divide-y divide-border sm:hidden">
-          {visible.map((s) => (
+          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {!loading && visible.map((s) => (
             <div key={s.id} className="space-y-2 p-4" onClick={() => openEdit(s)}>
               <div className="flex items-start justify-between gap-2">
                 <div>

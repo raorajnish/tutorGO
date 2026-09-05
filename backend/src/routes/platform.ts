@@ -18,6 +18,7 @@ import {
 } from "../lib/instituteLimits.js";
 import { seedDefaultExpenseCategories } from "../lib/expenseDefaults.js";
 import { instituteCodeSchema } from "./organization.js";
+import { notifyTicketCreatorOfReply } from "./support.js";
 import type { Role } from "../generated/prisma/enums.js";
 
 export const platformRouter = Router();
@@ -715,15 +716,24 @@ platformRouter.get("/organizations/:orgId/institutes/:instituteId", async (req, 
  * auditable, so `isActive: false` is the terminal state. Flipping it off is
  * enforced immediately: middleware/auth.ts rejects existing tokens bound to a
  * suspended institute, and /auth/enter-institute refuses to issue new ones. */
-const updateInstituteSchema = z.object({
-  name: z.string().min(1).optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email().optional(),
-  isActive: z.boolean().optional(),
-});
+const updateInstituteSchema = z
+  .object({
+    name: z.string().min(1).optional(),
+    address: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    phone: z.string().optional(),
+    email: z.string().email().optional(),
+    isActive: z.boolean().optional(),
+    // Required only for the suspend direction — see changes-phase12.md
+    // §12.10. Reactivating doesn't need a reason of its own; the reason
+    // that matters there is already on the suspension row being lifted.
+    reason: z.string().trim().min(1).max(500).optional(),
+  })
+  .refine((v) => v.isActive !== false || !!v.reason, {
+    message: "A reason is required to suspend an institute",
+    path: ["reason"],
+  });
 
 platformRouter.patch(
   "/organizations/:orgId/institutes/:instituteId",
@@ -735,24 +745,75 @@ platformRouter.patch(
       // otherwise any column on Institute (organizationId, code, planId) would
       // be settable through this endpoint.
       const body = req.body as z.infer<typeof updateInstituteSchema>;
-      const updated = await prisma.institute.update({
-        where: { id: institute.id },
-        data: {
-          name: body.name,
-          address: body.address,
-          city: body.city,
-          state: body.state,
-          phone: body.phone,
-          email: body.email,
-          isActive: body.isActive,
-        },
-      });
+
+      const [updated] = await prisma.$transaction([
+        prisma.institute.update({
+          where: { id: institute.id },
+          data: {
+            name: body.name,
+            address: body.address,
+            city: body.city,
+            state: body.state,
+            phone: body.phone,
+            email: body.email,
+            isActive: body.isActive,
+          },
+        }),
+        // Suspending: one new open row. Reactivating: close out whichever
+        // suspension row is still open (there's only ever at most one, since
+        // suspend/reactivate strictly alternate) rather than trusting the
+        // caller to know which row that is.
+        ...(body.isActive === false
+          ? [
+              prisma.instituteSuspension.create({
+                data: { instituteId: institute.id, reason: body.reason!, suspendedByUserId: req.user!.id },
+              }),
+            ]
+          : []),
+        ...(body.isActive === true
+          ? [
+              prisma.instituteSuspension.updateMany({
+                where: { instituteId: institute.id, liftedAt: null },
+                data: { liftedAt: new Date(), liftedByUserId: req.user!.id },
+              }),
+            ]
+          : []),
+      ]);
+
+      if (body.isActive !== undefined) {
+        await auditLog({
+          action: body.isActive ? "INSTITUTE_REACTIVATED" : "INSTITUTE_SUSPENDED",
+          organizationId: institute.organizationId,
+          instituteId: institute.id,
+          userId: req.user!.id,
+          targetType: "Institute",
+          targetId: institute.id,
+          metadata: body.isActive ? undefined : { reason: body.reason },
+        });
+      }
+
       res.json(updated);
     } catch (err) {
       next(err);
     }
   }
 );
+
+platformRouter.get("/institutes/:id/suspensions", async (req, res, next) => {
+  try {
+    const suspensions = await prisma.instituteSuspension.findMany({
+      where: { instituteId: req.params.id as string },
+      include: {
+        suspendedBy: { select: { id: true, fullName: true } },
+        liftedBy: { select: { id: true, fullName: true } },
+      },
+      orderBy: { suspendedAt: "desc" },
+    });
+    res.json(suspensions);
+  } catch (err) {
+    next(err);
+  }
+});
 
 platformRouter.post(
   "/organizations/:orgId/institutes/:instituteId/admins",
@@ -991,6 +1052,303 @@ platformRouter.get("/users", async (req, res, next) => {
         organizationName: u.institute?.organization.name ?? u.ownedOrganization?.name ?? null,
       }))
     );
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Audit log viewer — see changes-phase12.md §12.7. Read-only over rows
+// already written from org.ts/platform.ts; no new write path.
+// ---------------------------------------------------------------------------
+
+const AUDIT_LOG_PAGE_SIZE = 50;
+
+platformRouter.get("/audit-log", async (req, res, next) => {
+  try {
+    const organizationId = typeof req.query.organizationId === "string" ? req.query.organizationId : undefined;
+    const instituteId = typeof req.query.instituteId === "string" ? req.query.instituteId : undefined;
+    const action = typeof req.query.action === "string" ? req.query.action : undefined;
+    const from = typeof req.query.from === "string" ? new Date(req.query.from) : undefined;
+    const to = typeof req.query.to === "string" ? new Date(req.query.to) : undefined;
+    // Offset pagination is fine here — this is a SuperAdmin triage tool
+    // paging through at most a few thousand rows at a time, not a hot path
+    // that needs a keyset cursor.
+    const page = Math.max(1, Number(req.query.page) || 1);
+
+    const where = {
+      ...(organizationId ? { organizationId } : {}),
+      ...(instituteId ? { instituteId } : {}),
+      ...(action ? { action: { contains: action, mode: "insensitive" as const } } : {}),
+      ...(from || to
+        ? { createdAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } }
+        : {}),
+    };
+
+    const [total, rows] = await Promise.all([
+      prisma.auditLog.count({ where }),
+      prisma.auditLog.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * AUDIT_LOG_PAGE_SIZE,
+        take: AUDIT_LOG_PAGE_SIZE,
+      }),
+    ]);
+
+    // AuditLog.userId/organizationId/instituteId are plain columns, not
+    // relations (a log row must survive the thing it references being
+    // deleted) — so actor/org/institute names are resolved with one batched
+    // lookup per page rather than a join, and missing ones (a deleted user,
+    // say) just render as "—" on the frontend.
+    const userIds = [...new Set(rows.map((r) => r.userId).filter((id): id is string => !!id))];
+    const orgIds = [...new Set(rows.map((r) => r.organizationId).filter((id): id is string => !!id))];
+    const instIds = [...new Set(rows.map((r) => r.instituteId).filter((id): id is string => !!id))];
+
+    const [users, orgs, insts] = await Promise.all([
+      userIds.length ? prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, fullName: true, email: true } }) : [],
+      orgIds.length ? prisma.organization.findMany({ where: { id: { in: orgIds } }, select: { id: true, name: true } }) : [],
+      instIds.length ? prisma.institute.findMany({ where: { id: { in: instIds } }, select: { id: true, name: true } }) : [],
+    ]);
+    const userById = new Map(users.map((u) => [u.id, u]));
+    const orgById = new Map(orgs.map((o) => [o.id, o]));
+    const instById = new Map(insts.map((i) => [i.id, i]));
+
+    res.json({
+      total,
+      page,
+      pageSize: AUDIT_LOG_PAGE_SIZE,
+      rows: rows.map((r) => ({
+        id: r.id,
+        action: r.action,
+        targetType: r.targetType,
+        targetId: r.targetId,
+        metadata: r.metadata,
+        createdAt: r.createdAt,
+        actor: r.userId ? (userById.get(r.userId) ?? { id: r.userId, fullName: "Deleted user", email: "" }) : null,
+        organization: r.organizationId ? (orgById.get(r.organizationId) ?? null) : null,
+        institute: r.instituteId ? (instById.get(r.instituteId) ?? null) : null,
+      })),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Global search — see changes-phase12.md §12.9. "Which institute is this
+// phone number in" without guessing which organization to open first.
+// ---------------------------------------------------------------------------
+
+platformRouter.get("/search", async (req, res, next) => {
+  try {
+    const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+    if (q.length < 2) return res.json({ students: [], users: [], institutes: [], organizations: [] });
+
+    const contains = { contains: q, mode: "insensitive" as const };
+
+    const [students, users, institutes, organizations] = await Promise.all([
+      prisma.student.findMany({
+        where: { OR: [{ name: contains }, { email: contains }, { phone: contains }, { parentPhone: contains }] },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          studentCode: true,
+          institute: { select: { id: true, name: true, organizationId: true, organization: { select: { name: true } } } },
+        },
+        take: 20,
+      }),
+      prisma.user.findMany({
+        where: { OR: [{ fullName: contains }, { email: contains }] },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          role: true,
+          institute: { select: { id: true, name: true, organizationId: true, organization: { select: { name: true } } } },
+          ownedOrganization: { select: { id: true, name: true } },
+        },
+        take: 20,
+      }),
+      prisma.institute.findMany({
+        where: { OR: [{ name: contains }, { code: contains }] },
+        select: { id: true, name: true, code: true, organizationId: true, organization: { select: { name: true } } },
+        take: 20,
+      }),
+      prisma.organization.findMany({
+        where: { OR: [{ name: contains }, { code: contains }] },
+        select: { id: true, name: true, code: true },
+        take: 20,
+      }),
+    ]);
+
+    res.json({
+      students: students.map((s) => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        phone: s.phone,
+        studentCode: s.studentCode,
+        instituteId: s.institute.id,
+        instituteName: s.institute.name,
+        organizationId: s.institute.organizationId,
+        organizationName: s.institute.organization.name,
+      })),
+      users: users.map((u) => ({
+        id: u.id,
+        fullName: u.fullName,
+        email: u.email,
+        role: u.role,
+        instituteId: u.institute?.id ?? null,
+        instituteName: u.institute?.name ?? null,
+        organizationId: u.institute?.organizationId ?? u.ownedOrganization?.id ?? null,
+        organizationName: u.institute?.organization.name ?? u.ownedOrganization?.name ?? null,
+      })),
+      institutes: institutes.map((i) => ({
+        id: i.id,
+        name: i.name,
+        code: i.code,
+        organizationId: i.organizationId,
+        organizationName: i.organization.name,
+      })),
+      organizations: organizations.map((o) => ({ id: o.id, name: o.name, code: o.code })),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Forces every session on this account to sign out on its next request —
+ * the platform-side lever for a compromised account, usable without waiting
+ * for the account holder to do it themselves. Same mechanism as the
+ * self-service /auth/logout-everywhere: bump tokenVersion, nothing else.
+ * See changes-phase12.md §12.2. */
+platformRouter.post("/users/:id/logout-everywhere", async (req, res, next) => {
+  try {
+    const target = await prisma.user.findUnique({ where: { id: req.params.id as string } });
+    if (!target) throw ApiError.notFound("User not found");
+
+    await prisma.user.update({ where: { id: target.id }, data: { tokenVersion: { increment: 1 } } });
+
+    await auditLog({
+      action: "USER_FORCED_LOGOUT",
+      organizationId: null,
+      instituteId: target.instituteId,
+      userId: req.user!.id,
+      targetType: "User",
+      targetId: target.id,
+      metadata: { email: target.email },
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Help & support triage queue — see changes-phase12.md §12.3.
+// ---------------------------------------------------------------------------
+
+const supportTicketSummarySelect = {
+  id: true,
+  category: true,
+  subject: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+  organization: { select: { id: true, name: true } },
+  institute: { select: { id: true, name: true } },
+  createdBy: { select: { id: true, fullName: true, email: true } },
+  _count: { select: { messages: true } },
+} as const;
+
+platformRouter.get("/support/tickets", async (req, res, next) => {
+  try {
+    const status = typeof req.query.status === "string" ? req.query.status : undefined;
+    const category = typeof req.query.category === "string" ? req.query.category : undefined;
+
+    const tickets = await prisma.supportTicket.findMany({
+      where: {
+        ...(status ? { status: status as "OPEN" | "IN_PROGRESS" | "RESOLVED" } : {}),
+        ...(category ? { category: category as "BILLING" | "BUG" | "FEATURE_REQUEST" | "OTHER" } : {}),
+      },
+      select: supportTicketSummarySelect,
+      // Open-and-oldest-first: an unanswered ticket sitting the longest is
+      // the one most likely to have been missed, so it surfaces at the top
+      // of the queue rather than the most recently touched one.
+      orderBy: [{ status: "asc" }, { createdAt: "asc" }],
+    });
+    res.json(tickets);
+  } catch (err) {
+    next(err);
+  }
+});
+
+async function loadTicketOrThrow(ticketId: string) {
+  const ticket = await prisma.supportTicket.findUnique({
+    where: { id: ticketId },
+    include: { messages: { orderBy: { createdAt: "asc" }, include: { author: { select: { id: true, fullName: true } } } } },
+  });
+  if (!ticket) throw ApiError.notFound("Ticket not found");
+  return ticket;
+}
+
+platformRouter.get("/support/tickets/:id", async (req, res, next) => {
+  try {
+    res.json(await loadTicketOrThrow(req.params.id as string));
+  } catch (err) {
+    next(err);
+  }
+});
+
+const updateTicketSchema = z.object({
+  status: z.enum(["OPEN", "IN_PROGRESS", "RESOLVED"]).optional(),
+});
+
+platformRouter.patch("/support/tickets/:id", validateBody(updateTicketSchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof updateTicketSchema>;
+    const ticket = await loadTicketOrThrow(req.params.id as string);
+    const updated = await prisma.supportTicket.update({
+      where: { id: ticket.id },
+      data: { status: body.status },
+      select: supportTicketSummarySelect,
+    });
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+});
+
+const platformReplySchema = z.object({ body: z.string().trim().min(1, "Message is required").max(5000) });
+
+platformRouter.post("/support/tickets/:id/messages", validateBody(platformReplySchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof platformReplySchema>;
+    const ticket = await loadTicketOrThrow(req.params.id as string);
+
+    await prisma.$transaction([
+      prisma.supportTicketMessage.create({
+        data: { ticketId: ticket.id, authorUserId: req.user!.id, isFromPlatform: true, body: body.body },
+      }),
+      // A SuperAdmin's reply is exactly the "someone is now on this" moment —
+      // an OPEN ticket that's just been answered isn't still merely open.
+      prisma.supportTicket.update({
+        where: { id: ticket.id },
+        data: { status: ticket.status === "OPEN" ? "IN_PROGRESS" : ticket.status },
+      }),
+    ]);
+
+    await notifyTicketCreatorOfReply({
+      id: ticket.id,
+      subject: ticket.subject,
+      instituteId: ticket.instituteId,
+      createdByUserId: ticket.createdByUserId,
+    });
+
+    res.status(201).json(await loadTicketOrThrow(ticket.id));
   } catch (err) {
     next(err);
   }

@@ -5,6 +5,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Badge } from "@/components/ui/Badge";
 import { PayrollLedgerView } from "@/components/payroll/PayrollLedgerView";
+import { SkeletonBlock } from "@/components/ui/Skeleton";
 import { VoidPayrollPaymentModal } from "@/components/payroll/VoidPayrollPaymentModal";
 import { PayslipModal } from "@/components/payroll/PayslipModal";
 import { formatMoney } from "@/lib/money";
@@ -66,7 +67,13 @@ export function StaffLedgerModal({ salaryProfileId, onClose, onChanged }: Props)
   return (
     <Modal open={salaryProfileId !== null} onClose={onClose} title={ledger?.name ? `Payroll — ${ledger.name}` : "Payroll"} width="xl">
       {error && <div className="mb-4 rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
-      {!ledger && !error && <p className="text-sm text-muted-foreground">Loading…</p>}
+      {!ledger && !error && (
+        <div className="space-y-3">
+          {Array.from({ length: 3 }, (_, i) => (
+            <SkeletonBlock key={i} className="h-24 w-full" />
+          ))}
+        </div>
+      )}
 
       {ledger && (
         <div className="space-y-6">
