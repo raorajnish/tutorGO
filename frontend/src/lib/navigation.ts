@@ -28,7 +28,8 @@ export type NavIcon =
   | "auditLog"
   | "users"
   | "studyMaterial"
-  | "health";
+  | "health"
+  | "maintenance";
 
 export interface NavItem {
   label: string;
@@ -195,6 +196,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { label: "Subscriptions", href: "/platform/subscriptions", icon: "subscriptions", roles: ["SUPERADMIN"] },
       { label: "Email settings", href: "/platform/email-settings", icon: "mail", roles: ["SUPERADMIN"] },
       { label: "Support", href: "/platform/support", icon: "support", roles: ["SUPERADMIN"] },
+      { label: "Maintenance", href: "/platform/maintenance", icon: "maintenance", roles: ["SUPERADMIN"] },
       { label: "Audit log", href: "/platform/audit-log", icon: "auditLog", roles: ["SUPERADMIN"] },
       { label: "Users", href: "/platform/users", icon: "users", roles: ["SUPERADMIN"] },
     ],

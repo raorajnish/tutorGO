@@ -14,7 +14,9 @@
       "Bash(node drive_analytics.js)",
       "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"its fine for now\" npx prisma db push --accept-data-loss)",
       "Bash(echo \"BE EXIT: $?\")",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(DATABASE_URL='postgresql://tutorgoadmin:TutorGO%402026@127.0.0.1:5432/tutorgodb?schema=public' npx tsx test-maintenance-tmp.mjs)",
+      "Bash(rm -f test-maintenance-tmp.mjs)"
     ]
   }
 }

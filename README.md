@@ -17,7 +17,7 @@ npm install
 cp .env.example .env          # then edit — see "Environment" below
                               # at minimum: DATABASE_URL, JWT_SECRET, SUPERADMIN_*
 npm run prisma:generate
-npx prisma db push
+npm run prisma:deploy         # applies tracked migrations from prisma/migrations
 npm run db:seed               # creates the SUPERADMIN from your .env
 npm run dev                   # http://127.0.0.1:4000
 
@@ -48,7 +48,8 @@ Copy from [`backend/.env.example`](backend/.env.example).
 | `ENCRYPTION_KEY` | for WhatsApp | **32 bytes, hex-encoded (64 hex chars).** Encrypts WhatsApp access tokens at rest. Resolved lazily, so a bad value fails the WhatsApp call rather than the whole boot. Generate with the command in `.env.example` — **do not ship the zeros placeholder.** |
 | `PORT` / `NODE_ENV` / `FRONTEND_URL` | no | Defaults `4000` / `development` / `http://127.0.0.1:3000` |
 | `SUPERADMIN_EMAIL` / `_PASSWORD` / `_NAME` | for seed | Only read by `db:seed` |
-| `UPLOAD_DIR` | no | Where test papers are written. Defaults to `backend/var/uploads`. **Point this at a mounted volume in production** or a redeploy loses them. |
+| `CLOUDINARY_CLOUD_NAME` / `_API_KEY` / `_API_SECRET` | **yes, in production** | Real home for uploads (`services/uploads.ts`). `server.ts` calls `assertProductionConfig()` at boot, which **refuses to start** if `NODE_ENV=production` and any of these three is missing — without them, uploads silently fall back to local disk, which doesn't survive a redeploy. |
+| `UPLOAD_DIR` | no | Local-disk fallback path when Cloudinary isn't configured — fine for local dev only. Defaults to `backend/var/uploads`. |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | for web push | See [Web push](#web-push) below. Without them push is a silent no-op; the in-app bell still works. |
 | `WHATSAPP_APP_SECRET` / `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | for WhatsApp | Platform-level. Per-institute credentials live in `InstituteWhatsAppConfig`, not here. |
 | `REMINDER_SCHEDULER` | no | Set to `off` to disable the background reminder loop |
@@ -62,6 +63,19 @@ Copy from [`frontend/.env.example`](frontend/.env.example).
 |---|---|
 | `NEXT_PUBLIC_API_URL` | Backend origin for the `/api/*` rewrite. Defaults to `http://127.0.0.1:4000`. |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Must be byte-identical to `VAPID_PUBLIC_KEY` on the backend |
+
+### Switching `DATABASE_URL` to Neon (or any other Postgres)
+
+Local dev defaults to a Postgres instance on `127.0.0.1`. Prisma only cares about the connection string, so pointing at Neon instead is a config change, not a code change:
+
+1. Create the database on [Neon](https://neon.tech), and grab its connection string — it looks like `postgresql://<user>:<pass>@<host>.neon.tech/<dbname>?sslmode=require`.
+2. Replace `DATABASE_URL` in `backend/.env` with that string. **Neon requires `sslmode=require`** in the URL; local Postgres doesn't need it.
+3. Run `npm run prisma:deploy` — applies every migration in `prisma/migrations/` (starting from `20260906022419_init`) to the fresh, empty Neon database.
+4. Run `npm run db:seed` once against it — creates the SUPERADMIN, plan catalog and module catalog, same as local.
+
+Nothing else changes: `authenticate`, every route, and the Prisma client are all connection-string-agnostic.
+
+**For a real deployment**, set a *separate* `DATABASE_URL` in your host's environment variables (e.g. Render's dashboard) pointing at its own Neon database — don't reuse the one in your local `.env`. Keeping local dev and whatever's live on physically different databases means a bad local experiment can never touch real data.
 
 ### Web push
 
@@ -90,7 +104,8 @@ This signs and identifies the sender; it does **not** encrypt the message. Paylo
 | `npm run build` / `start` | Compile to `dist/`, then run it |
 | `npm run typecheck` | `tsc --noEmit` — run before every commit |
 | `npm run prisma:generate` | Regenerate the client into `src/generated/prisma` |
-| `npx prisma db push` | Sync the database to `schema.prisma`. **This project has no `prisma/migrations` folder** — schema changes are applied with `db push`, not tracked migrations. `npm run prisma:migrate` / `prisma:deploy` exist in `package.json` but assume migration history that doesn't exist here; don't use them until that changes (see `PRODUCTION_READINESS.md`). |
+| `npm run prisma:migrate` | Create + apply a new migration in dev (`prisma migrate dev --name <description>`). Use this for every schema change from now on — `prisma/migrations/` has tracked history as of `20260906022419_init`. |
+| `npm run prisma:deploy` | Apply pending migrations without prompting (`prisma migrate deploy`) — what production and a fresh clone both use. Never run `prisma db push` again outside of a throwaway experiment; it has no history and can't be reviewed or rolled back. |
 | `npm run db:seed` | Modules, plans, superadmin |
 | `npm run db:seed:demo` | Demo institute with sample data |
 | `npm run db:backfill-limits` | **One-time.** Freezes existing institutes at their current plan limits — see below |
@@ -110,8 +125,8 @@ Three one-time steps. **The backfill matters** — until it runs, editing a plan
 
 ```bash
 cd backend
-npm install                 # cloudinary was removed from dependencies
-npx prisma db push          # adds the per-institute limit columns
+npm install
+npm run prisma:deploy       # adds the per-institute limit columns
 npm run db:backfill-limits  # freezes existing institutes at current plan values
 ```
 
@@ -188,7 +203,7 @@ Headcount caps are **snapshotted onto the institute** when a plan is assigned, n
 
 **Rate limiting** is in-memory and therefore per-process; running multiple instances multiplies the effective allowance. It is a burst guard. The layer that has to hold under a distributed attempt is the per-record DB lockout (self-fill PIN attempts, OTP attempt caps). `app.set("trust proxy", 1)` in `app.ts` is what makes `req.ip` trustworthy — raise the hop count only if a second real proxy is added, and never set it to `true`.
 
-**Uploads** are written to local disk and served from `/uploads` with `nosniff` and a forced attachment disposition. File type is decided by magic bytes, never the client's `Content-Type`. Moving to an object store means changing `services/uploads.ts` and the static mount in `app.ts` — nothing else knows where a file physically lives.
+**Uploads** go to Cloudinary when `CLOUDINARY_CLOUD_NAME`/`_API_KEY`/`_API_SECRET` are set (`services/uploads.ts`), falling back to local disk — served from `/uploads` with `nosniff` and a forced attachment disposition, file type decided by magic bytes, never the client's `Content-Type` — only when they're not. The disk path is for local dev convenience only: on Render (and any host without a mounted volume) the container filesystem is ephemeral, so anything written there vanishes on the next deploy. `assertProductionConfig()` in `server.ts` enforces this at boot — the process refuses to start in production without Cloudinary configured, rather than silently losing uploads later.
 
 ---
 

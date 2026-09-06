@@ -109,6 +109,7 @@ export const ModelName = {
   DistributionReceipt: 'DistributionReceipt',
   LeaveRequest: 'LeaveRequest',
   InstituteSuspension: 'InstituteSuspension',
+  MaintenanceWindow: 'MaintenanceWindow',
   StudyResource: 'StudyResource'
 } as const
 
@@ -1041,6 +1042,23 @@ export const InstituteSuspensionScalarFieldEnum = {
 } as const
 
 export type InstituteSuspensionScalarFieldEnum = (typeof InstituteSuspensionScalarFieldEnum)[keyof typeof InstituteSuspensionScalarFieldEnum]
+
+
+export const MaintenanceWindowScalarFieldEnum = {
+  id: 'id',
+  scope: 'scope',
+  instituteId: 'instituteId',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  message: 'message',
+  createdByUserId: 'createdByUserId',
+  cancelledAt: 'cancelledAt',
+  cancelledByUserId: 'cancelledByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MaintenanceWindowScalarFieldEnum = (typeof MaintenanceWindowScalarFieldEnum)[keyof typeof MaintenanceWindowScalarFieldEnum]
 
 
 export const StudyResourceScalarFieldEnum = {

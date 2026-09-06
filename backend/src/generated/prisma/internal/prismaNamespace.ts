@@ -455,6 +455,7 @@ export const ModelName = {
   DistributionReceipt: 'DistributionReceipt',
   LeaveRequest: 'LeaveRequest',
   InstituteSuspension: 'InstituteSuspension',
+  MaintenanceWindow: 'MaintenanceWindow',
   StudyResource: 'StudyResource'
 } as const
 
@@ -471,7 +472,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "supportTicket" | "supportTicketMessage" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "instituteWhatsAppConfig" | "whatsAppTemplate" | "outboundMessage" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "parentMeeting" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentSubject" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeStructureSubjectLine" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "institutePaymentConfig" | "paymentProof" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt" | "leaveRequest" | "instituteSuspension" | "studyResource"
+    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "supportTicket" | "supportTicketMessage" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "instituteWhatsAppConfig" | "whatsAppTemplate" | "outboundMessage" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "parentMeeting" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentSubject" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeStructureSubjectLine" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "institutePaymentConfig" | "paymentProof" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt" | "leaveRequest" | "instituteSuspension" | "maintenanceWindow" | "studyResource"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4767,6 +4768,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MaintenanceWindow: {
+      payload: Prisma.$MaintenanceWindowPayload<ExtArgs>
+      fields: Prisma.MaintenanceWindowFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MaintenanceWindowFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MaintenanceWindowFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>
+        }
+        findFirst: {
+          args: Prisma.MaintenanceWindowFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MaintenanceWindowFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>
+        }
+        findMany: {
+          args: Prisma.MaintenanceWindowFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>[]
+        }
+        create: {
+          args: Prisma.MaintenanceWindowCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>
+        }
+        createMany: {
+          args: Prisma.MaintenanceWindowCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MaintenanceWindowCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>[]
+        }
+        delete: {
+          args: Prisma.MaintenanceWindowDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>
+        }
+        update: {
+          args: Prisma.MaintenanceWindowUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>
+        }
+        deleteMany: {
+          args: Prisma.MaintenanceWindowDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MaintenanceWindowUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MaintenanceWindowUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>[]
+        }
+        upsert: {
+          args: Prisma.MaintenanceWindowUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaintenanceWindowPayload>
+        }
+        aggregate: {
+          args: Prisma.MaintenanceWindowAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMaintenanceWindow>
+        }
+        groupBy: {
+          args: Prisma.MaintenanceWindowGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MaintenanceWindowGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MaintenanceWindowCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MaintenanceWindowCountAggregateOutputType> | number
+        }
+      }
+    }
     StudyResource: {
       payload: Prisma.$StudyResourcePayload<ExtArgs>
       fields: Prisma.StudyResourceFieldRefs
@@ -5795,6 +5870,23 @@ export const InstituteSuspensionScalarFieldEnum = {
 export type InstituteSuspensionScalarFieldEnum = (typeof InstituteSuspensionScalarFieldEnum)[keyof typeof InstituteSuspensionScalarFieldEnum]
 
 
+export const MaintenanceWindowScalarFieldEnum = {
+  id: 'id',
+  scope: 'scope',
+  instituteId: 'instituteId',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  message: 'message',
+  createdByUserId: 'createdByUserId',
+  cancelledAt: 'cancelledAt',
+  cancelledByUserId: 'cancelledByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MaintenanceWindowScalarFieldEnum = (typeof MaintenanceWindowScalarFieldEnum)[keyof typeof MaintenanceWindowScalarFieldEnum]
+
+
 export const StudyResourceScalarFieldEnum = {
   id: 'id',
   instituteId: 'instituteId',
@@ -6311,6 +6403,20 @@ export type ListEnumLeaveStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'MaintenanceScope'
+ */
+export type EnumMaintenanceScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MaintenanceScope'>
+    
+
+
+/**
+ * Reference to a field of type 'MaintenanceScope[]'
+ */
+export type ListEnumMaintenanceScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MaintenanceScope[]'>
+    
+
+
+/**
  * Reference to a field of type 'ResourceKind'
  */
 export type EnumResourceKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ResourceKind'>
@@ -6546,6 +6652,7 @@ export type GlobalOmitConfig = {
   distributionReceipt?: Prisma.DistributionReceiptOmit
   leaveRequest?: Prisma.LeaveRequestOmit
   instituteSuspension?: Prisma.InstituteSuspensionOmit
+  maintenanceWindow?: Prisma.MaintenanceWindowOmit
   studyResource?: Prisma.StudyResourceOmit
 }
 

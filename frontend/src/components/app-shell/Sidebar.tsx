@@ -182,6 +182,11 @@ const ICONS: Record<NavIcon, React.ReactNode> = {
       <path d="M9 12h6M9 16h6M9 8h2" strokeLinecap="round" />
     </svg>
   ),
+  maintenance: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.1 2.1-2-2z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
   users: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeLinecap="round" strokeLinejoin="round" />

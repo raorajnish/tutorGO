@@ -1,195 +1,85 @@
 # TutorGO — Progress Tracker
 
-> Living document. Update this file as work is completed or planned. Source of truth for feature scope: [`prd.md`](./prd.md). Tech/system docs: [`technicalarchitecture.txt`](./technicalarchitecture.txt), [`design.md`](./design.md).
+> Living document. Rewritten in full on 2026-09-05 — the previous version predated phases 8 through 14 entirely (wrong credentials, wrong page count, described the app as it was in early August). For the full end-to-end feature list, see [`FEATURES.md`](./FEATURES.md). For the detailed plan-and-build history of each phase, see `changes-phase8.md` through `changes-phase14.md` (each has its own status table) and `handoff.md` (the operating manual — architectural rules, conventions, things a fresh session gets wrong).
 >
-> **Last updated:** 2026-08-06
+> **Last updated:** 2026-09-05
 
 ---
 
-## 1. Project Overview
+## 1. Project overview
 
-TutorGO is a multi-tenant EdTech SaaS ERP for coaching institutes / schools / colleges.
+TutorGO is a multi-tenant SaaS ERP for coaching institutes, schools, and colleges — enquiry through admission, attendance, fees, payroll, and now a student portal, a platform-side SuperAdmin console, and a support/ops layer on top.
 
-- **Platform layer (SuperAdmin):** provisions institutes, manages module subscriptions, global SMTP, platform stats.
-- **Tenant layer (OWNER/ADMIN/FACULTY/RECEPTION/STUDENT):** fully isolated workspaces per institute, covering Enquiries → Admissions → Students → Academics (Courses/Batches/Lectures) → Attendance → Fees → Expenses → Payroll → Staff → Settings.
-- **Data isolation:** every tenant row carries `instituteId`; all queries are scoped by the authenticated tenant.
-- **Module gateway:** unsubscribed modules return `403 MODULE_DISABLED` regardless of role.
+- **Platform layer (SuperAdmin)** — provisions organizations/institutes, manages plans and module subscriptions, sees platform-wide delivery health, runs a global search, reviews the audit trail, triages support tickets, schedules maintenance windows, and holds the escape hatches (force logout, disable a stuck MFA, suspend an institute) for accounts and institutes that get stuck.
+- **Tenant layer (OWNER/ADMIN/ACCOUNTANT/FACULTY/RECEPTION)** — fully isolated per-institute workspaces: Enquiries → Admissions → Students → Academics → Attendance → Tests → Fees → Expenses → Payroll → Distribution → PTM → Study material → Settings.
+- **Student layer (STUDENT)** — a separate portal (`/portal/*`), not a cut-down staff view: their own timetable, tests/marks, attendance, fees (with a self-serve UPI QR + payment-proof submission), study material, and notifications.
+- **Tenant isolation** — every operational query is scoped by `instituteId`/`req.tenantId` from the authenticated JWT, never from the request body or params.
+- **Module gateway** — an institute without a module subscribed gets `403 MODULE_DISABLED` on that module's routes regardless of role.
 
 ### Stack
 
 | Layer | Tech |
 | --- | --- |
-| Frontend | Next.js 16.3 (App Router), React 19, Tailwind CSS v4, TypeScript — port **3000** |
-| Backend | Node.js, Express 5, TypeScript (ESM), zod 4 — port **4000**, all routes under `/api` |
-| Database | PostgreSQL 18, Prisma 7 (driver adapter, ESM client) — `tutorgodb` on `127.0.0.1:5432` |
-| Auth | JWT + bcryptjs, role-based access + forced password change |
+| Frontend | Next.js (App Router), React, Tailwind CSS v4, TypeScript — port **3000** |
+| Backend | Node.js, Express, TypeScript (ESM), Zod — port **4000**, all routes under `/api` |
+| Database | PostgreSQL, Prisma (driver adapter, ESM client) — tracked migrations as of 2026-09-06 (`npm run prisma:migrate` in dev, `prisma:deploy` for a fresh clone/production) |
+| Auth | JWT (bearer token in `localStorage`, not cookies) + bcrypt, role-based access, sliding-expiry sessions with a hard cap, per-session revocation, optional TOTP MFA |
+| File storage | Cloudinary, via one shared upload service (magic-byte validated, public-vs-authenticated visibility decided per file type) |
+| PWA | Installable, push notifications, offline app-shell caching |
 
-### Credentials
+### Dev credentials
 
-| Role | Email | Password |
-| --- | --- | --- |
-| SuperAdmin | `admin@tutorgovers.com` | `SuperAdmin@2026` |
-| Owner | `owner@tutorgovers.com` | `Demo@1234` |
-| Faculty (Prof. Sharma, FIXED ₹45,000) | `faculty@tutorgovers.com` | `Demo@1234` |
-| Faculty (Dr. Mehta, PER_LECTURE ₹800) | `mehta@tutorgovers.com` | temp from invite (console) |
-| Reception | `reception@tutorgovers.com` | `Demo@1234` |
-| Students (3) | `TGO-*-*-000*@local.in` | `Demo@1234` |
+These are the seeded/known test accounts as of this update — check `handoff.md` if any of these stop working, since it's the doc that gets updated when a session changes one.
 
----
-
-## 2. What Has Been Done ✅
-
-### 2.1 Platform & Onboarding (SuperAdmin layer)
-
-- [x] SuperAdmin provisioning of institutes (name, code, owner email, module selection) with invite email + temporary password.
-- [x] Module catalog + per-institute subscription toggle (`Platform → Institutes → Manage modules`), also from onboarding wizard and `Settings → Modules`.
-- [x] Global SMTP email config (`GET/PUT /email-config`, cached; console fallback when not configured).
-- [x] Platform stats + resend-owner-invite.
-- [x] Full onboarding wizard API: Profile → Modules → Academics → Team (invite Admin/Reception/Faculty, faculty require salary type+amount) → optional Biometric → Complete.
-
-### 2.2 Core ERP Modules (tenant layer)
-
-- [x] **Auth** — login, `/auth/me`, change-password (forced for temp passwords), forgot-password stub.
-- [x] **Academics** — courses, subjects, batches (CRUD, owner/admin/reception).
-- [x] **Students** — registration with deterministic student codes (`TGO-YY-CLASS-SEQ`), batch assignment, deactivation.
-- [x] **Enquiries** — pipeline (new → contacted → converted → lost), sources.
-- [x] **Admissions** — admit students from enquiries, batch assignment.
-- [x] **Fees** — fee accounts (`finalFee = courseFee − discount`, one per student), installments (splits fee, monthly gap, last absorbs rounding), payments with auto receipt numbers (`RCT-YYMM-SEQ`), single-transaction reconciliation, manual installment status override (`PENDING/PARTIAL/PAID/OVERDUE`).
-- [x] **Attendance** — lectures (scheduled, per-faculty auditable), roster, bulk marking (`PRESENT/ABSENT/LEAVE/HOLIDAY`, manual/biometric), daily summary, optional biometric devices + `POST /attendance/scans` (deviceKey auth).
-- [x] **Expenses** — expense CRUD, finance categories, dual-write to `FinanceEntry` ledger.
-- [x] **Payroll** — salary settings per faculty (`FIXED` / `PER_LECTURE`), run lifecycle **Draft → Approve → Paid** (`paidAt` stamped), per-period uniqueness, faculty view own payslips, delete only drafts.
-- [x] **Staff** — staff management + salary settings (`/payroll/faculty/:id`).
-- [x] **Settings** — institute profile, module toggles.
-
-### 2.3 Frontend (fully API-wired — no mock data)
-
-- [x] Landing page, auth screens (login w/ demo quick-fill, register, forgot password), app shell + dark/light theme system.
-- [x] All 22 app pages call the real API (`apiFetch`); role-based sidebar from `frontend/src/lib/navigation.ts`.
-
-### 2.4 Dashboard & Analytics
-
-- [x] Dashboard with stat cards + role-specific quick actions:
-  - owner: Dashboard, View ledger
-  - admin: Run payroll, View ledger
-  - others: module-scoped shortcuts.
-- [x] Analytics derive from real data (fees paid/outstanding, expenses, payroll, attendance, students).
-
-### 2.5 Ledger (NEW — Financials for the CA)
-
-- [x] `GET /ledger?from&to&type` (OWNER/ADMIN) — pulls fee payments (income), expenses, and **PAID payroll runs** into one feed with a summary (`totalIncome / totalExpense / totalPayroll / net / count`).
-- [x] Ledger page (`/ledger`) — stat cards (income/expenses/payroll/net), from/to/type filters, DataTable, **CSV export** with header + totals + net.
-- [x] `/ledger` added to owner/admin navigation + Finance section.
-
-### 2.6 Recent Session Work (2026-08-06)
-
-- [x] **Fee payments now auto-reconcile** — `recordPayment()` in `backend/src/services/fee.ts` auto-attaches an installment-less payment to the earliest open installment, so `totalPaid` / `balance` and the ledger stay consistent.
-- [x] **Installment status editing** — owner/admin can set each installment `PENDING/PARTIAL/PAID/OVERDUE` from the fees account drawer (dashboard stats refresh after).
-- [x] **Payroll: last-paid + pending per faculty** — new `getFacultyPayrollStatus()` in `backend/src/services/payroll.ts`:
-  - `lastPaidPeriod` / `lastPaidAt` from the latest PAID run.
-  - **FIXED** → pending = unpaid calendar months × salary.
-  - **PER_LECTURE** → pending = lectures taken **after** the last paid period × rate.
-- [x] `GET /payroll/faculty` now returns `id`, `lastPaidPeriod`, `lastPaidAt`, `pendingLectures`, `pendingAmount`.
-- [x] Payroll UI: faculty cards show **"Last paid {period}"** + a **pending badge** (`₹ · N lectures pending`) or **"Up to date"**; runs table has a **"Paid on"** column; "Mark paid" flow clarified.
-- [x] Bug fix — React "unique key" warning on PayrollPage (payload was missing `id`; verified with a jsdom repro).
-- [x] Bug fix — orphaned fee payment (installment not attached) removed from demo data; payments re-recorded cleanly through the fixed API.
-
-### 2.7 Verification / Quality Gates
-
-- [x] `npm run typecheck` (backend) — clean.
-- [x] `npm run lint` + `npm run build` (frontend) — clean.
-- [x] Backend integration tests (`npm test`) — green.
-- [x] Live E2E verified against running servers:
-  - `POST /fees/payments` (₹27,500 UPI, no installment) → receipt `RCT-2608-0001`, auto-PAID inst#1 → `totalPaid=27500`, `balance=82500`.
-  - July 2026 payroll run (Dr. Mehta ₹800) → created → approved → **paid**; pending Aug lecture ₹800 now surfaces.
-  - `GET /ledger` → `income=27500, expense=0, payroll=800, net=26700`.
-
----
-
-## 3. Current Demo Data State
-
-| Area | State |
-| --- | --- |
-| Fee accounts | Aarav (₹110,000, 4×₹27,500), Ananya, Rohan — all ₹110,000/4 installments. |
-| Payments | 1 payment: Aarav ₹27,500 UPI → `RCT-2608-0001` (inst#1 PAID). inst#2/3/4 PENDING. |
-| Payroll runs | 1 run: **2026-07 — PAID** (Dr. Mehta, 1 lecture, ₹800, `paidAt` 2026-08-05). |
-| Faculty | Prof. Sharma FIXED ₹45,000 (no payout yet); Dr. Mehta PER_LECTURE ₹800 (last paid 2026-07, **₹800 pending** for 1 lecture on 2026-08-03). |
-| Lectures | Biology — Prof. Sharma (2026-08-05) + Dr. Mehta (2026-07-20, 2026-08-03). |
-| Expenses | E2E test expenses deleted. |
-| Ledger | income 27500 / expense 0 / payroll 800 / net 26700. |
-
----
-
-## 4. Pending / To Be Implemented ⬜
-
-> Extracted from `prd.md §10 (Future Work)`, `README.md §7 (Not started)`, and gaps found while building. Ordered roughly by business value.
->
-> **Phase 2 priority (owner-selected, 2026-08-06):** Receipt PDF generation · Fix stale docs (README/PRD) · Payroll per-faculty payouts · Expanded P&L reporting · Notifications center. Everything else below is Phase 3+.
-
-### 4.1 Fees / Finance
-- [ ] **Receipt PDF generation** — receipts are JSON only today; export printable PDF (HTML→PDF) for student/parent + CA.
-- [ ] **Fee overpayment spillover** — if a payment exceeds the selected/oldest installment, optionally apply the surplus to the next open installment instead of stopping at one.
-- [ ] **Student self-service receipts** — students can view/download their own payment history & receipts.
-- [ ] **Payroll export to ledger detail** — currently the ledger shows payroll as one line per paid run; consider per-payee lines for the CA export.
-
-### 4.2 Payroll / HR
-- [ ] **Per-faculty payouts** — today a whole run flips to PAID; consider marking individual payees paid/part-paid so a run can be paid out in parts.
-- [ ] **Payslip PDF** + printable payslip view (period, breakdown, net).
-- [ ] **Leave management for staff** — leave/absence request workflow for faculty.
-- [ ] **Auto-schedule payroll** — remember last paid period and pre-fill the next run's dates.
-
-### 4.3 Attendance
-- [ ] **Student leave/absence request workflow** (parent-notified absence).
-- [ ] **Attendance report exports** (per student/batch monthly CSV/PDF).
-
-### 4.4 Communications & Notifications
-- [ ] **Notifications center plumbing** — UI shell exists in the header; wire real events (fee due, payment received, attendance marked, payroll run status).
-- [ ] **Student/parent email + SMS templates** — SMTP wiring exists; templates stubbed.
-
-### 4.5 Platform / Security / Hardening
-- [ ] **Forgot-password reset token + email flow** (currently a stub that always succeeds).
-- [ ] **Platform institute deletion cascade** (safe teardown of a tenant).
-- [ ] **Production security hardening** — rate limiting, refresh tokens, per-device session revocation, multi-factor auth, audit of failed logins.
-
-### 4.6 Reporting / Dashboards
-- [ ] **Expanded ledger & P&L reporting** across `FinanceEntry` (monthly P&L view, category breakdowns, chart export).
-- [ ] **Per-module dashboards** — more charts (revenue trend, attendance %, enquiry conversion funnel, top batches).
-- [ ] **Export center** — consistent CSV/PDF exports across fees, expenses, attendance, payroll (ledger already has CSV).
-
-### 4.7 Testing & Quality
-- [ ] **Frontend tests** (no JS test setup yet; backend uses `node:test` + supertest).
-- [ ] **Expand backend test coverage** for fees reconciliation, ledger, and payroll last-paid/pending logic.
-
-### 4.8 Documentation / Housekeeping
-- [ ] **README `§7` is stale** — it still says the frontend runs on mock data (it is now fully API-wired); `§6` API table and `prd.md §3.3` sidebar table are missing `/ledger`.
-- [ ] Add a demo faculty seed for **PER_LECTURE** so `TUTORGO_SEED=demo` matches the current manual demo state (Dr. Mehta was created live, not via seed).
-
----
-
-## 5. Known Bugs / Caveats (open)
-
-| # | Area | Description | Priority |
+| Role | Email | Password | Notes |
 | --- | --- | --- | --- |
-| 1 | Fees | Overpayment does not spill to the next installment (surplus stays on one installment). | Medium |
-| 2 | Payroll | Deleting a payment/paid run does not roll back fees or ledger entries — data is append-only by design today; verify expectations. | Low |
-| 3 | Demo | `Dr. Mehta` + July run + extra lectures were created live (not via seed) — a fresh `TUTORGO_SEED=demo` reseed will not reproduce them. | Low |
+| SuperAdmin | `superadmin@gmail.com` | `superadmin@2026` | Platform-seeded, not invited |
+| Owner/Admin (demo institute) | `demo.admin@tutorgo.local` | `E2eTest!2345` | "Demo Main Campus" under "Demo Academy" |
 
----
+### How to run
 
-## 6. How to Run & Verify
-
-```powershell
+```bash
 # Backend (port 4000)
-cd backend; npm install; npx prisma migrate deploy; npx prisma db seed; npm run dev
+cd backend; npm install; npx prisma db push; npm run dev
 
 # Frontend (port 3000)
 cd frontend; npm install; npm run dev
 ```
 
-Quick smoke checks (backend typecheck, tests, frontend lint/build):
+Verification convention for this codebase (see `handoff.md` §5): typecheck both sides (`npx tsc --noEmit`), lint the frontend (`npx next lint --dir src`), then verify anything auth- or money-adjacent with real HTTP requests against the running dev server and a real (test) database state — not just a passing typecheck. `next build`/`next start` share a `.next` cache with the dev server and can corrupt each other if run concurrently; default to `tsc --noEmit` instead.
 
-```powershell
-cd backend;  npm run typecheck; npm test
-cd frontend; npm run lint;      npm run build
-```
+---
 
-Playbook: log in as `owner@tutorgovers.com` → check **Finance → Ledger** (stat cards + CSV export), **Finance → Payroll** (faculty cards show last-paid + pending, runs table shows "Paid on"), **Finance → Fees** (installment status dropdown).
+## 2. What's built
+
+Full detail lives in `FEATURES.md` and the individual `changes-phaseN.md` files. Headline summary:
+
+- **Phases 1–11** (core ERP through PWA/push) — enquiries, admissions, students, academics, attendance (incl. biometric device scans), tests, fees (waterfall payment engine, receipts, defaulters, UPI/QR self-serve collection, payment-proof approval), payroll (fixed + per-lecture, runs, ledgers), expenses, distribution tracking, PTM, WhatsApp + email dispatch, document storage, the student portal, and PWA installability with push notifications. All verified live during their own build passes.
+- **Phase 12** — bulk CSV import (students/staff), session revocation ("log out everywhere" + a SuperAdmin force-logout lever), Help & Support (staff-to-SuperAdmin tickets), study material (course-scoped resource library), MFA (TOTP, opt-in, every staff role), an audit log viewer, global search, institute suspension reasons + history, and maintenance mode (global or per-institute scheduled downtime). Not built: multi-institute analytics rollup (12.4, nothing blocking, just not requested) and impersonation/"view as" (12.8, deliberately gated on explicit sign-off — the single highest-blast-radius item in the product).
+- **Phase 13** — the UPI payment QR is now generated client-side from the institute's UPI ID rather than uploaded as a static image, so it can never fall out of sync with a changed UPI ID. The "share a GPay screenshot into the app" idea (13.2) was discussed and deliberately not built — narrow payoff (Android-only, depends on undocumented share-text formats) against real new plumbing this app's `localStorage`-JWT auth would require; the manual screenshot-upload path already covers every device.
+- **Phase 14** — a platform-wide health dashboard (WhatsApp/email delivery failure rates, worst-institute-first) and institute data export (an OWNER's own CSV bundle, plus a SuperAdmin-side equivalent for offboarding). Deletion was deliberately not built — this codebase has never had a real delete anywhere (every suspend flow keeps history forever on purpose), and a real purge needs an explicit answer to "what does deleted mean" before any code.
+- **Also done outside any single phase's original scope**: a redesigned, shared document layout for receipts and (newly built from scratch) payslips — there was no real payslip document before this, only a WhatsApp-style text confirmation; `/forbidden` (403) and a global `/not-found` (404) page; `RoleRoute` added to every section that was missing frontend role gating (previously only the sidebar hid the link, with no page-level check); an app-wide thinner, auto-hiding scrollbar; the dark-mode toggle moved from the header into the profile dropdown.
+
+---
+
+## 3. Pending / explicitly deferred
+
+Not gaps found by accident — each of these was raised, discussed, and deliberately left for later:
+
+| Item | Why it's waiting |
+| --- | --- |
+| Multi-institute analytics rollup (12.4) | Nothing blocking; only useful once an org actually has 2+ institutes to view together. |
+| Impersonate / "view as" (12.8) | Highest-blast-radius item in the product — a compromised SuperAdmin account plus impersonation is a compromise of every institute. Needs explicit sign-off on the read-only-by-default design before any code. |
+| Web Share Target for payment proofs (13.2) | Android-only, best-effort text parsing of an undocumented GPay share format, and would need new server-side hand-off plumbing solely because this app authenticates via `localStorage` rather than cookies. Judged not worth it versus the manual upload path that already works everywhere. |
+| Institute data deletion (14.2) | This codebase has never had a real delete anywhere. Needs an actual policy answer — hard-delete, anonymize-but-keep-financial-history, or export-then-purge — before any schema/route work. |
+| Two older policy questions (from Phase 10) | Automatic fee-overdue sweeps, and whether unpaid leave should deduct from a FIXED salary — both need a business decision, not code. |
+| Billing/invoicing view, bulk institute operations | Blocked on things that don't exist yet: the platform has no mechanism to actually charge institutes, and there's no self-serve trial/signup flow to make "bulk" mean anything. |
+| Smaller, explicitly parked ideas | Audit log CSV export (currently view-only), a stale-ticket SLA notification for the support queue, a platform-wide health/error-monitoring tool beyond the messaging-delivery dashboard that exists today. |
+
+---
+
+## 4. Known caveats
+
+- `changes-phase12.md`'s own status table had drifted from the code before this update (12.11 maintenance mode was fully built without that table being updated) — corrected as part of this pass. Treat any phase doc's status table as a claim to spot-check against the actual code before fully trusting it, per `handoff.md`'s own warning that "this file rots the moment code moves."
+- `PRODUCTION_READINESS.md` (dated 2026-08-22) is explicitly known-stale in multiple places (claims no rate limiting and no upload validation, both of which exist) — don't cite it without re-checking each claim.
+- `developmentplan.md` and the pre-2026-09-05 version of this file predate Phase 8 and are historical context only.

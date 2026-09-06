@@ -1,11 +1,16 @@
 export class ApiError extends Error {
   status: number;
   code: string;
+  /// Extra structured data the client needs alongside the message — e.g. the
+  /// maintenance window's endAt/message on a MAINTENANCE_ACTIVE 503, so the
+  /// frontend doesn't need a second request to render the maintenance page.
+  details?: Record<string, unknown>;
 
-  constructor(status: number, code: string, message: string) {
+  constructor(status: number, code: string, message: string, details?: Record<string, unknown>) {
     super(message);
     this.status = status;
     this.code = code;
+    this.details = details;
   }
 
   static badRequest(message: string, code = "BAD_REQUEST") {

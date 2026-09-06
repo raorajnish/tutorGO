@@ -817,6 +817,23 @@ export type EnumLeaveStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel>
 }
 
+export type EnumMaintenanceScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MaintenanceScope | Prisma.EnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.MaintenanceScope[] | Prisma.ListEnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MaintenanceScope[] | Prisma.ListEnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMaintenanceScopeFilter<$PrismaModel> | $Enums.MaintenanceScope
+}
+
+export type EnumMaintenanceScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MaintenanceScope | Prisma.EnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.MaintenanceScope[] | Prisma.ListEnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MaintenanceScope[] | Prisma.ListEnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMaintenanceScopeWithAggregatesFilter<$PrismaModel> | $Enums.MaintenanceScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMaintenanceScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMaintenanceScopeFilter<$PrismaModel>
+}
+
 export type EnumResourceKindFilter<$PrismaModel = never> = {
   equals?: $Enums.ResourceKind | Prisma.EnumResourceKindFieldRefInput<$PrismaModel>
   in?: $Enums.ResourceKind[] | Prisma.ListEnumResourceKindFieldRefInput<$PrismaModel>
@@ -1594,6 +1611,23 @@ export type NestedEnumLeaveStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumLeaveStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumMaintenanceScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MaintenanceScope | Prisma.EnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.MaintenanceScope[] | Prisma.ListEnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MaintenanceScope[] | Prisma.ListEnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMaintenanceScopeFilter<$PrismaModel> | $Enums.MaintenanceScope
+}
+
+export type NestedEnumMaintenanceScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MaintenanceScope | Prisma.EnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.MaintenanceScope[] | Prisma.ListEnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MaintenanceScope[] | Prisma.ListEnumMaintenanceScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMaintenanceScopeWithAggregatesFilter<$PrismaModel> | $Enums.MaintenanceScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMaintenanceScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMaintenanceScopeFilter<$PrismaModel>
 }
 
 export type NestedEnumResourceKindFilter<$PrismaModel = never> = {

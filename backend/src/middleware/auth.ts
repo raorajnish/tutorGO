@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import { verifyToken, signToken, RENEW_AFTER_MS, SESSION_ABSOLUTE_CAP_MS } from "../lib/jwt.js";
 import { ApiError } from "../lib/http.js";
+import { getBlockingWindow } from "../lib/maintenance.js";
 import type { Role } from "../generated/prisma/enums.js";
 
 export interface AuthUser {
@@ -163,6 +164,24 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         if (!user.institute?.isActive) {
           throw ApiError.unauthorized("This institute is suspended. Contact your administrator.");
         }
+      }
+    }
+
+    // Scheduled maintenance (changes-phase12.md §12.11) — self-inflicted,
+    // temporary downtime, distinct from the institute-suspended check above.
+    // SUPERADMIN always bypasses (their payload.instituteId is null, so only
+    // a GLOBAL window could otherwise apply to them, and it's the platform
+    // team that schedules those in the first place). Cheap: at most two
+    // short-TTL-cached lookups, see lib/maintenance.ts.
+    if (user.role !== "SUPERADMIN") {
+      const blocking = await getBlockingWindow(payload.instituteId);
+      if (blocking) {
+        throw new ApiError(
+          503,
+          "MAINTENANCE_ACTIVE",
+          blocking.message || "We're doing scheduled maintenance. Please check back shortly.",
+          { scope: blocking.scope, startAt: blocking.startAt, endAt: blocking.endAt, message: blocking.message }
+        );
       }
     }
 

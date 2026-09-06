@@ -224,42 +224,43 @@ model Institute {
   /// shown in the platform UI so it's clear they're a point-in-time copy.
   planLimitsSetAt DateTime?
 
-  organization      Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  plan              Plan?                    @relation(fields: [planId], references: [id])
-  users             User[]
-  modules           InstituteModule[]
-  courses           Course[]
-  subjects          Subject[]
-  batches           Batch[]
-  enquiries         Enquiry[]
-  students          Student[]
-  lectures          Lecture[]
-  messageTemplates  MessageTemplate[]
-  feeStructures     FeeStructure[]
-  feeAccounts       FeeAccount[]
-  payments          Payment[]
-  salaryProfiles    SalaryProfile[]
-  payrollPayments   PayrollPayment[]
-  payrollRuns       PayrollRun[]
-  notifications     Notification[]
-  emailConfig       InstituteEmailConfig?
-  whatsAppConfig    InstituteWhatsAppConfig?
-  whatsAppTemplates WhatsAppTemplate[]
-  outboundMessages  OutboundMessage[]
-  expenseCategories ExpenseCategory[]
-  events            Event[]
-  expenses          Expense[]
-  financeEntries    FinanceEntry[]
-  tests             Test[]
-  reminders         ScheduledReminder[]
-  distributionItems DistributionItem[]
-  leaveRequests     LeaveRequest[]
-  paymentConfig     InstitutePaymentConfig?
-  paymentProofs     PaymentProof[]
-  parentMeetings    ParentMeeting[]
-  supportTickets    SupportTicket[]
-  suspensions       InstituteSuspension[]
-  studyResources    StudyResource[]
+  organization       Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan               Plan?                    @relation(fields: [planId], references: [id])
+  users              User[]
+  modules            InstituteModule[]
+  courses            Course[]
+  subjects           Subject[]
+  batches            Batch[]
+  enquiries          Enquiry[]
+  students           Student[]
+  lectures           Lecture[]
+  messageTemplates   MessageTemplate[]
+  feeStructures      FeeStructure[]
+  feeAccounts        FeeAccount[]
+  payments           Payment[]
+  salaryProfiles     SalaryProfile[]
+  payrollPayments    PayrollPayment[]
+  payrollRuns        PayrollRun[]
+  notifications      Notification[]
+  emailConfig        InstituteEmailConfig?
+  whatsAppConfig     InstituteWhatsAppConfig?
+  whatsAppTemplates  WhatsAppTemplate[]
+  outboundMessages   OutboundMessage[]
+  expenseCategories  ExpenseCategory[]
+  events             Event[]
+  expenses           Expense[]
+  financeEntries     FinanceEntry[]
+  tests              Test[]
+  reminders          ScheduledReminder[]
+  distributionItems  DistributionItem[]
+  leaveRequests      LeaveRequest[]
+  paymentConfig      InstitutePaymentConfig?
+  paymentProofs      PaymentProof[]
+  parentMeetings     ParentMeeting[]
+  supportTickets     SupportTicket[]
+  suspensions        InstituteSuspension[]
+  studyResources     StudyResource[]
+  maintenanceWindows MaintenanceWindow[]
 
   @@index([organizationId])
   @@map("institutes")
@@ -336,27 +337,29 @@ model User {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  institute             Institute?          @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  ownedOrganization     Organization?       @relation("OrganizationOwner")
-  lecturesTaught        Lecture[]
-  teachingAssignments   FacultyAssignment[]
-  notifications         Notification[]
-  salaryProfile         SalaryProfile?
-  passwordResetOtps     PasswordResetOtp[]
-  expensesRecorded      Expense[]
-  testsAuthored         Test[]              @relation("TestAuthor")
-  testResultsEntered    TestResult[]        @relation("TestResultAuthor")
-  pushSubscriptions     PushSubscription[]
-  leaveRequests         LeaveRequest[]      @relation("LeaveRequester")
-  leaveReviews          LeaveRequest[]      @relation("LeaveReviewer")
+  institute                   Institute?             @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  ownedOrganization           Organization?          @relation("OrganizationOwner")
+  lecturesTaught              Lecture[]
+  teachingAssignments         FacultyAssignment[]
+  notifications               Notification[]
+  salaryProfile               SalaryProfile?
+  passwordResetOtps           PasswordResetOtp[]
+  expensesRecorded            Expense[]
+  testsAuthored               Test[]                 @relation("TestAuthor")
+  testResultsEntered          TestResult[]           @relation("TestResultAuthor")
+  pushSubscriptions           PushSubscription[]
+  leaveRequests               LeaveRequest[]         @relation("LeaveRequester")
+  leaveReviews                LeaveRequest[]         @relation("LeaveReviewer")
   /// Set only on a role=STUDENT login — the student row it grants access to.
-  portalStudent         Student?            @relation("StudentPortalLogin")
-  parentMeetingsCreated ParentMeeting[]     @relation("ParentMeetingAuthor")
-  supportTicketsCreated SupportTicket[]
-  supportTicketMessages SupportTicketMessage[]
-  suspensionsMade       InstituteSuspension[] @relation("InstituteSuspensionSuspendedBy")
-  suspensionsLifted     InstituteSuspension[] @relation("InstituteSuspensionLiftedBy")
-  studyResourcesAdded   StudyResource[]
+  portalStudent               Student?               @relation("StudentPortalLogin")
+  parentMeetingsCreated       ParentMeeting[]        @relation("ParentMeetingAuthor")
+  supportTicketsCreated       SupportTicket[]
+  supportTicketMessages       SupportTicketMessage[]
+  suspensionsMade             InstituteSuspension[]  @relation("InstituteSuspensionSuspendedBy")
+  suspensionsLifted           InstituteSuspension[]  @relation("InstituteSuspensionLiftedBy")
+  studyResourcesAdded         StudyResource[]
+  maintenanceWindowsCreated   MaintenanceWindow[]    @relation("MaintenanceWindowCreatedBy")
+  maintenanceWindowsCancelled MaintenanceWindow[]    @relation("MaintenanceWindowCancelledBy")
 
   @@index([instituteId])
   @@map("users")
@@ -396,9 +399,9 @@ model SupportTicket {
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
 
-  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  institute    Institute?              @relation(fields: [instituteId], references: [id], onDelete: SetNull)
-  createdBy    User                    @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  institute    Institute?             @relation(fields: [instituteId], references: [id], onDelete: SetNull)
+  createdBy    User                   @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
   messages     SupportTicketMessage[]
 
   @@index([organizationId, status])
@@ -407,14 +410,14 @@ model SupportTicket {
 }
 
 model SupportTicketMessage {
-  id           String   @id @default(cuid())
-  ticketId     String
-  authorUserId String
+  id             String   @id @default(cuid())
+  ticketId       String
+  authorUserId   String
   /// True when written by a SuperAdmin — lets the thread render "You" vs
   /// "Support" without a second lookup or a role join.
   isFromPlatform Boolean
-  body         String
-  createdAt    DateTime @default(now())
+  body           String
+  createdAt      DateTime @default(now())
 
   ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   author User          @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
@@ -1483,20 +1486,20 @@ model PaymentAllocation {
 /// underneath it. Off means the student portal never renders a "Pay fees"
 /// button, whatever else is filled in here.
 model InstitutePaymentConfig {
-  id              String   @id @default(cuid())
-  instituteId     String   @unique
-  isEnabled       Boolean  @default(false)
+  id           String   @id @default(cuid())
+  instituteId  String   @unique
+  isEnabled    Boolean  @default(false)
   /// Required to enable payments (changes-phase13.md §13.1). The QR parents
   /// scan is generated from this on the fly rather than uploaded as an image:
   /// an uploaded QR can silently outlive the UPI ID it encodes, which is a
   /// misrouted-payment bug that generating it makes structurally impossible.
-  upiId           String?
-  payeeName       String?
+  upiId        String?
+  payeeName    String?
   /// Free text shown under the QR/UPI details — e.g. "include your student
   /// code in the payment note".
-  instructions    String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  instructions String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
 
@@ -1899,12 +1902,55 @@ model InstituteSuspension {
   liftedAt          DateTime?
   liftedByUserId    String?
 
-  institute    Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-  suspendedBy  User      @relation("InstituteSuspensionSuspendedBy", fields: [suspendedByUserId], references: [id])
-  liftedBy     User?     @relation("InstituteSuspensionLiftedBy", fields: [liftedByUserId], references: [id])
+  institute   Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  suspendedBy User      @relation("InstituteSuspensionSuspendedBy", fields: [suspendedByUserId], references: [id])
+  liftedBy    User?     @relation("InstituteSuspensionLiftedBy", fields: [liftedByUserId], references: [id])
 
   @@index([instituteId])
   @@map("institute_suspensions")
+}
+
+enum MaintenanceScope {
+  GLOBAL
+  INSTITUTE
+}
+
+/// A scheduled, temporary downtime window (changes-phase12.md §12.11) —
+/// distinct from InstituteSuspension, which is punitive and indefinite. This
+/// is self-inflicted and time-boxed: staff schedule it in advance for planned
+/// work and it lifts itself.
+///
+/// Status is deliberately never stored, only derived (same principle as
+/// ScheduledReminder/FeeInstallment/DistributionReceipt) — see
+/// lib/maintenance.ts: `cancelledAt` set means cancelled; otherwise
+/// `now < startAt` = upcoming, `startAt <= now <= endAt` = active, `now >
+/// endAt` = ended. A stored enum could drift from these timestamps; deriving
+/// it can't.
+model MaintenanceWindow {
+  id          String           @id @default(cuid())
+  scope       MaintenanceScope
+  /// Null when scope = GLOBAL (blocks every non-SUPERADMIN role platform-
+  /// wide). Required when scope = INSTITUTE (blocks only that institute).
+  instituteId String?
+  startAt     DateTime
+  endAt       DateTime
+  /// Optional "why"/"what" text shown to affected users in the pre-start
+  /// banner and on the maintenance page, e.g. "Upgrading our payment system".
+  message     String?
+
+  createdByUserId   String
+  cancelledAt       DateTime?
+  cancelledByUserId String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  institute   Institute? @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  createdBy   User       @relation("MaintenanceWindowCreatedBy", fields: [createdByUserId], references: [id])
+  cancelledBy User?      @relation("MaintenanceWindowCancelledBy", fields: [cancelledByUserId], references: [id])
+
+  @@index([scope, instituteId, startAt])
+  @@index([instituteId, endAt])
+  @@map("maintenance_windows")
 }
 
 enum ResourceKind {

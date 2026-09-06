@@ -261,6 +261,14 @@ export const LeaveStatus = {
 export type LeaveStatus = (typeof LeaveStatus)[keyof typeof LeaveStatus]
 
 
+export const MaintenanceScope = {
+  GLOBAL: 'GLOBAL',
+  INSTITUTE: 'INSTITUTE'
+} as const
+
+export type MaintenanceScope = (typeof MaintenanceScope)[keyof typeof MaintenanceScope]
+
+
 export const ResourceKind = {
   FILE: 'FILE',
   LINK: 'LINK'

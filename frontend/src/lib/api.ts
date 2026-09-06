@@ -1,5 +1,39 @@
 export interface ApiErrorBody {
-  error: { code: string; message: string };
+  error: {
+    code: string;
+    message: string;
+    details?: { scope: "GLOBAL" | "INSTITUTE"; startAt: string; endAt: string; message: string | null };
+  };
+}
+
+const MAINTENANCE_DETAILS_KEY = "tutorgo_maintenance";
+
+/** MAINTENANCE_ACTIVE (backend/src/middleware/auth.ts) is the one error code
+ * every caller should react to the same way, regardless of which endpoint
+ * tripped it — so it's handled once, centrally, rather than in every
+ * `catch (ApiClientError)` block across the app. The window's details ride
+ * along on the 503 body (ApiError.details) so /maintenance can render them
+ * without a second, doomed-to-also-503 request. */
+function handleMaintenanceResponse(body: ApiErrorBody | null): void {
+  if (body?.error.code !== "MAINTENANCE_ACTIVE") return;
+  if (typeof window === "undefined") return;
+  if (body.error.details) {
+    window.sessionStorage.setItem(MAINTENANCE_DETAILS_KEY, JSON.stringify(body.error.details));
+  }
+  if (window.location.pathname !== "/maintenance") {
+    window.location.href = "/maintenance";
+  }
+}
+
+export function readStoredMaintenanceDetails(): ApiErrorBody["error"]["details"] | null {
+  if (typeof window === "undefined") return null;
+  const raw = window.sessionStorage.getItem(MAINTENANCE_DETAILS_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
 }
 
 export class ApiClientError extends Error {
@@ -57,6 +91,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
 
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as ApiErrorBody | null;
+    handleMaintenanceResponse(body);
     throw new ApiClientError(
       res.status,
       body?.error.code ?? "UNKNOWN_ERROR",
@@ -93,6 +128,7 @@ export async function apiUpload<T>(
 
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as ApiErrorBody | null;
+    handleMaintenanceResponse(body);
     throw new ApiClientError(
       res.status,
       body?.error.code ?? "UNKNOWN_ERROR",
@@ -116,6 +152,7 @@ export async function apiDownload(path: string, filename: string): Promise<void>
 
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as ApiErrorBody | null;
+    handleMaintenanceResponse(body);
     throw new ApiClientError(
       res.status,
       body?.error.code ?? "UNKNOWN_ERROR",

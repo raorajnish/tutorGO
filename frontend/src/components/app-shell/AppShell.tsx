@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { MaintenanceBanner } from "./MaintenanceBanner";
 import { useAuth } from "@/lib/auth-context";
 import { StudentBottomNav } from "@/components/portal/StudentBottomNav";
 
@@ -28,6 +29,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         onClose={() => setSidebarOpen(false)}
       />
       <div className="flex min-w-0 flex-1 flex-col">
+        <MaintenanceBanner />
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main
           className={`content-scroll flex-1 px-4 py-6 sm:px-6 lg:px-8 ${showBottomNav ? "pb-28 lg:pb-6" : ""}`}

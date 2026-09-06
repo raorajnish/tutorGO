@@ -20,6 +20,7 @@ import { seedDefaultExpenseCategories } from "../lib/expenseDefaults.js";
 import { instituteCodeSchema } from "./organization.js";
 import { notifyTicketCreatorOfReply } from "./support.js";
 import { buildInstituteExportArchive } from "../services/instituteExport.js";
+import { deriveStatus, invalidateMaintenanceCache } from "../lib/maintenance.js";
 import type { Role } from "../generated/prisma/enums.js";
 
 export const platformRouter = Router();
@@ -924,6 +925,145 @@ platformRouter.get("/institutes/:id/suspensions", async (req, res, next) => {
       orderBy: { suspendedAt: "desc" },
     });
     res.json(suspensions);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Maintenance windows (changes-phase12.md §12.11) — self-inflicted, temporary
+// downtime. Distinct from suspension above: scheduled in advance, lifts
+// itself, and (unlike suspension) can also be platform-wide. middleware/
+// auth.ts is the only place that ever enforces this; these routes just
+// manage the schedule.
+// ---------------------------------------------------------------------------
+
+const createMaintenanceSchema = z
+  .object({
+    scope: z.enum(["GLOBAL", "INSTITUTE"]),
+    instituteId: z.string().min(1).optional(),
+    startAt: z.coerce.date(),
+    endAt: z.coerce.date(),
+    message: z.string().trim().max(500).optional(),
+  })
+  .refine((v) => v.scope !== "INSTITUTE" || !!v.instituteId, {
+    message: "instituteId is required for an INSTITUTE-scoped window",
+    path: ["instituteId"],
+  })
+  .refine((v) => v.scope !== "GLOBAL" || !v.instituteId, {
+    message: "instituteId must not be set for a GLOBAL window",
+    path: ["instituteId"],
+  })
+  .refine((v) => v.endAt > v.startAt, {
+    message: "endAt must be after startAt",
+    path: ["endAt"],
+  })
+  .refine((v) => v.endAt > new Date(), {
+    message: "endAt must be in the future",
+    path: ["endAt"],
+  });
+
+platformRouter.post("/maintenance", validateBody(createMaintenanceSchema), async (req, res, next) => {
+  try {
+    const body = req.body as z.infer<typeof createMaintenanceSchema>;
+
+    if (body.scope === "INSTITUTE") {
+      const institute = await prisma.institute.findUnique({ where: { id: body.instituteId! } });
+      if (!institute) throw ApiError.notFound("Institute not found");
+    }
+
+    // At most one live (non-cancelled, not yet ended) window per scope may
+    // overlap in time — enforced here rather than as a DB constraint, same
+    // approach as FeeStructure.isDefault's clearOtherDefaults().
+    const overlapping = await prisma.maintenanceWindow.findFirst({
+      where: {
+        scope: body.scope,
+        instituteId: body.scope === "INSTITUTE" ? body.instituteId : null,
+        cancelledAt: null,
+        endAt: { gt: body.startAt },
+        startAt: { lt: body.endAt },
+      },
+    });
+    if (overlapping) {
+      throw ApiError.conflict(
+        "A maintenance window already overlaps this time range for this scope — cancel it first.",
+        "MAINTENANCE_OVERLAP"
+      );
+    }
+
+    const created = await prisma.maintenanceWindow.create({
+      data: {
+        scope: body.scope,
+        instituteId: body.scope === "INSTITUTE" ? body.instituteId : null,
+        startAt: body.startAt,
+        endAt: body.endAt,
+        message: body.message,
+        createdByUserId: req.user!.id,
+      },
+    });
+    invalidateMaintenanceCache();
+
+    await auditLog({
+      action: "MAINTENANCE_SCHEDULED",
+      instituteId: body.scope === "INSTITUTE" ? body.instituteId : undefined,
+      userId: req.user!.id,
+      targetType: "MaintenanceWindow",
+      targetId: created.id,
+      metadata: { scope: body.scope, startAt: body.startAt, endAt: body.endAt, message: body.message },
+    });
+
+    res.status(201).json(created);
+  } catch (err) {
+    next(err);
+  }
+});
+
+platformRouter.get("/maintenance", async (req, res, next) => {
+  try {
+    const instituteId = typeof req.query.instituteId === "string" ? req.query.instituteId : undefined;
+    const windows = await prisma.maintenanceWindow.findMany({
+      where: instituteId ? { instituteId } : undefined,
+      include: {
+        institute: { select: { id: true, name: true, code: true } },
+        createdBy: { select: { id: true, fullName: true } },
+        cancelledBy: { select: { id: true, fullName: true } },
+      },
+      orderBy: { startAt: "desc" },
+    });
+    const now = new Date();
+    res.json(
+      windows.map((w) => ({
+        ...w,
+        status: deriveStatus(w.startAt, w.endAt, w.cancelledAt, now),
+      }))
+    );
+  } catch (err) {
+    next(err);
+  }
+});
+
+platformRouter.patch("/maintenance/:id/cancel", async (req, res, next) => {
+  try {
+    const window = await prisma.maintenanceWindow.findUnique({ where: { id: req.params.id as string } });
+    if (!window) throw ApiError.notFound("Maintenance window not found");
+    if (window.cancelledAt) throw ApiError.conflict("Already cancelled");
+    if (window.endAt <= new Date()) throw ApiError.conflict("This window has already ended");
+
+    const updated = await prisma.maintenanceWindow.update({
+      where: { id: window.id },
+      data: { cancelledAt: new Date(), cancelledByUserId: req.user!.id },
+    });
+    invalidateMaintenanceCache();
+
+    await auditLog({
+      action: "MAINTENANCE_CANCELLED",
+      instituteId: window.instituteId ?? undefined,
+      userId: req.user!.id,
+      targetType: "MaintenanceWindow",
+      targetId: window.id,
+    });
+
+    res.json(updated);
   } catch (err) {
     next(err);
   }

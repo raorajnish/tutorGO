@@ -17,12 +17,13 @@ import {
   MODULE_LABELS,
   type CappedRole,
   type InstituteSuspension,
+  type MaintenanceWindow,
   type ModuleCode,
   type PlanLimits,
   type PlatformInstituteDetail,
   type RoleLimitValues,
 } from "@/lib/types";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 
 interface PageProps {
   params: Promise<{ orgId: string; instituteId: string }>;
@@ -40,6 +41,9 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
   const [suspendOpen, setSuspendOpen] = useState(false);
   const [suspending, setSuspending] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [maintenanceOpen, setMaintenanceOpen] = useState(false);
+  const [schedulingMaintenance, setSchedulingMaintenance] = useState(false);
+  const [maintenanceWindows, setMaintenanceWindows] = useState<MaintenanceWindow[] | null>(null);
   const [logoutTarget, setLogoutTarget] = useState<{ id: string; fullName: string } | null>(null);
 
   function load() {
@@ -109,6 +113,41 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
   }
 
   useEffect(loadSuspensions, [instituteId]);
+
+  function loadMaintenanceWindows() {
+    apiFetch<MaintenanceWindow[]>(`/platform/maintenance?instituteId=${instituteId}`)
+      .then(setMaintenanceWindows)
+      .catch(() => setMaintenanceWindows([]));
+  }
+
+  useEffect(loadMaintenanceWindows, [instituteId]);
+
+  async function scheduleMaintenance(startAt: string, endAt: string, message: string) {
+    setSchedulingMaintenance(true);
+    setError(null);
+    try {
+      await apiFetch("/platform/maintenance", {
+        method: "POST",
+        body: JSON.stringify({ scope: "INSTITUTE", instituteId, startAt, endAt, message: message || undefined }),
+      });
+      setMaintenanceOpen(false);
+      loadMaintenanceWindows();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not schedule maintenance.");
+    } finally {
+      setSchedulingMaintenance(false);
+    }
+  }
+
+  async function cancelMaintenance(id: string) {
+    setError(null);
+    try {
+      await apiFetch(`/platform/maintenance/${id}/cancel`, { method: "PATCH" });
+      loadMaintenanceWindows();
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : "Could not cancel this window.");
+    }
+  }
 
   async function handleExport() {
     setExporting(true);
@@ -292,6 +331,61 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
                 </div>
               )}
             </div>
+
+            {/* Scheduled, self-lifting downtime (changes-phase12.md §12.11) —
+                distinct from suspension above, which is punitive/indefinite. */}
+            <div className="rounded-3xl border border-border bg-card p-6">
+              <p className="font-display text-base font-semibold text-foreground">Maintenance</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Schedule a temporary downtime window for this institute — staff and students see a countdown
+                banner beforehand and a maintenance page during it. Lifts itself automatically at the end time,
+                or cancel it any time before or during.
+              </p>
+
+              {(() => {
+                const live = maintenanceWindows?.find((w) => w.status === "upcoming" || w.status === "active");
+                return live ? (
+                  <div className="mt-4 rounded-xl border border-warning/30 bg-warning-soft px-3.5 py-2.5">
+                    <p className="text-sm font-medium text-foreground">
+                      {live.status === "active" ? "Active now" : "Scheduled"} — {formatDateTime(live.startAt)} to{" "}
+                      {formatDateTime(live.endAt)}
+                    </p>
+                    {live.message && <p className="mt-1 text-sm text-muted-foreground">{live.message}</p>}
+                    <Button variant="destructive" className="mt-3 w-full" onClick={() => cancelMaintenance(live.id)}>
+                      Cancel window
+                    </Button>
+                  </div>
+                ) : (
+                  <Button variant="secondary" className="mt-4 w-full" onClick={() => setMaintenanceOpen(true)}>
+                    Schedule maintenance
+                  </Button>
+                );
+              })()}
+
+              {maintenanceWindows && maintenanceWindows.filter((w) => w.status === "ended" || w.status === "cancelled").length > 0 && (
+                <div className="mt-5 border-t border-border pt-4">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">History</p>
+                  <ul className="space-y-2.5">
+                    {maintenanceWindows
+                      .filter((w) => w.status === "ended" || w.status === "cancelled")
+                      .map((w) => (
+                        <li key={w.id} className="rounded-lg border border-border px-3 py-2.5 text-sm">
+                          <p className="text-foreground">
+                            {formatDateTime(w.startAt)} – {formatDateTime(w.endAt)}
+                          </p>
+                          {w.message && <p className="text-xs text-muted-foreground">{w.message}</p>}
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {w.status === "cancelled"
+                              ? `Cancelled by ${w.cancelledBy?.fullName ?? "—"}`
+                              : "Ended"}{" "}
+                            · Scheduled by {w.createdBy.fullName}
+                          </p>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -324,6 +418,14 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
         onConfirm={(reason) => setSuspended(false, reason)}
         instituteName={detail?.name ?? "this institute"}
         submitting={suspending}
+      />
+
+      <ScheduleMaintenanceModal
+        open={maintenanceOpen}
+        onClose={() => setMaintenanceOpen(false)}
+        onConfirm={scheduleMaintenance}
+        instituteName={detail?.name ?? "this institute"}
+        submitting={schedulingMaintenance}
       />
 
       <ConfirmModal
@@ -391,6 +493,83 @@ function SuspendModal({
         placeholder="Why is this institute being suspended? Shown in its suspension history."
         className="w-full resize-none rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
       />
+    </Modal>
+  );
+}
+
+/** Schedules a temporary, self-lifting downtime window for one institute
+ * (changes-phase12.md §12.11) — distinct from SuspendModal above, which is
+ * punitive and indefinite. `datetime-local` inputs are treated as the
+ * browser's local time and sent as ISO strings; the backend re-validates
+ * ordering and future-ness regardless. */
+function ScheduleMaintenanceModal({
+  open,
+  onClose,
+  onConfirm,
+  instituteName,
+  submitting,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: (startAt: string, endAt: string, message: string) => void;
+  instituteName: string;
+  submitting: boolean;
+}) {
+  const [startAt, setStartAt] = useState("");
+  const [endAt, setEndAt] = useState("");
+  const [message, setMessage] = useState("");
+
+  function handleClose() {
+    setStartAt("");
+    setEndAt("");
+    setMessage("");
+    onClose();
+  }
+
+  const valid = !!startAt && !!endAt && new Date(endAt) > new Date(startAt) && new Date(endAt) > new Date();
+
+  return (
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title={`Schedule maintenance for ${instituteName}`}
+      description="Staff and students at this institute see a countdown banner beforehand, and a maintenance page for the duration. You can cancel it any time, before or during."
+      width="sm"
+      footer={
+        <>
+          <Button variant="ghost" onClick={handleClose} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => onConfirm(new Date(startAt).toISOString(), new Date(endAt).toISOString(), message)}
+            disabled={submitting || !valid}
+          >
+            {submitting ? "Scheduling…" : "Schedule"}
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-3">
+        <Input
+          label="Starts at"
+          type="datetime-local"
+          value={startAt}
+          onChange={(e) => setStartAt(e.target.value)}
+        />
+        <Input label="Ends at" type="datetime-local" value={endAt} onChange={(e) => setEndAt(e.target.value)} />
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground">Message (optional)</label>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="What's this for? Shown to affected users, e.g. 'Upgrading our payment system'."
+            className="w-full resize-none rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
+      </div>
     </Modal>
   );
 }

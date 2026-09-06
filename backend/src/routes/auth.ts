@@ -11,6 +11,7 @@ import { rateLimit } from "../middleware/rateLimit.js";
 import { sendMail } from "../services/mailer.js";
 import { otpEmailHtml } from "../lib/emailTemplates.js";
 import { encrypt, decrypt } from "../lib/crypto.js";
+import { getNoticeWindow } from "../lib/maintenance.js";
 import {
   MFA_ELIGIBLE_ROLES,
   generateTotpSecret,
@@ -151,8 +152,21 @@ authRouter.get("/me", authenticate, async (req, res, next) => {
     };
 
     if (user.role === "SUPERADMIN") {
-      return res.json({ ...base, organization: null, institutes: null, currentInstituteId: null, institute: null });
+      return res.json({ ...base, organization: null, institutes: null, currentInstituteId: null, institute: null, maintenance: null });
     }
+
+    // Upcoming/active window worth showing the countdown banner for —
+    // SUPERADMIN is excluded above since maintenance never affects them.
+    const noticeWindow = await getNoticeWindow(authUser.instituteId);
+    const maintenance = noticeWindow
+      ? {
+          scope: noticeWindow.scope,
+          startAt: noticeWindow.startAt,
+          endAt: noticeWindow.endAt,
+          message: noticeWindow.message,
+          status: noticeWindow.status,
+        }
+      : null;
 
     if (user.role === "OWNER") {
       const org = authUser.organizationId
@@ -181,6 +195,7 @@ authRouter.get("/me", authenticate, async (req, res, next) => {
           : [],
         currentInstituteId: authUser.instituteId,
         institute,
+        maintenance,
       });
     }
 
@@ -210,6 +225,7 @@ authRouter.get("/me", authenticate, async (req, res, next) => {
       currentInstituteId: authUser.instituteId,
       institute,
       hasStudyResources,
+      maintenance,
     });
   } catch (err) {
     next(err);

@@ -508,6 +508,21 @@ export type LeaveRequest = Prisma.LeaveRequestModel
  */
 export type InstituteSuspension = Prisma.InstituteSuspensionModel
 /**
+ * Model MaintenanceWindow
+ * A scheduled, temporary downtime window (changes-phase12.md §12.11) —
+ * distinct from InstituteSuspension, which is punitive and indefinite. This
+ * is self-inflicted and time-boxed: staff schedule it in advance for planned
+ * work and it lifts itself.
+ * 
+ * Status is deliberately never stored, only derived (same principle as
+ * ScheduledReminder/FeeInstallment/DistributionReceipt) — see
+ * lib/maintenance.ts: `cancelledAt` set means cancelled; otherwise
+ * `now < startAt` = upcoming, `startAt <= now <= endAt` = active, `now >
+ * endAt` = ended. A stored enum could drift from these timestamps; deriving
+ * it can't.
+ */
+export type MaintenanceWindow = Prisma.MaintenanceWindowModel
+/**
  * Model StudyResource
  * Study material — notes, recorded-lecture links, assignment PDFs — shared
  * with students (changes-phase12.md §12.5).

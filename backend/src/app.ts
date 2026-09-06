@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import { prisma } from "./lib/prisma.js";
 import { authRouter } from "./routes/auth.js";
 import { platformRouter } from "./routes/platform.js";
 import { orgRouter } from "./routes/org.js";
@@ -37,7 +39,24 @@ export const app = express();
 // ever added, never set it to `true`.
 app.set("trust proxy", 1);
 
-app.use(cors());
+app.use(helmet());
+
+// Restricted to the frontend's own origin(s) — comma-separate FRONTEND_URL for
+// more than one (e.g. a staging domain alongside production). The frontend
+// itself never hits this cross-origin anyway: next.config.ts rewrites `/api/*`
+// server-to-server, which CORS doesn't apply to. This only matters for a
+// direct browser call to the API from somewhere else — which is exactly what
+// should be refused.
+const allowedOrigins = (process.env.FRONTEND_URL ?? "http://127.0.0.1:3000")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+  })
+);
 // `verify` stashes the raw bytes on req.rawBody alongside the parsed body —
 // needed only by the WhatsApp webhook's X-Hub-Signature-256 check
 // (routes/public.ts), which HMACs the exact bytes Meta sent, not a
@@ -69,8 +88,18 @@ app.use(
   })
 );
 
-app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, service: "tutorgo-backend" });
+// A load balancer / uptime monitor's liveness probe. Checks the database
+// round-trip specifically because that's the dependency actually worth
+// knowing is down — a healthy Node process serving 503s for every real route
+// because Postgres is unreachable is not "ok" by any useful definition.
+app.get("/api/health", async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ ok: true, service: "tutorgo-backend", db: "ok" });
+  } catch (err) {
+    console.error("Health check: database unreachable", err);
+    res.status(503).json({ ok: false, service: "tutorgo-backend", db: "unreachable" });
+  }
 });
 
 app.use("/api/auth", authRouter);

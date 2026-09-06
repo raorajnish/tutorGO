@@ -56,7 +56,9 @@ function fromPrisma(err: Prisma.PrismaClientKnownRequestError): ApiError | null 
 
 export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
   if (err instanceof ApiError) {
-    return res.status(err.status).json({ error: { code: err.code, message: err.message } });
+    return res
+      .status(err.status)
+      .json({ error: { code: err.code, message: err.message, details: err.details } });
   }
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {

@@ -40,6 +40,17 @@ export interface CurrentInstitute {
   activeModules: ModuleCode[];
 }
 
+/// A maintenance window worth telling the current user about — either
+/// already active (rare on this endpoint; authenticate() blocks those before
+/// /auth/me is ever reached) or upcoming, for the pre-start countdown banner.
+export interface MaintenanceNotice {
+  scope: "GLOBAL" | "INSTITUTE";
+  startAt: string;
+  endAt: string;
+  message: string | null;
+  status: "upcoming" | "active";
+}
+
 export interface MeResponse {
   id: string;
   email: string;
@@ -66,6 +77,9 @@ export interface MeResponse {
   currentInstituteId: string | null;
   /// Populated whenever currentInstituteId is set (OWNER-entered or fixed role).
   institute: CurrentInstitute | null;
+  /// Null for SUPERADMIN always, and for everyone else once no window is
+  /// upcoming/active for their scope.
+  maintenance: MaintenanceNotice | null;
 }
 
 interface LoginSuccess {
@@ -344,6 +358,23 @@ export interface InstituteSuspension {
   liftedAt: string | null;
   suspendedBy: { id: string; fullName: string };
   liftedBy: { id: string; fullName: string } | null;
+}
+
+/// A scheduled maintenance window (changes-phase12.md §12.11), as returned by
+/// the SuperAdmin-only /platform/maintenance routes. `status` is computed
+/// server-side from startAt/endAt/cancelledAt — never stored.
+export interface MaintenanceWindow {
+  id: string;
+  scope: "GLOBAL" | "INSTITUTE";
+  instituteId: string | null;
+  institute: { id: string; name: string; code: string } | null;
+  startAt: string;
+  endAt: string;
+  message: string | null;
+  status: "upcoming" | "active" | "ended" | "cancelled";
+  createdBy: { id: string; fullName: string };
+  cancelledAt: string | null;
+  cancelledBy: { id: string; fullName: string } | null;
 }
 
 /// One row of the platform-wide user directory (SUPERADMIN only).

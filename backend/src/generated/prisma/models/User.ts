@@ -328,6 +328,8 @@ export type UserWhereInput = {
   suspensionsMade?: Prisma.InstituteSuspensionListRelationFilter
   suspensionsLifted?: Prisma.InstituteSuspensionListRelationFilter
   studyResourcesAdded?: Prisma.StudyResourceListRelationFilter
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowListRelationFilter
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -368,6 +370,8 @@ export type UserOrderByWithRelationInput = {
   suspensionsMade?: Prisma.InstituteSuspensionOrderByRelationAggregateInput
   suspensionsLifted?: Prisma.InstituteSuspensionOrderByRelationAggregateInput
   studyResourcesAdded?: Prisma.StudyResourceOrderByRelationAggregateInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowOrderByRelationAggregateInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -411,6 +415,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   suspensionsMade?: Prisma.InstituteSuspensionListRelationFilter
   suspensionsLifted?: Prisma.InstituteSuspensionListRelationFilter
   studyResourcesAdded?: Prisma.StudyResourceListRelationFilter
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowListRelationFilter
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -498,6 +504,8 @@ export type UserCreateInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -537,6 +545,8 @@ export type UserUncheckedCreateInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUpdateInput = {
@@ -576,6 +586,8 @@ export type UserUpdateInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -615,6 +627,8 @@ export type UserUncheckedUpdateInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1087,6 +1101,36 @@ export type UserUpdateOneWithoutSuspensionsLiftedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSuspensionsLiftedInput, Prisma.UserUpdateWithoutSuspensionsLiftedInput>, Prisma.UserUncheckedUpdateWithoutSuspensionsLiftedInput>
 }
 
+export type UserCreateNestedOneWithoutMaintenanceWindowsCreatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMaintenanceWindowsCreatedInput, Prisma.UserUncheckedCreateWithoutMaintenanceWindowsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMaintenanceWindowsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutMaintenanceWindowsCancelledInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMaintenanceWindowsCancelledInput, Prisma.UserUncheckedCreateWithoutMaintenanceWindowsCancelledInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMaintenanceWindowsCancelledInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMaintenanceWindowsCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMaintenanceWindowsCreatedInput, Prisma.UserUncheckedCreateWithoutMaintenanceWindowsCreatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMaintenanceWindowsCreatedInput
+  upsert?: Prisma.UserUpsertWithoutMaintenanceWindowsCreatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMaintenanceWindowsCreatedInput, Prisma.UserUpdateWithoutMaintenanceWindowsCreatedInput>, Prisma.UserUncheckedUpdateWithoutMaintenanceWindowsCreatedInput>
+}
+
+export type UserUpdateOneWithoutMaintenanceWindowsCancelledNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMaintenanceWindowsCancelledInput, Prisma.UserUncheckedCreateWithoutMaintenanceWindowsCancelledInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMaintenanceWindowsCancelledInput
+  upsert?: Prisma.UserUpsertWithoutMaintenanceWindowsCancelledInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMaintenanceWindowsCancelledInput, Prisma.UserUpdateWithoutMaintenanceWindowsCancelledInput>, Prisma.UserUncheckedUpdateWithoutMaintenanceWindowsCancelledInput>
+}
+
 export type UserCreateNestedOneWithoutStudyResourcesAddedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutStudyResourcesAddedInput, Prisma.UserUncheckedCreateWithoutStudyResourcesAddedInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutStudyResourcesAddedInput
@@ -1137,6 +1181,8 @@ export type UserCreateWithoutOwnedOrganizationInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutOwnedOrganizationInput = {
@@ -1175,6 +1221,8 @@ export type UserUncheckedCreateWithoutOwnedOrganizationInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutOwnedOrganizationInput = {
@@ -1229,6 +1277,8 @@ export type UserUpdateWithoutOwnedOrganizationInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedOrganizationInput = {
@@ -1267,6 +1317,8 @@ export type UserUncheckedUpdateWithoutOwnedOrganizationInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutInstituteInput = {
@@ -1305,6 +1357,8 @@ export type UserCreateWithoutInstituteInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutInstituteInput = {
@@ -1343,6 +1397,8 @@ export type UserUncheckedCreateWithoutInstituteInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutInstituteInput = {
@@ -1430,6 +1486,8 @@ export type UserCreateWithoutSupportTicketsCreatedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutSupportTicketsCreatedInput = {
@@ -1468,6 +1526,8 @@ export type UserUncheckedCreateWithoutSupportTicketsCreatedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutSupportTicketsCreatedInput = {
@@ -1522,6 +1582,8 @@ export type UserUpdateWithoutSupportTicketsCreatedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportTicketsCreatedInput = {
@@ -1560,6 +1622,8 @@ export type UserUncheckedUpdateWithoutSupportTicketsCreatedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutSupportTicketMessagesInput = {
@@ -1598,6 +1662,8 @@ export type UserCreateWithoutSupportTicketMessagesInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutSupportTicketMessagesInput = {
@@ -1636,6 +1702,8 @@ export type UserUncheckedCreateWithoutSupportTicketMessagesInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutSupportTicketMessagesInput = {
@@ -1690,6 +1758,8 @@ export type UserUpdateWithoutSupportTicketMessagesInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportTicketMessagesInput = {
@@ -1728,6 +1798,8 @@ export type UserUncheckedUpdateWithoutSupportTicketMessagesInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutPushSubscriptionsInput = {
@@ -1766,6 +1838,8 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
@@ -1804,6 +1878,8 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutPushSubscriptionsInput = {
@@ -1858,6 +1934,8 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
@@ -1896,6 +1974,8 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutPasswordResetOtpsInput = {
@@ -1934,6 +2014,8 @@ export type UserCreateWithoutPasswordResetOtpsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutPasswordResetOtpsInput = {
@@ -1972,6 +2054,8 @@ export type UserUncheckedCreateWithoutPasswordResetOtpsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutPasswordResetOtpsInput = {
@@ -2026,6 +2110,8 @@ export type UserUpdateWithoutPasswordResetOtpsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPasswordResetOtpsInput = {
@@ -2064,6 +2150,8 @@ export type UserUncheckedUpdateWithoutPasswordResetOtpsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -2102,6 +2190,8 @@ export type UserCreateWithoutNotificationsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -2140,6 +2230,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -2194,6 +2286,8 @@ export type UserUpdateWithoutNotificationsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -2232,6 +2326,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutParentMeetingsCreatedInput = {
@@ -2270,6 +2366,8 @@ export type UserCreateWithoutParentMeetingsCreatedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutParentMeetingsCreatedInput = {
@@ -2308,6 +2406,8 @@ export type UserUncheckedCreateWithoutParentMeetingsCreatedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutParentMeetingsCreatedInput = {
@@ -2362,6 +2462,8 @@ export type UserUpdateWithoutParentMeetingsCreatedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutParentMeetingsCreatedInput = {
@@ -2400,6 +2502,8 @@ export type UserUncheckedUpdateWithoutParentMeetingsCreatedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutPortalStudentInput = {
@@ -2438,6 +2542,8 @@ export type UserCreateWithoutPortalStudentInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutPortalStudentInput = {
@@ -2476,6 +2582,8 @@ export type UserUncheckedCreateWithoutPortalStudentInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutPortalStudentInput = {
@@ -2530,6 +2638,8 @@ export type UserUpdateWithoutPortalStudentInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPortalStudentInput = {
@@ -2568,6 +2678,8 @@ export type UserUncheckedUpdateWithoutPortalStudentInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutLecturesTaughtInput = {
@@ -2606,6 +2718,8 @@ export type UserCreateWithoutLecturesTaughtInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutLecturesTaughtInput = {
@@ -2644,6 +2758,8 @@ export type UserUncheckedCreateWithoutLecturesTaughtInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutLecturesTaughtInput = {
@@ -2698,6 +2814,8 @@ export type UserUpdateWithoutLecturesTaughtInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLecturesTaughtInput = {
@@ -2736,6 +2854,8 @@ export type UserUncheckedUpdateWithoutLecturesTaughtInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutTestsAuthoredInput = {
@@ -2774,6 +2894,8 @@ export type UserCreateWithoutTestsAuthoredInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutTestsAuthoredInput = {
@@ -2812,6 +2934,8 @@ export type UserUncheckedCreateWithoutTestsAuthoredInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutTestsAuthoredInput = {
@@ -2866,6 +2990,8 @@ export type UserUpdateWithoutTestsAuthoredInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTestsAuthoredInput = {
@@ -2904,6 +3030,8 @@ export type UserUncheckedUpdateWithoutTestsAuthoredInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutTestResultsEnteredInput = {
@@ -2942,6 +3070,8 @@ export type UserCreateWithoutTestResultsEnteredInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutTestResultsEnteredInput = {
@@ -2980,6 +3110,8 @@ export type UserUncheckedCreateWithoutTestResultsEnteredInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutTestResultsEnteredInput = {
@@ -3034,6 +3166,8 @@ export type UserUpdateWithoutTestResultsEnteredInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTestResultsEnteredInput = {
@@ -3072,6 +3206,8 @@ export type UserUncheckedUpdateWithoutTestResultsEnteredInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutTeachingAssignmentsInput = {
@@ -3110,6 +3246,8 @@ export type UserCreateWithoutTeachingAssignmentsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutTeachingAssignmentsInput = {
@@ -3148,6 +3286,8 @@ export type UserUncheckedCreateWithoutTeachingAssignmentsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutTeachingAssignmentsInput = {
@@ -3202,6 +3342,8 @@ export type UserUpdateWithoutTeachingAssignmentsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeachingAssignmentsInput = {
@@ -3240,6 +3382,8 @@ export type UserUncheckedUpdateWithoutTeachingAssignmentsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutSalaryProfileInput = {
@@ -3278,6 +3422,8 @@ export type UserCreateWithoutSalaryProfileInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutSalaryProfileInput = {
@@ -3316,6 +3462,8 @@ export type UserUncheckedCreateWithoutSalaryProfileInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutSalaryProfileInput = {
@@ -3370,6 +3518,8 @@ export type UserUpdateWithoutSalaryProfileInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSalaryProfileInput = {
@@ -3408,6 +3558,8 @@ export type UserUncheckedUpdateWithoutSalaryProfileInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutExpensesRecordedInput = {
@@ -3446,6 +3598,8 @@ export type UserCreateWithoutExpensesRecordedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutExpensesRecordedInput = {
@@ -3484,6 +3638,8 @@ export type UserUncheckedCreateWithoutExpensesRecordedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutExpensesRecordedInput = {
@@ -3538,6 +3694,8 @@ export type UserUpdateWithoutExpensesRecordedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExpensesRecordedInput = {
@@ -3576,6 +3734,8 @@ export type UserUncheckedUpdateWithoutExpensesRecordedInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutLeaveRequestsInput = {
@@ -3614,6 +3774,8 @@ export type UserCreateWithoutLeaveRequestsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutLeaveRequestsInput = {
@@ -3652,6 +3814,8 @@ export type UserUncheckedCreateWithoutLeaveRequestsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutLeaveRequestsInput = {
@@ -3695,6 +3859,8 @@ export type UserCreateWithoutLeaveReviewsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutLeaveReviewsInput = {
@@ -3733,6 +3899,8 @@ export type UserUncheckedCreateWithoutLeaveReviewsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutLeaveReviewsInput = {
@@ -3787,6 +3955,8 @@ export type UserUpdateWithoutLeaveRequestsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeaveRequestsInput = {
@@ -3825,6 +3995,8 @@ export type UserUncheckedUpdateWithoutLeaveRequestsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUpsertWithoutLeaveReviewsInput = {
@@ -3874,6 +4046,8 @@ export type UserUpdateWithoutLeaveReviewsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeaveReviewsInput = {
@@ -3912,6 +4086,8 @@ export type UserUncheckedUpdateWithoutLeaveReviewsInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateWithoutSuspensionsMadeInput = {
@@ -3950,6 +4126,8 @@ export type UserCreateWithoutSuspensionsMadeInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutSuspensionsMadeInput = {
@@ -3988,6 +4166,8 @@ export type UserUncheckedCreateWithoutSuspensionsMadeInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutSuspensionsMadeInput = {
@@ -4031,6 +4211,8 @@ export type UserCreateWithoutSuspensionsLiftedInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutSuspensionsLiftedInput = {
@@ -4069,6 +4251,8 @@ export type UserUncheckedCreateWithoutSuspensionsLiftedInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutSuspensionsLiftedInput = {
@@ -4123,6 +4307,8 @@ export type UserUpdateWithoutSuspensionsMadeInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSuspensionsMadeInput = {
@@ -4161,6 +4347,8 @@ export type UserUncheckedUpdateWithoutSuspensionsMadeInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUpsertWithoutSuspensionsLiftedInput = {
@@ -4210,6 +4398,8 @@ export type UserUpdateWithoutSuspensionsLiftedInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSuspensionsLiftedInput = {
@@ -4248,6 +4438,360 @@ export type UserUncheckedUpdateWithoutSuspensionsLiftedInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
+}
+
+export type UserCreateWithoutMaintenanceWindowsCreatedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  mfaSecret?: string | null
+  mfaEnabledAt?: Date | string | null
+  mfaBackupCodes?: Prisma.UserCreatemfaBackupCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
+  ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
+  studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
+}
+
+export type UserUncheckedCreateWithoutMaintenanceWindowsCreatedInput = {
+  id?: string
+  instituteId?: string | null
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  mfaSecret?: string | null
+  mfaEnabledAt?: Date | string | null
+  mfaBackupCodes?: Prisma.UserCreatemfaBackupCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestUncheckedCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultUncheckedCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
+  studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
+}
+
+export type UserCreateOrConnectWithoutMaintenanceWindowsCreatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMaintenanceWindowsCreatedInput, Prisma.UserUncheckedCreateWithoutMaintenanceWindowsCreatedInput>
+}
+
+export type UserCreateWithoutMaintenanceWindowsCancelledInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  mfaSecret?: string | null
+  mfaEnabledAt?: Date | string | null
+  mfaBackupCodes?: Prisma.UserCreatemfaBackupCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
+  ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
+  studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserUncheckedCreateWithoutMaintenanceWindowsCancelledInput = {
+  id?: string
+  instituteId?: string | null
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  mfaSecret?: string | null
+  mfaEnabledAt?: Date | string | null
+  mfaBackupCodes?: Prisma.UserCreatemfaBackupCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestUncheckedCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultUncheckedCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
+  studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserCreateOrConnectWithoutMaintenanceWindowsCancelledInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMaintenanceWindowsCancelledInput, Prisma.UserUncheckedCreateWithoutMaintenanceWindowsCancelledInput>
+}
+
+export type UserUpsertWithoutMaintenanceWindowsCreatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMaintenanceWindowsCreatedInput, Prisma.UserUncheckedUpdateWithoutMaintenanceWindowsCreatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMaintenanceWindowsCreatedInput, Prisma.UserUncheckedCreateWithoutMaintenanceWindowsCreatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMaintenanceWindowsCreatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMaintenanceWindowsCreatedInput, Prisma.UserUncheckedUpdateWithoutMaintenanceWindowsCreatedInput>
+}
+
+export type UserUpdateWithoutMaintenanceWindowsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  mfaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mfaEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaBackupCodes?: Prisma.UserUpdatemfaBackupCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
+  ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
+  studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMaintenanceWindowsCreatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  mfaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mfaEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaBackupCodes?: Prisma.UserUpdatemfaBackupCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUncheckedUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUncheckedUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
+  studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
+}
+
+export type UserUpsertWithoutMaintenanceWindowsCancelledInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMaintenanceWindowsCancelledInput, Prisma.UserUncheckedUpdateWithoutMaintenanceWindowsCancelledInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMaintenanceWindowsCancelledInput, Prisma.UserUncheckedCreateWithoutMaintenanceWindowsCancelledInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMaintenanceWindowsCancelledInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMaintenanceWindowsCancelledInput, Prisma.UserUncheckedUpdateWithoutMaintenanceWindowsCancelledInput>
+}
+
+export type UserUpdateWithoutMaintenanceWindowsCancelledInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  mfaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mfaEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaBackupCodes?: Prisma.UserUpdatemfaBackupCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
+  ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
+  studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMaintenanceWindowsCancelledInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  mfaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mfaEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaBackupCodes?: Prisma.UserUpdatemfaBackupCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUncheckedUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUncheckedUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
+  studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutStudyResourcesAddedInput = {
@@ -4286,6 +4830,8 @@ export type UserCreateWithoutStudyResourcesAddedInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
   suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserUncheckedCreateWithoutStudyResourcesAddedInput = {
@@ -4324,6 +4870,8 @@ export type UserUncheckedCreateWithoutStudyResourcesAddedInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
 }
 
 export type UserCreateOrConnectWithoutStudyResourcesAddedInput = {
@@ -4378,6 +4926,8 @@ export type UserUpdateWithoutStudyResourcesAddedInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStudyResourcesAddedInput = {
@@ -4416,6 +4966,8 @@ export type UserUncheckedUpdateWithoutStudyResourcesAddedInput = {
   supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserCreateManyInstituteInput = {
@@ -4473,6 +5025,8 @@ export type UserUpdateWithoutInstituteInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInstituteInput = {
@@ -4511,6 +5065,8 @@ export type UserUncheckedUpdateWithoutInstituteInput = {
   suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
   suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
   studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutInstituteInput = {
@@ -4554,6 +5110,8 @@ export type UserCountOutputType = {
   suspensionsMade: number
   suspensionsLifted: number
   studyResourcesAdded: number
+  maintenanceWindowsCreated: number
+  maintenanceWindowsCancelled: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4573,6 +5131,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   suspensionsMade?: boolean | UserCountOutputTypeCountSuspensionsMadeArgs
   suspensionsLifted?: boolean | UserCountOutputTypeCountSuspensionsLiftedArgs
   studyResourcesAdded?: boolean | UserCountOutputTypeCountStudyResourcesAddedArgs
+  maintenanceWindowsCreated?: boolean | UserCountOutputTypeCountMaintenanceWindowsCreatedArgs
+  maintenanceWindowsCancelled?: boolean | UserCountOutputTypeCountMaintenanceWindowsCancelledArgs
 }
 
 /**
@@ -4697,6 +5257,20 @@ export type UserCountOutputTypeCountStudyResourcesAddedArgs<ExtArgs extends runt
   where?: Prisma.StudyResourceWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMaintenanceWindowsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MaintenanceWindowWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMaintenanceWindowsCancelledArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MaintenanceWindowWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -4736,6 +5310,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   suspensionsMade?: boolean | Prisma.User$suspensionsMadeArgs<ExtArgs>
   suspensionsLifted?: boolean | Prisma.User$suspensionsLiftedArgs<ExtArgs>
   studyResourcesAdded?: boolean | Prisma.User$studyResourcesAddedArgs<ExtArgs>
+  maintenanceWindowsCreated?: boolean | Prisma.User$maintenanceWindowsCreatedArgs<ExtArgs>
+  maintenanceWindowsCancelled?: boolean | Prisma.User$maintenanceWindowsCancelledArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -4823,6 +5399,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   suspensionsMade?: boolean | Prisma.User$suspensionsMadeArgs<ExtArgs>
   suspensionsLifted?: boolean | Prisma.User$suspensionsLiftedArgs<ExtArgs>
   studyResourcesAdded?: boolean | Prisma.User$studyResourcesAddedArgs<ExtArgs>
+  maintenanceWindowsCreated?: boolean | Prisma.User$maintenanceWindowsCreatedArgs<ExtArgs>
+  maintenanceWindowsCancelled?: boolean | Prisma.User$maintenanceWindowsCancelledArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4858,6 +5436,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     suspensionsMade: Prisma.$InstituteSuspensionPayload<ExtArgs>[]
     suspensionsLifted: Prisma.$InstituteSuspensionPayload<ExtArgs>[]
     studyResourcesAdded: Prisma.$StudyResourcePayload<ExtArgs>[]
+    maintenanceWindowsCreated: Prisma.$MaintenanceWindowPayload<ExtArgs>[]
+    maintenanceWindowsCancelled: Prisma.$MaintenanceWindowPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -5322,6 +5902,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   suspensionsMade<T extends Prisma.User$suspensionsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$suspensionsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InstituteSuspensionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   suspensionsLifted<T extends Prisma.User$suspensionsLiftedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$suspensionsLiftedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InstituteSuspensionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   studyResourcesAdded<T extends Prisma.User$studyResourcesAddedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$studyResourcesAddedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudyResourcePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  maintenanceWindowsCreated<T extends Prisma.User$maintenanceWindowsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$maintenanceWindowsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaintenanceWindowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  maintenanceWindowsCancelled<T extends Prisma.User$maintenanceWindowsCancelledArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$maintenanceWindowsCancelledArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaintenanceWindowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6226,6 +6808,54 @@ export type User$studyResourcesAddedArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.StudyResourceScalarFieldEnum | Prisma.StudyResourceScalarFieldEnum[]
+}
+
+/**
+ * User.maintenanceWindowsCreated
+ */
+export type User$maintenanceWindowsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MaintenanceWindow
+   */
+  select?: Prisma.MaintenanceWindowSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MaintenanceWindow
+   */
+  omit?: Prisma.MaintenanceWindowOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MaintenanceWindowInclude<ExtArgs> | null
+  where?: Prisma.MaintenanceWindowWhereInput
+  orderBy?: Prisma.MaintenanceWindowOrderByWithRelationInput | Prisma.MaintenanceWindowOrderByWithRelationInput[]
+  cursor?: Prisma.MaintenanceWindowWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MaintenanceWindowScalarFieldEnum | Prisma.MaintenanceWindowScalarFieldEnum[]
+}
+
+/**
+ * User.maintenanceWindowsCancelled
+ */
+export type User$maintenanceWindowsCancelledArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MaintenanceWindow
+   */
+  select?: Prisma.MaintenanceWindowSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MaintenanceWindow
+   */
+  omit?: Prisma.MaintenanceWindowOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MaintenanceWindowInclude<ExtArgs> | null
+  where?: Prisma.MaintenanceWindowWhereInput
+  orderBy?: Prisma.MaintenanceWindowOrderByWithRelationInput | Prisma.MaintenanceWindowOrderByWithRelationInput[]
+  cursor?: Prisma.MaintenanceWindowWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MaintenanceWindowScalarFieldEnum | Prisma.MaintenanceWindowScalarFieldEnum[]
 }
 
 /**
