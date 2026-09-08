@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Course, Subject } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 
@@ -130,8 +131,12 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
               ))}
               {!loading && visible.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    {courseFilter ? "No subjects linked to this course." : "No subjects yet — create the first one."}
+                  <td colSpan={4}>
+                    <EmptyState
+                      message={courseFilter ? "No subjects linked to this course." : "No subjects yet."}
+                      actionLabel={courseFilter ? undefined : "New subject"}
+                      onAction={courseFilter ? undefined : openCreate}
+                    />
                   </td>
                 </tr>
               )}
@@ -161,9 +166,11 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
             </div>
           ))}
           {!loading && visible.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">
-              {courseFilter ? "No subjects linked to this course." : "No subjects yet — create the first one."}
-            </p>
+            <EmptyState
+              message={courseFilter ? "No subjects linked to this course." : "No subjects yet."}
+              actionLabel={courseFilter ? undefined : "New subject"}
+              onAction={courseFilter ? undefined : openCreate}
+            />
           )}
         </div>
       </div>

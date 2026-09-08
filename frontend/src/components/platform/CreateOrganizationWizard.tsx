@@ -296,7 +296,16 @@ export function CreateOrganizationWizard({ open, onClose, onCreated }: Props) {
           <Dropdown label="Plan" value={planCode} onChange={setPlanCode} options={plans.map((p) => ({ value: p.code, label: p.name }))} />
 
           <div>
-            <p className="mb-2 text-sm font-medium text-foreground">Modules</p>
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-sm font-medium text-foreground">Modules</p>
+              <button
+                type="button"
+                onClick={() => setModules(modules.size === MODULE_CODES.length ? new Set() : new Set(MODULE_CODES))}
+                className="text-xs font-medium text-accent hover:opacity-80"
+              >
+                {modules.size === MODULE_CODES.length ? "Deselect all" : "Select all"}
+              </button>
+            </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {MODULE_CODES.map((m) => (
                 <label

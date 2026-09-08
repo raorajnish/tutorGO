@@ -4,8 +4,8 @@ import { Fragment, useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Dropdown } from "@/components/ui/Dropdown";
-import { Button } from "@/components/ui/Button";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { Pagination } from "@/components/ui/Pagination";
 import type { PlatformInstituteListItem } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 
@@ -70,7 +70,6 @@ export default function AuditLogPage() {
   // set could leave the view stranded on a page that no longer exists.
   useEffect(() => setPage(1), [instituteId, action, from, to]);
 
-  const totalPages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
 
   return (
     <div className="space-y-6">
@@ -186,19 +185,7 @@ export default function AuditLogPage() {
       </div>
 
       {data && data.total > 0 && (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>
-            Page {data.page} of {totalPages} · {data.total} total
-          </span>
-          <div className="flex gap-2">
-            <Button variant="secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-              Previous
-            </Button>
-            <Button variant="secondary" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-              Next
-            </Button>
-          </div>
-        </div>
+        <Pagination page={data.page} pageSize={data.pageSize} total={data.total} onPageChange={setPage} />
       )}
     </div>
   );

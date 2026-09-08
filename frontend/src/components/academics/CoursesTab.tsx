@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Course, CourseFeeMode } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 
@@ -109,8 +110,8 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
               ))}
               {!loading && courses.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    No courses yet — create the first one.
+                  <td colSpan={7}>
+                    <EmptyState message="No courses yet." actionLabel="New course" onAction={openCreate} />
                   </td>
                 </tr>
               )}
@@ -135,7 +136,7 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
             </div>
           ))}
           {!loading && courses.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">No courses yet — create the first one.</p>
+            <EmptyState message="No courses yet." actionLabel="New course" onAction={openCreate} />
           )}
         </div>
       </div>

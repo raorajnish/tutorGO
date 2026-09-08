@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Modal } from "@/components/ui/Modal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Batch, Course } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 import { formatDate as fmtDate } from "@/lib/format";
@@ -136,8 +137,12 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
               ))}
               {!loading && visible.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    {courseFilter ? "No batches under this course." : "No batches yet."}
+                  <td colSpan={8}>
+                    <EmptyState
+                      message={courseFilter ? "No batches under this course." : "No batches yet."}
+                      actionLabel={courses.length > 0 ? "New batch" : undefined}
+                      onAction={courses.length > 0 ? openCreate : undefined}
+                    />
                   </td>
                 </tr>
               )}
@@ -163,9 +168,11 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
             </div>
           ))}
           {!loading && visible.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">
-              {courseFilter ? "No batches under this course." : "No batches yet."}
-            </p>
+            <EmptyState
+              message={courseFilter ? "No batches under this course." : "No batches yet."}
+              actionLabel={courses.length > 0 ? "New batch" : undefined}
+              onAction={courses.length > 0 ? openCreate : undefined}
+            />
           )}
         </div>
       </div>

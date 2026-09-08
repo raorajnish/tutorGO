@@ -6,6 +6,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/Button";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
@@ -265,8 +266,12 @@ function StaffScheduleView() {
               ))}
               {!loading && lectures.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    No lectures scheduled for this date.
+                  <td colSpan={6}>
+                    <EmptyState
+                      message="No lectures scheduled for this date."
+                      actionLabel="Schedule lecture"
+                      onAction={() => setScheduleOpen(true)}
+                    />
                   </td>
                 </tr>
               )}
@@ -340,7 +345,11 @@ function StaffScheduleView() {
             </div>
           ))}
           {!loading && lectures.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">No lectures scheduled for this date.</p>
+            <EmptyState
+              message="No lectures scheduled for this date."
+              actionLabel="Schedule lecture"
+              onAction={() => setScheduleOpen(true)}
+            />
           )}
         </div>
       </div>

@@ -12,6 +12,7 @@ import { ActionMenu } from "@/components/ui/ActionMenu";
 import { EnquiryModal } from "@/components/enquiries/EnquiryModal";
 import { MarkContactedModal } from "@/components/enquiries/MarkContactedModal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, type Course, type Enquiry, type EnquiryStatus } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 
@@ -239,8 +240,8 @@ export default function EnquiriesPage() {
               ))}
               {!loading && visible.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    No {emptyLabel}.
+                  <td colSpan={6}>
+                    <EmptyState message={`No ${emptyLabel}.`} actionLabel="New enquiry" onAction={openCreate} />
                   </td>
                 </tr>
               )}
@@ -296,9 +297,7 @@ export default function EnquiriesPage() {
             </div>
           ))}
           {!loading && visible.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">
-              No {emptyLabel}.
-            </p>
+            <EmptyState message={`No ${emptyLabel}.`} actionLabel="New enquiry" onAction={openCreate} />
           )}
         </div>
       </div>

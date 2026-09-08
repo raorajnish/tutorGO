@@ -45,6 +45,8 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
   const [schedulingMaintenance, setSchedulingMaintenance] = useState(false);
   const [maintenanceWindows, setMaintenanceWindows] = useState<MaintenanceWindow[] | null>(null);
   const [logoutTarget, setLogoutTarget] = useState<{ id: string; fullName: string } | null>(null);
+  const [changePlanOpen, setChangePlanOpen] = useState(false);
+  const [manageModulesOpen, setManageModulesOpen] = useState(false);
 
   function load() {
     apiFetch<PlatformInstituteDetail>(`/platform/organizations/${orgId}/institutes/${instituteId}`)
@@ -70,6 +72,9 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
     }
   }
 
+  // Applying is a deliberate action inside ChangePlanModal, not a side effect
+  // of picking an option — changing a plan reprices what this institute is
+  // allowed to have, so it needs the same explicit confirm step suspend does.
   async function changePlan(planId: string) {
     setSavingPlan(true);
     setError(null);
@@ -78,6 +83,7 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
         method: "PATCH",
         body: JSON.stringify({ planId: planId || null }),
       });
+      setChangePlanOpen(false);
       load();
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Could not update the plan.");
@@ -162,6 +168,7 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
   }
 
   const activeByCode = new Map(detail?.modules.map((m) => [m.code, m.isActive]) ?? []);
+  const activeModuleCount = MODULE_CODES.filter((code) => activeByCode.get(code)).length;
 
   return (
     <div className="space-y-6">
@@ -182,23 +189,111 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <div className="rounded-3xl border border-border bg-card p-6">
-              <p className="mb-3 font-display text-base font-semibold text-foreground">Modules</p>
-              <ul className="space-y-2">
-                {MODULE_CODES.map((code) => {
-                  const isActive = activeByCode.get(code) ?? false;
+              <div className="mb-4 flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Modules</p>
+                  <p className="mt-1 font-display text-xl font-semibold text-foreground">
+                    {activeModuleCount} of {MODULE_CODES.length} active
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setManageModulesOpen(true)}
+                  aria-label="Manage modules"
+                  title="Manage modules"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+                >
+                  <ChangePlanIcon />
+                </button>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {MODULE_CODES.map((code) => (
+                  <Badge key={code} tone={activeByCode.get(code) ? "success" : "neutral"}>
+                    {MODULE_LABELS[code]}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Scheduled, self-lifting downtime (changes-phase12.md §12.11) —
+                distinct from suspension above, which is punitive/indefinite.
+                Mirrors the Access card's shape: a status line, then a single
+                action whose color/label reflects that status. */}
+            <div className="rounded-3xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <p className="font-display text-base font-semibold text-foreground">Maintenance</p>
+                  <MaintenanceIcon className="text-muted-foreground" />
+                </div>
+                {!maintenanceWindows?.some((w) => w.status === "upcoming" || w.status === "active") && (
+                  <Button variant="secondary" onClick={() => setMaintenanceOpen(true)}>
+                    Schedule maintenance
+                  </Button>
+                )}
+              </div>
+
+              {(() => {
+                const live = maintenanceWindows?.find((w) => w.status === "upcoming" || w.status === "active");
+
+                if (!live) {
                   return (
-                    <li key={code} className="flex items-center justify-between rounded-xl border border-border px-3.5 py-2.5">
-                      <span className="text-sm font-medium text-foreground">{MODULE_LABELS[code]}</span>
-                      <Toggle
-                        checked={isActive}
-                        disabled={busyModule === code}
-                        onChange={(next) => toggleModule(code, next)}
-                        label={MODULE_LABELS[code]}
-                      />
-                    </li>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      No downtime scheduled — this institute is fully operational.
+                    </p>
                   );
-                })}
-              </ul>
+                }
+
+                const isActive = live.status === "active";
+                return (
+                  <>
+                    <p className={`mt-1 text-sm ${isActive ? "text-warning" : "text-muted-foreground"}`}>
+                      {isActive ? "Active now" : "Scheduled"} — back up {formatDateTime(live.endAt)}.
+                    </p>
+                    <div
+                      className={`mt-4 rounded-xl border px-3.5 py-2.5 ${
+                        isActive ? "border-warning/30 bg-warning-soft" : "border-border bg-muted/50"
+                      }`}
+                    >
+                      <p className="text-sm font-medium text-foreground">
+                        {formatDateTime(live.startAt)} → {formatDateTime(live.endAt)}
+                      </p>
+                      {live.message && <p className="mt-1 text-sm text-muted-foreground">{live.message}</p>}
+                    </div>
+                    <Button variant="destructive" className="mt-3 w-full" onClick={() => cancelMaintenance(live.id)}>
+                      Cancel window
+                    </Button>
+                  </>
+                );
+              })()}
+
+              {maintenanceWindows && maintenanceWindows.filter((w) => w.status === "ended" || w.status === "cancelled").length > 0 && (
+                <div className="mt-5 border-t border-border pt-4">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">History</p>
+                  <ul className="space-y-2.5">
+                    {maintenanceWindows
+                      .filter((w) => w.status === "ended" || w.status === "cancelled")
+                      .map((w) => (
+                        <li key={w.id} className="rounded-lg border border-border px-3 py-2.5 text-sm">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-foreground">
+                              {formatDateTime(w.startAt)} – {formatDateTime(w.endAt)}
+                            </p>
+                            <Badge tone={w.status === "cancelled" ? "danger" : "neutral"}>
+                              {w.status === "cancelled" ? "Cancelled" : "Ended"}
+                            </Badge>
+                          </div>
+                          {w.message && <p className="mt-1 text-xs text-muted-foreground">{w.message}</p>}
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {w.status === "cancelled" ? `By ${w.cancelledBy?.fullName ?? "—"}` : null}
+                            {w.status === "cancelled" ? " · " : null}
+                            Scheduled by {w.createdBy.fullName}
+                          </p>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             <div className="rounded-3xl border border-border bg-card p-6">
@@ -218,27 +313,30 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
 
           <div className="space-y-6">
             <div className="rounded-3xl border border-border bg-card p-6">
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <p className="font-display text-base font-semibold text-foreground">Plan</p>
-                {detail.customised && <Badge tone="warning">Customised</Badge>}
+              <div className="mb-4 flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Plan</p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <p className="font-display text-xl font-semibold text-foreground">
+                      {detail.plan?.name ?? "No plan"}
+                    </p>
+                    {detail.customised && <Badge tone="warning">Customised</Badge>}
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {detail.plan ? "Limits copied to this institute below." : "Unlimited headcount — no plan assigned."}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setChangePlanOpen(true)}
+                  disabled={savingPlan}
+                  aria-label="Change plan"
+                  title="Change plan"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <ChangePlanIcon />
+                </button>
               </div>
-
-              <Dropdown
-                value={detail.plan?.id ?? ""}
-                onChange={changePlan}
-                disabled={savingPlan}
-                placeholder="No plan (unlimited)"
-                options={[
-                  { value: "", label: "No plan (unlimited)" },
-                  ...detail.availablePlans.map((p) => ({ value: p.id, label: p.name })),
-                ]}
-              />
-
-              {/* The single most important thing to say on this screen: the
-                  numbers below belong to THIS institute, not to the plan. */}
-              <p className="mt-2 text-xs text-muted-foreground">
-                Choosing a plan copies its limits here. Editing the plan later won&apos;t change this institute.
-              </p>
 
               {detail.limits ? (
                 <>
@@ -331,61 +429,6 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
                 </div>
               )}
             </div>
-
-            {/* Scheduled, self-lifting downtime (changes-phase12.md §12.11) —
-                distinct from suspension above, which is punitive/indefinite. */}
-            <div className="rounded-3xl border border-border bg-card p-6">
-              <p className="font-display text-base font-semibold text-foreground">Maintenance</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Schedule a temporary downtime window for this institute — staff and students see a countdown
-                banner beforehand and a maintenance page during it. Lifts itself automatically at the end time,
-                or cancel it any time before or during.
-              </p>
-
-              {(() => {
-                const live = maintenanceWindows?.find((w) => w.status === "upcoming" || w.status === "active");
-                return live ? (
-                  <div className="mt-4 rounded-xl border border-warning/30 bg-warning-soft px-3.5 py-2.5">
-                    <p className="text-sm font-medium text-foreground">
-                      {live.status === "active" ? "Active now" : "Scheduled"} — {formatDateTime(live.startAt)} to{" "}
-                      {formatDateTime(live.endAt)}
-                    </p>
-                    {live.message && <p className="mt-1 text-sm text-muted-foreground">{live.message}</p>}
-                    <Button variant="destructive" className="mt-3 w-full" onClick={() => cancelMaintenance(live.id)}>
-                      Cancel window
-                    </Button>
-                  </div>
-                ) : (
-                  <Button variant="secondary" className="mt-4 w-full" onClick={() => setMaintenanceOpen(true)}>
-                    Schedule maintenance
-                  </Button>
-                );
-              })()}
-
-              {maintenanceWindows && maintenanceWindows.filter((w) => w.status === "ended" || w.status === "cancelled").length > 0 && (
-                <div className="mt-5 border-t border-border pt-4">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">History</p>
-                  <ul className="space-y-2.5">
-                    {maintenanceWindows
-                      .filter((w) => w.status === "ended" || w.status === "cancelled")
-                      .map((w) => (
-                        <li key={w.id} className="rounded-lg border border-border px-3 py-2.5 text-sm">
-                          <p className="text-foreground">
-                            {formatDateTime(w.startAt)} – {formatDateTime(w.endAt)}
-                          </p>
-                          {w.message && <p className="text-xs text-muted-foreground">{w.message}</p>}
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {w.status === "cancelled"
-                              ? `Cancelled by ${w.cancelledBy?.fullName ?? "—"}`
-                              : "Ended"}{" "}
-                            · Scheduled by {w.createdBy.fullName}
-                          </p>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       )}
@@ -428,6 +471,26 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
         submitting={schedulingMaintenance}
       />
 
+      <ManageModulesModal
+        open={manageModulesOpen}
+        onClose={() => setManageModulesOpen(false)}
+        activeByCode={activeByCode}
+        busyModule={busyModule}
+        onToggle={toggleModule}
+      />
+
+      {detail && (
+        <ChangePlanModal
+          open={changePlanOpen}
+          onClose={() => setChangePlanOpen(false)}
+          onApply={changePlan}
+          currentPlanId={detail.plan?.id ?? ""}
+          availablePlans={detail.availablePlans}
+          instituteName={detail.name}
+          submitting={savingPlan}
+        />
+      )}
+
       <ConfirmModal
         open={!!logoutTarget}
         onClose={() => setLogoutTarget(null)}
@@ -440,6 +503,153 @@ export default function PlatformInstituteDetailPage({ params }: PageProps) {
         description="Every session on this account is signed out immediately, on their next request. Their account and data are untouched — they can sign back in right away."
       />
     </div>
+  );
+}
+
+function MaintenanceIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.1 2.1-2-2z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ChangePlanIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M17 2.5l3 3-3 3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 5.5H9a5 5 0 00-5 5v.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 21.5l-3-3 3-3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 18.5h11a5 5 0 005-5V13" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Each toggle here still applies immediately, unlike ChangePlanModal's
+ * staged apply — a module flip is a single, independently reversible
+ * on/off switch, not a whole-plan swap that reprices several limits at
+ * once, so there's no batch of changes worth confirming together. */
+function ManageModulesModal({
+  open,
+  onClose,
+  activeByCode,
+  busyModule,
+  onToggle,
+}: {
+  open: boolean;
+  onClose: () => void;
+  activeByCode: Map<ModuleCode, boolean>;
+  busyModule: ModuleCode | null;
+  onToggle: (code: ModuleCode, isActive: boolean) => void;
+}) {
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Manage modules"
+      description="Toggling a module takes effect immediately for everyone at this institute."
+      width="sm"
+      footer={
+        <Button variant="secondary" onClick={onClose}>
+          Done
+        </Button>
+      }
+    >
+      <ul className="space-y-2">
+        {MODULE_CODES.map((code) => {
+          const isActive = activeByCode.get(code) ?? false;
+          return (
+            <li key={code} className="flex items-center justify-between rounded-xl border border-border px-3.5 py-2.5">
+              <span className="text-sm font-medium text-foreground">{MODULE_LABELS[code]}</span>
+              <Toggle
+                checked={isActive}
+                disabled={busyModule === code}
+                onChange={(next) => onToggle(code, next)}
+                label={MODULE_LABELS[code]}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </Modal>
+  );
+}
+
+/** Picking a plan is staged in this modal, applied only on an explicit
+ * "Apply plan" click — a plan copies its limits onto the institute the
+ * instant it's applied (see the Plan card's own note), so it shouldn't ever
+ * be a silent side effect of a dropdown selection alone. */
+function ChangePlanModal({
+  open,
+  onClose,
+  onApply,
+  currentPlanId,
+  availablePlans,
+  instituteName,
+  submitting,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onApply: (planId: string) => void;
+  currentPlanId: string;
+  availablePlans: { id: string; code: string; name: string; limits: RoleLimitValues }[];
+  instituteName: string;
+  submitting: boolean;
+}) {
+  const [selected, setSelected] = useState(currentPlanId);
+
+  useEffect(() => {
+    if (open) setSelected(currentPlanId);
+  }, [open, currentPlanId]);
+
+  const selectedPlan = availablePlans.find((p) => p.id === selected) ?? null;
+  const unchanged = selected === currentPlanId;
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={`Change plan for ${instituteName}`}
+      description="Choosing a plan copies its limits onto this institute the moment you apply it. Editing the plan itself later won't retroactively change this institute again."
+      width="sm"
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button onClick={() => onApply(selected)} disabled={submitting || unchanged}>
+            {submitting ? "Applying…" : "Apply plan"}
+          </Button>
+        </>
+      }
+    >
+      <Dropdown
+        label="Plan"
+        value={selected}
+        onChange={setSelected}
+        placeholder="No plan (unlimited)"
+        options={[
+          { value: "", label: "No plan (unlimited)" },
+          ...availablePlans.map((p) => ({ value: p.id, label: p.name })),
+        ]}
+      />
+
+      {selectedPlan && (
+        <ul className="mt-4 space-y-1.5 rounded-xl border border-border bg-muted/50 px-3.5 py-3">
+          {CAPPED_ROLES.map((role) => (
+            <li key={role} className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{CAPPED_ROLE_LABELS[role]}</span>
+              <span className="text-foreground">{selectedPlan.limits[role]}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="mt-3 text-xs text-muted-foreground">
+        Existing staff/students already over a lower new limit are not removed — the cap just stops new ones being
+        added until you&apos;re back under it.
+      </p>
+    </Modal>
   );
 }
 
@@ -701,35 +911,36 @@ function TeamList({
   members: PlatformInstituteDetail["admins"];
   onLogoutEverywhere: (member: { id: string; fullName: string }) => void;
 }) {
+  // No section at all when empty, rather than a heading over "None yet." —
+  // an institute with no accountants shouldn't have that fact take up space
+  // next to the roster that does exist.
+  if (members.length === 0) return null;
+
   return (
     <div>
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
-      {members.length === 0 ? (
-        <p className="text-sm text-muted-foreground">None yet.</p>
-      ) : (
-        <ul className="space-y-2">
-          {members.map((m) => (
-            <li key={m.id} className="flex items-center justify-between rounded-xl border border-border px-3.5 py-2.5 text-sm">
-              <div>
-                <p className="font-medium text-foreground">{m.fullName}</p>
-                <p className="text-xs text-muted-foreground">{m.email}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge tone={m.isActive ? "success" : "danger"}>{m.isActive ? "Active" : "Inactive"}</Badge>
-                {m.isActive && (
-                  <button
-                    type="button"
-                    onClick={() => onLogoutEverywhere({ id: m.id, fullName: m.fullName })}
-                    className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
-                  >
-                    Sign out everywhere
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="space-y-2">
+        {members.map((m) => (
+          <li key={m.id} className="flex items-center justify-between rounded-xl border border-border px-3.5 py-2.5 text-sm">
+            <div>
+              <p className="font-medium text-foreground">{m.fullName}</p>
+              <p className="text-xs text-muted-foreground">{m.email}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge tone={m.isActive ? "success" : "danger"}>{m.isActive ? "Active" : "Inactive"}</Badge>
+              {m.isActive && (
+                <button
+                  type="button"
+                  onClick={() => onLogoutEverywhere({ id: m.id, fullName: m.fullName })}
+                  className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
+                >
+                  Sign out everywhere
+                </button>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

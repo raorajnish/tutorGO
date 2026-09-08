@@ -8,6 +8,7 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { formatMoney } from "@/lib/money";
 import type { Course, FeeStructure, FeePlanType, Subject } from "@/lib/types";
 import { FEE_PLAN_TYPE_LABELS } from "@/lib/types";
@@ -138,8 +139,8 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
               ))}
               {!loading && structures.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    No fee structures yet — create the first one.
+                  <td colSpan={6}>
+                    <EmptyState message="No fee structures yet." actionLabel="New fee structure" onAction={openCreate} />
                   </td>
                 </tr>
               )}
@@ -182,7 +183,7 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
             </div>
           ))}
           {!loading && structures.length === 0 && (
-            <p className="px-4 py-8 text-center text-sm text-muted-foreground">No fee structures yet — create the first one.</p>
+            <EmptyState message="No fee structures yet." actionLabel="New fee structure" onAction={openCreate} />
           )}
         </div>
       </div>

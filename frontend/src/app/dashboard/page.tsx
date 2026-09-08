@@ -14,6 +14,7 @@ import { MODULE_LABELS, MODULE_CODES } from "@/lib/types";
 import { CreateInstituteModal } from "@/components/organization/CreateInstituteModal";
 import { ManageInstituteDrawer } from "@/components/organization/ManageInstituteDrawer";
 import { UpcomingLecturesWidget } from "@/components/attendance/UpcomingLecturesWidget";
+import { CreateOrganizationWizard } from "@/components/platform/CreateOrganizationWizard";
 
 const ICON_SHIELD = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -84,15 +85,28 @@ interface PlatformStats {
 
 function SuperAdminDashboard({ name }: { name: string }) {
   const [stats, setStats] = useState<PlatformStats | null>(null);
+  const [createOrgOpen, setCreateOrgOpen] = useState(false);
 
-  useEffect(() => {
+  function loadStats() {
     apiFetch<PlatformStats>("/platform/stats").then(setStats).catch(() => {});
-  }, []);
+  }
+
+  useEffect(loadStats, []);
 
   return (
     <div className="space-y-6">
-      <DateLabel />
-      <h1 className="font-display text-3xl font-bold text-foreground">Platform overview</h1>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <DateLabel />
+          <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Platform overview</h1>
+        </div>
+        <div className="flex gap-3">
+          <Link href="/platform/organizations">
+            <Button variant="secondary">Manage organizations</Button>
+          </Link>
+          <Button onClick={() => setCreateOrgOpen(true)}>New organization</Button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:col-span-2">
@@ -145,6 +159,16 @@ function SuperAdminDashboard({ name }: { name: string }) {
           />
         </div>
       </div>
+
+      <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground shadow-(--shadow-card)">
+        Set up the platform&apos;s outbound email in{" "}
+        <Link href="/platform/email-settings" className="font-medium text-primary underline underline-offset-2">
+          Email settings
+        </Link>{" "}
+        so owner and admin invites are delivered automatically instead of showing a temp password inline.
+      </div>
+
+      <CreateOrganizationWizard open={createOrgOpen} onClose={() => setCreateOrgOpen(false)} onCreated={loadStats} />
     </div>
   );
 }

@@ -188,17 +188,16 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     section: "Platform",
     items: [
-      { label: "Overview", href: "/platform", icon: "platform", roles: ["SUPERADMIN"] },
-      { label: "Health", href: "/platform/health", icon: "health", roles: ["SUPERADMIN"] },
       { label: "Organizations", href: "/platform/organizations", icon: "organizations", roles: ["SUPERADMIN"] },
       { label: "Institutes", href: "/platform/institutes", icon: "institutes", roles: ["SUPERADMIN"] },
       { label: "Plans", href: "/platform/plans", icon: "plans", roles: ["SUPERADMIN"] },
       { label: "Subscriptions", href: "/platform/subscriptions", icon: "subscriptions", roles: ["SUPERADMIN"] },
-      { label: "Email settings", href: "/platform/email-settings", icon: "mail", roles: ["SUPERADMIN"] },
       { label: "Support", href: "/platform/support", icon: "support", roles: ["SUPERADMIN"] },
       { label: "Maintenance", href: "/platform/maintenance", icon: "maintenance", roles: ["SUPERADMIN"] },
+      { label: "Health", href: "/platform/health", icon: "health", roles: ["SUPERADMIN"] },
       { label: "Audit log", href: "/platform/audit-log", icon: "auditLog", roles: ["SUPERADMIN"] },
       { label: "Users", href: "/platform/users", icon: "users", roles: ["SUPERADMIN"] },
+      { label: "Email settings", href: "/platform/email-settings", icon: "mail", roles: ["SUPERADMIN"] },
     ],
   },
 ];

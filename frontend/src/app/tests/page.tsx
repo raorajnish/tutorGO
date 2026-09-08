@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { ScheduleTestModal } from "@/components/tests/ScheduleTestModal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { TestListItem } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 
@@ -97,8 +98,8 @@ export default function TestsPage() {
               ))}
               {tests && tests.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                    No tests scheduled yet.
+                  <td colSpan={6}>
+                    <EmptyState message="No tests scheduled yet." actionLabel="Schedule test" onAction={() => setScheduleOpen(true)} />
                   </td>
                 </tr>
               )}
@@ -128,7 +129,7 @@ export default function TestsPage() {
             </button>
           ))}
           {tests && tests.length === 0 && (
-            <p className="p-8 text-center text-sm text-muted-foreground">No tests scheduled yet.</p>
+            <EmptyState message="No tests scheduled yet." actionLabel="Schedule test" onAction={() => setScheduleOpen(true)} />
           )}
         </div>
       </div>

@@ -10,6 +10,7 @@ import { Modal } from "@/components/ui/Modal";
 import { StatCard } from "@/components/ui/StatCard";
 import { DistributionRosterModal } from "@/components/distribution/DistributionRosterModal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { Course, DistributionItem } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 
@@ -129,8 +130,8 @@ export default function DistributionPage() {
               ))}
               {!loading && items.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                    No distribution items yet — create the first one.
+                  <td colSpan={5}>
+                    <EmptyState message="No distribution items yet." actionLabel="Add item" onAction={() => setAddOpen(true)} />
                   </td>
                 </tr>
               )}
@@ -162,7 +163,7 @@ export default function DistributionPage() {
             </button>
           ))}
           {!loading && items.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">No distribution items yet.</p>
+            <EmptyState message="No distribution items yet." actionLabel="Add item" onAction={() => setAddOpen(true)} />
           )}
         </div>
       </div>

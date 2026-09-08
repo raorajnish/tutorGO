@@ -8,8 +8,8 @@ import { Logo } from "@/components/marketing/Logo";
 
 const NAV_LINKS = [
   { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#roles", label: "Roles" },
+  { href: "#modules", label: "Modules" },
+  { href: "#portal", label: "Student portal" },
   { href: "#security", label: "Security" },
   { href: "#faq", label: "FAQ" },
 ];

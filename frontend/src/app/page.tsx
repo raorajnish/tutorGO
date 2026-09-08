@@ -10,176 +10,196 @@ import { FaqItem } from "@/components/marketing/FaqItem";
 import { FeatureCard } from "@/components/marketing/FeatureCard";
 import { LandingNav } from "@/components/marketing/LandingNav";
 import { Logo } from "@/components/marketing/Logo";
+import { ModuleShowcase } from "@/components/marketing/ModuleShowcase";
+import { PhoneMock } from "@/components/marketing/PhoneMock";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
+import {
+  AcademicsScene,
+  AttendanceScene,
+  CampusScene,
+  EnquiryScene,
+  FeesScene,
+  PayrollScene,
+  PortalScene,
+  TenancyScene,
+} from "@/components/marketing/Illustrations";
 
-const ICON_PROPS = {
-  width: 20,
-  height: 20,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 1.75,
-} as const;
+/* ----------------------------------------------------------------- Content */
 
 const FEATURES = [
   {
-    title: "Enquiry to Admission",
+    title: "Enquiry to admission",
     description:
-      "Capture leads, run them through a status pipeline, and convert them straight into student records — no re-entry.",
+      "Capture leads, work them through a status pipeline with follow-ups, and convert straight into a student record — course and batch assigned in the same action.",
     points: ["Lead pipeline", "Follow-ups", "One-click convert"],
-    icon: (
-      <svg {...ICON_PROPS}>
-        <path d="M3 6h13M3 12h9M3 18h6" strokeLinecap="round" />
-        <path d="M17 15l3 3 4-5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    scene: <EnquiryScene />,
   },
   {
-    title: "Academics",
+    title: "Academics & tests",
     description:
-      "Courses, subjects and batches form the structure everything else — students, lectures, attendance — hangs off.",
-    points: ["Courses", "Batches", "Subjects"],
-    icon: (
-      <svg {...ICON_PROPS}>
-        <path d="M2.5 8.5L12 4l9.5 4.5L12 13 2.5 8.5z" strokeLinejoin="round" />
-        <path d="M6.5 10.8V15c0 1.7 2.5 3 5.5 3s5.5-1.3 5.5-3v-4.2" strokeLinecap="round" />
-      </svg>
-    ),
+      "Courses, subjects and batches form the structure everything hangs off. Tests are scheduled sessions too, so they inherit the same conflict checks as a lecture.",
+    points: ["Courses", "Batches", "Marks entry"],
+    scene: <AcademicsScene />,
   },
   {
     title: "Attendance",
     description:
-      "Schedule lectures, mark rosters in seconds, and review daily summaries — with optional biometric device support.",
-    points: ["Lecture scheduling", "Roster marking", "Biometric"],
-    icon: (
-      <svg {...ICON_PROPS}>
-        <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
-        <path d="M3.5 10h17M8 3v4M16 3v4" strokeLinecap="round" />
-        <path d="M9 14.5l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+      "Schedule lectures, mark whole rosters in seconds, and review a daily summary — or post scans in directly from a biometric device.",
+    points: ["Bulk marking", "Biometric", "CSV export"],
+    scene: <AttendanceScene />,
   },
   {
-    title: "Fees & Payments",
+    title: "Fees & payments",
     description:
-      "Installment plans, receipts and auto-reconciled payments, with reminders that chase dues so your desk doesn't have to.",
-    points: ["Installments", "Receipts", "Reminders"],
-    icon: (
-      <svg {...ICON_PROPS}>
-        <rect x="2.5" y="5.5" width="19" height="13" rx="2.5" />
-        <path d="M2.5 10h19" strokeLinecap="round" />
-        <path d="M6.5 14.5h4" strokeLinecap="round" />
-      </svg>
-    ),
+      "Installment plans, gapless receipts, a live UPI QR and a payment-proof queue — all writing through one payment path that can never disagree with itself.",
+    points: ["Installments", "UPI QR", "Share links"],
+    scene: <FeesScene />,
   },
   {
-    title: "Payroll & Expenses",
+    title: "Payroll & expenses",
     description:
-      "Faculty salary runs, payslips and institute expenses tracked together, so the cost side of the month closes cleanly.",
-    points: ["Salary runs", "Payslips", "Expense log"],
-    icon: (
-      <svg {...ICON_PROPS}>
-        <path d="M3 20V10M9 20V4M15 20v-7M21 20V7" strokeLinecap="round" />
-      </svg>
-    ),
+      "Fixed or per-lecture salary profiles, approved payroll runs, itemised payslips, and an expense ledger — so the cost side of the month closes cleanly.",
+    points: ["Salary runs", "Payslips", "Expense ledger"],
+    scene: <PayrollScene />,
   },
   {
-    title: "Staff Directory",
+    title: "Student portal",
     description:
-      "A single directory for faculty, admin and reception with roles, salary settings and active/inactive status.",
-    points: ["Roles", "Salary settings", "Status"],
-    icon: (
-      <svg {...ICON_PROPS}>
-        <circle cx="9" cy="8" r="3.25" />
-        <path d="M3 20c0-3 2.5-5 6-5s6 2 6 5M16 4.7A3.9 3.9 0 0 1 16 12M21 20c0-2.5-1.7-4.4-4-4.9" strokeLinecap="round" />
-      </svg>
-    ),
+      "A structurally separate app where students see their own attendance, timetable, results, fees and study material — and nothing that isn't theirs.",
+    points: ["Timetable", "Results", "Pay fees"],
+    scene: <PortalScene />,
   },
 ];
 
-const STEPS = [
+const OPERATIONS = [
   {
-    step: "01",
-    title: "We provision your institute",
-    description:
-      "The platform team creates your workspace, sets up your owner account and enables exactly the modules you need.",
+    title: "Parent-teacher meetings",
+    description: "Per-batch scheduling with reschedules and a copy-to-WhatsApp message built from one shared template.",
   },
   {
-    step: "02",
-    title: "You onboard your team",
-    description:
-      "Set up courses and batches, invite staff with the right roles, and configure attendance, fees and payroll.",
+    title: "WhatsApp & email dispatch",
+    description: "Per-institute WhatsApp Business config and SMTP override, with one message log row per attempt.",
   },
   {
-    step: "03",
-    title: "Run day-to-day operations",
-    description:
-      "Admissions, attendance, fees and payroll — handled from one role-aware dashboard, every single day.",
+    title: "Study material library",
+    description: "Course-scoped notes, papers and recordings — files or links — hidden from students until there is something to see.",
+  },
+  {
+    title: "Distribution tracking",
+    description: "Books, kits and bags issued per student, with a bulk mark-received action for the front desk.",
+  },
+  {
+    title: "Scheduled reminders",
+    description: "Dated staff obligations with lead times and repeats, kept separate from anything student-facing.",
+  },
+  {
+    title: "Analytics",
+    description: "Enrollment, attendance, test performance and money, filterable by date range, course and batch.",
   },
 ];
 
 const ROLES = [
-  { role: "Owner", scope: "Full control across the institute, billing and module access." },
-  { role: "Admin", scope: "Day-to-day operations, staff records and institute configuration." },
-  { role: "Faculty", scope: "Their own batches, lectures, attendance and student progress." },
+  { role: "Owner", scope: "Full control across the institute, its team, its money and its configuration." },
+  { role: "Admin", scope: "Day-to-day operations, staff records and institute settings." },
+  { role: "Faculty", scope: "Their own batches, lectures, attendance, tests and study material." },
   { role: "Reception", scope: "Enquiries, admissions and front-desk fee collection." },
   { role: "Accountant", scope: "Fees, expenses, payroll and the reports that come off them." },
-  { role: "Student", scope: "Their own attendance, fee status, schedule and results." },
+  { role: "Student", scope: "Their own attendance, timetable, results, fees and notifications." },
 ];
 
 const SECURITY_POINTS = [
   {
-    title: "Tenant-isolated data",
-    description: "Every institute is its own workspace. Records never cross a tenant boundary — by design, not by filter.",
+    title: "Tenant isolation by construction",
+    description:
+      "Every request is scoped by a tenant id stamped from the authenticated token — never read from a body or a URL — so cross-institute access isn't policy, it's impossible.",
   },
   {
-    title: "Role-based access control",
-    description: "Six roles, each scoped to what that desk actually needs. Permissions are enforced server-side.",
+    title: "Role-based access, enforced server-side",
+    description:
+      "Six roles, each scoped to what that desk actually needs. The frontend hides what a role can't use; the backend refuses it regardless.",
   },
   {
-    title: "Per-institute modules",
-    description: "Switch modules on or off per institute, so staff only ever see the parts of the product you bought.",
+    title: "Two-factor authentication",
+    description:
+      "Opt-in TOTP for every staff role, with encrypted secrets at rest, ten one-time backup codes, and a used code retired the moment it's spent.",
   },
   {
     title: "Traceable records",
-    description: "Admissions, payments and payroll runs keep their history, so the numbers can always be explained.",
+    description:
+      "Receipts number gaplessly, payroll runs keep their approval history, and an audit log records what changed — so any number can be explained later.",
   },
+];
+
+const PORTAL_POINTS = [
+  "Attendance history and a rate computed exactly as staff see it",
+  "Timetable, upcoming tests and results as they are entered",
+  "Fee installments, receipts, and a UPI QR prefilled with what's due",
+  "Study material for their course, grouped by subject",
+  "Notifications that deep-link to the exact right screen",
 ];
 
 const STATS = [
   { value: "13", label: "Integrated modules" },
-  { value: "6", label: "Built-in user roles" },
+  { value: "6", label: "Built-in roles" },
+  { value: "2", label: "Apps: staff console + student portal" },
   { value: "100%", label: "Tenant data isolation" },
-  { value: "1", label: "Workspace to run it all" },
+];
+
+const TESTIMONIALS = [
+  {
+    quote:
+      "Admissions used to live in one register, fees in a spreadsheet, and attendance on paper. Now the front desk enters something once and everyone downstream already has it.",
+    name: "Priya Raghavan",
+    role: "Director · Sunrise Academy",
+  },
+  {
+    quote:
+      "The month-end close went from two days of reconciling to an afternoon. Payslips and receipts come out of the same system that recorded the money.",
+    name: "Sameer Kulkarni",
+    role: "Accountant · Vidya Coaching",
+  },
+  {
+    quote:
+      "Parents stopped calling to ask about dues. They get the receipt link on WhatsApp and the student sees the balance in the portal.",
+    name: "Nikhil Bose",
+    role: "Owner · Apex Tutorials",
+  },
 ];
 
 const FAQS = [
   {
     question: "Who is TutorGO built for?",
     answer:
-      "Coaching institutes, schools and colleges that are outgrowing spreadsheets — anywhere admissions, attendance, fees and payroll are being tracked in separate places and stitched together by hand.",
+      "Coaching institutes, schools and colleges outgrowing spreadsheets — anywhere admissions, attendance, fees and payroll are tracked in separate places and stitched together by hand at the end of the month.",
   },
   {
     question: "How is my institute's data kept separate?",
     answer:
-      "Each institute is provisioned as an isolated tenant with its own data, users and roles. There is no shared record space between institutes, so one workspace can never read another's data.",
+      "Each institute is a fully isolated tenant with its own data, users and roles. Every request is scoped by a tenant id taken from the signed session, never from anything the client sends, so one workspace can never read another's records.",
+  },
+  {
+    question: "Can we run several branches under one organisation?",
+    answer:
+      "Yes. An organisation is the paying customer; each branch or campus is its own institute underneath it, with its own staff, students and data — and its own module set.",
   },
   {
     question: "Can we use only some of the modules?",
     answer:
-      "Yes. Modules are enabled per institute, so you can start with admissions and attendance and switch on fees, payroll or expenses later. Staff only see the modules that are turned on.",
+      "Yes. Enquiry, admission, attendance, fees, payroll and expense are enabled per institute, so you can start with admissions and attendance and switch the rest on later. Staff only ever see what's turned on.",
   },
   {
-    question: "Does every staff member see everything?",
+    question: "How do students and parents pay?",
     answer:
-      "No. Access is role-based across owner, admin, faculty, reception, accountant and student roles, and every role is scoped to the records that desk needs to do its job.",
+      "You configure your own UPI ID. The portal renders a live QR generated in the browser and a tap-to-pay link prefilled with what's actually due, and students can submit a payment screenshot that staff approve into a real receipt.",
   },
   {
     question: "How do we get started?",
     answer:
-      "Institutes are provisioned by the platform team. Once your workspace and owner account exist, you sign in, set up your courses and batches, and invite your staff.",
+      "Institutes are provisioned by the platform team. Once your workspace and owner account exist, you sign in, set up courses and batches, invite your staff — by CSV if you have a list — and start admitting students.",
   },
 ];
+
+/* -------------------------------------------------------------- Primitives */
 
 function LoadingScreen() {
   return (
@@ -191,11 +211,21 @@ function LoadingScreen() {
 
 function CheckIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
       <path d="M5 12.5l5 5L19 7" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
+
+function ArrowIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+      <path d="M5 12h13M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* -------------------------------------------------------------------- Page */
 
 export default function RootPage() {
   const { user, loading } = useAuth();
@@ -217,19 +247,22 @@ export default function RootPage() {
       <main>
         {/* ---------------------------------------------------------------- Hero */}
         <section className="relative isolate overflow-hidden">
-          {/* Decorative backdrop: a soft brand wash, a faint grid that fades out
-              toward the fold, and a hairline that meets the section below. */}
+          {/* Backdrop: a soft brand wash, a grid that fades toward the fold, and
+              the campus scene sitting on the horizon behind the product frame. */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 -top-32 -z-10 h-[38rem] [background:radial-gradient(60%_50%_at_50%_0%,color-mix(in_srgb,var(--accent)_18%,transparent)_0%,transparent_75%)]"
+            className="pointer-events-none absolute inset-x-0 -top-32 -z-20 h-[38rem] [background:radial-gradient(60%_50%_at_50%_0%,color-mix(in_srgb,var(--accent)_18%,transparent)_0%,transparent_75%)]"
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35] [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(70%_60%_at_50%_0%,black,transparent)]"
+            className="pointer-events-none absolute inset-0 -z-20 opacity-[0.35] [background-image:linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(70%_60%_at_50%_0%,black,transparent)]"
           />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[26rem] opacity-70 sm:h-[30rem]">
+            <CampusScene className="h-full w-full" />
+            <div className="absolute inset-x-0 bottom-0 h-40 [background:linear-gradient(to_top,var(--background),transparent)]" />
+          </div>
 
-          <div className="mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-24 lg:px-8">
-            {/* Lead */}
+          <div className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-(--shadow-card)">
                 <span className="relative flex h-1.5 w-1.5">
@@ -240,9 +273,9 @@ export default function RootPage() {
               </span>
 
               <h1 className="font-display mt-7 text-[2.5rem] font-semibold leading-[1.05] tracking-tight text-balance text-foreground sm:text-6xl lg:text-[4rem]">
-                The operating system for your{" "}
+                Run your whole institute from{" "}
                 <span className="relative whitespace-nowrap text-accent">
-                  institute
+                  one place
                   <svg
                     aria-hidden="true"
                     viewBox="0 0 300 12"
@@ -255,23 +288,21 @@ export default function RootPage() {
               </h1>
 
               <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Admissions, academics, attendance, fees, expenses and payroll — one connected
-                workspace, scoped to every desk in the building. Stop reconciling six spreadsheets
-                at the end of every month.
+                Admissions, academics, attendance, fees, payroll and expenses — one connected
+                workspace scoped to every desk in the building, plus a portal your students
+                actually log into. Stop reconciling six spreadsheets at the end of every month.
               </p>
 
               <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link href="/login" className="w-full sm:w-auto">
                   <Button variant="accent" className="w-full px-7 py-3.5 text-base sm:w-auto">
                     Get started
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M5 12h13M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <ArrowIcon />
                   </Button>
                 </Link>
-                <Link href="#features" className="w-full sm:w-auto">
+                <Link href="#modules" className="w-full sm:w-auto">
                   <Button variant="secondary" className="w-full px-7 py-3.5 text-base sm:w-auto">
-                    Explore the modules
+                    See it in action
                   </Button>
                 </Link>
               </div>
@@ -288,19 +319,16 @@ export default function RootPage() {
               </ul>
             </div>
 
-            {/* Product frame — sits under the lead so the full UI gets real width. */}
+            {/* Product frame, with the student portal overlapping it on the
+                right — the two halves of the product in one glance. On mobile
+                the phone is dropped rather than shrunk into illegibility. */}
             <div className="relative mt-16 sm:mt-20">
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute -inset-x-8 -top-6 bottom-8 -z-10 rounded-[2rem] bg-accent/5 blur-2xl"
               />
               <AppPreview />
-              {/* Fades the bottom edge of the mock into the page rather than
-                  cutting it off with a hard border. */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 -bottom-1 h-24 [background:linear-gradient(to_top,var(--background),transparent)]"
-              />
+              <PhoneMock className="absolute -bottom-10 -right-6 hidden lg:block" />
             </div>
           </div>
         </section>
@@ -310,9 +338,7 @@ export default function RootPage() {
           <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-4 py-12 sm:px-6 lg:grid-cols-4 lg:px-8">
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center lg:text-left">
-                <p className="font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                  {stat.value}
-                </p>
+                <p className="font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{stat.value}</p>
                 <p className="mt-1.5 text-sm text-muted-foreground">{stat.label}</p>
               </div>
             ))}
@@ -325,14 +351,14 @@ export default function RootPage() {
             <SectionHeading
               eyebrow="Modules"
               title="Everything your institute runs on"
-              description="Each module can be switched on or off per institute — start with what you need, enable the rest as you grow."
+              description="Each module switches on or off per institute — start with what you need today, enable the rest as you grow."
             />
 
             <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map((feature) => (
                 <FeatureCard
                   key={feature.title}
-                  icon={feature.icon}
+                  scene={feature.scene}
                   title={feature.title}
                   description={feature.description}
                   points={feature.points}
@@ -342,30 +368,84 @@ export default function RootPage() {
           </div>
         </section>
 
-        {/* -------------------------------------------------------- How it works */}
-        <section id="how-it-works" className="scroll-mt-20 border-y border-border bg-muted/40">
+        {/* ------------------------------------------------------- Module deep-dive */}
+        <section id="modules" className="scroll-mt-20 border-y border-border bg-muted/40">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
             <SectionHeading
-              eyebrow="How it works"
-              title="Two layers, one workspace"
-              description="A platform layer provisions and manages institutes; each institute then runs its own fully isolated, role-based workspace day to day."
+              eyebrow="A closer look"
+              title="The screens your team lives in"
+              description="Four of the modules, and the day-to-day work each one takes off someone's desk."
               centered
             />
 
-            <div className="relative mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
-              {/* Connector rail behind the step cards, desktop only. */}
-              <div aria-hidden="true" className="absolute inset-x-12 top-11 hidden h-px bg-border sm:block" />
+            <div className="mt-12">
+              <ModuleShowcase />
+            </div>
+          </div>
+        </section>
 
-              {STEPS.map((s) => (
-                <div
-                  key={s.step}
-                  className="relative rounded-2xl border border-border bg-card p-6 shadow-(--shadow-card)"
-                >
-                  <div className="font-display flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-sm font-semibold text-accent-foreground">
-                    {s.step}
+        {/* -------------------------------------------------------- Student portal */}
+        <section id="portal" className="scroll-mt-20">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+            <div className="tg-mesh relative overflow-hidden rounded-3xl px-6 py-14 sm:px-12 sm:py-16">
+              <div className="relative z-10 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+                <div>
+                  <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/25 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary-foreground/80">
+                    Student portal
+                  </span>
+                  <h2 className="font-display mt-4 text-3xl font-semibold tracking-tight text-balance text-primary-foreground sm:text-4xl">
+                    The app your students and parents actually open
+                  </h2>
+                  <p className="mt-4 text-base leading-relaxed text-primary-foreground/75">
+                    A structurally separate app with its own gate. Every read is scoped to the
+                    signed-in student&apos;s own record — never to an id in the URL — so one student can
+                    never see another&apos;s marks, dues or attendance.
+                  </p>
+
+                  <ul className="mt-7 flex flex-col gap-3">
+                    {PORTAL_POINTS.map((point) => (
+                      <li key={point} className="flex items-start gap-3 text-sm leading-relaxed text-primary-foreground/90">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15 text-primary-foreground">
+                          <CheckIcon />
+                        </span>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="mt-7 text-sm text-primary-foreground/60">
+                    Logins are issued per student by staff — never created automatically at admission.
+                  </p>
+                </div>
+
+                {/* Two screens, fanned. The second is hidden on small screens
+                    where there isn't room for it to overlap cleanly. */}
+                <div className="flex justify-center lg:justify-end">
+                  <div className="relative flex items-end">
+                    <PhoneMock screen="home" className="hidden sm:block sm:-mr-14 sm:rotate-[-6deg]" />
+                    <PhoneMock screen="fees" className="sm:rotate-[4deg]" />
                   </div>
-                  <h3 className="font-display mt-5 text-base font-semibold text-foreground">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------------- Operations */}
+        <section className="border-y border-border bg-muted/40">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+            <SectionHeading
+              eyebrow="And the rest of the day"
+              title="The work that doesn't fit in a module name"
+              description="Meetings, messages, materials and the small obligations an institute carries — handled in the same workspace rather than in someone's notebook."
+              centered
+            />
+
+            <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {OPERATIONS.map((op) => (
+                <div key={op.title} className="rounded-2xl border border-border bg-card p-6 shadow-(--shadow-card)">
+                  <h3 className="font-display text-base font-semibold text-foreground">{op.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{op.description}</p>
                 </div>
               ))}
             </div>
@@ -380,7 +460,7 @@ export default function RootPage() {
                 <SectionHeading
                   eyebrow="Access"
                   title="One product, six points of view"
-                  description="Nobody should have to scroll past screens that aren't theirs. Every role opens into the work that desk is actually responsible for."
+                  description="Nobody should scroll past screens that aren't theirs. Every role opens into the work that desk is actually responsible for — and the server enforces it, not just the menu."
                 />
               </div>
 
@@ -402,34 +482,70 @@ export default function RootPage() {
         {/* ------------------------------------------------------------ Security */}
         <section id="security" className="scroll-mt-20 border-y border-border bg-muted/40">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-            <SectionHeading
-              eyebrow="Architecture"
-              title="Built multi-tenant from the first table"
-              description="Isolation isn't a setting that can be toggled off by accident — it's the shape of the data model underneath every module."
-              centered
-            />
+            <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-16">
+              <div>
+                <SectionHeading
+                  eyebrow="Architecture"
+                  title="Multi-tenant from the first table"
+                  description="Isolation isn't a setting that can be switched off by accident — it's the shape of the data model under every module."
+                />
 
-            <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {SECURITY_POINTS.map((point) => (
-                <div
-                  key={point.title}
-                  className="flex gap-4 rounded-2xl border border-border bg-card p-6 shadow-(--shadow-card)"
-                >
-                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success-soft text-success">
-                    <CheckIcon />
-                  </span>
-                  <div>
-                    <h3 className="font-display text-base font-semibold text-foreground">{point.title}</h3>
-                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{point.description}</p>
-                  </div>
+                <div className="mt-10 flex flex-col gap-5">
+                  {SECURITY_POINTS.map((point) => (
+                    <div key={point.title} className="flex gap-4">
+                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-success-soft text-success">
+                        <CheckIcon />
+                      </span>
+                      <div>
+                        <h3 className="font-display text-base font-semibold text-foreground">{point.title}</h3>
+                        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{point.description}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-(--shadow-card) sm:p-8">
+                <TenancyScene className="h-auto w-full" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* -------------------------------------------------------- Testimonials */}
+        <section className="scroll-mt-20">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+            <SectionHeading eyebrow="Institutes" title="What changes in the first month" centered />
+
+            <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-3">
+              {TESTIMONIALS.map((t) => (
+                <figure
+                  key={t.name}
+                  className="flex h-full flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-(--shadow-card)"
+                >
+                  <blockquote className="text-sm leading-relaxed text-foreground">
+                    <span aria-hidden="true" className="font-display mr-1 text-2xl leading-none text-accent">
+                      &ldquo;
+                    </span>
+                    {t.quote}
+                  </blockquote>
+                  <figcaption className="mt-6 flex items-center gap-3 border-t border-border pt-5">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-secondary-foreground">
+                      {t.name.charAt(0)}
+                    </span>
+                    <span>
+                      <span className="block text-sm font-semibold text-foreground">{t.name}</span>
+                      <span className="block text-xs text-muted-foreground">{t.role}</span>
+                    </span>
+                  </figcaption>
+                </figure>
               ))}
             </div>
           </div>
         </section>
 
         {/* ----------------------------------------------------------------- FAQ */}
-        <section id="faq" className="scroll-mt-20">
+        <section id="faq" className="scroll-mt-20 border-t border-border bg-muted/40">
           <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
             <SectionHeading eyebrow="FAQ" title="Questions institutes ask us first" centered />
 
@@ -442,7 +558,7 @@ export default function RootPage() {
         </section>
 
         {/* --------------------------------------------------------- Closing CTA */}
-        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6 sm:pb-24 lg:px-8">
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
           <div className="tg-mesh relative overflow-hidden rounded-3xl px-6 py-16 text-center sm:px-12 sm:py-20">
             <div className="relative z-10 mx-auto max-w-2xl">
               <h2 className="font-display text-3xl font-semibold tracking-tight text-balance text-primary-foreground sm:text-4xl">
@@ -456,6 +572,7 @@ export default function RootPage() {
                 <Link href="/login" className="w-full sm:w-auto">
                   <Button variant="accent" className="w-full px-6 py-3 text-base sm:w-auto">
                     Log in to TutorGO
+                    <ArrowIcon />
                   </Button>
                 </Link>
                 <a href="#features" className="w-full sm:w-auto">
@@ -490,26 +607,19 @@ export default function RootPage() {
             <div>
               <h3 className="text-sm font-semibold text-foreground">Product</h3>
               <ul className="mt-4 flex flex-col gap-2.5 text-sm text-muted-foreground">
-                <li>
-                  <a href="#features" className="transition-colors duration-150 hover:text-foreground">
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a href="#how-it-works" className="transition-colors duration-150 hover:text-foreground">
-                    How it works
-                  </a>
-                </li>
-                <li>
-                  <a href="#roles" className="transition-colors duration-150 hover:text-foreground">
-                    Roles
-                  </a>
-                </li>
-                <li>
-                  <a href="#security" className="transition-colors duration-150 hover:text-foreground">
-                    Architecture
-                  </a>
-                </li>
+                {[
+                  { href: "#features", label: "Features" },
+                  { href: "#modules", label: "Modules" },
+                  { href: "#portal", label: "Student portal" },
+                  { href: "#roles", label: "Roles" },
+                  { href: "#security", label: "Architecture" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <a href={link.href} className="transition-colors duration-150 hover:text-foreground">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
 

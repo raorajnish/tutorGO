@@ -9,6 +9,7 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDate } from "@/lib/format";
 import type { Course, StudyResource, StudyResourceUploadResult, Subject } from "@/lib/types";
 
@@ -170,8 +171,12 @@ export default function StudyMaterialPage() {
             ))}
             {resources && resources.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                  No study material yet. Add a PDF or a link to get started.
+                <td colSpan={5}>
+                  <EmptyState
+                    message="No study material yet — add a PDF or a link to get started."
+                    actionLabel="Add material"
+                    onAction={() => setAddOpen(true)}
+                  />
                 </td>
               </tr>
             )}
@@ -204,9 +209,13 @@ export default function StudyMaterialPage() {
           </div>
         ))}
         {resources && resources.length === 0 && (
-          <p className="rounded-xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
-            No study material yet.
-          </p>
+          <div className="rounded-xl border border-dashed border-border">
+            <EmptyState
+              message="No study material yet — add a PDF or a link to get started."
+              actionLabel="Add material"
+              onAction={() => setAddOpen(true)}
+            />
+          </div>
         )}
       </div>
 

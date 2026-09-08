@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -10,6 +10,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { AdmitModal } from "@/components/admissions/AdmitModal";
 import { SelfFillTab } from "@/components/admissions/SelfFillTab";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { ImportButton } from "@/components/ui/ImportButton";
 import { ImportModal } from "@/components/ui/ImportModal";
 import { ENQUIRY_SOURCE_LABELS, type Course, type Enquiry, type StudentListItem } from "@/lib/types";
@@ -44,6 +45,7 @@ export default function AdmissionsPage() {
 
 function AdmissionsContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [tab, setTab] = useState<"pipeline" | "admitted" | "selfFill">("admitted");
   const [pipeline, setPipeline] = useState<Enquiry[]>([]);
@@ -215,8 +217,8 @@ function AdmissionsContent() {
                   ))}
                   {!loading && pipeline.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                        No open enquiries. <Link href="/enquiries" className="text-primary underline underline-offset-2">Capture one</Link>.
+                      <td colSpan={5}>
+                        <EmptyState message="No open enquiries." actionLabel="Capture enquiry" onAction={() => router.push("/enquiries")} />
                       </td>
                     </tr>
                   )}
@@ -244,7 +246,7 @@ function AdmissionsContent() {
                 </div>
               ))}
               {!loading && pipeline.length === 0 && (
-                <p className="p-6 text-center text-sm text-muted-foreground">No open enquiries.</p>
+                <EmptyState message="No open enquiries." actionLabel="Capture enquiry" onAction={() => router.push("/enquiries")} />
               )}
             </div>
           </>
@@ -285,8 +287,8 @@ function AdmissionsContent() {
                   ))}
                   {!loading && admitted.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                        No students admitted yet.
+                      <td colSpan={5}>
+                        <EmptyState message="No students admitted yet." actionLabel="Admit directly" onAction={openAdmitDirect} />
                       </td>
                     </tr>
                   )}
@@ -311,7 +313,7 @@ function AdmissionsContent() {
                 </div>
               ))}
               {!loading && admitted.length === 0 && (
-                <p className="p-6 text-center text-sm text-muted-foreground">No students admitted yet.</p>
+                <EmptyState message="No students admitted yet." actionLabel="Admit directly" onAction={openAdmitDirect} />
               )}
             </div>
           </>
