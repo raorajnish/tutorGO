@@ -17,6 +17,8 @@ interface ConfirmModalProps {
   /// standard destructive-action warning; override for a confirm that's
   /// reversible (e.g. changing a plan back) rather than a real delete.
   note?: string;
+  /// Removes the header/footer dividers — for confirmations with no body content.
+  noDividers?: boolean;
 }
 
 export function ConfirmModal({
@@ -29,6 +31,7 @@ export function ConfirmModal({
   cancelLabel = "Cancel",
   destructive = true,
   note = "This action can't be undone.",
+  noDividers = false,
 }: ConfirmModalProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +56,7 @@ export function ConfirmModal({
       title={title}
       description={description}
       width="sm"
+      noDividers={noDividers}
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={submitting}>

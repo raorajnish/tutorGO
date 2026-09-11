@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 
@@ -66,27 +67,12 @@ export default function ProfilePage() {
 function SignOutEverywhereCard() {
   const { logout } = useAuth();
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-  async function handleClick() {
-    if (
-      !window.confirm(
-        "Sign out of all devices? This immediately signs out every session on this account, including this one — you'll need to log in again here too."
-      )
-    ) {
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      await apiFetch("/auth/logout-everywhere", { method: "POST" });
-      logout();
-      router.replace("/login");
-    } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "Could not sign out other sessions.");
-      setBusy(false);
-    }
+  async function handleSignOut() {
+    await apiFetch("/auth/logout-everywhere", { method: "POST" });
+    logout();
+    router.replace("/login");
   }
 
   return (
@@ -96,13 +82,20 @@ function SignOutEverywhereCard() {
           <p className="text-sm font-medium text-foreground">Sessions</p>
           <p className="mt-0.5 text-xs text-muted-foreground">Signed in somewhere you don&apos;t recognise? Sign out everywhere at once.</p>
         </div>
-        <Button variant="secondary" onClick={handleClick} disabled={busy}>
-          {busy ? "Signing out…" : "Sign out of all devices"}
+        <Button variant="secondary" onClick={() => setConfirmOpen(true)}>
+          Sign out of all devices
         </Button>
       </div>
-      {error && (
-        <div className="mt-3 rounded-lg border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>
-      )}
+      <ConfirmModal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleSignOut}
+        title="Sign out of all devices?"
+        description="This immediately signs out every session on this account, including this one — you'll need to log in again here too."
+        confirmLabel="Sign out everywhere"
+        note=""
+        noDividers
+      />
     </div>
   );
 }
@@ -238,8 +231,8 @@ function ChangePasswordCard() {
 
 type MfaStep = "idle" | "scan" | "confirm" | "backupCodes" | "disable";
 
-/** changes-phase12.md §12.6 — opt-in for every staff role (this card only
- * renders at all when user.mfaEligible). Four states in one card rather than
+/** changes-phase12.md §12.6 — opt-in for every eligible role (all staff plus
+ * SUPERADMIN, excluding STUDENT). Four states in one card rather than
  * separate pages: idle → scan (QR + manual secret) → confirm (6-digit code)
  * → backupCodes (shown once), or idle → disable (current password). */
 function TwoFactorCard({ enabled: initiallyEnabled }: { enabled: boolean }) {

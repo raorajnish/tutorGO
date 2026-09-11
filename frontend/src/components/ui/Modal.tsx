@@ -10,6 +10,9 @@ interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   width?: "sm" | "md" | "lg" | "xl";
+  /// Removes the horizontal dividers under the header and above the footer,
+  /// for compact confirmations whose body is empty.
+  noDividers?: boolean;
 }
 
 const WIDTH_CLASSES = {
@@ -19,7 +22,7 @@ const WIDTH_CLASSES = {
   xl: "max-w-4xl",
 };
 
-export function Modal({ open, onClose, title, description, children, footer, width = "md" }: ModalProps) {
+export function Modal({ open, onClose, title, description, children, footer, width = "md", noDividers = false }: ModalProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -37,7 +40,7 @@ export function Modal({ open, onClose, title, description, children, footer, wid
       <div
         className={`relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-xl border border-border bg-card shadow-(--shadow-overlay) sm:rounded-xl ${WIDTH_CLASSES[width]}`}
       >
-        <div className="flex items-start justify-between border-b border-border px-6 py-4">
+        <div className={`flex items-start justify-between ${noDividers ? "" : "border-b border-border"} px-6 py-4`}>
           <div>
             <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
             {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
@@ -54,9 +57,9 @@ export function Modal({ open, onClose, title, description, children, footer, wid
           </button>
         </div>
 
-        <div className="no-scrollbar flex-1 overflow-y-auto px-6 py-5">{children}</div>
+        <div className={`no-scrollbar flex-1 overflow-y-auto px-6 ${noDividers ? "py-0" : "py-5"}`}>{children}</div>
 
-        {footer && <div className="flex justify-end gap-3 border-t border-border px-6 py-4">{footer}</div>}
+        {footer && <div className={`flex justify-end gap-3 ${noDividers ? "" : "border-t border-border"} px-6 py-4`}>{footer}</div>}
       </div>
     </div>
   );

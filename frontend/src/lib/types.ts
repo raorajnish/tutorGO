@@ -60,8 +60,9 @@ export interface MeResponse {
   mustChangePassword: boolean;
   termsAcceptedAt: string | null;
   /// changes-phase12.md §12.6 — true for every staff role (OWNER/ADMIN/
-  /// ACCOUNTANT/FACULTY/RECEPTION), false for STUDENT/SUPERADMIN. Gates
-  /// whether the Security tab even offers the option.
+  /// ACCOUNTANT/FACULTY/RECEPTION) plus SUPERADMIN (whose rescue path is an
+  /// env-keyed recovery code instead of a normal backup-code flow). False for
+  /// STUDENT. Gates whether the Security tab offers the TwoFactorCard.
   mfaEligible: boolean;
   mfaEnabled: boolean;
   /// STUDENT only — true when their course has any study material. Hides the

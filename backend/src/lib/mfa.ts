@@ -4,12 +4,12 @@ import QRCode from "qrcode";
 import type { Role } from "../generated/prisma/enums.js";
 
 /// Opt-in per changes-phase12.md §12.6, expanded at build time to every
-/// staff role (not just OWNER/ADMIN as originally scoped) — STUDENT and
-/// SUPERADMIN are deliberately excluded: the portal has its own simpler
-/// access model, and SUPERADMIN is the account that has to stay reachable to
-/// disable everyone else's MFA, so gating it behind MFA too raises the
-/// platform's own lockout risk for no real benefit.
-export const MFA_ELIGIBLE_ROLES: Role[] = ["OWNER", "ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION"];
+/// staff role plus SUPERADMIN. STUDENT alone is excluded: the portal has its
+/// own simpler access model, and SUPERADMIN being MFA-eligible no longer
+/// raises a lockout risk because /auth/mfa/verify accepts a long recovery
+/// code (SUPERADMIN_MFA_RECOVERY_CODE) as a last-resort second factor for
+/// that role — a keyed-up escape hatch, not a code checked into the repo.
+export const MFA_ELIGIBLE_ROLES: Role[] = ["SUPERADMIN", "OWNER", "ADMIN", "ACCOUNTANT", "FACULTY", "RECEPTION"];
 
 export function generateTotpSecret(): string {
   return authenticator.generateSecret();

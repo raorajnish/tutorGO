@@ -503,15 +503,26 @@ authRouter.post("/logout-everywhere", authenticate, async (req, res, next) => {
 
 // ---------------------------------------------------------------------------
 // MFA (TOTP) — see changes-phase12.md §12.6. Opt-in, expanded at build time
-// to every staff role (OWNER/ADMIN/ACCOUNTANT/FACULTY/RECEPTION) rather than
-// just OWNER/ADMIN as originally scoped — see lib/mfa.ts's MFA_ELIGIBLE_ROLES
-// doc comment for why STUDENT/SUPERADMIN stay excluded.
+// to every staff role (OWNER/ADMIN/ACCOUNTANT/FACULTY/RECEPTION) plus
+// SUPERADMIN rather than just OWNER/ADMIN as originally scoped — see
+// lib/mfa.ts's MFA_ELIGIBLE_ROLES doc comment for why SUPERADMIN gets one
+// extra recovery path (an env-keyed rescue code) instead of being excluded.
 // ---------------------------------------------------------------------------
 
 function assertMfaEligible(role: string) {
   if (!MFA_ELIGIBLE_ROLES.includes(role as (typeof MFA_ELIGIBLE_ROLES)[number])) {
     throw ApiError.forbidden("Two-factor authentication isn't available for this account type");
   }
+}
+
+/** Constant-time string comparison for the SUPERADMIN rescue code — the
+ *  normal backup-code path is bcrypt-compared, but this env value isn't
+ *  persisted anywhere to hash, so timingSafeEqual is the right shape. */
+function safeEqual(a: string, b: string) {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
 }
 
 authRouter.post("/mfa/setup", authenticate, async (req, res, next) => {
@@ -637,6 +648,17 @@ authRouter.post("/mfa/verify", mfaVerifyLimiter, validateBody(mfaVerifySchema), 
           });
           break;
         }
+      }
+    }
+
+    if (!matched && body.code) {
+      // SUPERADMIN-only last resort beyond backup codes: an env-configured
+      // recovery code, so the platform account can't be bricked by losing a
+      // phone and backup codes together. Never persisted; rate-limited by the
+      // same mfaVerifyLimiter as every other attempt on this route.
+      const recovery = (process.env.SUPERADMIN_MFA_RECOVERY_CODE ?? "").trim();
+      if (user.role === "SUPERADMIN" && recovery.length >= 16 && safeEqual(body.code, recovery)) {
+        matched = true;
       }
     }
 
