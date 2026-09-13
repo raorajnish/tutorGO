@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Input } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -117,6 +118,11 @@ function ChangePasswordCard() {
     setSuccess(false);
   }
 
+  function close() {
+    setOpen(false);
+    reset();
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -137,13 +143,7 @@ function ChangePasswordCard() {
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       setSuccess(true);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setTimeout(() => {
-        setOpen(false);
-        setSuccess(false);
-      }, 1500);
+      setTimeout(close, 1500);
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Could not update your password.");
     } finally {
@@ -158,21 +158,35 @@ function ChangePasswordCard() {
           <p className="text-sm font-medium text-foreground">Password</p>
           <p className="mt-0.5 text-xs text-muted-foreground">Change the password used to sign in.</p>
         </div>
-        {!open && (
-          <Button
-            variant="secondary"
-            onClick={() => {
-              reset();
-              setOpen(true);
-            }}
-          >
-            Change
-          </Button>
-        )}
+        <Button
+          variant="secondary"
+          onClick={() => {
+            reset();
+            setOpen(true);
+          }}
+        >
+          Change
+        </Button>
       </div>
 
-      {open && (
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4 border-t border-border pt-4">
+      <Modal
+        open={open}
+        onClose={close}
+        title="Change password"
+        description="Update the password you use to sign in."
+        width="sm"
+        footer={
+          <>
+            <Button type="button" variant="ghost" onClick={close} disabled={submitting}>
+              Cancel
+            </Button>
+            <Button type="submit" form="change-password-form" disabled={submitting}>
+              {submitting ? "Saving…" : "Update password"}
+            </Button>
+          </>
+        }
+      >
+        <form id="change-password-form" onSubmit={handleSubmit} className="space-y-4">
           <PasswordInput
             id="currentPassword"
             label="Current password"
@@ -199,32 +213,15 @@ function ChangePasswordCard() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-
-          {error && <div className="rounded-lg border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
-          {success && (
-            <div className="rounded-lg border border-success/30 bg-success-soft px-3.5 py-2.5 text-sm text-success">
-              Password updated.
-            </div>
-          )}
-
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                setOpen(false);
-                reset();
-              }}
-              disabled={submitting}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Saving…" : "Update password"}
-            </Button>
-          </div>
         </form>
-      )}
+
+        {error && <div className="mt-3 rounded-lg border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
+        {success && (
+          <div className="mt-3 rounded-lg border border-success/30 bg-success-soft px-3.5 py-2.5 text-sm text-success">
+            Password updated.
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
