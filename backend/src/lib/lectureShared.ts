@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "./prisma.js";
 import { ApiError } from "./http.js";
+import { addDays, toDateOnly, todayDateOnly } from "./dateOnly.js";
 
 /// Attendance statuses that mean "this student was actually in the room" —
 /// the gate for entering test marks (marks for an absentee are always a
@@ -112,5 +113,19 @@ export async function deriveRoster(batchId: string, date: Date, subjectId?: stri
 export function assertCanActOnLecture(req: { user?: { role: string; id: string } }, facultyId: string) {
   if (req.user!.role === "FACULTY" && facultyId !== req.user!.id) {
     throw ApiError.forbidden("You can only manage your own sessions");
+  }
+}
+
+/** Checks if the attendance marking window for a lecture date has passed for FACULTY (closed at end of next day). */
+export function isAttendanceWindowExpired(lectureDate: Date, nowInIst: Date = todayDateOnly()): boolean {
+  const cutoff = addDays(toDateOnly(lectureDate), 2);
+  return nowInIst.getTime() >= cutoff.getTime();
+}
+
+export function assertCanMarkAttendance(req: { user?: { role: string } }, lectureDate: Date) {
+  if (req.user?.role === "FACULTY" && isAttendanceWindowExpired(lectureDate)) {
+    throw ApiError.forbidden(
+      "The attendance marking window for this lecture closed at the end of the next day. Contact an administrator to record backdated attendance."
+    );
   }
 }

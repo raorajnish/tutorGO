@@ -9,9 +9,10 @@ import { AttendanceToggleGroup } from "@/components/attendance/ToggleGroup";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import { SkeletonRow } from "@/components/ui/Skeleton";
 import { useMessageTemplate } from "@/lib/useMessageTemplate";
+import { useAuth } from "@/lib/auth-context";
 import { attendanceMarkedVars, renderTemplate } from "@/lib/messageTemplates";
 import type { AttendanceStatus, Lecture, RosterEntry } from "@/lib/types";
-import { formatDate as fmtDate } from "@/lib/format";
+import { formatDate as fmtDate, isFacultyWindowExpired } from "@/lib/format";
 
 function fmtTime(d: string) {
   return new Date(d).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });
@@ -24,6 +25,10 @@ interface Props {
 }
 
 export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
+  const { user } = useAuth();
+  const isFaculty = user?.role === "FACULTY";
+  const isExpired = isFaculty && lecture ? isFacultyWindowExpired(lecture.date) : false;
+
   const [roster, setRoster] = useState<RosterEntry[] | null>(null);
   const [statuses, setStatuses] = useState<Record<string, AttendanceStatus>>({});
   const [error, setError] = useState<string | null>(null);
@@ -139,19 +144,29 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
       description={lecture ? `${fmtDate(lecture.date)} · ${lecture.startTime}–${lecture.endTime} · ${lecture.faculty.fullName}` : undefined}
       width="lg"
       footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="secondary" onClick={markAllPresent} disabled={markingAll || loading}>
-            {markingAll ? "Marking…" : "Mark all present"}
-          </Button>
-          <Button onClick={handleSave} disabled={submitting || loading}>
-            {submitting ? "Saving…" : "Save attendance"}
-          </Button>
-        </>
+        isExpired ? (
+          <Button onClick={onClose}>Close</Button>
+        ) : (
+          <>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="secondary" onClick={markAllPresent} disabled={markingAll || loading}>
+              {markingAll ? "Marking…" : "Mark all present"}
+            </Button>
+            <Button onClick={handleSave} disabled={submitting || loading}>
+              {submitting ? "Saving…" : "Save attendance"}
+            </Button>
+          </>
+        )
       }
     >
+      {isExpired && (
+        <div className="mb-4 rounded-xl border border-warning/30 bg-warning-soft px-3.5 py-2.5 text-sm font-medium text-warning">
+          The attendance marking window for this lecture closed at the end of the next day. Contact an administrator to record backdated attendance.
+        </div>
+      )}
+
       {error && <div className="mb-4 rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
       {loading && (
@@ -195,6 +210,7 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
                 </div>
                 <AttendanceToggleGroup
                   value={statuses[r.student.id] ?? null}
+                  disabled={isExpired}
                   onChange={(status) => setStatuses((prev) => ({ ...prev, [r.student.id]: status }))}
                 />
               </div>

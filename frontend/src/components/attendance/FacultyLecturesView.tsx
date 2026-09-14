@@ -13,7 +13,7 @@ import { EditLectureModal } from "@/components/attendance/EditLectureModal";
 import { CancelLectureModal } from "@/components/attendance/CancelLectureModal";
 import { CopyLectureButton } from "@/components/attendance/CopyLectureButton";
 import type { AttendanceStats, Lecture } from "@/lib/types";
-import { formatDate, fmtTime12, todayInput } from "@/lib/format";
+import { formatDate, fmtTime12, todayInput, isFacultyWindowExpired } from "@/lib/format";
 
 function EditIcon() {
   return (
@@ -194,8 +194,8 @@ export function FacultyLecturesView() {
                             </>
                           )}
                           <CopyLectureButton lecture={l} />
-                          <Button variant="secondary" onClick={() => setMarkLecture(l)}>
-                            Mark
+                          <Button variant={isFacultyWindowExpired(l.date) ? "ghost" : "secondary"} onClick={() => setMarkLecture(l)}>
+                            {isFacultyWindowExpired(l.date) ? "Roster" : "Mark"}
                           </Button>
                         </>
                       )}
@@ -274,8 +274,8 @@ export function FacultyLecturesView() {
                     </>
                   )}
                   <CopyLectureButton lecture={l} />
-                  <Button variant="secondary" onClick={() => setMarkLecture(l)}>
-                    Mark attendance
+                  <Button variant={isFacultyWindowExpired(l.date) ? "ghost" : "secondary"} onClick={() => setMarkLecture(l)}>
+                    {isFacultyWindowExpired(l.date) ? "View roster" : "Mark attendance"}
                   </Button>
                 </div>
               )}

@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
@@ -7,9 +8,12 @@ import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
 import { Modal } from "@/components/ui/Modal";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
-import { CreateMeetingModal } from "@/components/ptm/CreateMeetingModal";
 import { formatDate, fmtTime12 } from "@/lib/format";
 import type { ParentMeeting } from "@/lib/types";
+
+const CreateMeetingModal = dynamic(
+  () => import("@/components/ptm/CreateMeetingModal").then((m) => m.CreateMeetingModal)
+);
 
 const TABS = [
   { id: "upcoming", label: "Upcoming" },

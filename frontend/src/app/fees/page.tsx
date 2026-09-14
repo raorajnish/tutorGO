@@ -1,17 +1,33 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { Tabs } from "@/components/ui/Tabs";
 import { Dropdown } from "@/components/ui/Dropdown";
-import { FeeAccountModal } from "@/components/fees/FeeAccountModal";
-import { SetupFeeAccountModal } from "@/components/fees/SetupFeeAccountModal";
-import { DefaultersTab } from "@/components/fees/DefaultersTab";
-import { ReceiptsTab } from "@/components/fees/ReceiptsTab";
-import { PaymentProofsTab } from "@/components/fees/PaymentProofsTab";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { Batch, Course, StudentListItem, StudentsResponse } from "@/lib/types";
+
+const DefaultersTab = dynamic(
+  () => import("@/components/fees/DefaultersTab").then((m) => m.DefaultersTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const ReceiptsTab = dynamic(
+  () => import("@/components/fees/ReceiptsTab").then((m) => m.ReceiptsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const PaymentProofsTab = dynamic(
+  () => import("@/components/fees/PaymentProofsTab").then((m) => m.PaymentProofsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const FeeAccountModal = dynamic(
+  () => import("@/components/fees/FeeAccountModal").then((m) => m.FeeAccountModal)
+);
+const SetupFeeAccountModal = dynamic(
+  () => import("@/components/fees/SetupFeeAccountModal").then((m) => m.SetupFeeAccountModal)
+);
 
 const STATUS_OPTIONS = [
   { value: "active", label: "Active" },

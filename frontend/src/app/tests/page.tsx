@@ -1,16 +1,20 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
-import { ScheduleTestModal } from "@/components/tests/ScheduleTestModal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { TestListItem } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+
+const ScheduleTestModal = dynamic(
+  () => import("@/components/tests/ScheduleTestModal").then((m) => m.ScheduleTestModal)
+);
 
 export default function TestsPage() {
   const router = useRouter();

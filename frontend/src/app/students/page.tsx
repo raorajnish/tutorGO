@@ -1,17 +1,21 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { Dropdown } from "@/components/ui/Dropdown";
-import { StudentProfileModal } from "@/components/students/StudentProfileModal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
 import { ExportButton } from "@/components/ui/ExportButton";
 import type { Batch, Course, StudentsResponse } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
+
+const StudentProfileModal = dynamic(
+  () => import("@/components/students/StudentProfileModal").then((m) => m.StudentProfileModal)
+);
 
 const STATUS_FILTERS = [
   { id: "active", label: "Active" },

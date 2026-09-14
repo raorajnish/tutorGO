@@ -1,13 +1,31 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { Tabs } from "@/components/ui/Tabs";
-import { StaffTab } from "@/components/payroll/StaffTab";
-import { RunsTab } from "@/components/payroll/RunsTab";
-import { MyPayslipsTab } from "@/components/payroll/MyPayslipsTab";
-import { LeaveTab } from "@/components/payroll/LeaveTab";
-import { MyLeaveTab } from "@/components/payroll/MyLeaveTab";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import { useAuth } from "@/lib/auth-context";
+
+const StaffTab = dynamic(
+  () => import("@/components/payroll/StaffTab").then((m) => m.StaffTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const RunsTab = dynamic(
+  () => import("@/components/payroll/RunsTab").then((m) => m.RunsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const MyPayslipsTab = dynamic(
+  () => import("@/components/payroll/MyPayslipsTab").then((m) => m.MyPayslipsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const LeaveTab = dynamic(
+  () => import("@/components/payroll/LeaveTab").then((m) => m.LeaveTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const MyLeaveTab = dynamic(
+  () => import("@/components/payroll/MyLeaveTab").then((m) => m.MyLeaveTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
 
 export default function PayrollPage() {
   const { user } = useAuth();

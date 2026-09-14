@@ -1,9 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { Tabs } from "@/components/ui/Tabs";
-import { InstituteAnalyticsTab } from "@/components/analytics/InstituteAnalyticsTab";
-import { StudentAnalyticsTab } from "@/components/analytics/StudentAnalyticsTab";
+import { SkeletonRow } from "@/components/ui/Skeleton";
+
+const InstituteAnalyticsTab = dynamic(
+  () => import("@/components/analytics/InstituteAnalyticsTab").then((m) => m.InstituteAnalyticsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={6} /></div> }
+);
+const StudentAnalyticsTab = dynamic(
+  () => import("@/components/analytics/StudentAnalyticsTab").then((m) => m.StudentAnalyticsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={6} /></div> }
+);
 
 const TABS = [
   { id: "institute", label: "Institute" },

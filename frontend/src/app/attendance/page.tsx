@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch, ApiClientError } from "@/lib/api";
@@ -10,15 +11,26 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
-import { ScheduleLectureModal } from "@/components/attendance/ScheduleLectureModal";
-import { MarkAttendanceModal } from "@/components/attendance/MarkAttendanceModal";
-import { EditLectureModal } from "@/components/attendance/EditLectureModal";
-import { CancelLectureModal } from "@/components/attendance/CancelLectureModal";
 import { CopyLectureButton } from "@/components/attendance/CopyLectureButton";
 import { ExportButton } from "@/components/ui/ExportButton";
-import { FacultyLecturesView } from "@/components/attendance/FacultyLecturesView";
 import type { Lecture, LectureSummary } from "@/lib/types";
 import { todayInput, fmtTime12, formatDate } from "@/lib/format";
+
+const FacultyLecturesView = dynamic(
+  () => import("@/components/attendance/FacultyLecturesView").then((m) => m.FacultyLecturesView)
+);
+const ScheduleLectureModal = dynamic(
+  () => import("@/components/attendance/ScheduleLectureModal").then((m) => m.ScheduleLectureModal)
+);
+const MarkAttendanceModal = dynamic(
+  () => import("@/components/attendance/MarkAttendanceModal").then((m) => m.MarkAttendanceModal)
+);
+const EditLectureModal = dynamic(
+  () => import("@/components/attendance/EditLectureModal").then((m) => m.EditLectureModal)
+);
+const CancelLectureModal = dynamic(
+  () => import("@/components/attendance/CancelLectureModal").then((m) => m.CancelLectureModal)
+);
 
 function EditIcon() {
   return (

@@ -1,13 +1,28 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Tabs } from "@/components/ui/Tabs";
-import { CoursesTab } from "@/components/academics/CoursesTab";
-import { SubjectsTab } from "@/components/academics/SubjectsTab";
-import { BatchesTab } from "@/components/academics/BatchesTab";
-import { FeeStructuresTab } from "@/components/academics/FeeStructuresTab";
+import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { AcademicsTabHandle } from "@/components/academics/tabHandle";
+
+const CoursesTab = dynamic(
+  () => import("@/components/academics/CoursesTab").then((m) => m.CoursesTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const SubjectsTab = dynamic(
+  () => import("@/components/academics/SubjectsTab").then((m) => m.SubjectsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const BatchesTab = dynamic(
+  () => import("@/components/academics/BatchesTab").then((m) => m.BatchesTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const FeeStructuresTab = dynamic(
+  () => import("@/components/academics/FeeStructuresTab").then((m) => m.FeeStructuresTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
 
 type TabId = "courses" | "subjects" | "batches" | "fee-structures";
 

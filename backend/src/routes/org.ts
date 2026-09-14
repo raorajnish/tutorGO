@@ -218,7 +218,8 @@ orgRouter.post("/team", requireRoles("OWNER", "ADMIN"), validateBody(inviteTeamS
     res.status(201).json({
       member: { id: member.id, fullName: member.fullName, email: member.email, role: member.role },
       emailDelivered: mailResult.delivered,
-      tempPassword: mailResult.delivered ? undefined : tempPassword,
+      tempPassword,
+      loginUrl,
     });
   } catch (err) {
     next(err);

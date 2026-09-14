@@ -61,3 +61,12 @@ export function fmtTime12(hhmm: string): string {
   const hour12 = h % 12 === 0 ? 12 : h % 12;
   return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
+
+/** Checks if the faculty attendance marking window (which closes at the end of the next day) has passed. */
+export function isFacultyWindowExpired(lectureDateIso: string, today: string = todayInput()): boolean {
+  if (!lectureDateIso) return false;
+  const [y, m, d] = lectureDateIso.slice(0, 10).split("-").map(Number);
+  const nextDayDt = new Date(y, m - 1, d + 1);
+  const nextDay = `${nextDayDt.getFullYear()}-${String(nextDayDt.getMonth() + 1).padStart(2, "0")}-${String(nextDayDt.getDate()).padStart(2, "0")}`;
+  return today > nextDay;
+}

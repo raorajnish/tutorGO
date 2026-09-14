@@ -1,18 +1,45 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
-import { InstituteDetailsTab } from "@/components/settings/InstituteDetailsTab";
-import { TeamTab } from "@/components/settings/TeamTab";
-import { SubscriptionTab } from "@/components/settings/SubscriptionTab";
-import { MessageTemplatesTab } from "@/components/settings/MessageTemplatesTab";
-import { EmailSettingsTab } from "@/components/settings/EmailSettingsTab";
-import { WhatsAppSettingsTab } from "@/components/settings/WhatsAppSettingsTab";
-import { RemindersTab } from "@/components/settings/RemindersTab";
-import { PaymentsSettingsTab } from "@/components/settings/PaymentsSettingsTab";
+import { SkeletonRow } from "@/components/ui/Skeleton";
+
+const InstituteDetailsTab = dynamic(
+  () => import("@/components/settings/InstituteDetailsTab").then((m) => m.InstituteDetailsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const TeamTab = dynamic(
+  () => import("@/components/settings/TeamTab").then((m) => m.TeamTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const SubscriptionTab = dynamic(
+  () => import("@/components/settings/SubscriptionTab").then((m) => m.SubscriptionTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const MessageTemplatesTab = dynamic(
+  () => import("@/components/settings/MessageTemplatesTab").then((m) => m.MessageTemplatesTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const EmailSettingsTab = dynamic(
+  () => import("@/components/settings/EmailSettingsTab").then((m) => m.EmailSettingsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const WhatsAppSettingsTab = dynamic(
+  () => import("@/components/settings/WhatsAppSettingsTab").then((m) => m.WhatsAppSettingsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const RemindersTab = dynamic(
+  () => import("@/components/settings/RemindersTab").then((m) => m.RemindersTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
+const PaymentsSettingsTab = dynamic(
+  () => import("@/components/settings/PaymentsSettingsTab").then((m) => m.PaymentsSettingsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
 
 const TABS = [
   { id: "details", label: "Institute details" },

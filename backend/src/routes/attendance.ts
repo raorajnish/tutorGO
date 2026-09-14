@@ -6,6 +6,7 @@ import { authenticate, requireInstitute, requireModule, requireRoles } from "../
 import { validateBody } from "../middleware/validate.js";
 import {
   assertCanActOnLecture,
+  assertCanMarkAttendance,
   deriveRoster,
   lectureInclude,
   serializeLecture,
@@ -514,6 +515,7 @@ attendanceRouter.post("/lectures/:id/mark", requireRoles(...SCHEDULE_ROLES), val
     const body = req.body as z.infer<typeof markSchema>;
     const lecture = await loadLecture(req.params.id as string, instituteId);
     assertCanActOnLecture(req, lecture.facultyId);
+    assertCanMarkAttendance(req, lecture.date);
     if (lecture.cancelledAt) throw ApiError.badRequest("This lecture was cancelled — attendance can't be marked");
 
     const roster = await deriveRoster(lecture.batchId, lecture.date, lecture.subjectId);
@@ -543,6 +545,7 @@ attendanceRouter.post("/lectures/:id/mark-all-present", requireRoles(...SCHEDULE
     const instituteId = req.tenantId!;
     const lecture = await loadLecture(req.params.id as string, instituteId);
     assertCanActOnLecture(req, lecture.facultyId);
+    assertCanMarkAttendance(req, lecture.date);
     if (lecture.cancelledAt) throw ApiError.badRequest("This lecture was cancelled — attendance can't be marked");
 
     const roster = await deriveRoster(lecture.batchId, lecture.date, lecture.subjectId);

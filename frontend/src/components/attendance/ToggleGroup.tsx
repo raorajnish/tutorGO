@@ -12,9 +12,11 @@ const TONE_CLASSES: Record<(typeof ATTENDANCE_STATUSES)[number], string> = {
 export function AttendanceToggleGroup({
   value,
   onChange,
+  disabled = false,
 }: {
   value: AttendanceStatus | null;
   onChange: (status: AttendanceStatus) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="inline-flex flex-wrap gap-1 rounded-lg bg-muted p-1">
@@ -22,9 +24,10 @@ export function AttendanceToggleGroup({
         <button
           key={s}
           type="button"
+          disabled={disabled}
           data-active={value === s}
-          onClick={() => onChange(s)}
-          className={`rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground ${TONE_CLASSES[s]}`}
+          onClick={() => !disabled && onChange(s)}
+          className={`rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 ${TONE_CLASSES[s]}`}
         >
           {ATTENDANCE_STATUS_LABELS[s]}
         </button>
