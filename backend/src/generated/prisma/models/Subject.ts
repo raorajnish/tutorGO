@@ -201,6 +201,7 @@ export type SubjectWhereInput = {
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   courses?: Prisma.CourseSubjectListRelationFilter
   lectures?: Prisma.LectureListRelationFilter
+  timetableSlots?: Prisma.TimetableSlotListRelationFilter
   assignments?: Prisma.FacultyAssignmentListRelationFilter
   tests?: Prisma.TestListRelationFilter
   feeStructureLines?: Prisma.FeeStructureSubjectLineListRelationFilter
@@ -219,6 +220,7 @@ export type SubjectOrderByWithRelationInput = {
   institute?: Prisma.InstituteOrderByWithRelationInput
   courses?: Prisma.CourseSubjectOrderByRelationAggregateInput
   lectures?: Prisma.LectureOrderByRelationAggregateInput
+  timetableSlots?: Prisma.TimetableSlotOrderByRelationAggregateInput
   assignments?: Prisma.FacultyAssignmentOrderByRelationAggregateInput
   tests?: Prisma.TestOrderByRelationAggregateInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineOrderByRelationAggregateInput
@@ -241,6 +243,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   courses?: Prisma.CourseSubjectListRelationFilter
   lectures?: Prisma.LectureListRelationFilter
+  timetableSlots?: Prisma.TimetableSlotListRelationFilter
   assignments?: Prisma.FacultyAssignmentListRelationFilter
   tests?: Prisma.TestListRelationFilter
   feeStructureLines?: Prisma.FeeStructureSubjectLineListRelationFilter
@@ -284,6 +287,7 @@ export type SubjectCreateInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
   courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
@@ -301,6 +305,7 @@ export type SubjectUncheckedCreateInput = {
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
@@ -318,6 +323,7 @@ export type SubjectUpdateInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
   courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
@@ -335,6 +341,7 @@ export type SubjectUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
@@ -510,6 +517,20 @@ export type SubjectUpdateOneRequiredWithoutLecturesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutLecturesInput, Prisma.SubjectUpdateWithoutLecturesInput>, Prisma.SubjectUncheckedUpdateWithoutLecturesInput>
 }
 
+export type SubjectCreateNestedOneWithoutTimetableSlotsInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutTimetableSlotsInput, Prisma.SubjectUncheckedCreateWithoutTimetableSlotsInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutTimetableSlotsInput
+  connect?: Prisma.SubjectWhereUniqueInput
+}
+
+export type SubjectUpdateOneRequiredWithoutTimetableSlotsNestedInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutTimetableSlotsInput, Prisma.SubjectUncheckedCreateWithoutTimetableSlotsInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutTimetableSlotsInput
+  upsert?: Prisma.SubjectUpsertWithoutTimetableSlotsInput
+  connect?: Prisma.SubjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutTimetableSlotsInput, Prisma.SubjectUpdateWithoutTimetableSlotsInput>, Prisma.SubjectUncheckedUpdateWithoutTimetableSlotsInput>
+}
+
 export type SubjectCreateNestedOneWithoutTestsInput = {
   create?: Prisma.XOR<Prisma.SubjectCreateWithoutTestsInput, Prisma.SubjectUncheckedCreateWithoutTestsInput>
   connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutTestsInput
@@ -579,6 +600,7 @@ export type SubjectCreateWithoutInstituteInput = {
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
@@ -595,6 +617,7 @@ export type SubjectUncheckedCreateWithoutInstituteInput = {
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
@@ -650,6 +673,7 @@ export type SubjectCreateWithoutCoursesInput = {
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
   lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
@@ -666,6 +690,7 @@ export type SubjectUncheckedCreateWithoutCoursesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
@@ -698,6 +723,7 @@ export type SubjectUpdateWithoutCoursesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
@@ -714,6 +740,7 @@ export type SubjectUncheckedUpdateWithoutCoursesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
@@ -731,6 +758,7 @@ export type SubjectCreateWithoutStudentSubjectsInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
   courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
@@ -747,6 +775,7 @@ export type SubjectUncheckedCreateWithoutStudentSubjectsInput = {
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
@@ -779,6 +808,7 @@ export type SubjectUpdateWithoutStudentSubjectsInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
   courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
@@ -795,6 +825,7 @@ export type SubjectUncheckedUpdateWithoutStudentSubjectsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
@@ -810,6 +841,7 @@ export type SubjectCreateWithoutLecturesInput = {
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
   courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
@@ -826,6 +858,7 @@ export type SubjectUncheckedCreateWithoutLecturesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
@@ -858,6 +891,7 @@ export type SubjectUpdateWithoutLecturesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
   courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
@@ -874,6 +908,91 @@ export type SubjectUncheckedUpdateWithoutLecturesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
+  assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
+  feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
+  studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput
+}
+
+export type SubjectCreateWithoutTimetableSlotsInput = {
+  id?: string
+  name: string
+  shortCode: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
+  courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
+  tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
+  feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
+  studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutSubjectInput
+}
+
+export type SubjectUncheckedCreateWithoutTimetableSlotsInput = {
+  id?: string
+  instituteId: string
+  name: string
+  shortCode: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
+  feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
+  studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutSubjectInput
+}
+
+export type SubjectCreateOrConnectWithoutTimetableSlotsInput = {
+  where: Prisma.SubjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutTimetableSlotsInput, Prisma.SubjectUncheckedCreateWithoutTimetableSlotsInput>
+}
+
+export type SubjectUpsertWithoutTimetableSlotsInput = {
+  update: Prisma.XOR<Prisma.SubjectUpdateWithoutTimetableSlotsInput, Prisma.SubjectUncheckedUpdateWithoutTimetableSlotsInput>
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutTimetableSlotsInput, Prisma.SubjectUncheckedCreateWithoutTimetableSlotsInput>
+  where?: Prisma.SubjectWhereInput
+}
+
+export type SubjectUpdateToOneWithWhereWithoutTimetableSlotsInput = {
+  where?: Prisma.SubjectWhereInput
+  data: Prisma.XOR<Prisma.SubjectUpdateWithoutTimetableSlotsInput, Prisma.SubjectUncheckedUpdateWithoutTimetableSlotsInput>
+}
+
+export type SubjectUpdateWithoutTimetableSlotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  shortCode?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
+  courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
+  tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
+  feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
+  studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutSubjectNestedInput
+}
+
+export type SubjectUncheckedUpdateWithoutTimetableSlotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  shortCode?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
@@ -891,6 +1010,7 @@ export type SubjectCreateWithoutTestsInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
   courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
@@ -907,6 +1027,7 @@ export type SubjectUncheckedCreateWithoutTestsInput = {
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
@@ -939,6 +1060,7 @@ export type SubjectUpdateWithoutTestsInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
   courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
@@ -955,6 +1077,7 @@ export type SubjectUncheckedUpdateWithoutTestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
@@ -971,6 +1094,7 @@ export type SubjectCreateWithoutAssignmentsInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
   courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
@@ -987,6 +1111,7 @@ export type SubjectUncheckedCreateWithoutAssignmentsInput = {
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
@@ -1019,6 +1144,7 @@ export type SubjectUpdateWithoutAssignmentsInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
   courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
@@ -1035,6 +1161,7 @@ export type SubjectUncheckedUpdateWithoutAssignmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1051,6 +1178,7 @@ export type SubjectCreateWithoutFeeStructureLinesInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
   courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectCreateNestedManyWithoutSubjectInput
@@ -1067,6 +1195,7 @@ export type SubjectUncheckedCreateWithoutFeeStructureLinesInput = {
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   studentSubjects?: Prisma.StudentSubjectUncheckedCreateNestedManyWithoutSubjectInput
@@ -1099,6 +1228,7 @@ export type SubjectUpdateWithoutFeeStructureLinesInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
   courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUpdateManyWithoutSubjectNestedInput
@@ -1115,6 +1245,7 @@ export type SubjectUncheckedUpdateWithoutFeeStructureLinesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   studentSubjects?: Prisma.StudentSubjectUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1131,6 +1262,7 @@ export type SubjectCreateWithoutStudyResourcesInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutSubjectsInput
   courses?: Prisma.CourseSubjectCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineCreateNestedManyWithoutSubjectInput
@@ -1147,6 +1279,7 @@ export type SubjectUncheckedCreateWithoutStudyResourcesInput = {
   updatedAt?: Date | string
   courses?: Prisma.CourseSubjectUncheckedCreateNestedManyWithoutSubjectInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutSubjectInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutSubjectInput
   assignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutSubjectInput
   tests?: Prisma.TestUncheckedCreateNestedManyWithoutSubjectInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedCreateNestedManyWithoutSubjectInput
@@ -1179,6 +1312,7 @@ export type SubjectUpdateWithoutStudyResourcesInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutSubjectsNestedInput
   courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
@@ -1195,6 +1329,7 @@ export type SubjectUncheckedUpdateWithoutStudyResourcesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1219,6 +1354,7 @@ export type SubjectUpdateWithoutInstituteInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUpdateManyWithoutSubjectNestedInput
@@ -1235,6 +1371,7 @@ export type SubjectUncheckedUpdateWithoutInstituteInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courses?: Prisma.CourseSubjectUncheckedUpdateManyWithoutSubjectNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutSubjectNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutSubjectNestedInput
   assignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutSubjectNestedInput
   tests?: Prisma.TestUncheckedUpdateManyWithoutSubjectNestedInput
   feeStructureLines?: Prisma.FeeStructureSubjectLineUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1259,6 +1396,7 @@ export type SubjectUncheckedUpdateManyWithoutInstituteInput = {
 export type SubjectCountOutputType = {
   courses: number
   lectures: number
+  timetableSlots: number
   assignments: number
   tests: number
   feeStructureLines: number
@@ -1269,6 +1407,7 @@ export type SubjectCountOutputType = {
 export type SubjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   courses?: boolean | SubjectCountOutputTypeCountCoursesArgs
   lectures?: boolean | SubjectCountOutputTypeCountLecturesArgs
+  timetableSlots?: boolean | SubjectCountOutputTypeCountTimetableSlotsArgs
   assignments?: boolean | SubjectCountOutputTypeCountAssignmentsArgs
   tests?: boolean | SubjectCountOutputTypeCountTestsArgs
   feeStructureLines?: boolean | SubjectCountOutputTypeCountFeeStructureLinesArgs
@@ -1298,6 +1437,13 @@ export type SubjectCountOutputTypeCountCoursesArgs<ExtArgs extends runtime.Types
  */
 export type SubjectCountOutputTypeCountLecturesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LectureWhereInput
+}
+
+/**
+ * SubjectCountOutputType without action
+ */
+export type SubjectCountOutputTypeCountTimetableSlotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TimetableSlotWhereInput
 }
 
 /**
@@ -1347,6 +1493,7 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   courses?: boolean | Prisma.Subject$coursesArgs<ExtArgs>
   lectures?: boolean | Prisma.Subject$lecturesArgs<ExtArgs>
+  timetableSlots?: boolean | Prisma.Subject$timetableSlotsArgs<ExtArgs>
   assignments?: boolean | Prisma.Subject$assignmentsArgs<ExtArgs>
   tests?: boolean | Prisma.Subject$testsArgs<ExtArgs>
   feeStructureLines?: boolean | Prisma.Subject$feeStructureLinesArgs<ExtArgs>
@@ -1392,6 +1539,7 @@ export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   courses?: boolean | Prisma.Subject$coursesArgs<ExtArgs>
   lectures?: boolean | Prisma.Subject$lecturesArgs<ExtArgs>
+  timetableSlots?: boolean | Prisma.Subject$timetableSlotsArgs<ExtArgs>
   assignments?: boolean | Prisma.Subject$assignmentsArgs<ExtArgs>
   tests?: boolean | Prisma.Subject$testsArgs<ExtArgs>
   feeStructureLines?: boolean | Prisma.Subject$feeStructureLinesArgs<ExtArgs>
@@ -1412,6 +1560,7 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     institute: Prisma.$InstitutePayload<ExtArgs>
     courses: Prisma.$CourseSubjectPayload<ExtArgs>[]
     lectures: Prisma.$LecturePayload<ExtArgs>[]
+    timetableSlots: Prisma.$TimetableSlotPayload<ExtArgs>[]
     assignments: Prisma.$FacultyAssignmentPayload<ExtArgs>[]
     tests: Prisma.$TestPayload<ExtArgs>[]
     feeStructureLines: Prisma.$FeeStructureSubjectLinePayload<ExtArgs>[]
@@ -1823,6 +1972,7 @@ export interface Prisma__SubjectClient<T, Null = never, ExtArgs extends runtime.
   institute<T extends Prisma.InstituteDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InstituteDefaultArgs<ExtArgs>>): Prisma.Prisma__InstituteClient<runtime.Types.Result.GetResult<Prisma.$InstitutePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   courses<T extends Prisma.Subject$coursesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$coursesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   lectures<T extends Prisma.Subject$lecturesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$lecturesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LecturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  timetableSlots<T extends Prisma.Subject$timetableSlotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$timetableSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimetableSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignments<T extends Prisma.Subject$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FacultyAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tests<T extends Prisma.Subject$testsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$testsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   feeStructureLines<T extends Prisma.Subject$feeStructureLinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$feeStructureLinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FeeStructureSubjectLinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2310,6 +2460,30 @@ export type Subject$lecturesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.LectureScalarFieldEnum | Prisma.LectureScalarFieldEnum[]
+}
+
+/**
+ * Subject.timetableSlots
+ */
+export type Subject$timetableSlotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TimetableSlot
+   */
+  select?: Prisma.TimetableSlotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TimetableSlot
+   */
+  omit?: Prisma.TimetableSlotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TimetableSlotInclude<ExtArgs> | null
+  where?: Prisma.TimetableSlotWhereInput
+  orderBy?: Prisma.TimetableSlotOrderByWithRelationInput | Prisma.TimetableSlotOrderByWithRelationInput[]
+  cursor?: Prisma.TimetableSlotWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TimetableSlotScalarFieldEnum | Prisma.TimetableSlotScalarFieldEnum[]
 }
 
 /**

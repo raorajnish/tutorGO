@@ -28,6 +28,7 @@ export function TeamTab() {
   const [reminderOpen, setReminderOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmMember, setConfirmMember] = useState<TeamMember | null>(null);
+  const [assignFaculty, setAssignFaculty] = useState<TeamMember | null>(null);
 
   const teamList = team ?? [];
   const { paginatedItems: paginatedTeam, paginationProps: teamPaginationProps } = useClientPagination(teamList, 10);
@@ -84,11 +85,11 @@ export function TeamTab() {
           <table className="w-full table-fixed text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/40 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <th className="w-[30%] px-4 py-3 font-medium">Name</th>
-                <th className="w-[20%] px-4 py-3 font-medium">Role</th>
-                <th className="w-[20%] px-4 py-3 font-medium">Phone</th>
-                <th className="w-[15%] px-4 py-3 font-medium">Status</th>
-                {canManage && <th className="w-[15%] px-4 py-3 text-right font-medium">Actions</th>}
+                <th className="w-[28%] px-4 py-3 font-medium">Name</th>
+                <th className="w-[14%] px-4 py-3 font-medium">Role</th>
+                <th className="w-[16%] px-4 py-3 font-medium">Phone</th>
+                <th className="w-[14%] px-4 py-3 font-medium">Status</th>
+                {canManage && <th className="w-[28%] px-4 py-3 text-right font-medium">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -117,17 +118,28 @@ export function TeamTab() {
                   </td>
                   {canManage && (
                     <td className="px-4 py-3 text-right">
-                      {m.id !== currentUser?.id && (
-                        <Button
-                          variant={m.isActive ? "destructive" : "secondary"}
-                          disabled={busyId === m.id}
-                          onClick={() => setConfirmMember(m)}
-                          className="text-xs"
-                        >
-                          {m.isActive ? "Deactivate" : "Activate"}
-                        </Button>
-                      )}
-                      {m.id === currentUser?.id && <span className="text-xs text-muted-foreground">You</span>}
+                      <div className="flex items-center justify-end gap-2">
+                        {m.role === "FACULTY" && (
+                          <Button
+                            variant="secondary"
+                            onClick={() => setAssignFaculty(m)}
+                            className="whitespace-nowrap text-xs"
+                          >
+                            Assign courses
+                          </Button>
+                        )}
+                        {m.id !== currentUser?.id && (
+                          <Button
+                            variant={m.isActive ? "destructive" : "secondary"}
+                            disabled={busyId === m.id}
+                            onClick={() => setConfirmMember(m)}
+                            className="whitespace-nowrap text-xs"
+                          >
+                            {m.isActive ? "Deactivate" : "Activate"}
+                          </Button>
+                        )}
+                        {m.id === currentUser?.id && <span className="text-xs text-muted-foreground">You</span>}
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -170,16 +182,27 @@ export function TeamTab() {
                   <Badge tone={m.isActive ? "success" : "danger"}>{m.isActive ? "Active" : "Inactive"}</Badge>
                 </div>
               </div>
-              {canManage && m.id !== currentUser?.id && (
-                <div className="flex justify-end pt-1">
-                  <Button
-                    variant={m.isActive ? "destructive" : "secondary"}
-                    disabled={busyId === m.id}
-                    onClick={() => setConfirmMember(m)}
-                    className="w-full text-xs"
-                  >
-                    {m.isActive ? "Deactivate" : "Activate"}
-                  </Button>
+              {canManage && (
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  {m.role === "FACULTY" && (
+                    <Button
+                      variant="secondary"
+                      onClick={() => setAssignFaculty(m)}
+                      className="whitespace-nowrap text-xs"
+                    >
+                      Assign courses
+                    </Button>
+                  )}
+                  {m.id !== currentUser?.id && (
+                    <Button
+                      variant={m.isActive ? "destructive" : "secondary"}
+                      disabled={busyId === m.id}
+                      onClick={() => setConfirmMember(m)}
+                      className="whitespace-nowrap text-xs"
+                    >
+                      {m.isActive ? "Deactivate" : "Activate"}
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
@@ -220,6 +243,7 @@ export function TeamTab() {
             extraColumnValue={(row) => (typeof row.tempPassword === "string" ? row.tempPassword : "")}
           />
           <SendReminderModal open={reminderOpen} onClose={() => setReminderOpen(false)} />
+          <FacultyAssignmentModal faculty={assignFaculty} onClose={() => { setAssignFaculty(null); loadTeam(); }} />
           {confirmMember && (
             <ConfirmModal
               open={!!confirmMember}

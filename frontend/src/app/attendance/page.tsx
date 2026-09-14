@@ -6,6 +6,7 @@ import Link from "next/link";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/Button";
+import { Tabs } from "@/components/ui/Tabs";
 import { SkeletonRow } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
@@ -26,6 +27,10 @@ const ScheduleLectureModal = dynamic(
 const MarkAttendanceModal = dynamic(
   () => import("@/components/attendance/MarkAttendanceModal").then((m) => m.MarkAttendanceModal)
 );
+const StaffTimetableTab = dynamic(
+  () => import("@/components/attendance/TimetableTab").then((m) => m.TimetableTab)
+);
+
 const EditLectureModal = dynamic(
   () => import("@/components/attendance/EditLectureModal").then((m) => m.EditLectureModal)
 );
@@ -80,6 +85,7 @@ export default function AttendancePage() {
 }
 
 function StaffScheduleView() {
+  const [activeTab, setActiveTab] = useState<"daily" | "timetable">("daily");
   const [date, setDate] = useState(todayInput());
   const [lectures, setLectures] = useState<LectureSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,9 +112,11 @@ function StaffScheduleView() {
   }
 
   useEffect(() => {
-    load();
+    if (activeTab === "daily") {
+      load();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date]);
+  }, [date, activeTab]);
 
   const totals = lectures.reduce(
     (acc, l) => ({
@@ -130,82 +138,102 @@ function StaffScheduleView() {
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
-          <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Attendance</h1>
+          <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Attendance & Timetable</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Schedule lectures and track daily attendance.
+            Schedule lectures, view weekly timetable matrix, and track daily attendance.
           </p>
         </div>
-        <Button onClick={() => setScheduleOpen(true)}>Schedule lecture</Button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        <StatCard label="Lectures today" value={lectures.length} tone="primary" />
-        <StatCard label="Expected" value={totals.expected} tone="accent" />
-        <StatCard label="Present" value={totals.present} tone="success" />
-        <StatCard label="Late" value={totals.late} tone="warning" />
-        <StatCard label="Absent" value={totals.absent} tone="danger" />
-      </div>
-
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => shiftDate(-1)}
-              aria-label="Previous day"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="hidden text-sm font-medium text-foreground sm:inline">{fmtDateLabel(date)}</span>
-              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-[9.5rem]" />
-            </div>
-            <button
-              type="button"
-              onClick={() => shiftDate(1)}
-              aria-label="Next day"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            {date !== todayInput() && (
-              <Button variant="ghost" onClick={() => setDate(todayInput())}>
-                Jump to today
-              </Button>
-            )}
-            <ExportButton
-              path={`/attendance/summary/export.csv?date=${date}`}
-              filename={`attendance-${date}.csv`}
-              title="Export this day's attendance as CSV"
-            />
-          </div>
+        <div className="flex items-center gap-2">
+          {activeTab === "daily" && (
+            <Button onClick={() => setScheduleOpen(true)}>Schedule lecture</Button>
+          )}
         </div>
+      </div>
 
-        {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
+      <Tabs
+        tabs={[
+          { id: "daily", label: "Daily schedule & attendance" },
+          { id: "timetable", label: "Weekly timetable" },
+        ]}
+        activeId={activeTab}
+        onChange={(id) => setActiveTab(id as "daily" | "timetable")}
+      />
 
-        <div className="hidden overflow-x-auto sm:block">
-          <table className="w-full table-fixed text-sm">
-            <thead>
+      {activeTab === "timetable" ? (
+        <StaffTimetableTab />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            <StatCard label="Lectures today" value={lectures.length} tone="primary" />
+            <StatCard label="Expected" value={totals.expected} tone="accent" />
+            <StatCard label="Present" value={totals.present} tone="success" />
+            <StatCard label="Late" value={totals.late} tone="warning" />
+            <StatCard label="Absent" value={totals.absent} tone="danger" />
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
+            <div className="flex items-center justify-between gap-2 border-b border-border p-3 sm:p-4">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  type="button"
+                  onClick={() => shiftDate(-1)}
+                  aria-label="Previous day"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <div className="flex items-center gap-2">
+                  <span className="hidden text-sm font-medium text-foreground sm:inline">{fmtDateLabel(date)}</span>
+                  <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-[8.5rem] sm:w-[9.5rem]" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => shiftDate(1)}
+                  aria-label="Next day"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                {date !== todayInput() && (
+                  <Button variant="ghost" onClick={() => setDate(todayInput())} className="px-2 sm:px-3 text-xs sm:text-sm">
+                    <span className="sm:hidden">Today</span>
+                    <span className="hidden sm:inline">Jump to today</span>
+                  </Button>
+                )}
+                <ExportButton
+                  path={`/attendance/summary/export.csv?date=${date}`}
+                  filename={`attendance-${date}.csv`}
+                  title="Export this day's attendance as CSV"
+                />
+              </div>
+            </div>
+
+            {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
+
+            <div className="hidden overflow-x-auto sm:block">
+              <table className="w-full table-fixed text-sm">
+                <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="w-[15%] px-4 py-3 font-medium">Time</th>
-                <th className="w-[17%] px-4 py-3 font-medium">Batch</th>
+                <th className="w-[14%] px-4 py-3 font-medium">Time</th>
+                <th className="w-[16%] px-4 py-3 font-medium">Batch</th>
                 <th className="w-[13%] px-4 py-3 font-medium">Subject</th>
                 <th className="w-[13%] px-4 py-3 font-medium">Faculty</th>
+                <th className="w-[12%] px-4 py-3 font-medium">Room</th>
                 <th className="w-[10%] px-4 py-3 font-medium">Marked</th>
-                <th className="w-[30%] px-4 py-3 text-right font-medium">Action</th>
+                <th className="w-[22%] px-4 py-3 text-right font-medium">Action</th>
               </tr>
             </thead>
             <tbody>
               {loading && Array.from({ length: 6 }, (_, i) => (
                 <tr key={`sk-${i}`}>
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     <SkeletonRow lines={2} />
                   </td>
                 </tr>
@@ -227,6 +255,13 @@ function StaffScheduleView() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-foreground">{l.faculty.fullName}</td>
+                  <td className="px-4 py-3 text-foreground">
+                    {l.room ? (
+                      <span className="font-medium">{l.room.name}</span>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     {l.cancelled ? (
                       <Badge tone="danger">Cancelled</Badge>
@@ -281,7 +316,7 @@ function StaffScheduleView() {
               ))}
               {!loading && lectures.length === 0 && (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     <EmptyState
                       message="No lectures scheduled for this date."
                       actionLabel="Schedule lecture"
@@ -310,6 +345,7 @@ function StaffScheduleView() {
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {fmtTime12(l.startTime)}–{fmtTime12(l.endTime)} · {l.faculty.fullName}
+                    {l.room && <span className="ml-1 text-accent font-medium">· 📍 {l.room.name}</span>}
                   </p>
                 </div>
                 {l.cancelled ? (
@@ -376,6 +412,8 @@ function StaffScheduleView() {
           />
         )}
       </div>
+      </>
+      )}
 
       <ScheduleLectureModal open={scheduleOpen} onClose={() => setScheduleOpen(false)} onScheduled={load} defaultDate={date} />
 

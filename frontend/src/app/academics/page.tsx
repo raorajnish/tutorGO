@@ -23,21 +23,26 @@ const FeeStructuresTab = dynamic(
   () => import("@/components/academics/FeeStructuresTab").then((m) => m.FeeStructuresTab),
   { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
 );
+const RoomsTab = dynamic(
+  () => import("@/components/academics/RoomsTab").then((m) => m.RoomsTab),
+  { loading: () => <div className="p-4"><SkeletonRow lines={5} /></div> }
+);
 
-type TabId = "courses" | "subjects" | "batches" | "fee-structures";
+type TabId = "courses" | "subjects" | "batches" | "fee-structures" | "rooms";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "courses", label: "Courses" },
   { id: "subjects", label: "Subjects" },
   { id: "batches", label: "Batches" },
   { id: "fee-structures", label: "Fee structures" },
+  { id: "rooms", label: "Rooms & Labs" },
 ];
 
 // One label per tab for the page-level create button — matches Enquiries'
 // and Admissions' "title + primary action" header instead of burying the
 // action inside each tab's own card, and keeps it in the same place as the
 // tab changes rather than jumping around.
-const CREATE_LABEL: Record<TabId, string> = {
+const CREATE_LABEL: Partial<Record<TabId, string>> = {
   courses: "New course",
   subjects: "New subject",
   batches: "New batch",
@@ -55,8 +60,14 @@ export default function AcademicsPage() {
   const feeStructuresRef = useRef<AcademicsTabHandle>(null);
 
   function handleCreate() {
-    const handle = { courses: coursesRef, subjects: subjectsRef, batches: batchesRef, "fee-structures": feeStructuresRef }[tab];
-    handle.current?.openCreate();
+    const handleMap: Record<string, React.RefObject<AcademicsTabHandle | null>> = {
+      courses: coursesRef,
+      subjects: subjectsRef,
+      batches: batchesRef,
+      "fee-structures": feeStructuresRef,
+    };
+    const handle = handleMap[tab];
+    handle?.current?.openCreate();
   }
 
   return (
@@ -66,10 +77,10 @@ export default function AcademicsPage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Academics</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Courses, subjects and batches — the structure everything else in this institute hangs off of.
+            Courses, subjects, batches, fee structures, and classrooms — the structure everything else in this institute hangs off of.
           </p>
         </div>
-        <Button onClick={handleCreate}>{CREATE_LABEL[tab]}</Button>
+        {CREATE_LABEL[tab] && <Button onClick={handleCreate}>{CREATE_LABEL[tab]}</Button>}
       </div>
 
       <Tabs tabs={TABS} activeId={tab} onChange={(id) => setTab(id as TabId)} />
@@ -79,6 +90,7 @@ export default function AcademicsPage() {
         {tab === "subjects" && <SubjectsTab ref={subjectsRef} />}
         {tab === "batches" && <BatchesTab ref={batchesRef} />}
         {tab === "fee-structures" && <FeeStructuresTab ref={feeStructuresRef} />}
+        {tab === "rooms" && <RoomsTab canManage={true} />}
       </div>
     </div>
   );

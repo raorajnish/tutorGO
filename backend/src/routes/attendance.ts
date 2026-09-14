@@ -260,6 +260,7 @@ const createLectureSchema = z.object({
   startTime: timeSchema,
   endTime: timeSchema,
   facultyId: z.string().optional(),
+  roomId: z.string().optional().nullable(),
   note: noteSchema.optional(),
 });
 
@@ -343,12 +344,55 @@ attendanceRouter.post("/lectures", requireRoles(...SCHEDULE_ROLES), validateBody
 
     if (body.endTime <= body.startTime) throw ApiError.badRequest("End time must be after start time");
 
+    if (body.roomId) {
+      const room = await prisma.room.findUnique({ where: { id: body.roomId } });
+      if (!room || room.instituteId !== instituteId) throw ApiError.badRequest("Room not found");
+    }
+
+    // Validate clashes across Room, Faculty, and Batch
+    const startDt = toTimeDate(body.startTime);
+    const endDt = toTimeDate(body.endTime);
+    const clashes = await prisma.lecture.findMany({
+      where: {
+        instituteId,
+        date: body.date,
+        cancelledAt: null,
+        startTime: { lt: endDt },
+        endTime: { gt: startDt },
+        OR: [
+          { batchId: body.batchId },
+          { facultyId },
+          ...(body.roomId ? [{ roomId: body.roomId }] : []),
+        ],
+      },
+      include: lectureInclude,
+    });
+
+    for (const l of clashes) {
+      if (l.batchId === body.batchId) {
+        throw ApiError.conflict(
+          `Batch "${l.batch.name}" already has a session (${l.subject.name}) scheduled from ${toTimeString(l.startTime)} to ${toTimeString(l.endTime)} on this date.`
+        );
+      }
+      if (l.facultyId === facultyId) {
+        throw ApiError.conflict(
+          `Faculty member ${l.faculty.fullName} is already teaching ${l.subject.name} (Batch "${l.batch.name}") from ${toTimeString(l.startTime)} to ${toTimeString(l.endTime)} on this date.`
+        );
+      }
+      if (body.roomId && l.roomId === body.roomId && l.room) {
+        throw ApiError.conflict(
+          `Room "${l.room.name}" is already occupied from ${toTimeString(l.startTime)} to ${toTimeString(l.endTime)} by Batch "${l.batch.name}" (${l.subject.name}).`
+        );
+      }
+    }
+
     const lecture = await prisma.lecture.create({
       data: {
         instituteId,
         batchId: body.batchId,
         subjectId: body.subjectId,
         facultyId,
+        roomId: body.roomId || null,
         date: body.date,
         startTime: toTimeDate(body.startTime),
         endTime: toTimeDate(body.endTime),
@@ -377,6 +421,7 @@ const updateLectureSchema = z.object({
   startTime: timeSchema.optional(),
   endTime: timeSchema.optional(),
   facultyId: z.string().optional(),
+  roomId: z.string().optional().nullable(),
   note: noteSchema.nullable().optional(),
 });
 
@@ -401,6 +446,50 @@ attendanceRouter.patch("/lectures/:id", requireRoles(...SCHEDULE_ROLES), validat
       await assertFacultyAssignment(lecture.facultyId, resolvedBatch.courseId, resolvedSubjectId);
     }
 
+    const resolvedBatchId = body.batchId ?? lecture.batch.id;
+    const resolvedFacultyId = body.facultyId ?? lecture.facultyId;
+    const resolvedRoomId = body.roomId !== undefined ? (body.roomId || null) : lecture.roomId;
+    const resolvedDate = body.date ?? lecture.date;
+    const resolvedStartTime = body.startTime ?? toTimeString(lecture.startTime);
+    const resolvedEndTime = body.endTime ?? toTimeString(lecture.endTime);
+
+    const startDt = toTimeDate(resolvedStartTime);
+    const endDt = toTimeDate(resolvedEndTime);
+    const clashes = await prisma.lecture.findMany({
+      where: {
+        instituteId,
+        date: resolvedDate,
+        cancelledAt: null,
+        id: { not: lecture.id },
+        startTime: { lt: endDt },
+        endTime: { gt: startDt },
+        OR: [
+          { batchId: resolvedBatchId },
+          { facultyId: resolvedFacultyId },
+          ...(resolvedRoomId ? [{ roomId: resolvedRoomId }] : []),
+        ],
+      },
+      include: lectureInclude,
+    });
+
+    for (const l of clashes) {
+      if (l.batchId === resolvedBatchId) {
+        throw ApiError.conflict(
+          `Batch "${l.batch.name}" already has a session (${l.subject.name}) scheduled from ${toTimeString(l.startTime)} to ${toTimeString(l.endTime)} on this date.`
+        );
+      }
+      if (l.facultyId === resolvedFacultyId) {
+        throw ApiError.conflict(
+          `Faculty member ${l.faculty.fullName} is already teaching ${l.subject.name} (Batch "${l.batch.name}") from ${toTimeString(l.startTime)} to ${toTimeString(l.endTime)} on this date.`
+        );
+      }
+      if (resolvedRoomId && l.roomId === resolvedRoomId && l.room) {
+        throw ApiError.conflict(
+          `Room "${l.room.name}" is already occupied from ${toTimeString(l.startTime)} to ${toTimeString(l.endTime)} by Batch "${l.batch.name}" (${l.subject.name}).`
+        );
+      }
+    }
+
     const updated = await prisma.lecture.update({
       where: { id: lecture.id },
       data: {
@@ -410,6 +499,7 @@ attendanceRouter.patch("/lectures/:id", requireRoles(...SCHEDULE_ROLES), validat
         startTime: body.startTime ? toTimeDate(body.startTime) : undefined,
         endTime: body.endTime ? toTimeDate(body.endTime) : undefined,
         facultyId: body.facultyId,
+        roomId: body.roomId !== undefined ? (body.roomId || null) : undefined,
         note: body.note,
       },
       include: lectureInclude,

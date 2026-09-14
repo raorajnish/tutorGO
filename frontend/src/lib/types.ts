@@ -813,6 +813,68 @@ export interface SubjectRef {
 export const LECTURE_KINDS = ["LECTURE", "TEST"] as const;
 export type LectureKind = (typeof LECTURE_KINDS)[number];
 
+export interface Room {
+  id: string;
+  name: string;
+  code: string | null;
+  capacity: number | null;
+  building: string | null;
+  isActive: boolean;
+}
+
+export interface CreateRoomPayload {
+  name: string;
+  code?: string;
+  capacity?: number;
+  building?: string;
+  isActive?: boolean;
+}
+
+export const DAYS_OF_WEEK = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"] as const;
+export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
+
+export const DAY_OF_WEEK_LABELS: Record<DayOfWeek, string> = {
+  MONDAY: "Monday",
+  TUESDAY: "Tuesday",
+  WEDNESDAY: "Wednesday",
+  THURSDAY: "Thursday",
+  FRIDAY: "Friday",
+  SATURDAY: "Saturday",
+  SUNDAY: "Sunday",
+};
+
+export const DAY_OF_WEEK_SHORT: Record<DayOfWeek, string> = {
+  MONDAY: "Mon",
+  TUESDAY: "Tue",
+  WEDNESDAY: "Wed",
+  THURSDAY: "Thu",
+  FRIDAY: "Fri",
+  SATURDAY: "Sat",
+  SUNDAY: "Sun",
+};
+
+export interface TimetableSlot {
+  id: string;
+  dayOfWeek: DayOfWeek;
+  startTime: string;
+  endTime: string;
+  isActive: boolean;
+  batch: { id: string; name: string; course: CourseRef };
+  subject: SubjectRef;
+  faculty: FacultyRef;
+  room: Room | null;
+}
+
+export interface CreateTimetableSlotPayload {
+  batchId: string;
+  subjectId: string;
+  facultyId: string;
+  roomId?: string | null;
+  dayOfWeek: DayOfWeek;
+  startTime: string;
+  endTime: string;
+}
+
 export interface Lecture {
   id: string;
   /// A test session is the same row with kind "TEST" — see the Tests section.
@@ -828,6 +890,7 @@ export interface Lecture {
   batch: { id: string; name: string; course: CourseRef };
   subject: SubjectRef;
   faculty: FacultyRef;
+  room: Room | null;
   markedCount: number;
 }
 

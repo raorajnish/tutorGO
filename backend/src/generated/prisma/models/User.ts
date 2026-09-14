@@ -311,6 +311,7 @@ export type UserWhereInput = {
   institute?: Prisma.XOR<Prisma.InstituteNullableScalarRelationFilter, Prisma.InstituteWhereInput> | null
   ownedOrganization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   lecturesTaught?: Prisma.LectureListRelationFilter
+  timetableSlots?: Prisma.TimetableSlotListRelationFilter
   teachingAssignments?: Prisma.FacultyAssignmentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   salaryProfile?: Prisma.XOR<Prisma.SalaryProfileNullableScalarRelationFilter, Prisma.SalaryProfileWhereInput> | null
@@ -353,6 +354,7 @@ export type UserOrderByWithRelationInput = {
   institute?: Prisma.InstituteOrderByWithRelationInput
   ownedOrganization?: Prisma.OrganizationOrderByWithRelationInput
   lecturesTaught?: Prisma.LectureOrderByRelationAggregateInput
+  timetableSlots?: Prisma.TimetableSlotOrderByRelationAggregateInput
   teachingAssignments?: Prisma.FacultyAssignmentOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   salaryProfile?: Prisma.SalaryProfileOrderByWithRelationInput
@@ -398,6 +400,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   institute?: Prisma.XOR<Prisma.InstituteNullableScalarRelationFilter, Prisma.InstituteWhereInput> | null
   ownedOrganization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   lecturesTaught?: Prisma.LectureListRelationFilter
+  timetableSlots?: Prisma.TimetableSlotListRelationFilter
   teachingAssignments?: Prisma.FacultyAssignmentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   salaryProfile?: Prisma.XOR<Prisma.SalaryProfileNullableScalarRelationFilter, Prisma.SalaryProfileWhereInput> | null
@@ -487,6 +490,7 @@ export type UserCreateInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -528,6 +532,7 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -569,6 +574,7 @@ export type UserUpdateInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -610,6 +616,7 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -969,6 +976,20 @@ export type UserUpdateOneRequiredWithoutLecturesTaughtNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLecturesTaughtInput, Prisma.UserUpdateWithoutLecturesTaughtInput>, Prisma.UserUncheckedUpdateWithoutLecturesTaughtInput>
 }
 
+export type UserCreateNestedOneWithoutTimetableSlotsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTimetableSlotsInput, Prisma.UserUncheckedCreateWithoutTimetableSlotsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTimetableSlotsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTimetableSlotsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTimetableSlotsInput, Prisma.UserUncheckedCreateWithoutTimetableSlotsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTimetableSlotsInput
+  upsert?: Prisma.UserUpsertWithoutTimetableSlotsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTimetableSlotsInput, Prisma.UserUpdateWithoutTimetableSlotsInput>, Prisma.UserUncheckedUpdateWithoutTimetableSlotsInput>
+}
+
 export type UserCreateNestedOneWithoutTestsAuthoredInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutTestsAuthoredInput, Prisma.UserUncheckedCreateWithoutTestsAuthoredInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutTestsAuthoredInput
@@ -1164,6 +1185,7 @@ export type UserCreateWithoutOwnedOrganizationInput = {
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -1204,6 +1226,7 @@ export type UserUncheckedCreateWithoutOwnedOrganizationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1260,6 +1283,7 @@ export type UserUpdateWithoutOwnedOrganizationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -1300,6 +1324,7 @@ export type UserUncheckedUpdateWithoutOwnedOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1340,6 +1365,7 @@ export type UserCreateWithoutInstituteInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -1380,6 +1406,7 @@ export type UserUncheckedCreateWithoutInstituteInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1470,6 +1497,7 @@ export type UserCreateWithoutSupportTicketsCreatedInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -1510,6 +1538,7 @@ export type UserUncheckedCreateWithoutSupportTicketsCreatedInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1566,6 +1595,7 @@ export type UserUpdateWithoutSupportTicketsCreatedInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -1606,6 +1636,7 @@ export type UserUncheckedUpdateWithoutSupportTicketsCreatedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1646,6 +1677,7 @@ export type UserCreateWithoutSupportTicketMessagesInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -1686,6 +1718,7 @@ export type UserUncheckedCreateWithoutSupportTicketMessagesInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1742,6 +1775,7 @@ export type UserUpdateWithoutSupportTicketMessagesInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -1782,6 +1816,7 @@ export type UserUncheckedUpdateWithoutSupportTicketMessagesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1822,6 +1857,7 @@ export type UserCreateWithoutPushSubscriptionsInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -1862,6 +1898,7 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -1918,6 +1955,7 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -1958,6 +1996,7 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -1998,6 +2037,7 @@ export type UserCreateWithoutPasswordResetOtpsInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -2038,6 +2078,7 @@ export type UserUncheckedCreateWithoutPasswordResetOtpsInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2094,6 +2135,7 @@ export type UserUpdateWithoutPasswordResetOtpsInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -2134,6 +2176,7 @@ export type UserUncheckedUpdateWithoutPasswordResetOtpsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2174,6 +2217,7 @@ export type UserCreateWithoutNotificationsInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
   passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
@@ -2214,6 +2258,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
   passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
@@ -2270,6 +2315,7 @@ export type UserUpdateWithoutNotificationsInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
   passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
@@ -2310,6 +2356,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
   passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
@@ -2350,6 +2397,7 @@ export type UserCreateWithoutParentMeetingsCreatedInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -2390,6 +2438,7 @@ export type UserUncheckedCreateWithoutParentMeetingsCreatedInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2446,6 +2495,7 @@ export type UserUpdateWithoutParentMeetingsCreatedInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -2486,6 +2536,7 @@ export type UserUncheckedUpdateWithoutParentMeetingsCreatedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2526,6 +2577,7 @@ export type UserCreateWithoutPortalStudentInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -2566,6 +2618,7 @@ export type UserUncheckedCreateWithoutPortalStudentInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2622,6 +2675,7 @@ export type UserUpdateWithoutPortalStudentInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -2662,6 +2716,7 @@ export type UserUncheckedUpdateWithoutPortalStudentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2701,6 +2756,7 @@ export type UserCreateWithoutLecturesTaughtInput = {
   updatedAt?: Date | string
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -2741,6 +2797,7 @@ export type UserUncheckedCreateWithoutLecturesTaughtInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2797,6 +2854,7 @@ export type UserUpdateWithoutLecturesTaughtInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -2837,6 +2895,187 @@ export type UserUncheckedUpdateWithoutLecturesTaughtInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUncheckedUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUncheckedUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutLiftedByNestedInput
+  studyResourcesAdded?: Prisma.StudyResourceUncheckedUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutCancelledByNestedInput
+}
+
+export type UserCreateWithoutTimetableSlotsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  mfaSecret?: string | null
+  mfaEnabledAt?: Date | string | null
+  mfaBackupCodes?: Prisma.UserCreatemfaBackupCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
+  ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionCreateNestedManyWithoutLiftedByInput
+  studyResourcesAdded?: Prisma.StudyResourceCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowCreateNestedManyWithoutCancelledByInput
+}
+
+export type UserUncheckedCreateWithoutTimetableSlotsInput = {
+  id?: string
+  instituteId?: string | null
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string | null
+  role: $Enums.Role
+  isActive?: boolean
+  mustChangePassword?: boolean
+  termsAcceptedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  tokenVersion?: number
+  mfaSecret?: string | null
+  mfaEnabledAt?: Date | string | null
+  mfaBackupCodes?: Prisma.UserCreatemfaBackupCodesInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
+  lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
+  expensesRecorded?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  testsAuthored?: Prisma.TestUncheckedCreateNestedManyWithoutCreatedByInput
+  testResultsEntered?: Prisma.TestResultUncheckedCreateNestedManyWithoutEnteredByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutUserInput
+  leaveReviews?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  portalStudent?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketsCreated?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutCreatedByInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUncheckedCreateNestedManyWithoutAuthorInput
+  suspensionsMade?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutSuspendedByInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutLiftedByInput
+  studyResourcesAdded?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutUploadedByInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCreatedByInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutCancelledByInput
+}
+
+export type UserCreateOrConnectWithoutTimetableSlotsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTimetableSlotsInput, Prisma.UserUncheckedCreateWithoutTimetableSlotsInput>
+}
+
+export type UserUpsertWithoutTimetableSlotsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTimetableSlotsInput, Prisma.UserUncheckedUpdateWithoutTimetableSlotsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTimetableSlotsInput, Prisma.UserUncheckedCreateWithoutTimetableSlotsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTimetableSlotsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTimetableSlotsInput, Prisma.UserUncheckedUpdateWithoutTimetableSlotsInput>
+}
+
+export type UserUpdateWithoutTimetableSlotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  mfaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mfaEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaBackupCodes?: Prisma.UserUpdatemfaBackupCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
+  ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
+  passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
+  expensesRecorded?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  testsAuthored?: Prisma.TestUpdateManyWithoutCreatedByNestedInput
+  testResultsEntered?: Prisma.TestResultUpdateManyWithoutEnteredByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutUserNestedInput
+  leaveReviews?: Prisma.LeaveRequestUpdateManyWithoutReviewedByNestedInput
+  portalStudent?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  parentMeetingsCreated?: Prisma.ParentMeetingUpdateManyWithoutCreatedByNestedInput
+  supportTicketsCreated?: Prisma.SupportTicketUpdateManyWithoutCreatedByNestedInput
+  supportTicketMessages?: Prisma.SupportTicketMessageUpdateManyWithoutAuthorNestedInput
+  suspensionsMade?: Prisma.InstituteSuspensionUpdateManyWithoutSuspendedByNestedInput
+  suspensionsLifted?: Prisma.InstituteSuspensionUpdateManyWithoutLiftedByNestedInput
+  studyResourcesAdded?: Prisma.StudyResourceUpdateManyWithoutUploadedByNestedInput
+  maintenanceWindowsCreated?: Prisma.MaintenanceWindowUpdateManyWithoutCreatedByNestedInput
+  maintenanceWindowsCancelled?: Prisma.MaintenanceWindowUpdateManyWithoutCancelledByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTimetableSlotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  termsAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  mfaSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mfaEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mfaBackupCodes?: Prisma.UserUpdatemfaBackupCodesInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
+  lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -2878,6 +3117,7 @@ export type UserCreateWithoutTestsAuthoredInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -2918,6 +3158,7 @@ export type UserUncheckedCreateWithoutTestsAuthoredInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -2974,6 +3215,7 @@ export type UserUpdateWithoutTestsAuthoredInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -3014,6 +3256,7 @@ export type UserUncheckedUpdateWithoutTestsAuthoredInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -3054,6 +3297,7 @@ export type UserCreateWithoutTestResultsEnteredInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -3094,6 +3338,7 @@ export type UserUncheckedCreateWithoutTestResultsEnteredInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -3150,6 +3395,7 @@ export type UserUpdateWithoutTestResultsEnteredInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -3190,6 +3436,7 @@ export type UserUncheckedUpdateWithoutTestResultsEnteredInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -3230,6 +3477,7 @@ export type UserCreateWithoutTeachingAssignmentsInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
   passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
@@ -3270,6 +3518,7 @@ export type UserUncheckedCreateWithoutTeachingAssignmentsInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
   passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
@@ -3326,6 +3575,7 @@ export type UserUpdateWithoutTeachingAssignmentsInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
   passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
@@ -3366,6 +3616,7 @@ export type UserUncheckedUpdateWithoutTeachingAssignmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
   passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
@@ -3406,6 +3657,7 @@ export type UserCreateWithoutSalaryProfileInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   passwordResetOtps?: Prisma.PasswordResetOtpCreateNestedManyWithoutUserInput
@@ -3446,6 +3698,7 @@ export type UserUncheckedCreateWithoutSalaryProfileInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   passwordResetOtps?: Prisma.PasswordResetOtpUncheckedCreateNestedManyWithoutUserInput
@@ -3502,6 +3755,7 @@ export type UserUpdateWithoutSalaryProfileInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   passwordResetOtps?: Prisma.PasswordResetOtpUpdateManyWithoutUserNestedInput
@@ -3542,6 +3796,7 @@ export type UserUncheckedUpdateWithoutSalaryProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   passwordResetOtps?: Prisma.PasswordResetOtpUncheckedUpdateManyWithoutUserNestedInput
@@ -3582,6 +3837,7 @@ export type UserCreateWithoutExpensesRecordedInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -3622,6 +3878,7 @@ export type UserUncheckedCreateWithoutExpensesRecordedInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -3678,6 +3935,7 @@ export type UserUpdateWithoutExpensesRecordedInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -3718,6 +3976,7 @@ export type UserUncheckedUpdateWithoutExpensesRecordedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -3758,6 +4017,7 @@ export type UserCreateWithoutLeaveRequestsInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -3798,6 +4058,7 @@ export type UserUncheckedCreateWithoutLeaveRequestsInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -3843,6 +4104,7 @@ export type UserCreateWithoutLeaveReviewsInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -3883,6 +4145,7 @@ export type UserUncheckedCreateWithoutLeaveReviewsInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -3939,6 +4202,7 @@ export type UserUpdateWithoutLeaveRequestsInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -3979,6 +4243,7 @@ export type UserUncheckedUpdateWithoutLeaveRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4030,6 +4295,7 @@ export type UserUpdateWithoutLeaveReviewsInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -4070,6 +4336,7 @@ export type UserUncheckedUpdateWithoutLeaveReviewsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4110,6 +4377,7 @@ export type UserCreateWithoutSuspensionsMadeInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -4150,6 +4418,7 @@ export type UserUncheckedCreateWithoutSuspensionsMadeInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4195,6 +4464,7 @@ export type UserCreateWithoutSuspensionsLiftedInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -4235,6 +4505,7 @@ export type UserUncheckedCreateWithoutSuspensionsLiftedInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4291,6 +4562,7 @@ export type UserUpdateWithoutSuspensionsMadeInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -4331,6 +4603,7 @@ export type UserUncheckedUpdateWithoutSuspensionsMadeInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4382,6 +4655,7 @@ export type UserUpdateWithoutSuspensionsLiftedInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -4422,6 +4696,7 @@ export type UserUncheckedUpdateWithoutSuspensionsLiftedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4462,6 +4737,7 @@ export type UserCreateWithoutMaintenanceWindowsCreatedInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -4502,6 +4778,7 @@ export type UserUncheckedCreateWithoutMaintenanceWindowsCreatedInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4547,6 +4824,7 @@ export type UserCreateWithoutMaintenanceWindowsCancelledInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -4587,6 +4865,7 @@ export type UserUncheckedCreateWithoutMaintenanceWindowsCancelledInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4643,6 +4922,7 @@ export type UserUpdateWithoutMaintenanceWindowsCreatedInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -4683,6 +4963,7 @@ export type UserUncheckedUpdateWithoutMaintenanceWindowsCreatedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4734,6 +5015,7 @@ export type UserUpdateWithoutMaintenanceWindowsCancelledInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -4774,6 +5056,7 @@ export type UserUncheckedUpdateWithoutMaintenanceWindowsCancelledInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -4814,6 +5097,7 @@ export type UserCreateWithoutStudyResourcesAddedInput = {
   institute?: Prisma.InstituteCreateNestedOneWithoutUsersInput
   ownedOrganization?: Prisma.OrganizationCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileCreateNestedOneWithoutUserInput
@@ -4854,6 +5138,7 @@ export type UserUncheckedCreateWithoutStudyResourcesAddedInput = {
   updatedAt?: Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedCreateNestedOneWithoutOwnerInput
   lecturesTaught?: Prisma.LectureUncheckedCreateNestedManyWithoutFacultyInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutFacultyInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedCreateNestedManyWithoutFacultyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   salaryProfile?: Prisma.SalaryProfileUncheckedCreateNestedOneWithoutUserInput
@@ -4910,6 +5195,7 @@ export type UserUpdateWithoutStudyResourcesAddedInput = {
   institute?: Prisma.InstituteUpdateOneWithoutUsersNestedInput
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -4950,6 +5236,7 @@ export type UserUncheckedUpdateWithoutStudyResourcesAddedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -5008,6 +5295,7 @@ export type UserUpdateWithoutInstituteInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUpdateOneWithoutUserNestedInput
@@ -5048,6 +5336,7 @@ export type UserUncheckedUpdateWithoutInstituteInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedOrganization?: Prisma.OrganizationUncheckedUpdateOneWithoutOwnerNestedInput
   lecturesTaught?: Prisma.LectureUncheckedUpdateManyWithoutFacultyNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutFacultyNestedInput
   teachingAssignments?: Prisma.FacultyAssignmentUncheckedUpdateManyWithoutFacultyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   salaryProfile?: Prisma.SalaryProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -5095,6 +5384,7 @@ export type UserUncheckedUpdateManyWithoutInstituteInput = {
 
 export type UserCountOutputType = {
   lecturesTaught: number
+  timetableSlots: number
   teachingAssignments: number
   notifications: number
   passwordResetOtps: number
@@ -5116,6 +5406,7 @@ export type UserCountOutputType = {
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lecturesTaught?: boolean | UserCountOutputTypeCountLecturesTaughtArgs
+  timetableSlots?: boolean | UserCountOutputTypeCountTimetableSlotsArgs
   teachingAssignments?: boolean | UserCountOutputTypeCountTeachingAssignmentsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   passwordResetOtps?: boolean | UserCountOutputTypeCountPasswordResetOtpsArgs
@@ -5150,6 +5441,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  */
 export type UserCountOutputTypeCountLecturesTaughtArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LectureWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTimetableSlotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TimetableSlotWhereInput
 }
 
 /**
@@ -5293,6 +5591,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   institute?: boolean | Prisma.User$instituteArgs<ExtArgs>
   ownedOrganization?: boolean | Prisma.User$ownedOrganizationArgs<ExtArgs>
   lecturesTaught?: boolean | Prisma.User$lecturesTaughtArgs<ExtArgs>
+  timetableSlots?: boolean | Prisma.User$timetableSlotsArgs<ExtArgs>
   teachingAssignments?: boolean | Prisma.User$teachingAssignmentsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   salaryProfile?: boolean | Prisma.User$salaryProfileArgs<ExtArgs>
@@ -5382,6 +5681,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   institute?: boolean | Prisma.User$instituteArgs<ExtArgs>
   ownedOrganization?: boolean | Prisma.User$ownedOrganizationArgs<ExtArgs>
   lecturesTaught?: boolean | Prisma.User$lecturesTaughtArgs<ExtArgs>
+  timetableSlots?: boolean | Prisma.User$timetableSlotsArgs<ExtArgs>
   teachingAssignments?: boolean | Prisma.User$teachingAssignmentsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   salaryProfile?: boolean | Prisma.User$salaryProfileArgs<ExtArgs>
@@ -5416,6 +5716,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     institute: Prisma.$InstitutePayload<ExtArgs> | null
     ownedOrganization: Prisma.$OrganizationPayload<ExtArgs> | null
     lecturesTaught: Prisma.$LecturePayload<ExtArgs>[]
+    timetableSlots: Prisma.$TimetableSlotPayload<ExtArgs>[]
     teachingAssignments: Prisma.$FacultyAssignmentPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     salaryProfile: Prisma.$SalaryProfilePayload<ExtArgs> | null
@@ -5885,6 +6186,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   institute<T extends Prisma.User$instituteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$instituteArgs<ExtArgs>>): Prisma.Prisma__InstituteClient<runtime.Types.Result.GetResult<Prisma.$InstitutePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ownedOrganization<T extends Prisma.User$ownedOrganizationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedOrganizationArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   lecturesTaught<T extends Prisma.User$lecturesTaughtArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$lecturesTaughtArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LecturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  timetableSlots<T extends Prisma.User$timetableSlotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$timetableSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimetableSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   teachingAssignments<T extends Prisma.User$teachingAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$teachingAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FacultyAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   salaryProfile<T extends Prisma.User$salaryProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$salaryProfileArgs<ExtArgs>>): Prisma.Prisma__SalaryProfileClient<runtime.Types.Result.GetResult<Prisma.$SalaryProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -6410,6 +6712,30 @@ export type User$lecturesTaughtArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.LectureScalarFieldEnum | Prisma.LectureScalarFieldEnum[]
+}
+
+/**
+ * User.timetableSlots
+ */
+export type User$timetableSlotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TimetableSlot
+   */
+  select?: Prisma.TimetableSlotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TimetableSlot
+   */
+  omit?: Prisma.TimetableSlotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TimetableSlotInclude<ExtArgs> | null
+  where?: Prisma.TimetableSlotWhereInput
+  orderBy?: Prisma.TimetableSlotOrderByWithRelationInput | Prisma.TimetableSlotOrderByWithRelationInput[]
+  cursor?: Prisma.TimetableSlotWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TimetableSlotScalarFieldEnum | Prisma.TimetableSlotScalarFieldEnum[]
 }
 
 /**

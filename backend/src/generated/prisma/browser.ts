@@ -248,6 +248,16 @@ export type StudentBatch = Prisma.StudentBatchModel
  */
 export type Lecture = Prisma.LectureModel
 /**
+ * Model Room
+ * 
+ */
+export type Room = Prisma.RoomModel
+/**
+ * Model TimetableSlot
+ * 
+ */
+export type TimetableSlot = Prisma.TimetableSlotModel
+/**
  * Model Test
  * A test definition — the paper, the marks scheme, the instructions. It is
  * scheduled into one Lecture row (kind = TEST) per batch it's held for, so

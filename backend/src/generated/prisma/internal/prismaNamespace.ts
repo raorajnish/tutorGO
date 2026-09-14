@@ -428,6 +428,8 @@ export const ModelName = {
   StudentSubject: 'StudentSubject',
   StudentBatch: 'StudentBatch',
   Lecture: 'Lecture',
+  Room: 'Room',
+  TimetableSlot: 'TimetableSlot',
   Test: 'Test',
   TestResult: 'TestResult',
   AttendanceRecord: 'AttendanceRecord',
@@ -472,7 +474,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "supportTicket" | "supportTicketMessage" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "instituteWhatsAppConfig" | "whatsAppTemplate" | "outboundMessage" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "parentMeeting" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentSubject" | "studentBatch" | "lecture" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeStructureSubjectLine" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "institutePaymentConfig" | "paymentProof" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt" | "leaveRequest" | "instituteSuspension" | "maintenanceWindow" | "studyResource"
+    modelProps: "plan" | "organization" | "institute" | "module" | "instituteModule" | "user" | "supportTicket" | "supportTicketMessage" | "pushSubscription" | "passwordResetOtp" | "emailConfig" | "instituteEmailConfig" | "instituteWhatsAppConfig" | "whatsAppTemplate" | "outboundMessage" | "messageLog" | "auditLog" | "notification" | "scheduledReminder" | "course" | "subject" | "courseSubject" | "batch" | "parentMeeting" | "enquiry" | "enquiryActivity" | "studentCodeCounter" | "student" | "studentSubject" | "studentBatch" | "lecture" | "room" | "timetableSlot" | "test" | "testResult" | "attendanceRecord" | "facultyAssignment" | "messageTemplate" | "feeStructure" | "feeStructureSubjectLine" | "feeAccount" | "feeInstallment" | "payment" | "paymentAllocation" | "institutePaymentConfig" | "paymentProof" | "receiptCounter" | "salaryProfile" | "payrollLineItem" | "payrollPayment" | "payrollPaymentAllocation" | "payrollRun" | "expenseCategory" | "event" | "expense" | "financeEntry" | "distributionItem" | "distributionReceipt" | "leaveRequest" | "instituteSuspension" | "maintenanceWindow" | "studyResource"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2767,6 +2769,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.LectureCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.LectureCountAggregateOutputType> | number
+        }
+      }
+    }
+    Room: {
+      payload: Prisma.$RoomPayload<ExtArgs>
+      fields: Prisma.RoomFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RoomFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RoomFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>
+        }
+        findFirst: {
+          args: Prisma.RoomFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RoomFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>
+        }
+        findMany: {
+          args: Prisma.RoomFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>[]
+        }
+        create: {
+          args: Prisma.RoomCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>
+        }
+        createMany: {
+          args: Prisma.RoomCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RoomCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>[]
+        }
+        delete: {
+          args: Prisma.RoomDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>
+        }
+        update: {
+          args: Prisma.RoomUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>
+        }
+        deleteMany: {
+          args: Prisma.RoomDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RoomUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RoomUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>[]
+        }
+        upsert: {
+          args: Prisma.RoomUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoomPayload>
+        }
+        aggregate: {
+          args: Prisma.RoomAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRoom>
+        }
+        groupBy: {
+          args: Prisma.RoomGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RoomGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RoomCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RoomCountAggregateOutputType> | number
+        }
+      }
+    }
+    TimetableSlot: {
+      payload: Prisma.$TimetableSlotPayload<ExtArgs>
+      fields: Prisma.TimetableSlotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TimetableSlotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TimetableSlotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>
+        }
+        findFirst: {
+          args: Prisma.TimetableSlotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TimetableSlotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>
+        }
+        findMany: {
+          args: Prisma.TimetableSlotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>[]
+        }
+        create: {
+          args: Prisma.TimetableSlotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>
+        }
+        createMany: {
+          args: Prisma.TimetableSlotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TimetableSlotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>[]
+        }
+        delete: {
+          args: Prisma.TimetableSlotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>
+        }
+        update: {
+          args: Prisma.TimetableSlotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>
+        }
+        deleteMany: {
+          args: Prisma.TimetableSlotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TimetableSlotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TimetableSlotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>[]
+        }
+        upsert: {
+          args: Prisma.TimetableSlotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TimetableSlotPayload>
+        }
+        aggregate: {
+          args: Prisma.TimetableSlotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTimetableSlot>
+        }
+        groupBy: {
+          args: Prisma.TimetableSlotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TimetableSlotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TimetableSlotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TimetableSlotCountAggregateOutputType> | number
         }
       }
     }
@@ -5450,6 +5600,7 @@ export const LectureScalarFieldEnum = {
   batchId: 'batchId',
   subjectId: 'subjectId',
   facultyId: 'facultyId',
+  roomId: 'roomId',
   kind: 'kind',
   testId: 'testId',
   date: 'date',
@@ -5463,6 +5614,39 @@ export const LectureScalarFieldEnum = {
 } as const
 
 export type LectureScalarFieldEnum = (typeof LectureScalarFieldEnum)[keyof typeof LectureScalarFieldEnum]
+
+
+export const RoomScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  name: 'name',
+  code: 'code',
+  capacity: 'capacity',
+  building: 'building',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoomScalarFieldEnum = (typeof RoomScalarFieldEnum)[keyof typeof RoomScalarFieldEnum]
+
+
+export const TimetableSlotScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  batchId: 'batchId',
+  subjectId: 'subjectId',
+  facultyId: 'facultyId',
+  roomId: 'roomId',
+  dayOfWeek: 'dayOfWeek',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TimetableSlotScalarFieldEnum = (typeof TimetableSlotScalarFieldEnum)[keyof typeof TimetableSlotScalarFieldEnum]
 
 
 export const TestScalarFieldEnum = {
@@ -6263,6 +6447,20 @@ export type ListEnumLectureKindFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'DayOfWeek'
+ */
+export type EnumDayOfWeekFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DayOfWeek'>
+    
+
+
+/**
+ * Reference to a field of type 'DayOfWeek[]'
+ */
+export type ListEnumDayOfWeekFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DayOfWeek[]'>
+    
+
+
+/**
  * Reference to a field of type 'AttendanceStatus'
  */
 export type EnumAttendanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AttendanceStatus'>
@@ -6625,6 +6823,8 @@ export type GlobalOmitConfig = {
   studentSubject?: Prisma.StudentSubjectOmit
   studentBatch?: Prisma.StudentBatchOmit
   lecture?: Prisma.LectureOmit
+  room?: Prisma.RoomOmit
+  timetableSlot?: Prisma.TimetableSlotOmit
   test?: Prisma.TestOmit
   testResult?: Prisma.TestResultOmit
   attendanceRecord?: Prisma.AttendanceRecordOmit

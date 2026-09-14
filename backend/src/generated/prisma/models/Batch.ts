@@ -218,6 +218,7 @@ export type BatchWhereInput = {
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   students?: Prisma.StudentBatchListRelationFilter
   lectures?: Prisma.LectureListRelationFilter
+  timetableSlots?: Prisma.TimetableSlotListRelationFilter
   parentMeetings?: Prisma.ParentMeetingListRelationFilter
 }
 
@@ -235,6 +236,7 @@ export type BatchOrderByWithRelationInput = {
   course?: Prisma.CourseOrderByWithRelationInput
   students?: Prisma.StudentBatchOrderByRelationAggregateInput
   lectures?: Prisma.LectureOrderByRelationAggregateInput
+  timetableSlots?: Prisma.TimetableSlotOrderByRelationAggregateInput
   parentMeetings?: Prisma.ParentMeetingOrderByRelationAggregateInput
 }
 
@@ -255,6 +257,7 @@ export type BatchWhereUniqueInput = Prisma.AtLeast<{
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   students?: Prisma.StudentBatchListRelationFilter
   lectures?: Prisma.LectureListRelationFilter
+  timetableSlots?: Prisma.TimetableSlotListRelationFilter
   parentMeetings?: Prisma.ParentMeetingListRelationFilter
 }, "id">
 
@@ -300,6 +303,7 @@ export type BatchCreateInput = {
   course: Prisma.CourseCreateNestedOneWithoutBatchesInput
   students?: Prisma.StudentBatchCreateNestedManyWithoutBatchInput
   lectures?: Prisma.LectureCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutBatchInput
 }
 
@@ -315,6 +319,7 @@ export type BatchUncheckedCreateInput = {
   updatedAt?: Date | string
   students?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutBatchInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutBatchInput
 }
 
@@ -330,6 +335,7 @@ export type BatchUpdateInput = {
   course?: Prisma.CourseUpdateOneRequiredWithoutBatchesNestedInput
   students?: Prisma.StudentBatchUpdateManyWithoutBatchNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutBatchNestedInput
 }
 
@@ -345,6 +351,7 @@ export type BatchUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentBatchUncheckedUpdateManyWithoutBatchNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutBatchNestedInput
 }
 
@@ -559,6 +566,20 @@ export type BatchUpdateOneRequiredWithoutLecturesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BatchUpdateToOneWithWhereWithoutLecturesInput, Prisma.BatchUpdateWithoutLecturesInput>, Prisma.BatchUncheckedUpdateWithoutLecturesInput>
 }
 
+export type BatchCreateNestedOneWithoutTimetableSlotsInput = {
+  create?: Prisma.XOR<Prisma.BatchCreateWithoutTimetableSlotsInput, Prisma.BatchUncheckedCreateWithoutTimetableSlotsInput>
+  connectOrCreate?: Prisma.BatchCreateOrConnectWithoutTimetableSlotsInput
+  connect?: Prisma.BatchWhereUniqueInput
+}
+
+export type BatchUpdateOneRequiredWithoutTimetableSlotsNestedInput = {
+  create?: Prisma.XOR<Prisma.BatchCreateWithoutTimetableSlotsInput, Prisma.BatchUncheckedCreateWithoutTimetableSlotsInput>
+  connectOrCreate?: Prisma.BatchCreateOrConnectWithoutTimetableSlotsInput
+  upsert?: Prisma.BatchUpsertWithoutTimetableSlotsInput
+  connect?: Prisma.BatchWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BatchUpdateToOneWithWhereWithoutTimetableSlotsInput, Prisma.BatchUpdateWithoutTimetableSlotsInput>, Prisma.BatchUncheckedUpdateWithoutTimetableSlotsInput>
+}
+
 export type BatchCreateWithoutInstituteInput = {
   id?: string
   name: string
@@ -570,6 +591,7 @@ export type BatchCreateWithoutInstituteInput = {
   course: Prisma.CourseCreateNestedOneWithoutBatchesInput
   students?: Prisma.StudentBatchCreateNestedManyWithoutBatchInput
   lectures?: Prisma.LectureCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutBatchInput
 }
 
@@ -584,6 +606,7 @@ export type BatchUncheckedCreateWithoutInstituteInput = {
   updatedAt?: Date | string
   students?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutBatchInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutBatchInput
 }
 
@@ -639,6 +662,7 @@ export type BatchCreateWithoutCourseInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutBatchesInput
   students?: Prisma.StudentBatchCreateNestedManyWithoutBatchInput
   lectures?: Prisma.LectureCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutBatchInput
 }
 
@@ -653,6 +677,7 @@ export type BatchUncheckedCreateWithoutCourseInput = {
   updatedAt?: Date | string
   students?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutBatchInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutBatchInput
 }
 
@@ -694,6 +719,7 @@ export type BatchCreateWithoutParentMeetingsInput = {
   course: Prisma.CourseCreateNestedOneWithoutBatchesInput
   students?: Prisma.StudentBatchCreateNestedManyWithoutBatchInput
   lectures?: Prisma.LectureCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutBatchInput
 }
 
 export type BatchUncheckedCreateWithoutParentMeetingsInput = {
@@ -708,6 +734,7 @@ export type BatchUncheckedCreateWithoutParentMeetingsInput = {
   updatedAt?: Date | string
   students?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutBatchInput
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutBatchInput
 }
 
 export type BatchCreateOrConnectWithoutParentMeetingsInput = {
@@ -738,6 +765,7 @@ export type BatchUpdateWithoutParentMeetingsInput = {
   course?: Prisma.CourseUpdateOneRequiredWithoutBatchesNestedInput
   students?: Prisma.StudentBatchUpdateManyWithoutBatchNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutBatchNestedInput
 }
 
 export type BatchUncheckedUpdateWithoutParentMeetingsInput = {
@@ -752,6 +780,7 @@ export type BatchUncheckedUpdateWithoutParentMeetingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentBatchUncheckedUpdateManyWithoutBatchNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutBatchNestedInput
 }
 
 export type BatchCreateWithoutStudentsInput = {
@@ -765,6 +794,7 @@ export type BatchCreateWithoutStudentsInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutBatchesInput
   course: Prisma.CourseCreateNestedOneWithoutBatchesInput
   lectures?: Prisma.LectureCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutBatchInput
 }
 
@@ -779,6 +809,7 @@ export type BatchUncheckedCreateWithoutStudentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutBatchInput
 }
 
@@ -809,6 +840,7 @@ export type BatchUpdateWithoutStudentsInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutBatchesNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutBatchesNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutBatchNestedInput
 }
 
@@ -823,6 +855,7 @@ export type BatchUncheckedUpdateWithoutStudentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutBatchNestedInput
 }
 
@@ -837,6 +870,7 @@ export type BatchCreateWithoutLecturesInput = {
   institute: Prisma.InstituteCreateNestedOneWithoutBatchesInput
   course: Prisma.CourseCreateNestedOneWithoutBatchesInput
   students?: Prisma.StudentBatchCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutBatchInput
 }
 
@@ -851,6 +885,7 @@ export type BatchUncheckedCreateWithoutLecturesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   students?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutBatchInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutBatchInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutBatchInput
 }
 
@@ -881,6 +916,7 @@ export type BatchUpdateWithoutLecturesInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutBatchesNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutBatchesNestedInput
   students?: Prisma.StudentBatchUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutBatchNestedInput
 }
 
@@ -895,6 +931,83 @@ export type BatchUncheckedUpdateWithoutLecturesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentBatchUncheckedUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutBatchNestedInput
+  parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutBatchNestedInput
+}
+
+export type BatchCreateWithoutTimetableSlotsInput = {
+  id?: string
+  name: string
+  startDate: Date | string
+  endDate?: Date | string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutBatchesInput
+  course: Prisma.CourseCreateNestedOneWithoutBatchesInput
+  students?: Prisma.StudentBatchCreateNestedManyWithoutBatchInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutBatchInput
+  parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutBatchInput
+}
+
+export type BatchUncheckedCreateWithoutTimetableSlotsInput = {
+  id?: string
+  instituteId: string
+  courseId: string
+  name: string
+  startDate: Date | string
+  endDate?: Date | string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  students?: Prisma.StudentBatchUncheckedCreateNestedManyWithoutBatchInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutBatchInput
+  parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutBatchInput
+}
+
+export type BatchCreateOrConnectWithoutTimetableSlotsInput = {
+  where: Prisma.BatchWhereUniqueInput
+  create: Prisma.XOR<Prisma.BatchCreateWithoutTimetableSlotsInput, Prisma.BatchUncheckedCreateWithoutTimetableSlotsInput>
+}
+
+export type BatchUpsertWithoutTimetableSlotsInput = {
+  update: Prisma.XOR<Prisma.BatchUpdateWithoutTimetableSlotsInput, Prisma.BatchUncheckedUpdateWithoutTimetableSlotsInput>
+  create: Prisma.XOR<Prisma.BatchCreateWithoutTimetableSlotsInput, Prisma.BatchUncheckedCreateWithoutTimetableSlotsInput>
+  where?: Prisma.BatchWhereInput
+}
+
+export type BatchUpdateToOneWithWhereWithoutTimetableSlotsInput = {
+  where?: Prisma.BatchWhereInput
+  data: Prisma.XOR<Prisma.BatchUpdateWithoutTimetableSlotsInput, Prisma.BatchUncheckedUpdateWithoutTimetableSlotsInput>
+}
+
+export type BatchUpdateWithoutTimetableSlotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutBatchesNestedInput
+  course?: Prisma.CourseUpdateOneRequiredWithoutBatchesNestedInput
+  students?: Prisma.StudentBatchUpdateManyWithoutBatchNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutBatchNestedInput
+  parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutBatchNestedInput
+}
+
+export type BatchUncheckedUpdateWithoutTimetableSlotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  students?: Prisma.StudentBatchUncheckedUpdateManyWithoutBatchNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutBatchNestedInput
 }
 
@@ -920,6 +1033,7 @@ export type BatchUpdateWithoutInstituteInput = {
   course?: Prisma.CourseUpdateOneRequiredWithoutBatchesNestedInput
   students?: Prisma.StudentBatchUpdateManyWithoutBatchNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutBatchNestedInput
 }
 
@@ -934,6 +1048,7 @@ export type BatchUncheckedUpdateWithoutInstituteInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentBatchUncheckedUpdateManyWithoutBatchNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutBatchNestedInput
 }
 
@@ -970,6 +1085,7 @@ export type BatchUpdateWithoutCourseInput = {
   institute?: Prisma.InstituteUpdateOneRequiredWithoutBatchesNestedInput
   students?: Prisma.StudentBatchUpdateManyWithoutBatchNestedInput
   lectures?: Prisma.LectureUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutBatchNestedInput
 }
 
@@ -984,6 +1100,7 @@ export type BatchUncheckedUpdateWithoutCourseInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentBatchUncheckedUpdateManyWithoutBatchNestedInput
   lectures?: Prisma.LectureUncheckedUpdateManyWithoutBatchNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutBatchNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutBatchNestedInput
 }
 
@@ -1006,12 +1123,14 @@ export type BatchUncheckedUpdateManyWithoutCourseInput = {
 export type BatchCountOutputType = {
   students: number
   lectures: number
+  timetableSlots: number
   parentMeetings: number
 }
 
 export type BatchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   students?: boolean | BatchCountOutputTypeCountStudentsArgs
   lectures?: boolean | BatchCountOutputTypeCountLecturesArgs
+  timetableSlots?: boolean | BatchCountOutputTypeCountTimetableSlotsArgs
   parentMeetings?: boolean | BatchCountOutputTypeCountParentMeetingsArgs
 }
 
@@ -1042,6 +1161,13 @@ export type BatchCountOutputTypeCountLecturesArgs<ExtArgs extends runtime.Types.
 /**
  * BatchCountOutputType without action
  */
+export type BatchCountOutputTypeCountTimetableSlotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TimetableSlotWhereInput
+}
+
+/**
+ * BatchCountOutputType without action
+ */
 export type BatchCountOutputTypeCountParentMeetingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ParentMeetingWhereInput
 }
@@ -1061,6 +1187,7 @@ export type BatchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   students?: boolean | Prisma.Batch$studentsArgs<ExtArgs>
   lectures?: boolean | Prisma.Batch$lecturesArgs<ExtArgs>
+  timetableSlots?: boolean | Prisma.Batch$timetableSlotsArgs<ExtArgs>
   parentMeetings?: boolean | Prisma.Batch$parentMeetingsArgs<ExtArgs>
   _count?: boolean | Prisma.BatchCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["batch"]>
@@ -1111,6 +1238,7 @@ export type BatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   students?: boolean | Prisma.Batch$studentsArgs<ExtArgs>
   lectures?: boolean | Prisma.Batch$lecturesArgs<ExtArgs>
+  timetableSlots?: boolean | Prisma.Batch$timetableSlotsArgs<ExtArgs>
   parentMeetings?: boolean | Prisma.Batch$parentMeetingsArgs<ExtArgs>
   _count?: boolean | Prisma.BatchCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1130,6 +1258,7 @@ export type $BatchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     course: Prisma.$CoursePayload<ExtArgs>
     students: Prisma.$StudentBatchPayload<ExtArgs>[]
     lectures: Prisma.$LecturePayload<ExtArgs>[]
+    timetableSlots: Prisma.$TimetableSlotPayload<ExtArgs>[]
     parentMeetings: Prisma.$ParentMeetingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1540,6 +1669,7 @@ export interface Prisma__BatchClient<T, Null = never, ExtArgs extends runtime.Ty
   course<T extends Prisma.CourseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   students<T extends Prisma.Batch$studentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Batch$studentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudentBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   lectures<T extends Prisma.Batch$lecturesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Batch$lecturesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LecturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  timetableSlots<T extends Prisma.Batch$timetableSlotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Batch$timetableSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimetableSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   parentMeetings<T extends Prisma.Batch$parentMeetingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Batch$parentMeetingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParentMeetingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2025,6 +2155,30 @@ export type Batch$lecturesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.LectureScalarFieldEnum | Prisma.LectureScalarFieldEnum[]
+}
+
+/**
+ * Batch.timetableSlots
+ */
+export type Batch$timetableSlotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TimetableSlot
+   */
+  select?: Prisma.TimetableSlotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TimetableSlot
+   */
+  omit?: Prisma.TimetableSlotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TimetableSlotInclude<ExtArgs> | null
+  where?: Prisma.TimetableSlotWhereInput
+  orderBy?: Prisma.TimetableSlotOrderByWithRelationInput | Prisma.TimetableSlotOrderByWithRelationInput[]
+  cursor?: Prisma.TimetableSlotWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TimetableSlotScalarFieldEnum | Prisma.TimetableSlotScalarFieldEnum[]
 }
 
 /**

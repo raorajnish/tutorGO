@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import { useMessageTemplate } from "@/lib/useMessageTemplate";
 import { lectureScheduledVars, renderTemplate } from "@/lib/messageTemplates";
-import { MAX_NOTE_LENGTH, type Batch, type Course, type FacultyCourseAssignment, type FacultyRef, type Lecture, type ScheduleLecturePayload } from "@/lib/types";
+import { MAX_NOTE_LENGTH, type Batch, type Course, type FacultyCourseAssignment, type FacultyRef, type Lecture, type Room, type ScheduleLecturePayload } from "@/lib/types";
 import { todayInput } from "@/lib/format";
 
 interface Props {
@@ -43,12 +43,14 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
   const [courses, setCourses] = useState<Course[]>([]);
   const [batches, setBatches] = useState<Batch[]>([]);
   const [faculty, setFaculty] = useState<FacultyRef[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [assignments, setAssignments] = useState<FacultyCourseAssignment[]>([]);
 
   const [courseId, setCourseId] = useState("");
   const [batchId, setBatchId] = useState("");
   const [subjectId, setSubjectId] = useState("");
   const [facultyId, setFacultyId] = useState("");
+  const [roomId, setRoomId] = useState("");
   const [date, setDate] = useState(defaultDate);
   const [startTime, setStartTime] = useState("");
   const [duration, setDuration] = useState("120");
@@ -67,6 +69,7 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
     setBatchId("");
     setSubjectId("");
     setFacultyId(isFaculty ? (user?.id ?? "") : "");
+    setRoomId("");
     setAssignments([]);
     setDate(defaultDate);
     setStartTime("");
@@ -77,6 +80,12 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
     setScheduled(null);
 
     apiFetch<Course[]>("/academics/courses?active=true").then(setCourses);
+    apiFetch<Room[]>("/rooms")
+      .then((data) => {
+        setRooms(data);
+        if (data.length === 1) setRoomId(data[0]!.id);
+      })
+      .catch(() => setRooms([]));
     if (!isFaculty) apiFetch<FacultyRef[]>("/attendance/faculty").then(setFaculty);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, defaultDate, isFaculty]);
@@ -170,13 +179,14 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
     setError(null);
     setSubmitting(true);
 
-    const payload: ScheduleLecturePayload = {
+    const payload: ScheduleLecturePayload & { roomId?: string } = {
       batchId,
       subjectId,
       date,
       startTime,
       endTime,
       facultyId: isFaculty ? undefined : facultyId,
+      roomId: roomId || undefined,
       note: note || undefined,
     };
 
@@ -276,6 +286,14 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
             disabled={!courseId}
           />
         </div>
+
+        <Dropdown
+          label="Classroom / Room (optional)"
+          value={roomId}
+          onChange={setRoomId}
+          options={rooms.map((r) => ({ value: r.id, label: `${r.name}${r.capacity ? ` (${r.capacity} seats)` : ""}` }))}
+          placeholder="Select room (optional)…"
+        />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Input label="Date" type="date" required min={todayInput()} value={date} onChange={(e) => setDate(e.target.value)} />

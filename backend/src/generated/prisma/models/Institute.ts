@@ -408,6 +408,8 @@ export type InstituteWhereInput = {
   paymentProofs?: Prisma.PaymentProofListRelationFilter
   parentMeetings?: Prisma.ParentMeetingListRelationFilter
   supportTickets?: Prisma.SupportTicketListRelationFilter
+  rooms?: Prisma.RoomListRelationFilter
+  timetableSlots?: Prisma.TimetableSlotListRelationFilter
   suspensions?: Prisma.InstituteSuspensionListRelationFilter
   studyResources?: Prisma.StudyResourceListRelationFilter
   maintenanceWindows?: Prisma.MaintenanceWindowListRelationFilter
@@ -470,6 +472,8 @@ export type InstituteOrderByWithRelationInput = {
   paymentProofs?: Prisma.PaymentProofOrderByRelationAggregateInput
   parentMeetings?: Prisma.ParentMeetingOrderByRelationAggregateInput
   supportTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
+  rooms?: Prisma.RoomOrderByRelationAggregateInput
+  timetableSlots?: Prisma.TimetableSlotOrderByRelationAggregateInput
   suspensions?: Prisma.InstituteSuspensionOrderByRelationAggregateInput
   studyResources?: Prisma.StudyResourceOrderByRelationAggregateInput
   maintenanceWindows?: Prisma.MaintenanceWindowOrderByRelationAggregateInput
@@ -535,6 +539,8 @@ export type InstituteWhereUniqueInput = Prisma.AtLeast<{
   paymentProofs?: Prisma.PaymentProofListRelationFilter
   parentMeetings?: Prisma.ParentMeetingListRelationFilter
   supportTickets?: Prisma.SupportTicketListRelationFilter
+  rooms?: Prisma.RoomListRelationFilter
+  timetableSlots?: Prisma.TimetableSlotListRelationFilter
   suspensions?: Prisma.InstituteSuspensionListRelationFilter
   studyResources?: Prisma.StudyResourceListRelationFilter
   maintenanceWindows?: Prisma.MaintenanceWindowListRelationFilter
@@ -653,6 +659,8 @@ export type InstituteCreateInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -713,6 +721,8 @@ export type InstituteUncheckedCreateInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -773,6 +783,8 @@ export type InstituteUpdateInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -833,6 +845,8 @@ export type InstituteUncheckedUpdateInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -1348,6 +1362,34 @@ export type InstituteUpdateOneRequiredWithoutLecturesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutLecturesInput, Prisma.InstituteUpdateWithoutLecturesInput>, Prisma.InstituteUncheckedUpdateWithoutLecturesInput>
 }
 
+export type InstituteCreateNestedOneWithoutRoomsInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutRoomsInput, Prisma.InstituteUncheckedCreateWithoutRoomsInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutRoomsInput
+  connect?: Prisma.InstituteWhereUniqueInput
+}
+
+export type InstituteUpdateOneRequiredWithoutRoomsNestedInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutRoomsInput, Prisma.InstituteUncheckedCreateWithoutRoomsInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutRoomsInput
+  upsert?: Prisma.InstituteUpsertWithoutRoomsInput
+  connect?: Prisma.InstituteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutRoomsInput, Prisma.InstituteUpdateWithoutRoomsInput>, Prisma.InstituteUncheckedUpdateWithoutRoomsInput>
+}
+
+export type InstituteCreateNestedOneWithoutTimetableSlotsInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutTimetableSlotsInput, Prisma.InstituteUncheckedCreateWithoutTimetableSlotsInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutTimetableSlotsInput
+  connect?: Prisma.InstituteWhereUniqueInput
+}
+
+export type InstituteUpdateOneRequiredWithoutTimetableSlotsNestedInput = {
+  create?: Prisma.XOR<Prisma.InstituteCreateWithoutTimetableSlotsInput, Prisma.InstituteUncheckedCreateWithoutTimetableSlotsInput>
+  connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutTimetableSlotsInput
+  upsert?: Prisma.InstituteUpsertWithoutTimetableSlotsInput
+  connect?: Prisma.InstituteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstituteUpdateToOneWithWhereWithoutTimetableSlotsInput, Prisma.InstituteUpdateWithoutTimetableSlotsInput>, Prisma.InstituteUncheckedUpdateWithoutTimetableSlotsInput>
+}
+
 export type InstituteCreateNestedOneWithoutTestsInput = {
   create?: Prisma.XOR<Prisma.InstituteCreateWithoutTestsInput, Prisma.InstituteUncheckedCreateWithoutTestsInput>
   connectOrCreate?: Prisma.InstituteCreateOrConnectWithoutTestsInput
@@ -1670,6 +1712,8 @@ export type InstituteCreateWithoutPlanInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -1729,6 +1773,8 @@ export type InstituteUncheckedCreateWithoutPlanInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -1842,6 +1888,8 @@ export type InstituteCreateWithoutOrganizationInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -1901,6 +1949,8 @@ export type InstituteUncheckedCreateWithoutOrganizationInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -1986,6 +2036,8 @@ export type InstituteCreateWithoutModulesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -2045,6 +2097,8 @@ export type InstituteUncheckedCreateWithoutModulesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -2120,6 +2174,8 @@ export type InstituteUpdateWithoutModulesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -2179,6 +2235,8 @@ export type InstituteUncheckedUpdateWithoutModulesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2238,6 +2296,8 @@ export type InstituteCreateWithoutUsersInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -2297,6 +2357,8 @@ export type InstituteUncheckedCreateWithoutUsersInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -2372,6 +2434,8 @@ export type InstituteUpdateWithoutUsersInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -2431,6 +2495,8 @@ export type InstituteUncheckedUpdateWithoutUsersInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2490,6 +2556,8 @@ export type InstituteCreateWithoutSupportTicketsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigCreateNestedOneWithoutInstituteInput
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -2549,6 +2617,8 @@ export type InstituteUncheckedCreateWithoutSupportTicketsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUncheckedCreateNestedOneWithoutInstituteInput
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -2624,6 +2694,8 @@ export type InstituteUpdateWithoutSupportTicketsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUpdateOneWithoutInstituteNestedInput
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -2683,6 +2755,8 @@ export type InstituteUncheckedUpdateWithoutSupportTicketsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUncheckedUpdateOneWithoutInstituteNestedInput
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2742,6 +2816,8 @@ export type InstituteCreateWithoutEmailConfigInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -2801,6 +2877,8 @@ export type InstituteUncheckedCreateWithoutEmailConfigInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -2876,6 +2954,8 @@ export type InstituteUpdateWithoutEmailConfigInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -2935,6 +3015,8 @@ export type InstituteUncheckedUpdateWithoutEmailConfigInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -2994,6 +3076,8 @@ export type InstituteCreateWithoutWhatsAppConfigInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -3053,6 +3137,8 @@ export type InstituteUncheckedCreateWithoutWhatsAppConfigInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -3128,6 +3214,8 @@ export type InstituteUpdateWithoutWhatsAppConfigInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -3187,6 +3275,8 @@ export type InstituteUncheckedUpdateWithoutWhatsAppConfigInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3246,6 +3336,8 @@ export type InstituteCreateWithoutWhatsAppTemplatesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -3305,6 +3397,8 @@ export type InstituteUncheckedCreateWithoutWhatsAppTemplatesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -3380,6 +3474,8 @@ export type InstituteUpdateWithoutWhatsAppTemplatesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -3439,6 +3535,8 @@ export type InstituteUncheckedUpdateWithoutWhatsAppTemplatesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3498,6 +3596,8 @@ export type InstituteCreateWithoutOutboundMessagesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -3557,6 +3657,8 @@ export type InstituteUncheckedCreateWithoutOutboundMessagesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -3632,6 +3734,8 @@ export type InstituteUpdateWithoutOutboundMessagesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -3691,6 +3795,8 @@ export type InstituteUncheckedUpdateWithoutOutboundMessagesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -3750,6 +3856,8 @@ export type InstituteCreateWithoutNotificationsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -3809,6 +3917,8 @@ export type InstituteUncheckedCreateWithoutNotificationsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -3884,6 +3994,8 @@ export type InstituteUpdateWithoutNotificationsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -3943,6 +4055,8 @@ export type InstituteUncheckedUpdateWithoutNotificationsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4002,6 +4116,8 @@ export type InstituteCreateWithoutRemindersInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -4061,6 +4177,8 @@ export type InstituteUncheckedCreateWithoutRemindersInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -4136,6 +4254,8 @@ export type InstituteUpdateWithoutRemindersInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -4195,6 +4315,8 @@ export type InstituteUncheckedUpdateWithoutRemindersInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4254,6 +4376,8 @@ export type InstituteCreateWithoutCoursesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -4313,6 +4437,8 @@ export type InstituteUncheckedCreateWithoutCoursesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -4388,6 +4514,8 @@ export type InstituteUpdateWithoutCoursesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -4447,6 +4575,8 @@ export type InstituteUncheckedUpdateWithoutCoursesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4506,6 +4636,8 @@ export type InstituteCreateWithoutSubjectsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -4565,6 +4697,8 @@ export type InstituteUncheckedCreateWithoutSubjectsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -4640,6 +4774,8 @@ export type InstituteUpdateWithoutSubjectsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -4699,6 +4835,8 @@ export type InstituteUncheckedUpdateWithoutSubjectsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -4758,6 +4896,8 @@ export type InstituteCreateWithoutBatchesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -4817,6 +4957,8 @@ export type InstituteUncheckedCreateWithoutBatchesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -4892,6 +5034,8 @@ export type InstituteUpdateWithoutBatchesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -4951,6 +5095,8 @@ export type InstituteUncheckedUpdateWithoutBatchesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5010,6 +5156,8 @@ export type InstituteCreateWithoutParentMeetingsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigCreateNestedOneWithoutInstituteInput
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -5069,6 +5217,8 @@ export type InstituteUncheckedCreateWithoutParentMeetingsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUncheckedCreateNestedOneWithoutInstituteInput
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -5144,6 +5294,8 @@ export type InstituteUpdateWithoutParentMeetingsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUpdateOneWithoutInstituteNestedInput
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -5203,6 +5355,8 @@ export type InstituteUncheckedUpdateWithoutParentMeetingsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUncheckedUpdateOneWithoutInstituteNestedInput
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5262,6 +5416,8 @@ export type InstituteCreateWithoutEnquiriesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -5321,6 +5477,8 @@ export type InstituteUncheckedCreateWithoutEnquiriesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -5396,6 +5554,8 @@ export type InstituteUpdateWithoutEnquiriesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -5455,6 +5615,8 @@ export type InstituteUncheckedUpdateWithoutEnquiriesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5514,6 +5676,8 @@ export type InstituteCreateWithoutStudentsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -5573,6 +5737,8 @@ export type InstituteUncheckedCreateWithoutStudentsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -5648,6 +5814,8 @@ export type InstituteUpdateWithoutStudentsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -5707,6 +5875,8 @@ export type InstituteUncheckedUpdateWithoutStudentsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -5766,6 +5936,8 @@ export type InstituteCreateWithoutLecturesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -5825,6 +5997,8 @@ export type InstituteUncheckedCreateWithoutLecturesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -5900,6 +6074,8 @@ export type InstituteUpdateWithoutLecturesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -5959,6 +6135,528 @@ export type InstituteUncheckedUpdateWithoutLecturesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
+  suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
+  maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteCreateWithoutRoomsInput = {
+  id?: string
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
+  organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
+  plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
+  users?: Prisma.UserCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
+  paymentConfig?: Prisma.InstitutePaymentConfigCreateNestedOneWithoutInstituteInput
+  paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
+  parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
+  suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
+  maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteUncheckedCreateWithoutRoomsInput = {
+  id?: string
+  organizationId: string
+  planId?: string | null
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
+  paymentConfig?: Prisma.InstitutePaymentConfigUncheckedCreateNestedOneWithoutInstituteInput
+  paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
+  parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
+  suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
+  maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteCreateOrConnectWithoutRoomsInput = {
+  where: Prisma.InstituteWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutRoomsInput, Prisma.InstituteUncheckedCreateWithoutRoomsInput>
+}
+
+export type InstituteUpsertWithoutRoomsInput = {
+  update: Prisma.XOR<Prisma.InstituteUpdateWithoutRoomsInput, Prisma.InstituteUncheckedUpdateWithoutRoomsInput>
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutRoomsInput, Prisma.InstituteUncheckedCreateWithoutRoomsInput>
+  where?: Prisma.InstituteWhereInput
+}
+
+export type InstituteUpdateToOneWithWhereWithoutRoomsInput = {
+  where?: Prisma.InstituteWhereInput
+  data: Prisma.XOR<Prisma.InstituteUpdateWithoutRoomsInput, Prisma.InstituteUncheckedUpdateWithoutRoomsInput>
+}
+
+export type InstituteUpdateWithoutRoomsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
+  plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
+  users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
+  paymentConfig?: Prisma.InstitutePaymentConfigUpdateOneWithoutInstituteNestedInput
+  paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
+  parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
+  suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
+  maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteUncheckedUpdateWithoutRoomsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
+  paymentConfig?: Prisma.InstitutePaymentConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
+  parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
+  suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
+  maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteCreateWithoutTimetableSlotsInput = {
+  id?: string
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
+  organization: Prisma.OrganizationCreateNestedOneWithoutInstitutesInput
+  plan?: Prisma.PlanCreateNestedOneWithoutInstitutesInput
+  users?: Prisma.UserCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutInstituteInput
+  paymentConfig?: Prisma.InstitutePaymentConfigCreateNestedOneWithoutInstituteInput
+  paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
+  parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
+  maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteUncheckedCreateWithoutTimetableSlotsInput = {
+  id?: string
+  organizationId: string
+  planId?: string | null
+  code: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  isActive?: boolean
+  biometricEnabled?: boolean
+  onboardingStep?: number
+  onboardingDone?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  maxAdmins?: number | null
+  maxAccountants?: number | null
+  maxFaculty?: number | null
+  maxReception?: number | null
+  maxStudents?: number | null
+  planLimitsSetAt?: Date | string | null
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutInstituteInput
+  modules?: Prisma.InstituteModuleUncheckedCreateNestedManyWithoutInstituteInput
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstituteInput
+  subjects?: Prisma.SubjectUncheckedCreateNestedManyWithoutInstituteInput
+  batches?: Prisma.BatchUncheckedCreateNestedManyWithoutInstituteInput
+  enquiries?: Prisma.EnquiryUncheckedCreateNestedManyWithoutInstituteInput
+  students?: Prisma.StudentUncheckedCreateNestedManyWithoutInstituteInput
+  lectures?: Prisma.LectureUncheckedCreateNestedManyWithoutInstituteInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  feeStructures?: Prisma.FeeStructureUncheckedCreateNestedManyWithoutInstituteInput
+  feeAccounts?: Prisma.FeeAccountUncheckedCreateNestedManyWithoutInstituteInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutInstituteInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedCreateNestedManyWithoutInstituteInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedCreateNestedManyWithoutInstituteInput
+  payrollRuns?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutInstituteInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutInstituteInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedCreateNestedOneWithoutInstituteInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedCreateNestedManyWithoutInstituteInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedCreateNestedManyWithoutInstituteInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutInstituteInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutInstituteInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutInstituteInput
+  financeEntries?: Prisma.FinanceEntryUncheckedCreateNestedManyWithoutInstituteInput
+  tests?: Prisma.TestUncheckedCreateNestedManyWithoutInstituteInput
+  reminders?: Prisma.ScheduledReminderUncheckedCreateNestedManyWithoutInstituteInput
+  distributionItems?: Prisma.DistributionItemUncheckedCreateNestedManyWithoutInstituteInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutInstituteInput
+  paymentConfig?: Prisma.InstitutePaymentConfigUncheckedCreateNestedOneWithoutInstituteInput
+  paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
+  parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
+  maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
+}
+
+export type InstituteCreateOrConnectWithoutTimetableSlotsInput = {
+  where: Prisma.InstituteWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutTimetableSlotsInput, Prisma.InstituteUncheckedCreateWithoutTimetableSlotsInput>
+}
+
+export type InstituteUpsertWithoutTimetableSlotsInput = {
+  update: Prisma.XOR<Prisma.InstituteUpdateWithoutTimetableSlotsInput, Prisma.InstituteUncheckedUpdateWithoutTimetableSlotsInput>
+  create: Prisma.XOR<Prisma.InstituteCreateWithoutTimetableSlotsInput, Prisma.InstituteUncheckedCreateWithoutTimetableSlotsInput>
+  where?: Prisma.InstituteWhereInput
+}
+
+export type InstituteUpdateToOneWithWhereWithoutTimetableSlotsInput = {
+  where?: Prisma.InstituteWhereInput
+  data: Prisma.XOR<Prisma.InstituteUpdateWithoutTimetableSlotsInput, Prisma.InstituteUncheckedUpdateWithoutTimetableSlotsInput>
+}
+
+export type InstituteUpdateWithoutTimetableSlotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutInstitutesNestedInput
+  plan?: Prisma.PlanUpdateOneWithoutInstitutesNestedInput
+  users?: Prisma.UserUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutInstituteNestedInput
+  paymentConfig?: Prisma.InstitutePaymentConfigUpdateOneWithoutInstituteNestedInput
+  paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
+  parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
+  maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
+}
+
+export type InstituteUncheckedUpdateWithoutTimetableSlotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  planId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  biometricEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingStep?: Prisma.IntFieldUpdateOperationsInput | number
+  onboardingDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxAdmins?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxAccountants?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxFaculty?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxReception?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  maxStudents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  planLimitsSetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUncheckedUpdateManyWithoutInstituteNestedInput
+  modules?: Prisma.InstituteModuleUncheckedUpdateManyWithoutInstituteNestedInput
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstituteNestedInput
+  subjects?: Prisma.SubjectUncheckedUpdateManyWithoutInstituteNestedInput
+  batches?: Prisma.BatchUncheckedUpdateManyWithoutInstituteNestedInput
+  enquiries?: Prisma.EnquiryUncheckedUpdateManyWithoutInstituteNestedInput
+  students?: Prisma.StudentUncheckedUpdateManyWithoutInstituteNestedInput
+  lectures?: Prisma.LectureUncheckedUpdateManyWithoutInstituteNestedInput
+  messageTemplates?: Prisma.MessageTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  feeStructures?: Prisma.FeeStructureUncheckedUpdateManyWithoutInstituteNestedInput
+  feeAccounts?: Prisma.FeeAccountUncheckedUpdateManyWithoutInstituteNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  salaryProfiles?: Prisma.SalaryProfileUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollPayments?: Prisma.PayrollPaymentUncheckedUpdateManyWithoutInstituteNestedInput
+  payrollRuns?: Prisma.PayrollRunUncheckedUpdateManyWithoutInstituteNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutInstituteNestedInput
+  emailConfig?: Prisma.InstituteEmailConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppConfig?: Prisma.InstituteWhatsAppConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  whatsAppTemplates?: Prisma.WhatsAppTemplateUncheckedUpdateManyWithoutInstituteNestedInput
+  outboundMessages?: Prisma.OutboundMessageUncheckedUpdateManyWithoutInstituteNestedInput
+  expenseCategories?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutInstituteNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutInstituteNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutInstituteNestedInput
+  financeEntries?: Prisma.FinanceEntryUncheckedUpdateManyWithoutInstituteNestedInput
+  tests?: Prisma.TestUncheckedUpdateManyWithoutInstituteNestedInput
+  reminders?: Prisma.ScheduledReminderUncheckedUpdateManyWithoutInstituteNestedInput
+  distributionItems?: Prisma.DistributionItemUncheckedUpdateManyWithoutInstituteNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutInstituteNestedInput
+  paymentConfig?: Prisma.InstitutePaymentConfigUncheckedUpdateOneWithoutInstituteNestedInput
+  paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
+  parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6018,6 +6716,8 @@ export type InstituteCreateWithoutTestsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -6077,6 +6777,8 @@ export type InstituteUncheckedCreateWithoutTestsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -6152,6 +6854,8 @@ export type InstituteUpdateWithoutTestsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -6211,6 +6915,8 @@ export type InstituteUncheckedUpdateWithoutTestsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6270,6 +6976,8 @@ export type InstituteCreateWithoutMessageTemplatesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -6329,6 +7037,8 @@ export type InstituteUncheckedCreateWithoutMessageTemplatesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -6404,6 +7114,8 @@ export type InstituteUpdateWithoutMessageTemplatesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -6463,6 +7175,8 @@ export type InstituteUncheckedUpdateWithoutMessageTemplatesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6522,6 +7236,8 @@ export type InstituteCreateWithoutFeeStructuresInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -6581,6 +7297,8 @@ export type InstituteUncheckedCreateWithoutFeeStructuresInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -6656,6 +7374,8 @@ export type InstituteUpdateWithoutFeeStructuresInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -6715,6 +7435,8 @@ export type InstituteUncheckedUpdateWithoutFeeStructuresInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -6774,6 +7496,8 @@ export type InstituteCreateWithoutFeeAccountsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -6833,6 +7557,8 @@ export type InstituteUncheckedCreateWithoutFeeAccountsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -6908,6 +7634,8 @@ export type InstituteUpdateWithoutFeeAccountsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -6967,6 +7695,8 @@ export type InstituteUncheckedUpdateWithoutFeeAccountsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -7026,6 +7756,8 @@ export type InstituteCreateWithoutPaymentsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -7085,6 +7817,8 @@ export type InstituteUncheckedCreateWithoutPaymentsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -7160,6 +7894,8 @@ export type InstituteUpdateWithoutPaymentsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -7219,6 +7955,8 @@ export type InstituteUncheckedUpdateWithoutPaymentsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -7278,6 +8016,8 @@ export type InstituteCreateWithoutPaymentConfigInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -7337,6 +8077,8 @@ export type InstituteUncheckedCreateWithoutPaymentConfigInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -7412,6 +8154,8 @@ export type InstituteUpdateWithoutPaymentConfigInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -7471,6 +8215,8 @@ export type InstituteUncheckedUpdateWithoutPaymentConfigInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -7530,6 +8276,8 @@ export type InstituteCreateWithoutPaymentProofsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigCreateNestedOneWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -7589,6 +8337,8 @@ export type InstituteUncheckedCreateWithoutPaymentProofsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUncheckedCreateNestedOneWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -7664,6 +8414,8 @@ export type InstituteUpdateWithoutPaymentProofsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUpdateOneWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -7723,6 +8475,8 @@ export type InstituteUncheckedUpdateWithoutPaymentProofsInput = {
   paymentConfig?: Prisma.InstitutePaymentConfigUncheckedUpdateOneWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -7782,6 +8536,8 @@ export type InstituteCreateWithoutSalaryProfilesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -7841,6 +8597,8 @@ export type InstituteUncheckedCreateWithoutSalaryProfilesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -7916,6 +8674,8 @@ export type InstituteUpdateWithoutSalaryProfilesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -7975,6 +8735,8 @@ export type InstituteUncheckedUpdateWithoutSalaryProfilesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -8034,6 +8796,8 @@ export type InstituteCreateWithoutPayrollPaymentsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -8093,6 +8857,8 @@ export type InstituteUncheckedCreateWithoutPayrollPaymentsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -8168,6 +8934,8 @@ export type InstituteUpdateWithoutPayrollPaymentsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -8227,6 +8995,8 @@ export type InstituteUncheckedUpdateWithoutPayrollPaymentsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -8286,6 +9056,8 @@ export type InstituteCreateWithoutPayrollRunsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -8345,6 +9117,8 @@ export type InstituteUncheckedCreateWithoutPayrollRunsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -8420,6 +9194,8 @@ export type InstituteUpdateWithoutPayrollRunsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -8479,6 +9255,8 @@ export type InstituteUncheckedUpdateWithoutPayrollRunsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -8538,6 +9316,8 @@ export type InstituteCreateWithoutExpenseCategoriesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -8597,6 +9377,8 @@ export type InstituteUncheckedCreateWithoutExpenseCategoriesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -8672,6 +9454,8 @@ export type InstituteUpdateWithoutExpenseCategoriesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -8731,6 +9515,8 @@ export type InstituteUncheckedUpdateWithoutExpenseCategoriesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -8790,6 +9576,8 @@ export type InstituteCreateWithoutEventsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -8849,6 +9637,8 @@ export type InstituteUncheckedCreateWithoutEventsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -8924,6 +9714,8 @@ export type InstituteUpdateWithoutEventsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -8983,6 +9775,8 @@ export type InstituteUncheckedUpdateWithoutEventsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -9042,6 +9836,8 @@ export type InstituteCreateWithoutExpensesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -9101,6 +9897,8 @@ export type InstituteUncheckedCreateWithoutExpensesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -9176,6 +9974,8 @@ export type InstituteUpdateWithoutExpensesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -9235,6 +10035,8 @@ export type InstituteUncheckedUpdateWithoutExpensesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -9294,6 +10096,8 @@ export type InstituteCreateWithoutFinanceEntriesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -9353,6 +10157,8 @@ export type InstituteUncheckedCreateWithoutFinanceEntriesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -9428,6 +10234,8 @@ export type InstituteUpdateWithoutFinanceEntriesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -9487,6 +10295,8 @@ export type InstituteUncheckedUpdateWithoutFinanceEntriesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -9546,6 +10356,8 @@ export type InstituteCreateWithoutDistributionItemsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -9605,6 +10417,8 @@ export type InstituteUncheckedCreateWithoutDistributionItemsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -9680,6 +10494,8 @@ export type InstituteUpdateWithoutDistributionItemsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -9739,6 +10555,8 @@ export type InstituteUncheckedUpdateWithoutDistributionItemsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -9798,6 +10616,8 @@ export type InstituteCreateWithoutLeaveRequestsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
@@ -9857,6 +10677,8 @@ export type InstituteUncheckedCreateWithoutLeaveRequestsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
@@ -9932,6 +10754,8 @@ export type InstituteUpdateWithoutLeaveRequestsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -9991,6 +10815,8 @@ export type InstituteUncheckedUpdateWithoutLeaveRequestsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -10051,6 +10877,8 @@ export type InstituteCreateWithoutSuspensionsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
 }
@@ -10110,6 +10938,8 @@ export type InstituteUncheckedCreateWithoutSuspensionsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
 }
@@ -10185,6 +11015,8 @@ export type InstituteUpdateWithoutSuspensionsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
 }
@@ -10244,6 +11076,8 @@ export type InstituteUncheckedUpdateWithoutSuspensionsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
 }
@@ -10303,6 +11137,8 @@ export type InstituteCreateWithoutMaintenanceWindowsInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceCreateNestedManyWithoutInstituteInput
 }
@@ -10362,6 +11198,8 @@ export type InstituteUncheckedCreateWithoutMaintenanceWindowsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutInstituteInput
 }
@@ -10437,6 +11275,8 @@ export type InstituteUpdateWithoutMaintenanceWindowsInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
 }
@@ -10496,6 +11336,8 @@ export type InstituteUncheckedUpdateWithoutMaintenanceWindowsInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
 }
@@ -10555,6 +11397,8 @@ export type InstituteCreateWithoutStudyResourcesInput = {
   paymentProofs?: Prisma.PaymentProofCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowCreateNestedManyWithoutInstituteInput
 }
@@ -10614,6 +11458,8 @@ export type InstituteUncheckedCreateWithoutStudyResourcesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedCreateNestedManyWithoutInstituteInput
   parentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutInstituteInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutInstituteInput
+  rooms?: Prisma.RoomUncheckedCreateNestedManyWithoutInstituteInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedCreateNestedManyWithoutInstituteInput
   suspensions?: Prisma.InstituteSuspensionUncheckedCreateNestedManyWithoutInstituteInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedCreateNestedManyWithoutInstituteInput
 }
@@ -10689,6 +11535,8 @@ export type InstituteUpdateWithoutStudyResourcesInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
 }
@@ -10748,6 +11596,8 @@ export type InstituteUncheckedUpdateWithoutStudyResourcesInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
 }
@@ -10830,6 +11680,8 @@ export type InstituteUpdateWithoutPlanInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -10889,6 +11741,8 @@ export type InstituteUncheckedUpdateWithoutPlanInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -10996,6 +11850,8 @@ export type InstituteUpdateWithoutOrganizationInput = {
   paymentProofs?: Prisma.PaymentProofUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUpdateManyWithoutInstituteNestedInput
@@ -11055,6 +11911,8 @@ export type InstituteUncheckedUpdateWithoutOrganizationInput = {
   paymentProofs?: Prisma.PaymentProofUncheckedUpdateManyWithoutInstituteNestedInput
   parentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutInstituteNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutInstituteNestedInput
+  rooms?: Prisma.RoomUncheckedUpdateManyWithoutInstituteNestedInput
+  timetableSlots?: Prisma.TimetableSlotUncheckedUpdateManyWithoutInstituteNestedInput
   suspensions?: Prisma.InstituteSuspensionUncheckedUpdateManyWithoutInstituteNestedInput
   studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutInstituteNestedInput
   maintenanceWindows?: Prisma.MaintenanceWindowUncheckedUpdateManyWithoutInstituteNestedInput
@@ -11119,6 +11977,8 @@ export type InstituteCountOutputType = {
   paymentProofs: number
   parentMeetings: number
   supportTickets: number
+  rooms: number
+  timetableSlots: number
   suspensions: number
   studyResources: number
   maintenanceWindows: number
@@ -11154,6 +12014,8 @@ export type InstituteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   paymentProofs?: boolean | InstituteCountOutputTypeCountPaymentProofsArgs
   parentMeetings?: boolean | InstituteCountOutputTypeCountParentMeetingsArgs
   supportTickets?: boolean | InstituteCountOutputTypeCountSupportTicketsArgs
+  rooms?: boolean | InstituteCountOutputTypeCountRoomsArgs
+  timetableSlots?: boolean | InstituteCountOutputTypeCountTimetableSlotsArgs
   suspensions?: boolean | InstituteCountOutputTypeCountSuspensionsArgs
   studyResources?: boolean | InstituteCountOutputTypeCountStudyResourcesArgs
   maintenanceWindows?: boolean | InstituteCountOutputTypeCountMaintenanceWindowsArgs
@@ -11375,6 +12237,20 @@ export type InstituteCountOutputTypeCountSupportTicketsArgs<ExtArgs extends runt
 /**
  * InstituteCountOutputType without action
  */
+export type InstituteCountOutputTypeCountRoomsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RoomWhereInput
+}
+
+/**
+ * InstituteCountOutputType without action
+ */
+export type InstituteCountOutputTypeCountTimetableSlotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TimetableSlotWhereInput
+}
+
+/**
+ * InstituteCountOutputType without action
+ */
 export type InstituteCountOutputTypeCountSuspensionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.InstituteSuspensionWhereInput
 }
@@ -11451,6 +12327,8 @@ export type InstituteSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   paymentProofs?: boolean | Prisma.Institute$paymentProofsArgs<ExtArgs>
   parentMeetings?: boolean | Prisma.Institute$parentMeetingsArgs<ExtArgs>
   supportTickets?: boolean | Prisma.Institute$supportTicketsArgs<ExtArgs>
+  rooms?: boolean | Prisma.Institute$roomsArgs<ExtArgs>
+  timetableSlots?: boolean | Prisma.Institute$timetableSlotsArgs<ExtArgs>
   suspensions?: boolean | Prisma.Institute$suspensionsArgs<ExtArgs>
   studyResources?: boolean | Prisma.Institute$studyResourcesArgs<ExtArgs>
   maintenanceWindows?: boolean | Prisma.Institute$maintenanceWindowsArgs<ExtArgs>
@@ -11572,6 +12450,8 @@ export type InstituteInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   paymentProofs?: boolean | Prisma.Institute$paymentProofsArgs<ExtArgs>
   parentMeetings?: boolean | Prisma.Institute$parentMeetingsArgs<ExtArgs>
   supportTickets?: boolean | Prisma.Institute$supportTicketsArgs<ExtArgs>
+  rooms?: boolean | Prisma.Institute$roomsArgs<ExtArgs>
+  timetableSlots?: boolean | Prisma.Institute$timetableSlotsArgs<ExtArgs>
   suspensions?: boolean | Prisma.Institute$suspensionsArgs<ExtArgs>
   studyResources?: boolean | Prisma.Institute$studyResourcesArgs<ExtArgs>
   maintenanceWindows?: boolean | Prisma.Institute$maintenanceWindowsArgs<ExtArgs>
@@ -11623,6 +12503,8 @@ export type $InstitutePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     paymentProofs: Prisma.$PaymentProofPayload<ExtArgs>[]
     parentMeetings: Prisma.$ParentMeetingPayload<ExtArgs>[]
     supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
+    rooms: Prisma.$RoomPayload<ExtArgs>[]
+    timetableSlots: Prisma.$TimetableSlotPayload<ExtArgs>[]
     suspensions: Prisma.$InstituteSuspensionPayload<ExtArgs>[]
     studyResources: Prisma.$StudyResourcePayload<ExtArgs>[]
     maintenanceWindows: Prisma.$MaintenanceWindowPayload<ExtArgs>[]
@@ -12095,6 +12977,8 @@ export interface Prisma__InstituteClient<T, Null = never, ExtArgs extends runtim
   paymentProofs<T extends Prisma.Institute$paymentProofsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$paymentProofsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentProofPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   parentMeetings<T extends Prisma.Institute$parentMeetingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$parentMeetingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParentMeetingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   supportTickets<T extends Prisma.Institute$supportTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  rooms<T extends Prisma.Institute$roomsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$roomsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RoomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  timetableSlots<T extends Prisma.Institute$timetableSlotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$timetableSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TimetableSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   suspensions<T extends Prisma.Institute$suspensionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$suspensionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InstituteSuspensionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   studyResources<T extends Prisma.Institute$studyResourcesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$studyResourcesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudyResourcePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   maintenanceWindows<T extends Prisma.Institute$maintenanceWindowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institute$maintenanceWindowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaintenanceWindowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -13319,6 +14203,54 @@ export type Institute$supportTicketsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.SupportTicketScalarFieldEnum | Prisma.SupportTicketScalarFieldEnum[]
+}
+
+/**
+ * Institute.rooms
+ */
+export type Institute$roomsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Room
+   */
+  select?: Prisma.RoomSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Room
+   */
+  omit?: Prisma.RoomOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RoomInclude<ExtArgs> | null
+  where?: Prisma.RoomWhereInput
+  orderBy?: Prisma.RoomOrderByWithRelationInput | Prisma.RoomOrderByWithRelationInput[]
+  cursor?: Prisma.RoomWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RoomScalarFieldEnum | Prisma.RoomScalarFieldEnum[]
+}
+
+/**
+ * Institute.timetableSlots
+ */
+export type Institute$timetableSlotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TimetableSlot
+   */
+  select?: Prisma.TimetableSlotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TimetableSlot
+   */
+  omit?: Prisma.TimetableSlotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TimetableSlotInclude<ExtArgs> | null
+  where?: Prisma.TimetableSlotWhereInput
+  orderBy?: Prisma.TimetableSlotOrderByWithRelationInput | Prisma.TimetableSlotOrderByWithRelationInput[]
+  cursor?: Prisma.TimetableSlotWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TimetableSlotScalarFieldEnum | Prisma.TimetableSlotScalarFieldEnum[]
 }
 
 /**

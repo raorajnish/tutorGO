@@ -4,9 +4,10 @@ import { useEffect, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
-import { MAX_NOTE_LENGTH, type Lecture } from "@/lib/types";
+import { MAX_NOTE_LENGTH, type Lecture, type Room } from "@/lib/types";
 import { todayInput } from "@/lib/format";
 
 interface Props {
@@ -19,6 +20,8 @@ export function EditLectureModal({ lecture, onClose, onSaved }: Props) {
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [roomId, setRoomId] = useState("");
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -30,6 +33,19 @@ export function EditLectureModal({ lecture, onClose, onSaved }: Props) {
     setEndTime(lecture.endTime);
     setNote(lecture.note ?? "");
     setError(null);
+
+    apiFetch<Room[]>("/rooms")
+      .then((data) => {
+        setRooms(data);
+        if (lecture.room?.id) {
+          setRoomId(lecture.room.id);
+        } else if (data.length === 1) {
+          setRoomId(data[0]!.id);
+        } else {
+          setRoomId("");
+        }
+      })
+      .catch(() => setRooms([]));
   }, [lecture]);
 
   async function handleSubmit(e: FormEvent) {
@@ -44,7 +60,7 @@ export function EditLectureModal({ lecture, onClose, onSaved }: Props) {
     try {
       await apiFetch(`/attendance/lectures/${lecture.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ date, startTime, endTime, note: note || null }),
+        body: JSON.stringify({ date, startTime, endTime, roomId: roomId || null, note: note || null }),
       });
       onSaved();
       onClose();
@@ -60,7 +76,7 @@ export function EditLectureModal({ lecture, onClose, onSaved }: Props) {
       open={!!lecture}
       onClose={onClose}
       title={lecture ? `Reschedule ${lecture.subject.name} — ${lecture.batch.name}` : "Reschedule lecture"}
-      description="Change the date or time — batch, subject and faculty stay the same."
+      description="Change date, time or classroom — batch, subject and faculty stay the same."
       width="sm"
       footer={
         <>
@@ -79,6 +95,14 @@ export function EditLectureModal({ lecture, onClose, onSaved }: Props) {
           <Input label="Start time" type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} />
           <Input label="End time" type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} />
         </div>
+
+        <Dropdown
+          label="Classroom / Room (optional)"
+          value={roomId}
+          onChange={setRoomId}
+          options={rooms.map((r) => ({ value: r.id, label: `${r.name}${r.capacity ? ` (${r.capacity} seats)` : ""}` }))}
+          placeholder="Select room (optional)…"
+        />
 
         <Textarea
           label="Note (optional)"

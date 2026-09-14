@@ -82,6 +82,8 @@ export const ModelName = {
   StudentSubject: 'StudentSubject',
   StudentBatch: 'StudentBatch',
   Lecture: 'Lecture',
+  Room: 'Room',
+  TimetableSlot: 'TimetableSlot',
   Test: 'Test',
   TestResult: 'TestResult',
   AttendanceRecord: 'AttendanceRecord',
@@ -624,6 +626,7 @@ export const LectureScalarFieldEnum = {
   batchId: 'batchId',
   subjectId: 'subjectId',
   facultyId: 'facultyId',
+  roomId: 'roomId',
   kind: 'kind',
   testId: 'testId',
   date: 'date',
@@ -637,6 +640,39 @@ export const LectureScalarFieldEnum = {
 } as const
 
 export type LectureScalarFieldEnum = (typeof LectureScalarFieldEnum)[keyof typeof LectureScalarFieldEnum]
+
+
+export const RoomScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  name: 'name',
+  code: 'code',
+  capacity: 'capacity',
+  building: 'building',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoomScalarFieldEnum = (typeof RoomScalarFieldEnum)[keyof typeof RoomScalarFieldEnum]
+
+
+export const TimetableSlotScalarFieldEnum = {
+  id: 'id',
+  instituteId: 'instituteId',
+  batchId: 'batchId',
+  subjectId: 'subjectId',
+  facultyId: 'facultyId',
+  roomId: 'roomId',
+  dayOfWeek: 'dayOfWeek',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TimetableSlotScalarFieldEnum = (typeof TimetableSlotScalarFieldEnum)[keyof typeof TimetableSlotScalarFieldEnum]
 
 
 export const TestScalarFieldEnum = {

@@ -24,6 +24,7 @@ export const lectureInclude = {
   batch: { include: { course: { select: { id: true, name: true, code: true } } } },
   subject: { select: { id: true, name: true, shortCode: true } },
   faculty: { select: { id: true, fullName: true } },
+  room: { select: { id: true, name: true, code: true, capacity: true, building: true } },
   test: { select: { id: true, title: true, totalMarks: true } },
 } as const;
 
@@ -40,6 +41,7 @@ export function serializeLecture(l: {
   batch: { id: string; name: string; course: { id: string; name: string; code: string } };
   subject: { id: string; name: string; shortCode: string };
   faculty: { id: string; fullName: string };
+  room?: { id: string; name: string; code: string | null; capacity: number | null; building: string | null } | null;
   test?: { id: string; title: string; totalMarks: number } | null;
 }) {
   return {
@@ -56,6 +58,7 @@ export function serializeLecture(l: {
     batch: { id: l.batch.id, name: l.batch.name, course: l.batch.course },
     subject: { id: l.subject.id, name: l.subject.name, shortCode: l.subject.shortCode },
     faculty: l.faculty,
+    room: l.room ? { id: l.room.id, name: l.room.name, code: l.room.code, capacity: l.room.capacity, building: l.room.building } : null,
   };
 }
 

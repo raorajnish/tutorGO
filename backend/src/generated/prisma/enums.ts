@@ -133,6 +133,19 @@ export const FeeAccountStatus = {
 export type FeeAccountStatus = (typeof FeeAccountStatus)[keyof typeof FeeAccountStatus]
 
 
+export const DayOfWeek = {
+  MONDAY: 'MONDAY',
+  TUESDAY: 'TUESDAY',
+  WEDNESDAY: 'WEDNESDAY',
+  THURSDAY: 'THURSDAY',
+  FRIDAY: 'FRIDAY',
+  SATURDAY: 'SATURDAY',
+  SUNDAY: 'SUNDAY'
+} as const
+
+export type DayOfWeek = (typeof DayOfWeek)[keyof typeof DayOfWeek]
+
+
 export const SalaryType = {
   FIXED: 'FIXED',
   PER_LECTURE: 'PER_LECTURE'

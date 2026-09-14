@@ -109,6 +109,16 @@ enum FeeAccountStatus {
   CLOSED
 }
 
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
 enum SalaryType {
   FIXED
   PER_LECTURE
@@ -258,6 +268,8 @@ model Institute {
   paymentProofs      PaymentProof[]
   parentMeetings     ParentMeeting[]
   supportTickets     SupportTicket[]
+  rooms              Room[]
+  timetableSlots     TimetableSlot[]
   suspensions        InstituteSuspension[]
   studyResources     StudyResource[]
   maintenanceWindows MaintenanceWindow[]
@@ -340,6 +352,7 @@ model User {
   institute                   Institute?             @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   ownedOrganization           Organization?          @relation("OrganizationOwner")
   lecturesTaught              Lecture[]
+  timetableSlots              TimetableSlot[]
   teachingAssignments         FacultyAssignment[]
   notifications               Notification[]
   salaryProfile               SalaryProfile?
@@ -824,6 +837,7 @@ model Subject {
   institute         Institute                 @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   courses           CourseSubject[]
   lectures          Lecture[]
+  timetableSlots    TimetableSlot[]
   assignments       FacultyAssignment[]
   tests             Test[]
   feeStructureLines FeeStructureSubjectLine[]
@@ -865,6 +879,7 @@ model Batch {
   course         Course          @relation(fields: [courseId], references: [id])
   students       StudentBatch[]
   lectures       Lecture[]
+  timetableSlots TimetableSlot[]
   parentMeetings ParentMeeting[]
 
   @@index([instituteId])
@@ -1131,6 +1146,7 @@ model Lecture {
   batchId      String
   subjectId    String
   facultyId    String
+  roomId       String?
   kind         LectureKind @default(LECTURE)
   testId       String?
   date         DateTime    @db.Date
@@ -1146,6 +1162,7 @@ model Lecture {
   batch           Batch              @relation(fields: [batchId], references: [id])
   subject         Subject            @relation(fields: [subjectId], references: [id])
   faculty         User               @relation(fields: [facultyId], references: [id])
+  room            Room?              @relation(fields: [roomId], references: [id], onDelete: SetNull)
   test            Test?              @relation(fields: [testId], references: [id], onDelete: Cascade)
   attendance      AttendanceRecord[]
   results         TestResult[]
@@ -1153,8 +1170,56 @@ model Lecture {
 
   @@index([instituteId, date])
   @@index([batchId, date])
+  @@index([roomId, date])
   @@index([testId])
   @@map("lectures")
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  instituteId String
+  name        String
+  code        String?
+  capacity    Int?
+  building    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  institute      Institute       @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  lectures       Lecture[]
+  timetableSlots TimetableSlot[]
+
+  @@unique([instituteId, name])
+  @@index([instituteId])
+  @@map("rooms")
+}
+
+model TimetableSlot {
+  id          String    @id @default(cuid())
+  instituteId String
+  batchId     String
+  subjectId   String
+  facultyId   String
+  roomId      String?
+  dayOfWeek   DayOfWeek
+  startTime   DateTime  @db.Time
+  endTime     DateTime  @db.Time
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  batch     Batch     @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  subject   Subject   @relation(fields: [subjectId], references: [id])
+  faculty   User      @relation(fields: [facultyId], references: [id])
+  room      Room?     @relation(fields: [roomId], references: [id], onDelete: SetNull)
+
+  @@index([instituteId, dayOfWeek])
+  @@index([batchId, dayOfWeek])
+  @@index([facultyId, dayOfWeek])
+  @@index([roomId, dayOfWeek])
+  @@map("timetable_slots")
 }
 
 /// A test definition — the paper, the marks scheme, the instructions. It is
