@@ -113,7 +113,14 @@ export default function PublicReceiptPage({ params }: PageProps) {
               }))}
             />
 
-            <DocumentTotals rows={[{ label: "Amount received", value: formatMoney(receipt.amount), emphasize: true }]} />
+            <DocumentTotals
+              rows={[
+                { label: "Amount received", value: formatMoney(receipt.amount), emphasize: true },
+                ...(receipt.accountTotals?.balance !== undefined
+                  ? [{ label: "Account balance remaining", value: formatMoney(receipt.accountTotals.balance) }]
+                  : []),
+              ]}
+            />
 
             <DocumentFooter
               lines={[`Recorded on ${formatDate(receipt.createdAt)}`, "This is a computer-generated receipt and requires no signature."]}

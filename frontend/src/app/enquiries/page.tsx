@@ -15,6 +15,7 @@ import { SkeletonRow } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, type Course, type Enquiry, type EnquiryStatus } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 function EditIcon() {
   return (
@@ -117,6 +118,7 @@ export default function EnquiriesPage() {
   );
   const visible = statusTab === "ALL" ? enquiries : enquiries.filter((e) => e.status === statusTab);
   const emptyLabel = statusTab === "ALL" ? "enquiries" : `${ENQUIRY_STATUS_LABELS[statusTab].toLowerCase()} enquiries`;
+  const { paginatedItems, paginationProps } = useClientPagination(visible, 10);
 
   return (
     <div className="space-y-6">
@@ -191,7 +193,7 @@ export default function EnquiriesPage() {
                   </td>
                 </tr>
               ))}
-              {!loading && visible.map((e) => (
+              {!loading && paginatedItems.map((e) => (
                 <tr key={e.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">{e.name}</p>
@@ -251,7 +253,7 @@ export default function EnquiriesPage() {
 
         <div className="divide-y divide-border sm:hidden">
           {loading && Array.from({ length: 6 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {!loading && visible.map((e) => (
+          {!loading && paginatedItems.map((e) => (
             <div key={e.id} className="space-y-2 p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -300,6 +302,14 @@ export default function EnquiriesPage() {
             <EmptyState message={`No ${emptyLabel}.`} actionLabel="New enquiry" onAction={openCreate} />
           )}
         </div>
+
+        {!loading && visible.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <EnquiryModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />

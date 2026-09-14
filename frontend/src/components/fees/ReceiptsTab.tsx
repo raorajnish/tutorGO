@@ -10,12 +10,16 @@ import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatMoney } from "@/lib/money";
 import { PAYMENT_MODE_LABELS, type ReceiptListItem } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 export function ReceiptsTab() {
   const [search, setSearch] = useState("");
   const [receipts, setReceipts] = useState<ReceiptListItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
+
+  const receiptList = receipts ?? [];
+  const { paginatedItems, paginationProps } = useClientPagination(receiptList, 10);
 
   function load() {
     const qs = new URLSearchParams();
@@ -71,7 +75,7 @@ export function ReceiptsTab() {
                     </td>
                   </tr>
                 ))}
-              {receipts !== null && receipts.map((r) => (
+              {receipts !== null && paginatedItems.map((r) => (
                 <tr
                   key={r.id}
                   className="cursor-pointer border-b border-border last:border-0 hover:bg-muted"
@@ -103,6 +107,14 @@ export function ReceiptsTab() {
             </tbody>
           </table>
         </div>
+
+        {receipts !== null && receipts.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <ReceiptModal paymentId={selectedPaymentId} onClose={() => setSelectedPaymentId(null)} />

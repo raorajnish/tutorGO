@@ -14,6 +14,7 @@ import { CancelLectureModal } from "@/components/attendance/CancelLectureModal";
 import { CopyLectureButton } from "@/components/attendance/CopyLectureButton";
 import type { AttendanceStats, Lecture } from "@/lib/types";
 import { formatDate, fmtTime12, todayInput, isFacultyWindowExpired } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 function EditIcon() {
   return (
@@ -54,6 +55,8 @@ export function FacultyLecturesView() {
   const [markLecture, setMarkLecture] = useState<Lecture | null>(null);
   const [editLecture, setEditLecture] = useState<Lecture | null>(null);
   const [cancelLecture, setCancelLecture] = useState<Lecture | null>(null);
+
+  const { paginatedItems, paginationProps } = useClientPagination(lectures, 10);
 
   async function load() {
     setLoading(true);
@@ -132,7 +135,7 @@ export function FacultyLecturesView() {
                   </td>
                 </tr>
               ))}
-              {!loading && lectures.map((l) => (
+              {!loading && paginatedItems.map((l) => (
                 <tr key={l.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="whitespace-nowrap px-4 py-3 text-foreground">{fmtDate(l.date)}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-foreground">
@@ -216,7 +219,7 @@ export function FacultyLecturesView() {
 
         <div className="divide-y divide-border sm:hidden">
           {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {!loading && lectures.map((l) => (
+          {!loading && paginatedItems.map((l) => (
             <div key={l.id} className="space-y-2 p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -287,6 +290,14 @@ export function FacultyLecturesView() {
             </p>
           )}
         </div>
+
+        {!loading && lectures.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <ScheduleLectureModal open={scheduleOpen} onClose={() => setScheduleOpen(false)} onScheduled={load} defaultDate={todayInput()} />

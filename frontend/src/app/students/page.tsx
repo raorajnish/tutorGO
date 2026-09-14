@@ -12,6 +12,7 @@ import { ExportButton } from "@/components/ui/ExportButton";
 import type { Batch, Course, StudentsResponse } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 const StudentProfileModal = dynamic(
   () => import("@/components/students/StudentProfileModal").then((m) => m.StudentProfileModal)
@@ -82,6 +83,7 @@ export default function StudentsPage() {
   }, [search, status, courseId, batchId]);
 
   const students = data?.students ?? [];
+  const { paginatedItems, paginationProps } = useClientPagination(students, 10);
 
   return (
     <div className="space-y-6">
@@ -168,7 +170,7 @@ export default function StudentsPage() {
                 ))
               ) : (
                 <>
-                  {students.map((s) => (
+                  {paginatedItems.map((s) => (
                     <tr
                       key={s.id}
                       onClick={() => setSelectedId(s.id)}
@@ -204,7 +206,7 @@ export default function StudentsPage() {
             Array.from({ length: 6 }, (_, i) => <SkeletonRow key={i} avatar lines={2} />)
           ) : (
             <>
-              {students.map((s) => (
+              {paginatedItems.map((s) => (
                 <div key={s.id} className="space-y-2 p-4" onClick={() => setSelectedId(s.id)}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -222,6 +224,14 @@ export default function StudentsPage() {
             </>
           )}
         </div>
+
+        {!loading && students.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <StudentProfileModal studentId={selectedId} onClose={() => setSelectedId(null)} onChanged={load} />

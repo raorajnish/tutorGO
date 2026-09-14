@@ -263,25 +263,31 @@ input[type="password"]::-webkit-strong-password-auto-fill-button {
    the sidebar, header and page chrome are screen-only furniture. Pages opt in
    by marking their own non-printable parts with Tailwind's `print:hidden`. */
 @media print {
-  .app-shell > aside,
-  .app-shell header {
+  /* Hide standard page furniture when printing */
+  aside,
+  header,
+  nav,
+  .no-print {
     display: none !important;
   }
 
-  .app-shell,
-  .app-shell .content-scroll {
-    display: block !important;
-    height: auto !important;
-    overflow: visible !important;
-    padding: 0 !important;
+  /* When printing while a modal portal is open, hide the background app shell */
+  body:has(.tg-modal-portal) .app-shell {
+    display: none !important;
   }
 
-  .app-shell .content-scroll > div {
-    max-width: none !important;
-    animation: none !important;
+  /* Flatten the portal wrapper during print so it fills the paper page */
+  .tg-modal-portal {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
   }
 
   body {
     background: #fff !important;
+    color: #000 !important;
   }
 }

@@ -9,13 +9,14 @@ export interface DropdownOption {
 }
 
 interface DropdownProps {
-  label?: string;
+  label?: React.ReactNode;
   value: string;
   onChange: (value: string) => void;
   options: DropdownOption[];
   placeholder?: string;
   disabled?: boolean;
   error?: string;
+  required?: boolean;
 }
 
 function highlightMatch(label: string, query: string) {
@@ -39,7 +40,7 @@ interface FloatingPosition {
   bottom?: number;
 }
 
-export function Dropdown({ label, value, onChange, options, placeholder = "Select…", disabled, error }: DropdownProps) {
+export function Dropdown({ label, value, onChange, options, placeholder = "Select…", disabled, error, required }: DropdownProps) {
   // useId(), not a module-level counter: a plain mutable counter increments
   // in whatever order components happen to mount, which the server's render
   // pass and the browser's hydration pass aren't guaranteed to agree on once
@@ -168,7 +169,12 @@ export function Dropdown({ label, value, onChange, options, placeholder = "Selec
 
   return (
     <div ref={rootRef} className="relative flex flex-col gap-1.5">
-      {label && <span className="text-sm font-medium text-foreground">{label}</span>}
+      {label && (
+        <span className="text-sm font-medium text-foreground flex items-center gap-0.5">
+          <span>{label}</span>
+          {required && <span className="text-accent font-semibold text-xs ml-0.5" aria-hidden="true">*</span>}
+        </span>
+      )}
 
       <div
         className={`flex w-full items-center gap-2 rounded-xl border bg-card px-3.5 py-2.5 text-sm transition-colors focus-within:ring-2 focus-within:ring-ring ${

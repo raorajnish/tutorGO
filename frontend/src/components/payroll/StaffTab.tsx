@@ -13,6 +13,7 @@ import { formatMoney, parseMoney } from "@/lib/money";
 import { useAuth } from "@/lib/auth-context";
 import { SALARY_TYPE_LABELS, type PayrollStaffResponse, type SalaryProfileListItem, type UnconfiguredStaffUser } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 export function StaffTab() {
   const { user } = useAuth();
@@ -42,6 +43,8 @@ export function StaffTab() {
     : allStaff;
   const totalPending = allStaff.reduce((sum, s) => sum + Math.max(0, parseMoney(s.pendingAmount)), 0);
   const totalCredit = allStaff.reduce((sum, s) => sum + Math.max(0, -parseMoney(s.pendingAmount)), 0);
+
+  const { paginatedItems: paginatedStaff, paginationProps: staffPaginationProps } = useClientPagination(staff, 10);
 
   return (
     <div className="space-y-6">
@@ -86,7 +89,7 @@ export function StaffTab() {
                 </tr>
               </thead>
               <tbody>
-                {staff.map((s) => {
+                {paginatedStaff.map((s) => {
                   const pending = parseMoney(s.pendingAmount);
                   const inactiveWithBalance = !s.isActive && pending > 0.005;
                   return (
@@ -149,11 +152,19 @@ export function StaffTab() {
               </tbody>
             </table>
           </div>
+
+          {staff.length > 0 && (
+            <Pagination
+              {...staffPaginationProps}
+              pageSizeOptions={[10, 20, 50]}
+              className="border-t border-border bg-card/50"
+            />
+          )}
         </div>
 
         {/* Mobile: cards */}
         <div className="space-y-2 sm:hidden">
-          {staff.map((s) => {
+          {paginatedStaff.map((s) => {
             const pending = parseMoney(s.pendingAmount);
             const inactiveWithBalance = !s.isActive && pending > 0.005;
             return (
@@ -203,6 +214,14 @@ export function StaffTab() {
             <p className="rounded-xl border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
               {allStaff.length === 0 ? "No staff on payroll yet." : "No staff match this search."}
             </p>
+          )}
+
+          {staff.length > 0 && (
+            <Pagination
+              {...staffPaginationProps}
+              pageSizeOptions={[10, 20, 50]}
+              className="rounded-xl border border-border bg-card"
+            />
           )}
         </div>
       </div>

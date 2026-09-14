@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { Prisma } from "../generated/prisma/client.js";
 import { prisma } from "./prisma.js";
 import { money } from "./money.js";
 
@@ -13,7 +14,9 @@ const receiptInclude = {
   institute: { select: { name: true, address: true, phone: true, email: true } },
   feeAccount: {
     select: {
+      id: true,
       student: { select: { id: true, name: true, studentCode: true, course: { select: { name: true, code: true } } } },
+      installments: { select: { amount: true, paidAmount: true, waived: true } },
     },
   },
   allocations: { include: { installment: { select: { seq: true, dueDate: true } } } },
@@ -32,7 +35,7 @@ export function loadReceiptByToken(publicToken: string) {
 /** The one shape both the staff-side view and the public receipt page
  * render — a receipt documents this ONE payment (what it covered, against
  * which installment), not a statement of the whole fee account. */
-export function serializeReceipt(payment: ReceiptRow) {
+export function serializeReceipt(payment: ReceiptRow, accountTotals?: { balance: string | null }) {
   return {
     receiptNumber: payment.receiptNumber,
     amount: money(payment.amount),
@@ -48,5 +51,6 @@ export function serializeReceipt(payment: ReceiptRow) {
       .slice()
       .sort((a, b) => a.installment.seq - b.installment.seq)
       .map((a) => ({ installmentSeq: a.installment.seq, dueDate: a.installment.dueDate, amount: money(a.amount) })),
+    ...(accountTotals ? { accountTotals } : {}),
   };
 }

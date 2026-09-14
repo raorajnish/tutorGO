@@ -1,12 +1,14 @@
 import { Router, type Request } from "express";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
+import { Prisma } from "../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
 import { ApiError } from "../lib/http.js";
 import { validateBody } from "../middleware/validate.js";
 import { rateLimit } from "../middleware/rateLimit.js";
 import { auditLog } from "../services/audit.js";
 import { loadReceiptByToken, serializeReceipt } from "../lib/receiptPayload.js";
+import { money } from "../lib/money.js";
 
 /** Everything mounted here is intentionally unauthenticated — the one public
  * surface in the whole app (§8f). Kept in its own file rather than scattered
@@ -259,7 +261,23 @@ publicRouter.get("/receipts/:token", receiptLimiter, async (req, res, next) => {
     // merely wrong versus ones that once worked.
     if (!payment || payment.publicTokenRevokedAt) throw ApiError.notFound("This receipt link is no longer available.");
 
-    res.json(serializeReceipt(payment));
+    const allAccountPayments = await prisma.payment.findMany({
+      where: { feeAccountId: payment.feeAccountId, voidedAt: null },
+      select: { id: true, amount: true, createdAt: true },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    });
+
+    const totalDue = payment.feeAccount.installments.reduce((sum, i) => sum.plus(i.amount), new Prisma.Decimal(0));
+    const totalPaidAsOfReceipt = allAccountPayments
+      .filter((p) => p.createdAt < payment.createdAt || (p.createdAt.getTime() === payment.createdAt.getTime() && p.id <= payment.id))
+      .reduce((sum, p) => sum.plus(p.amount), new Prisma.Decimal(0));
+    const totalWaived = payment.feeAccount.installments.reduce(
+      (sum, i) => (i.waived ? sum.plus(i.amount.minus(i.paidAmount)) : sum),
+      new Prisma.Decimal(0)
+    );
+    const balance = Prisma.Decimal.max(new Prisma.Decimal(0), totalDue.minus(totalPaidAsOfReceipt).minus(totalWaived));
+
+    res.json(serializeReceipt(payment, { balance: money(balance) }));
   } catch (err) {
     next(err);
   }

@@ -101,7 +101,12 @@ studentsRouter.get("/", async (req, res, next) => {
         include: {
           course: { select: { id: true, name: true, code: true } },
           batches: { where: { leftAt: null }, include: { batch: { select: { id: true, name: true } } } },
-          feeAccount: { select: { id: true } },
+          feeAccount: {
+            select: {
+              id: true,
+              installments: { select: { amount: true, paidAmount: true, waived: true } },
+            },
+          },
         },
         orderBy,
       }),
@@ -111,24 +116,32 @@ studentsRouter.get("/", async (req, res, next) => {
     ]);
 
     res.json({
-      students: students.map((s) => ({
-        id: s.id,
-        studentCode: s.studentCode,
-        name: s.name,
-        email: s.email,
-        phone: s.phone,
-        course: s.course,
-        currentBatch: s.batches[0]?.batch ?? null,
-        admissionDate: s.admissionDate,
-        isActive: s.isActive,
-        hasFeeAccount: s.feeAccount !== null,
-        // null = admitted normally (nothing to self-fill); non-null and
-        // still null-valued *inside* profileCompletedAt would be a
-        // contradiction — this is just "was this row ever bulk-precreated,
-        // and if so has the student filled it in yet".
-        selfFillPending: s.selfFillEligible && s.profileCompletedAt === null,
-        profileCompletedAt: s.profileCompletedAt,
-      })),
+      students: students.map((s) => {
+        let pendingFees: string | null = null;
+        if (s.feeAccount) {
+          const pendingDecimal = s.feeAccount.installments.reduce((sum, i) => {
+            if (i.waived) return sum;
+            const rem = i.amount.minus(i.paidAmount);
+            return rem.gt(0) ? sum.plus(rem) : sum;
+          }, new Prisma.Decimal(0));
+          pendingFees = money(pendingDecimal);
+        }
+        return {
+          id: s.id,
+          studentCode: s.studentCode,
+          name: s.name,
+          email: s.email,
+          phone: s.phone,
+          course: s.course,
+          currentBatch: s.batches[0]?.batch ?? null,
+          admissionDate: s.admissionDate,
+          isActive: s.isActive,
+          hasFeeAccount: s.feeAccount !== null,
+          pendingFees,
+          selfFillPending: s.selfFillEligible && s.profileCompletedAt === null,
+          profileCompletedAt: s.profileCompletedAt,
+        };
+      }),
       stats: {
         activeStudents: activeCount,
         totalStudents: totalCount,

@@ -13,6 +13,7 @@ import { formatMoney } from "@/lib/money";
 import type { Course, FeeStructure, FeePlanType, Subject } from "@/lib/types";
 import { FEE_PLAN_TYPE_LABELS } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 /** courseFee is null on a SUBJECT_WISE structure — its price lives on
  * subjectLines instead, since the total is per-student (whichever subjects
@@ -34,6 +35,8 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<FeeStructure | null>(null);
+
+  const { paginatedItems, paginationProps } = useClientPagination(structures, 10);
 
   async function load() {
     setLoading(true);
@@ -109,7 +112,7 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
                   </td>
                 </tr>
               ))}
-              {!loading && structures.map((s) => (
+              {!loading && paginatedItems.map((s) => (
                 <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3 font-medium text-foreground">{s.name}</td>
                   <td className="px-4 py-3 text-foreground">
@@ -151,7 +154,7 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
         {/* Mobile: cards */}
         <div className="divide-y divide-border sm:hidden">
           {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {!loading && structures.map((s) => (
+          {!loading && paginatedItems.map((s) => (
             <div key={s.id} className="p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -186,6 +189,14 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
             <EmptyState message="No fee structures yet." actionLabel="New fee structure" onAction={openCreate} />
           )}
         </div>
+
+        {!loading && structures.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <FeeStructureModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />

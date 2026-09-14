@@ -12,6 +12,7 @@ import { SkeletonRow } from "@/components/ui/Skeleton";
 import { formatDateTime } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 import type { ApprovePaymentProofResult, StaffPaymentProof } from "@/lib/types";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 const STATUS_TONE = { PENDING: "warning", APPROVED: "success", REJECTED: "danger" } as const;
 
@@ -208,6 +209,9 @@ export function PaymentProofsTab() {
 
   const pendingCount = (proofs ?? []).filter((p) => p.status === "PENDING").length;
 
+  const proofList = proofs ?? [];
+  const { paginatedItems, paginationProps } = useClientPagination(proofList, 10);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -257,7 +261,7 @@ export function PaymentProofsTab() {
                     </td>
                   </tr>
                 ))}
-              {proofs !== null && proofs.map((p) => (
+              {proofs !== null && paginatedItems.map((p) => (
                 <tr key={p.id} onClick={() => setSelected(p)} className="cursor-pointer border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">{p.student.name}</p>
@@ -283,7 +287,7 @@ export function PaymentProofsTab() {
 
         <div className="divide-y divide-border sm:hidden">
           {proofs === null && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} avatar lines={2} />)}
-          {proofs !== null && proofs.map((p) => (
+          {proofs !== null && paginatedItems.map((p) => (
             <div key={p.id} className="space-y-2 p-4" onClick={() => setSelected(p)}>
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -299,6 +303,14 @@ export function PaymentProofsTab() {
           ))}
           {proofs && proofs.length === 0 && <p className="p-6 text-center text-sm text-muted-foreground">Nothing here.</p>}
         </div>
+
+        {proofs !== null && proofs.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <ReviewModal proof={selected} onClose={() => setSelected(null)} onDone={load} />

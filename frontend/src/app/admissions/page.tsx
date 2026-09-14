@@ -15,6 +15,7 @@ import { ImportButton } from "@/components/ui/ImportButton";
 import { ImportModal } from "@/components/ui/ImportModal";
 import { ENQUIRY_SOURCE_LABELS, type Course, type Enquiry, type StudentListItem } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 function UsersIcon() {
   return (
@@ -57,6 +58,9 @@ function AdmissionsContent() {
   const [admitOpen, setAdmitOpen] = useState(false);
   const [admitEnquiry, setAdmitEnquiry] = useState<Enquiry | null>(null);
   const [importOpen, setImportOpen] = useState(false);
+
+  const { paginatedItems: paginatedPipeline, paginationProps: pipelinePaginationProps } = useClientPagination(pipeline, 10);
+  const { paginatedItems: paginatedAdmitted, paginationProps: admittedPaginationProps } = useClientPagination(admitted, 10);
 
   async function load() {
     setLoading(true);
@@ -197,7 +201,7 @@ function AdmissionsContent() {
                       </td>
                     </tr>
                   ))}
-                  {!loading && pipeline.map((e) => (
+                  {!loading && paginatedPipeline.map((e) => (
                     <tr key={e.id} className="border-b border-border last:border-0 hover:bg-muted">
                       <td className="px-4 py-3">
                         <p className="font-medium text-foreground">{e.name}</p>
@@ -228,7 +232,7 @@ function AdmissionsContent() {
 
             <div className="divide-y divide-border sm:hidden">
               {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-              {!loading && pipeline.map((e) => (
+              {!loading && paginatedPipeline.map((e) => (
                 <div key={e.id} className="space-y-2 p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -249,6 +253,14 @@ function AdmissionsContent() {
                 <EmptyState message="No open enquiries." actionLabel="Capture enquiry" onAction={() => router.push("/enquiries")} />
               )}
             </div>
+
+            {!loading && pipeline.length > 0 && (
+              <Pagination
+                {...pipelinePaginationProps}
+                pageSizeOptions={[10, 20, 50]}
+                className="border-t border-border bg-card/50"
+              />
+            )}
           </>
         ) : (
           <>
@@ -271,7 +283,7 @@ function AdmissionsContent() {
                       </td>
                     </tr>
                   ))}
-                  {!loading && admitted.map((s) => (
+                  {!loading && paginatedAdmitted.map((s) => (
                     <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted">
                       <td className="px-4 py-3">
                         <p className="font-medium text-foreground">{s.name}</p>
@@ -298,7 +310,7 @@ function AdmissionsContent() {
 
             <div className="divide-y divide-border sm:hidden">
               {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} avatar lines={2} />)}
-              {!loading && admitted.map((s) => (
+              {!loading && paginatedAdmitted.map((s) => (
                 <div key={s.id} className="space-y-1.5 p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -316,6 +328,14 @@ function AdmissionsContent() {
                 <EmptyState message="No students admitted yet." actionLabel="Admit directly" onAction={openAdmitDirect} />
               )}
             </div>
+
+            {!loading && admitted.length > 0 && (
+              <Pagination
+                {...admittedPaginationProps}
+                pageSizeOptions={[10, 20, 50]}
+                className="border-t border-border bg-card/50"
+              />
+            )}
           </>
         )}
       </div>

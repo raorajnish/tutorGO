@@ -12,6 +12,7 @@ import { SkeletonRow } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { Course, Subject } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_props, ref) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -61,6 +62,7 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
   const visible = courseFilter
     ? subjects.filter((s) => s.courses.some((c) => c.id === courseFilter))
     : subjects;
+  const { paginatedItems, paginationProps } = useClientPagination(visible, 10);
 
   return (
     <div className="space-y-6">
@@ -102,7 +104,7 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
                   </td>
                 </tr>
               ))}
-              {!loading && visible.map((s) => (
+              {!loading && paginatedItems.map((s) => (
                 <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">
@@ -146,7 +148,7 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
 
         <div className="divide-y divide-border sm:hidden">
           {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {!loading && visible.map((s) => (
+          {!loading && paginatedItems.map((s) => (
             <div key={s.id} className="space-y-2 p-4" onClick={() => openEdit(s)}>
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -173,6 +175,14 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
             />
           )}
         </div>
+
+        {!loading && visible.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <SubjectModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />

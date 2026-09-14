@@ -141,6 +141,7 @@ export function AdmitModal({ open, onClose, onAdmitted, courses, enquiry }: Prop
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Dropdown
             label="Course (class/standard)"
+            required
             value={courseId}
             onChange={setCourseId}
             options={courseOptions(courses, enquiry?.course)}
@@ -148,6 +149,7 @@ export function AdmitModal({ open, onClose, onAdmitted, courses, enquiry }: Prop
           />
           <Dropdown
             label="Batch"
+            required
             value={batchId}
             onChange={setBatchId}
             options={batches.map((b) => ({ value: b.id, label: b.name }))}

@@ -15,6 +15,7 @@ import { CopyLectureButton } from "@/components/attendance/CopyLectureButton";
 import { ExportButton } from "@/components/ui/ExportButton";
 import type { Lecture, LectureSummary } from "@/lib/types";
 import { todayInput, fmtTime12, formatDate } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 const FacultyLecturesView = dynamic(
   () => import("@/components/attendance/FacultyLecturesView").then((m) => m.FacultyLecturesView)
@@ -88,6 +89,8 @@ function StaffScheduleView() {
   const [markLecture, setMarkLecture] = useState<Lecture | null>(null);
   const [editLecture, setEditLecture] = useState<Lecture | null>(null);
   const [cancelLecture, setCancelLecture] = useState<Lecture | null>(null);
+
+  const { paginatedItems, paginationProps } = useClientPagination(lectures, 10);
 
   async function load() {
     setLoading(true);
@@ -207,7 +210,7 @@ function StaffScheduleView() {
                   </td>
                 </tr>
               ))}
-              {!loading && lectures.map((l) => (
+              {!loading && paginatedItems.map((l) => (
                 <tr key={l.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="whitespace-nowrap px-4 py-3 text-foreground">
                     {fmtTime12(l.startTime)}–{fmtTime12(l.endTime)}
@@ -293,7 +296,7 @@ function StaffScheduleView() {
 
         <div className="divide-y divide-border sm:hidden">
           {loading && Array.from({ length: 6 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {!loading && lectures.map((l) => (
+          {!loading && paginatedItems.map((l) => (
             <div key={l.id} className="space-y-2 p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -364,6 +367,14 @@ function StaffScheduleView() {
             />
           )}
         </div>
+
+        {!loading && lectures.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <ScheduleLectureModal open={scheduleOpen} onClose={() => setScheduleOpen(false)} onScheduled={load} defaultDate={date} />

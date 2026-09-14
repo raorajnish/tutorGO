@@ -12,6 +12,7 @@ import { renderTemplate, feeOverdueReminderVars } from "@/lib/messageTemplates";
 import { resolveMessageTemplate } from "@/lib/useMessageTemplate";
 import type { OverdueEntry } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: string) => void }) {
   const [entries, setEntries] = useState<OverdueEntry[] | null>(null);
@@ -20,6 +21,9 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
   const [reminderMessage, setReminderMessage] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [sentResult, setSentResult] = useState<{ id: string; text: string } | null>(null);
+
+  const entryList = entries ?? [];
+  const { paginatedItems, paginationProps } = useClientPagination(entryList, 10);
 
   function load() {
     apiFetch<OverdueEntry[]>("/fees/overdue")
@@ -105,7 +109,7 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
                     </td>
                   </tr>
                 ))}
-              {entries !== null && entries.map((e) => (
+              {entries !== null && paginatedItems.map((e) => (
                 <tr key={e.installment.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <button type="button" className="font-medium text-foreground hover:underline" onClick={() => onOpenStudent(e.student.id)}>
@@ -153,6 +157,14 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
             </tbody>
           </table>
         </div>
+
+        {entries !== null && entries.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
 
         {reminderFor && reminderMessage !== null && (
           <div className="border-t border-border p-4">

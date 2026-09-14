@@ -11,6 +11,7 @@ import { SkeletonRow } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { Course, CourseFeeMode } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_props, ref) {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -18,6 +19,8 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Course | null>(null);
+
+  const { paginatedItems, paginationProps } = useClientPagination(courses, 10);
 
   async function load() {
     setLoading(true);
@@ -86,7 +89,7 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
                   </td>
                 </tr>
               ))}
-              {!loading && courses.map((c) => (
+              {!loading && paginatedItems.map((c) => (
                 <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground">
@@ -121,7 +124,7 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
 
         <div className="divide-y divide-border sm:hidden">
           {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {!loading && courses.map((c) => (
+          {!loading && paginatedItems.map((c) => (
             <div key={c.id} className="space-y-2 p-4" onClick={() => openEdit(c)}>
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -139,6 +142,14 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
             <EmptyState message="No courses yet." actionLabel="New course" onAction={openCreate} />
           )}
         </div>
+
+        {!loading && courses.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <CourseModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} />

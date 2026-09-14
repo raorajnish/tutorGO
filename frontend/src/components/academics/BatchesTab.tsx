@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import type { Batch, Course } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 import { formatDate as fmtDate } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_props, ref) {
   const [batches, setBatches] = useState<Batch[]>([]);
@@ -65,6 +66,7 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
   const totalEnrolled = batches.reduce((sum, b) => sum + b.enrolledCount, 0);
 
   const visible = courseFilter ? batches.filter((b) => b.course.id === courseFilter) : batches;
+  const { paginatedItems, paginationProps } = useClientPagination(visible, 10);
 
   return (
     <div className="space-y-6">
@@ -115,7 +117,7 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
                   </td>
                 </tr>
               ))}
-              {!loading && visible.map((b) => (
+              {!loading && paginatedItems.map((b) => (
                 <tr key={b.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3 font-medium text-foreground">{b.name}</td>
                   <td className="px-4 py-3 text-foreground">
@@ -152,7 +154,7 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
 
         <div className="divide-y divide-border sm:hidden">
           {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {!loading && visible.map((b) => (
+          {!loading && paginatedItems.map((b) => (
             <div key={b.id} className="space-y-2 p-4" onClick={() => openEdit(b)}>
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -175,6 +177,14 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
             />
           )}
         </div>
+
+        {!loading && visible.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <BatchModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />

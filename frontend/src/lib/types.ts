@@ -709,6 +709,7 @@ export interface StudentListItem {
   admissionDate: string;
   isActive: boolean;
   hasFeeAccount: boolean;
+  pendingFees?: string | null;
   selfFillPending: boolean;
   profileCompletedAt: string | null;
 }
@@ -1208,6 +1209,7 @@ export interface PublicReceipt {
   institute: { name: string; address: string | null; phone: string | null; email: string | null };
   student: { id: string; name: string; studentCode: string; course: { name: string; code: string } | null };
   allocations: { installmentSeq: number; dueDate: string; amount: string }[];
+  accountTotals?: { balance: string };
 }
 
 export interface ReceiptListItem extends FeePayment {

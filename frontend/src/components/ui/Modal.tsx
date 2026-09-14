@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   open: boolean;
@@ -23,6 +24,12 @@ const WIDTH_CLASSES = {
 };
 
 export function Modal({ open, onClose, title, description, children, footer, width = "md", noDividers = false }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -32,15 +39,19 @@ export function Modal({ open, onClose, title, description, children, footer, wid
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" onClick={onClose} aria-hidden="true" />
+  return createPortal(
+    <div className="tg-modal-portal fixed inset-0 z-50 flex items-end justify-center sm:items-center print:static print:z-auto print:block print:w-full print:p-0 print:m-0">
+      {/* Translucent backdrop — hidden during print */}
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] print:hidden" onClick={onClose} aria-hidden="true" />
+      
+      {/* Modal Dialog Card — unstyled during print so it fills the sheet without borders/shadows */}
       <div
-        className={`relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-xl border border-border bg-card shadow-(--shadow-overlay) sm:rounded-xl ${WIDTH_CLASSES[width]}`}
+        className={`relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-xl border border-border bg-card shadow-(--shadow-overlay) sm:rounded-xl print:static print:max-h-none print:w-full print:max-w-none print:overflow-visible print:rounded-none print:border-0 print:bg-white print:p-0 print:m-0 print:shadow-none ${WIDTH_CLASSES[width]}`}
       >
-        <div className={`flex items-start justify-between ${noDividers ? "" : "border-b border-border"} px-6 py-4`}>
+        {/* Modal Header Bar — hidden during print */}
+        <div className={`flex items-start justify-between ${noDividers ? "" : "border-b border-border"} px-6 py-4 print:hidden`}>
           <div>
             <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
             {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
@@ -57,10 +68,13 @@ export function Modal({ open, onClose, title, description, children, footer, wid
           </button>
         </div>
 
-        <div className={`no-scrollbar flex-1 overflow-y-auto px-6 ${noDividers ? "py-0" : "py-5"}`}>{children}</div>
+        {/* Modal Body Container */}
+        <div className={`no-scrollbar flex-1 overflow-y-auto px-6 ${noDividers ? "py-0" : "py-5"} print:overflow-visible print:p-0`}>{children}</div>
 
-        {footer && <div className={`flex justify-end gap-3 ${noDividers ? "" : "border-t border-border"} px-6 py-4`}>{footer}</div>}
+        {/* Modal Footer Bar — hidden during print */}
+        {footer && <div className={`flex justify-end gap-3 ${noDividers ? "" : "border-t border-border"} px-6 py-4 print:hidden`}>{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

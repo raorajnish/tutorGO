@@ -11,6 +11,7 @@ import { SkeletonRow } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { TestListItem } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 const ScheduleTestModal = dynamic(
   () => import("@/components/tests/ScheduleTestModal").then((m) => m.ScheduleTestModal)
@@ -21,6 +22,9 @@ export default function TestsPage() {
   const [tests, setTests] = useState<TestListItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+
+  const testList = tests ?? [];
+  const { paginatedItems, paginationProps } = useClientPagination(testList, 10);
 
   function load() {
     apiFetch<TestListItem[]>("/tests")
@@ -78,7 +82,7 @@ export default function TestsPage() {
                     </td>
                   </tr>
                 ))}
-              {tests?.map((t) => (
+              {tests !== null && paginatedItems.map((t) => (
                 <tr
                   key={t.id}
                   onClick={() => router.push(`/tests/${t.id}`)}
@@ -113,7 +117,7 @@ export default function TestsPage() {
 
         <div className="divide-y divide-border sm:hidden">
           {tests === null && Array.from({ length: 6 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {tests?.map((t) => (
+          {tests !== null && paginatedItems.map((t) => (
             <button
               key={t.id}
               type="button"
@@ -136,6 +140,14 @@ export default function TestsPage() {
             <EmptyState message="No tests scheduled yet." actionLabel="Schedule test" onAction={() => setScheduleOpen(true)} />
           )}
         </div>
+
+        {tests !== null && tests.length > 0 && (
+          <Pagination
+            {...paginationProps}
+            pageSizeOptions={[10, 20, 50]}
+            className="border-t border-border bg-card/50"
+          />
+        )}
       </div>
 
       <ScheduleTestModal open={scheduleOpen} onClose={() => setScheduleOpen(false)} onScheduled={load} />

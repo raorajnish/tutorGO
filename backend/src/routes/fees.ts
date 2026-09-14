@@ -1246,7 +1246,23 @@ feesRouter.get("/payments/:id/receipt", requireRoles(...READ_ROLES), async (req,
     if (!payment || payment.instituteId !== instituteId) throw ApiError.notFound("Receipt not found");
 
     const userRefs = await loadUserRefs([payment.createdByUserId, payment.voidedByUserId]);
-    const { totalDue, totalPaid, totalWaived, balance } = accountTotals(payment.feeAccount.installments);
+
+    // Calculate historical balance as of this receipt (payments up to and including this receipt)
+    const allAccountPayments = await prisma.payment.findMany({
+      where: { feeAccountId: payment.feeAccountId, voidedAt: null },
+      select: { id: true, amount: true, createdAt: true },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    });
+
+    const totalDue = payment.feeAccount.installments.reduce((sum, i) => sum.plus(i.amount), new Prisma.Decimal(0));
+    const totalPaidAsOfReceipt = allAccountPayments
+      .filter((p) => p.createdAt < payment.createdAt || (p.createdAt.getTime() === payment.createdAt.getTime() && p.id <= payment.id))
+      .reduce((sum, p) => sum.plus(p.amount), new Prisma.Decimal(0));
+    const totalWaived = payment.feeAccount.installments.reduce(
+      (sum, i) => (i.waived ? sum.plus(i.amount.minus(i.paidAmount)) : sum),
+      new Prisma.Decimal(0)
+    );
+    const balance = Prisma.Decimal.max(new Prisma.Decimal(0), totalDue.minus(totalPaidAsOfReceipt).minus(totalWaived));
 
     res.json({
       ...serializePayment({
@@ -1255,7 +1271,7 @@ feesRouter.get("/payments/:id/receipt", requireRoles(...READ_ROLES), async (req,
         voidedBy: payment.voidedByUserId ? (userRefs.get(payment.voidedByUserId) ?? null) : null,
       }),
       student: payment.feeAccount.student,
-      accountTotals: { totalDue: money(totalDue), totalPaid: money(totalPaid), totalWaived: money(totalWaived), balance: money(balance) },
+      accountTotals: { totalDue: money(totalDue), totalPaid: money(totalPaidAsOfReceipt), totalWaived: money(totalWaived), balance: money(balance) },
       // Null when this row predates the publicToken column, or after a
       // deliberate revoke — either way, no link exists to hand out.
       publicToken: payment.publicTokenRevokedAt ? null : payment.publicToken,

@@ -9,6 +9,8 @@ import { Tabs } from "@/components/ui/Tabs";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { SkeletonRow } from "@/components/ui/Skeleton";
 import type { Batch, Course, StudentListItem, StudentsResponse } from "@/lib/types";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
+import { formatMoney } from "@/lib/money";
 
 const DefaultersTab = dynamic(
   () => import("@/components/fees/DefaultersTab").then((m) => m.DefaultersTab),
@@ -108,6 +110,8 @@ export default function FeesPage() {
     return true;
   });
 
+  const { paginatedItems: paginatedStudents, paginationProps: studentsPaginationProps } = useClientPagination(students, 10);
+
   return (
     <div className="space-y-6">
       <div>
@@ -161,11 +165,12 @@ export default function FeesPage() {
                     <th className="px-4 py-3 font-medium">Course</th>
                     <th className="px-4 py-3 font-medium">Batch</th>
                     <th className="px-4 py-3 font-medium">Fee account</th>
+                    <th className="px-4 py-3 font-medium">Pending fees</th>
                     <th className="px-4 py-3 font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {students.map((s) => (
+                  {paginatedStudents.map((s) => (
                     <tr key={s.id} className="border-b border-border last:border-0 hover:bg-muted">
                       <td className="cursor-pointer px-4 py-3" onClick={() => setSelectedId(s.id)}>
                         <p className="font-medium text-foreground">{s.name}</p>
@@ -179,6 +184,9 @@ export default function FeesPage() {
                       </td>
                       <td className="cursor-pointer px-4 py-3" onClick={() => setSelectedId(s.id)}>
                         <Badge tone={s.hasFeeAccount ? "success" : "warning"}>{s.hasFeeAccount ? "Set up" : "Not set up"}</Badge>
+                      </td>
+                      <td className="cursor-pointer px-4 py-3 font-medium text-foreground" onClick={() => setSelectedId(s.id)}>
+                        {s.hasFeeAccount && s.pendingFees != null ? formatMoney(s.pendingFees) : "—"}
                       </td>
                       <td className="px-4 py-3">
                         {s.hasFeeAccount ? (
@@ -199,7 +207,7 @@ export default function FeesPage() {
                   ))}
                   {students.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                      <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
                         No students found.
                       </td>
                     </tr>
@@ -207,6 +215,14 @@ export default function FeesPage() {
                 </tbody>
               </table>
             </div>
+
+            {students.length > 0 && (
+              <Pagination
+                {...studentsPaginationProps}
+                pageSizeOptions={[10, 20, 50]}
+                className="border-t border-border bg-card/50"
+              />
+            )}
           </div>
         </div>
       )}
