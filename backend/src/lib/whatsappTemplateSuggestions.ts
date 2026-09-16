@@ -80,4 +80,20 @@ export const WHATSAPP_TEMPLATE_SUGGESTIONS: Record<MessageTemplateType, WhatsApp
     bodyText: "The Parent-Teacher Meeting — {{1}} — for {{2}} ({{3}}) on {{4}} has been cancelled. Reason: {{5}}.",
     sampleValues: ["Term 1 PTM", "Batch A", "NEET 2026", "12 Mar", "Faculty unavailable"],
   },
+  FEE_PRE_DUE_REMINDER: {
+    mappedType: "FEE_PRE_DUE_REMINDER",
+    name: "fee_pre_due_reminder",
+    language: "en",
+    category: "UTILITY",
+    bodyText: "Dear parent/guardian of {{1}}, reminder: a fee installment of Rs. {{2}} for {{3}} is due in {{4}} day(s) on {{5}}.",
+    sampleValues: ["Rohan Mehta", "5,000", "NEET 2026", "3", "15 Mar"],
+  },
+  BATCH_ANNOUNCEMENT: {
+    mappedType: "BATCH_ANNOUNCEMENT",
+    name: "batch_announcement",
+    language: "en",
+    category: "UTILITY",
+    bodyText: "Announcement for {{1}}: {{2}} — {{3}}.",
+    sampleValues: ["Batch A", "Revision Class", "Timing shifted to 4:00 PM today"],
+  },
 };

@@ -254,7 +254,89 @@ export async function runDueReminders(now: Date = new Date()): Promise<ReminderR
     }
   }
 
+  try {
+    await checkFeePreDueReminders(now);
+  } catch (err) {
+    console.error("[reminders] failed checking fee pre-due reminders:", err);
+  }
+
   return result;
+}
+
+export async function checkFeePreDueReminders(now: Date = new Date()): Promise<number> {
+  const today = todayDateOnly(now);
+  const targetDueDate = addDays(today, 3);
+
+  const installments = await prisma.feeInstallment.findMany({
+    where: {
+      waived: false,
+      dueDate: targetDueDate,
+      feeAccount: { status: "ACTIVE" },
+    },
+    include: {
+      feeAccount: {
+        include: {
+          student: {
+            include: {
+              course: { select: { name: true } },
+            },
+          },
+        },
+      },
+    },
+    take: 200,
+  });
+
+  let sent = 0;
+  for (const inst of installments) {
+    const outstanding = inst.amount.minus(inst.paidAmount);
+    if (outstanding.lte(0)) continue;
+
+    const student = inst.feeAccount.student;
+    if (!student || !student.isActive) continue;
+
+    if (student.userId) {
+      const alreadySent = await prisma.notification.findFirst({
+        where: {
+          userId: student.userId,
+          type: "FEE_PRE_DUE_REMINDER",
+          createdAt: { gte: today },
+        },
+      });
+      if (alreadySent) continue;
+    }
+
+    const dueDateStr = inst.dueDate.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+
+    try {
+      const { notifyStudent } = await import("./studentNotify.js");
+      const { money } = await import("../lib/money.js");
+      await notifyStudent({
+        instituteId: inst.feeAccount.instituteId,
+        studentId: student.id,
+        type: "FEE_PRE_DUE_REMINDER",
+        title: `Fee Due in 3 Days (₹${money(outstanding)})`,
+        vars: {
+          studentName: student.name,
+          amount: String(money(outstanding)),
+          course: student.course.name,
+          dueDate: dueDateStr,
+          daysUntilDue: "3",
+        },
+        metadata: { installmentId: inst.id },
+      });
+      sent++;
+    } catch (err) {
+      console.error(`[reminders] Failed sending pre-due fee reminder for installment ${inst.id}:`, err);
+    }
+  }
+
+  return sent;
 }
 
 /** Fires a reminder immediately regardless of lead time — backs "Send now".

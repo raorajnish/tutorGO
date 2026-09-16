@@ -17,6 +17,8 @@ const WHATSAPP_PARAM_ORDER: Record<MessageTemplateType, string[]> = {
   TEST_RESULT_ENTERED: ["studentName", "marksObtained", "totalMarks", "testTitle", "subject", "heldOn"],
   PTM_SCHEDULED: ["title", "batch", "course", "date", "startTime", "endTime"],
   PTM_CANCELLED: ["title", "batch", "course", "date", "cancelReason"],
+  FEE_PRE_DUE_REMINDER: ["studentName", "amount", "course", "dueDate", "daysUntilDue"],
+  BATCH_ANNOUNCEMENT: ["batchName", "title", "announcementText"],
 };
 
 export interface DispatchResult {

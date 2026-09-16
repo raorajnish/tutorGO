@@ -14,6 +14,8 @@ const PORTAL_ROUTE_FOR_TYPE: Record<MessageTemplateType, string> = {
   LECTURE_CANCELLED: "/portal/timetable",
   ATTENDANCE_MARKED: "/portal/attendance",
   FEE_OVERDUE_REMINDER: "/portal/fees",
+  FEE_PRE_DUE_REMINDER: "/portal/fees",
+  BATCH_ANNOUNCEMENT: "/portal/notifications",
   PAYROLL_PAYMENT_RECORDED: "/portal", // staff-only in practice; never actually dispatched to a student
   TEST_RESULT_ENTERED: "/portal/tests",
   PTM_SCHEDULED: "/portal/timetable",

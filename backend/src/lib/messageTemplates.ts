@@ -5,6 +5,8 @@ export const MESSAGE_TEMPLATE_TYPES = [
   "LECTURE_CANCELLED",
   "ATTENDANCE_MARKED",
   "FEE_OVERDUE_REMINDER",
+  "FEE_PRE_DUE_REMINDER",
+  "BATCH_ANNOUNCEMENT",
   "PAYROLL_PAYMENT_RECORDED",
   "TEST_RESULT_ENTERED",
   "PTM_SCHEDULED",
@@ -20,6 +22,10 @@ export const DEFAULT_MESSAGE_TEMPLATES: Record<MessageTemplateType, string> = {
     "✅ *Attendance — {{subject}}, {{batch}}*\n{{course}} · {{date}}\nPresent: {{presentCount}}/{{totalCount}}{{lateNames}}{{absentNames}}{{leaveNames}}{{note}}",
   FEE_OVERDUE_REMINDER:
     "Dear parent/guardian of *{{studentName}}*,\n\nA fee installment of *₹{{amount}}* for {{course}} was due on {{dueDate}} and is now {{daysOverdue}} day(s) overdue.\n\nKindly clear the pending amount at the earliest. Contact us for any queries.\n\nThank you.",
+  FEE_PRE_DUE_REMINDER:
+    "Dear parent/guardian of *{{studentName}}*,\n\nReminder: A fee installment of *₹{{amount}}* for {{course}} is due in {{daysUntilDue}} day(s) on {{dueDate}}.\n\nKindly clear the payment at your earliest convenience. Thank you.",
+  BATCH_ANNOUNCEMENT:
+    "📢 *Announcement — {{batchName}}*\n\n{{title}}\n\n{{announcementText}}",
   PAYROLL_PAYMENT_RECORDED:
     "💰 *Payment recorded*\nHi {{name}}, ₹{{amount}} was paid to you via {{mode}} on {{paidOn}}.\n\nPending balance: ₹{{pendingAmount}}\n\n— {{instituteName}}",
   TEST_RESULT_ENTERED:

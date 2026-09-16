@@ -28,6 +28,8 @@ import { supportRouter } from "./routes/support.js";
 import { studyResourcesRouter } from "./routes/studyResources.js";
 import { roomsRouter } from "./routes/rooms.js";
 import { timetableRouter } from "./routes/timetable.js";
+import { announcementsRouter } from "./routes/announcements.js";
+import { materialsRouter } from "./routes/materials.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import { UPLOAD_ROOT, UPLOAD_URL_PREFIX } from "./services/uploads.js";
 
@@ -132,6 +134,8 @@ app.use("/api/support", supportRouter);
 app.use("/api/study-resources", studyResourcesRouter);
 app.use("/api/rooms", roomsRouter);
 app.use("/api/timetable", timetableRouter);
+app.use("/api/announcements", announcementsRouter);
+app.use("/api/materials", materialsRouter);
 // Deliberately outside authenticate/requireInstitute — the one unauthenticated
 // public surface in the app (now also the WhatsApp webhook — see
 // routes/public.ts's header comment).

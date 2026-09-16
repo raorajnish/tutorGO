@@ -89,6 +89,8 @@ export const MessageTemplateType = {
   LECTURE_CANCELLED: 'LECTURE_CANCELLED',
   ATTENDANCE_MARKED: 'ATTENDANCE_MARKED',
   FEE_OVERDUE_REMINDER: 'FEE_OVERDUE_REMINDER',
+  FEE_PRE_DUE_REMINDER: 'FEE_PRE_DUE_REMINDER',
+  BATCH_ANNOUNCEMENT: 'BATCH_ANNOUNCEMENT',
   PAYROLL_PAYMENT_RECORDED: 'PAYROLL_PAYMENT_RECORDED',
   TEST_RESULT_ENTERED: 'TEST_RESULT_ENTERED',
   PTM_SCHEDULED: 'PTM_SCHEDULED',
@@ -284,7 +286,8 @@ export type MaintenanceScope = (typeof MaintenanceScope)[keyof typeof Maintenanc
 
 export const ResourceKind = {
   FILE: 'FILE',
-  LINK: 'LINK'
+  LINK: 'LINK',
+  HOMEWORK: 'HOMEWORK'
 } as const
 
 export type ResourceKind = (typeof ResourceKind)[keyof typeof ResourceKind]

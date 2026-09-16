@@ -14,6 +14,7 @@ import type { Batch, Course } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 import { formatDate as fmtDate } from "@/lib/format";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
+import { BatchAnnouncementModal } from "@/components/academics/BatchAnnouncementModal";
 
 export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_props, ref) {
   const [batches, setBatches] = useState<Batch[]>([]);
@@ -22,6 +23,7 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Batch | null>(null);
+  const [announcementBatch, setAnnouncementBatch] = useState<Batch | null>(null);
   const [courseFilter, setCourseFilter] = useState("");
 
   async function load() {
@@ -131,9 +133,14 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
                     <Badge tone={b.isActive ? "success" : "danger"}>{b.isActive ? "Active" : "Inactive"}</Badge>
                   </td>
                   <td className="px-4 py-3">
-                    <Button variant="ghost" onClick={() => openEdit(b)}>
-                      Edit
-                    </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" onClick={() => setAnnouncementBatch(b)} title="Broadcast announcement to batch" className="whitespace-nowrap">
+                        Broadcast
+                      </Button>
+                      <Button variant="ghost" onClick={() => openEdit(b)} className="whitespace-nowrap">
+                        Edit
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -166,7 +173,12 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
               <p className="text-sm text-muted-foreground">
                 {fmtDate(b.startDate)} – {b.endDate ? fmtDate(b.endDate) : "Ongoing"}
               </p>
-              <p className="text-xs text-muted-foreground">{b.enrolledCount} enrolled · {b.lectureCount} lectures</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs text-muted-foreground">{b.enrolledCount} enrolled · {b.lectureCount} lectures</p>
+                <Button variant="secondary" onClick={(e) => { e.stopPropagation(); setAnnouncementBatch(b); }} className="text-xs whitespace-nowrap">
+                  Broadcast
+                </Button>
+              </div>
             </div>
           ))}
           {!loading && visible.length === 0 && (
@@ -188,6 +200,7 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
       </div>
 
       <BatchModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />
+      <BatchAnnouncementModal batch={announcementBatch} onClose={() => setAnnouncementBatch(null)} />
     </div>
   );
 });

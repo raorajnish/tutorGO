@@ -1102,6 +1102,8 @@ export const StudyResourceScalarFieldEnum = {
   instituteId: 'instituteId',
   courseId: 'courseId',
   subjectId: 'subjectId',
+  batchId: 'batchId',
+  lectureId: 'lectureId',
   title: 'title',
   description: 'description',
   kind: 'kind',
@@ -1109,6 +1111,7 @@ export const StudyResourceScalarFieldEnum = {
   assetName: 'assetName',
   assetPublicId: 'assetPublicId',
   externalUrl: 'externalUrl',
+  dueDate: 'dueDate',
   uploadedByUserId: 'uploadedByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -14,20 +14,8 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model StudyResource
- * Study material — notes, recorded-lecture links, assignment PDFs — shared
- * with students (changes-phase12.md §12.5).
- * 
- * Scoped to a COURSE, not a batch (the plan originally said batch): the same
- * "Physics — Chapter 3 notes" is the same material for every batch of that
- * course, and batch-scoping would mean re-uploading it per batch and having
- * them drift apart. `subjectId` is optional — course-wide material (a
- * syllabus, a timetable PDF) genuinely belongs to no single subject, so it
- * is nullable rather than forced into a catch-all subject row.
- * 
- * Files reuse the exact test-paper upload pattern: `visibility: "public"`,
- * because this is course material where an unguessable URL is acceptable
- * exposure — unlike payment proofs, which are financial documents and are
- * deliberately `authenticated`. See services/uploads.ts.
+ * Study material — notes, recorded-lecture links, assignment PDFs, homework — shared
+ * with students.
  */
 export type StudyResourceModel = runtime.Types.Result.DefaultSelection<Prisma.$StudyResourcePayload>
 
@@ -42,6 +30,8 @@ export type StudyResourceMinAggregateOutputType = {
   instituteId: string | null
   courseId: string | null
   subjectId: string | null
+  batchId: string | null
+  lectureId: string | null
   title: string | null
   description: string | null
   kind: $Enums.ResourceKind | null
@@ -49,6 +39,7 @@ export type StudyResourceMinAggregateOutputType = {
   assetName: string | null
   assetPublicId: string | null
   externalUrl: string | null
+  dueDate: Date | null
   uploadedByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -59,6 +50,8 @@ export type StudyResourceMaxAggregateOutputType = {
   instituteId: string | null
   courseId: string | null
   subjectId: string | null
+  batchId: string | null
+  lectureId: string | null
   title: string | null
   description: string | null
   kind: $Enums.ResourceKind | null
@@ -66,6 +59,7 @@ export type StudyResourceMaxAggregateOutputType = {
   assetName: string | null
   assetPublicId: string | null
   externalUrl: string | null
+  dueDate: Date | null
   uploadedByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -76,6 +70,8 @@ export type StudyResourceCountAggregateOutputType = {
   instituteId: number
   courseId: number
   subjectId: number
+  batchId: number
+  lectureId: number
   title: number
   description: number
   kind: number
@@ -83,6 +79,7 @@ export type StudyResourceCountAggregateOutputType = {
   assetName: number
   assetPublicId: number
   externalUrl: number
+  dueDate: number
   uploadedByUserId: number
   createdAt: number
   updatedAt: number
@@ -95,6 +92,8 @@ export type StudyResourceMinAggregateInputType = {
   instituteId?: true
   courseId?: true
   subjectId?: true
+  batchId?: true
+  lectureId?: true
   title?: true
   description?: true
   kind?: true
@@ -102,6 +101,7 @@ export type StudyResourceMinAggregateInputType = {
   assetName?: true
   assetPublicId?: true
   externalUrl?: true
+  dueDate?: true
   uploadedByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -112,6 +112,8 @@ export type StudyResourceMaxAggregateInputType = {
   instituteId?: true
   courseId?: true
   subjectId?: true
+  batchId?: true
+  lectureId?: true
   title?: true
   description?: true
   kind?: true
@@ -119,6 +121,7 @@ export type StudyResourceMaxAggregateInputType = {
   assetName?: true
   assetPublicId?: true
   externalUrl?: true
+  dueDate?: true
   uploadedByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -129,6 +132,8 @@ export type StudyResourceCountAggregateInputType = {
   instituteId?: true
   courseId?: true
   subjectId?: true
+  batchId?: true
+  lectureId?: true
   title?: true
   description?: true
   kind?: true
@@ -136,6 +141,7 @@ export type StudyResourceCountAggregateInputType = {
   assetName?: true
   assetPublicId?: true
   externalUrl?: true
+  dueDate?: true
   uploadedByUserId?: true
   createdAt?: true
   updatedAt?: true
@@ -219,6 +225,8 @@ export type StudyResourceGroupByOutputType = {
   instituteId: string
   courseId: string
   subjectId: string | null
+  batchId: string | null
+  lectureId: string | null
   title: string
   description: string | null
   kind: $Enums.ResourceKind
@@ -226,6 +234,7 @@ export type StudyResourceGroupByOutputType = {
   assetName: string | null
   assetPublicId: string | null
   externalUrl: string | null
+  dueDate: Date | null
   uploadedByUserId: string
   createdAt: Date
   updatedAt: Date
@@ -257,6 +266,8 @@ export type StudyResourceWhereInput = {
   instituteId?: Prisma.StringFilter<"StudyResource"> | string
   courseId?: Prisma.StringFilter<"StudyResource"> | string
   subjectId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  batchId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  lectureId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   title?: Prisma.StringFilter<"StudyResource"> | string
   description?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   kind?: Prisma.EnumResourceKindFilter<"StudyResource"> | $Enums.ResourceKind
@@ -264,12 +275,15 @@ export type StudyResourceWhereInput = {
   assetName?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   assetPublicId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   externalUrl?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  dueDate?: Prisma.DateTimeNullableFilter<"StudyResource"> | Date | string | null
   uploadedByUserId?: Prisma.StringFilter<"StudyResource"> | string
   createdAt?: Prisma.DateTimeFilter<"StudyResource"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StudyResource"> | Date | string
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   subject?: Prisma.XOR<Prisma.SubjectNullableScalarRelationFilter, Prisma.SubjectWhereInput> | null
+  batch?: Prisma.XOR<Prisma.BatchNullableScalarRelationFilter, Prisma.BatchWhereInput> | null
+  lecture?: Prisma.XOR<Prisma.LectureNullableScalarRelationFilter, Prisma.LectureWhereInput> | null
   uploadedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -278,6 +292,8 @@ export type StudyResourceOrderByWithRelationInput = {
   instituteId?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrderInput | Prisma.SortOrder
+  batchId?: Prisma.SortOrderInput | Prisma.SortOrder
+  lectureId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   kind?: Prisma.SortOrder
@@ -285,12 +301,15 @@ export type StudyResourceOrderByWithRelationInput = {
   assetName?: Prisma.SortOrderInput | Prisma.SortOrder
   assetPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
   externalUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
   uploadedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   institute?: Prisma.InstituteOrderByWithRelationInput
   course?: Prisma.CourseOrderByWithRelationInput
   subject?: Prisma.SubjectOrderByWithRelationInput
+  batch?: Prisma.BatchOrderByWithRelationInput
+  lecture?: Prisma.LectureOrderByWithRelationInput
   uploadedBy?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -302,6 +321,8 @@ export type StudyResourceWhereUniqueInput = Prisma.AtLeast<{
   instituteId?: Prisma.StringFilter<"StudyResource"> | string
   courseId?: Prisma.StringFilter<"StudyResource"> | string
   subjectId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  batchId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  lectureId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   title?: Prisma.StringFilter<"StudyResource"> | string
   description?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   kind?: Prisma.EnumResourceKindFilter<"StudyResource"> | $Enums.ResourceKind
@@ -309,12 +330,15 @@ export type StudyResourceWhereUniqueInput = Prisma.AtLeast<{
   assetName?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   assetPublicId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   externalUrl?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  dueDate?: Prisma.DateTimeNullableFilter<"StudyResource"> | Date | string | null
   uploadedByUserId?: Prisma.StringFilter<"StudyResource"> | string
   createdAt?: Prisma.DateTimeFilter<"StudyResource"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StudyResource"> | Date | string
   institute?: Prisma.XOR<Prisma.InstituteScalarRelationFilter, Prisma.InstituteWhereInput>
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   subject?: Prisma.XOR<Prisma.SubjectNullableScalarRelationFilter, Prisma.SubjectWhereInput> | null
+  batch?: Prisma.XOR<Prisma.BatchNullableScalarRelationFilter, Prisma.BatchWhereInput> | null
+  lecture?: Prisma.XOR<Prisma.LectureNullableScalarRelationFilter, Prisma.LectureWhereInput> | null
   uploadedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -323,6 +347,8 @@ export type StudyResourceOrderByWithAggregationInput = {
   instituteId?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrderInput | Prisma.SortOrder
+  batchId?: Prisma.SortOrderInput | Prisma.SortOrder
+  lectureId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   kind?: Prisma.SortOrder
@@ -330,6 +356,7 @@ export type StudyResourceOrderByWithAggregationInput = {
   assetName?: Prisma.SortOrderInput | Prisma.SortOrder
   assetPublicId?: Prisma.SortOrderInput | Prisma.SortOrder
   externalUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
   uploadedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -346,6 +373,8 @@ export type StudyResourceScalarWhereWithAggregatesInput = {
   instituteId?: Prisma.StringWithAggregatesFilter<"StudyResource"> | string
   courseId?: Prisma.StringWithAggregatesFilter<"StudyResource"> | string
   subjectId?: Prisma.StringNullableWithAggregatesFilter<"StudyResource"> | string | null
+  batchId?: Prisma.StringNullableWithAggregatesFilter<"StudyResource"> | string | null
+  lectureId?: Prisma.StringNullableWithAggregatesFilter<"StudyResource"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"StudyResource"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"StudyResource"> | string | null
   kind?: Prisma.EnumResourceKindWithAggregatesFilter<"StudyResource"> | $Enums.ResourceKind
@@ -353,6 +382,7 @@ export type StudyResourceScalarWhereWithAggregatesInput = {
   assetName?: Prisma.StringNullableWithAggregatesFilter<"StudyResource"> | string | null
   assetPublicId?: Prisma.StringNullableWithAggregatesFilter<"StudyResource"> | string | null
   externalUrl?: Prisma.StringNullableWithAggregatesFilter<"StudyResource"> | string | null
+  dueDate?: Prisma.DateTimeNullableWithAggregatesFilter<"StudyResource"> | Date | string | null
   uploadedByUserId?: Prisma.StringWithAggregatesFilter<"StudyResource"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StudyResource"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"StudyResource"> | Date | string
@@ -367,11 +397,14 @@ export type StudyResourceCreateInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutStudyResourcesInput
   course: Prisma.CourseCreateNestedOneWithoutStudyResourcesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutStudyResourcesInput
+  batch?: Prisma.BatchCreateNestedOneWithoutStudyResourcesInput
+  lecture?: Prisma.LectureCreateNestedOneWithoutStudyResourcesInput
   uploadedBy: Prisma.UserCreateNestedOneWithoutStudyResourcesAddedInput
 }
 
@@ -380,6 +413,8 @@ export type StudyResourceUncheckedCreateInput = {
   instituteId: string
   courseId: string
   subjectId?: string | null
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -387,6 +422,7 @@ export type StudyResourceUncheckedCreateInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   uploadedByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -401,11 +437,14 @@ export type StudyResourceUpdateInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutStudyResourcesNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudyResourcesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutStudyResourcesNestedInput
+  batch?: Prisma.BatchUpdateOneWithoutStudyResourcesNestedInput
+  lecture?: Prisma.LectureUpdateOneWithoutStudyResourcesNestedInput
   uploadedBy?: Prisma.UserUpdateOneRequiredWithoutStudyResourcesAddedNestedInput
 }
 
@@ -414,6 +453,8 @@ export type StudyResourceUncheckedUpdateInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -421,6 +462,7 @@ export type StudyResourceUncheckedUpdateInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -431,6 +473,8 @@ export type StudyResourceCreateManyInput = {
   instituteId: string
   courseId: string
   subjectId?: string | null
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -438,6 +482,7 @@ export type StudyResourceCreateManyInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   uploadedByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -452,6 +497,7 @@ export type StudyResourceUpdateManyMutationInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -461,6 +507,8 @@ export type StudyResourceUncheckedUpdateManyInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -468,6 +516,7 @@ export type StudyResourceUncheckedUpdateManyInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -488,6 +537,8 @@ export type StudyResourceCountOrderByAggregateInput = {
   instituteId?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
+  batchId?: Prisma.SortOrder
+  lectureId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   kind?: Prisma.SortOrder
@@ -495,6 +546,7 @@ export type StudyResourceCountOrderByAggregateInput = {
   assetName?: Prisma.SortOrder
   assetPublicId?: Prisma.SortOrder
   externalUrl?: Prisma.SortOrder
+  dueDate?: Prisma.SortOrder
   uploadedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -505,6 +557,8 @@ export type StudyResourceMaxOrderByAggregateInput = {
   instituteId?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
+  batchId?: Prisma.SortOrder
+  lectureId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   kind?: Prisma.SortOrder
@@ -512,6 +566,7 @@ export type StudyResourceMaxOrderByAggregateInput = {
   assetName?: Prisma.SortOrder
   assetPublicId?: Prisma.SortOrder
   externalUrl?: Prisma.SortOrder
+  dueDate?: Prisma.SortOrder
   uploadedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -522,6 +577,8 @@ export type StudyResourceMinOrderByAggregateInput = {
   instituteId?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
   subjectId?: Prisma.SortOrder
+  batchId?: Prisma.SortOrder
+  lectureId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   kind?: Prisma.SortOrder
@@ -529,6 +586,7 @@ export type StudyResourceMinOrderByAggregateInput = {
   assetName?: Prisma.SortOrder
   assetPublicId?: Prisma.SortOrder
   externalUrl?: Prisma.SortOrder
+  dueDate?: Prisma.SortOrder
   uploadedByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -702,6 +760,90 @@ export type StudyResourceUncheckedUpdateManyWithoutSubjectNestedInput = {
   deleteMany?: Prisma.StudyResourceScalarWhereInput | Prisma.StudyResourceScalarWhereInput[]
 }
 
+export type StudyResourceCreateNestedManyWithoutBatchInput = {
+  create?: Prisma.XOR<Prisma.StudyResourceCreateWithoutBatchInput, Prisma.StudyResourceUncheckedCreateWithoutBatchInput> | Prisma.StudyResourceCreateWithoutBatchInput[] | Prisma.StudyResourceUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.StudyResourceCreateOrConnectWithoutBatchInput | Prisma.StudyResourceCreateOrConnectWithoutBatchInput[]
+  createMany?: Prisma.StudyResourceCreateManyBatchInputEnvelope
+  connect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+}
+
+export type StudyResourceUncheckedCreateNestedManyWithoutBatchInput = {
+  create?: Prisma.XOR<Prisma.StudyResourceCreateWithoutBatchInput, Prisma.StudyResourceUncheckedCreateWithoutBatchInput> | Prisma.StudyResourceCreateWithoutBatchInput[] | Prisma.StudyResourceUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.StudyResourceCreateOrConnectWithoutBatchInput | Prisma.StudyResourceCreateOrConnectWithoutBatchInput[]
+  createMany?: Prisma.StudyResourceCreateManyBatchInputEnvelope
+  connect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+}
+
+export type StudyResourceUpdateManyWithoutBatchNestedInput = {
+  create?: Prisma.XOR<Prisma.StudyResourceCreateWithoutBatchInput, Prisma.StudyResourceUncheckedCreateWithoutBatchInput> | Prisma.StudyResourceCreateWithoutBatchInput[] | Prisma.StudyResourceUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.StudyResourceCreateOrConnectWithoutBatchInput | Prisma.StudyResourceCreateOrConnectWithoutBatchInput[]
+  upsert?: Prisma.StudyResourceUpsertWithWhereUniqueWithoutBatchInput | Prisma.StudyResourceUpsertWithWhereUniqueWithoutBatchInput[]
+  createMany?: Prisma.StudyResourceCreateManyBatchInputEnvelope
+  set?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  disconnect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  delete?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  connect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  update?: Prisma.StudyResourceUpdateWithWhereUniqueWithoutBatchInput | Prisma.StudyResourceUpdateWithWhereUniqueWithoutBatchInput[]
+  updateMany?: Prisma.StudyResourceUpdateManyWithWhereWithoutBatchInput | Prisma.StudyResourceUpdateManyWithWhereWithoutBatchInput[]
+  deleteMany?: Prisma.StudyResourceScalarWhereInput | Prisma.StudyResourceScalarWhereInput[]
+}
+
+export type StudyResourceUncheckedUpdateManyWithoutBatchNestedInput = {
+  create?: Prisma.XOR<Prisma.StudyResourceCreateWithoutBatchInput, Prisma.StudyResourceUncheckedCreateWithoutBatchInput> | Prisma.StudyResourceCreateWithoutBatchInput[] | Prisma.StudyResourceUncheckedCreateWithoutBatchInput[]
+  connectOrCreate?: Prisma.StudyResourceCreateOrConnectWithoutBatchInput | Prisma.StudyResourceCreateOrConnectWithoutBatchInput[]
+  upsert?: Prisma.StudyResourceUpsertWithWhereUniqueWithoutBatchInput | Prisma.StudyResourceUpsertWithWhereUniqueWithoutBatchInput[]
+  createMany?: Prisma.StudyResourceCreateManyBatchInputEnvelope
+  set?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  disconnect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  delete?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  connect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  update?: Prisma.StudyResourceUpdateWithWhereUniqueWithoutBatchInput | Prisma.StudyResourceUpdateWithWhereUniqueWithoutBatchInput[]
+  updateMany?: Prisma.StudyResourceUpdateManyWithWhereWithoutBatchInput | Prisma.StudyResourceUpdateManyWithWhereWithoutBatchInput[]
+  deleteMany?: Prisma.StudyResourceScalarWhereInput | Prisma.StudyResourceScalarWhereInput[]
+}
+
+export type StudyResourceCreateNestedManyWithoutLectureInput = {
+  create?: Prisma.XOR<Prisma.StudyResourceCreateWithoutLectureInput, Prisma.StudyResourceUncheckedCreateWithoutLectureInput> | Prisma.StudyResourceCreateWithoutLectureInput[] | Prisma.StudyResourceUncheckedCreateWithoutLectureInput[]
+  connectOrCreate?: Prisma.StudyResourceCreateOrConnectWithoutLectureInput | Prisma.StudyResourceCreateOrConnectWithoutLectureInput[]
+  createMany?: Prisma.StudyResourceCreateManyLectureInputEnvelope
+  connect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+}
+
+export type StudyResourceUncheckedCreateNestedManyWithoutLectureInput = {
+  create?: Prisma.XOR<Prisma.StudyResourceCreateWithoutLectureInput, Prisma.StudyResourceUncheckedCreateWithoutLectureInput> | Prisma.StudyResourceCreateWithoutLectureInput[] | Prisma.StudyResourceUncheckedCreateWithoutLectureInput[]
+  connectOrCreate?: Prisma.StudyResourceCreateOrConnectWithoutLectureInput | Prisma.StudyResourceCreateOrConnectWithoutLectureInput[]
+  createMany?: Prisma.StudyResourceCreateManyLectureInputEnvelope
+  connect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+}
+
+export type StudyResourceUpdateManyWithoutLectureNestedInput = {
+  create?: Prisma.XOR<Prisma.StudyResourceCreateWithoutLectureInput, Prisma.StudyResourceUncheckedCreateWithoutLectureInput> | Prisma.StudyResourceCreateWithoutLectureInput[] | Prisma.StudyResourceUncheckedCreateWithoutLectureInput[]
+  connectOrCreate?: Prisma.StudyResourceCreateOrConnectWithoutLectureInput | Prisma.StudyResourceCreateOrConnectWithoutLectureInput[]
+  upsert?: Prisma.StudyResourceUpsertWithWhereUniqueWithoutLectureInput | Prisma.StudyResourceUpsertWithWhereUniqueWithoutLectureInput[]
+  createMany?: Prisma.StudyResourceCreateManyLectureInputEnvelope
+  set?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  disconnect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  delete?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  connect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  update?: Prisma.StudyResourceUpdateWithWhereUniqueWithoutLectureInput | Prisma.StudyResourceUpdateWithWhereUniqueWithoutLectureInput[]
+  updateMany?: Prisma.StudyResourceUpdateManyWithWhereWithoutLectureInput | Prisma.StudyResourceUpdateManyWithWhereWithoutLectureInput[]
+  deleteMany?: Prisma.StudyResourceScalarWhereInput | Prisma.StudyResourceScalarWhereInput[]
+}
+
+export type StudyResourceUncheckedUpdateManyWithoutLectureNestedInput = {
+  create?: Prisma.XOR<Prisma.StudyResourceCreateWithoutLectureInput, Prisma.StudyResourceUncheckedCreateWithoutLectureInput> | Prisma.StudyResourceCreateWithoutLectureInput[] | Prisma.StudyResourceUncheckedCreateWithoutLectureInput[]
+  connectOrCreate?: Prisma.StudyResourceCreateOrConnectWithoutLectureInput | Prisma.StudyResourceCreateOrConnectWithoutLectureInput[]
+  upsert?: Prisma.StudyResourceUpsertWithWhereUniqueWithoutLectureInput | Prisma.StudyResourceUpsertWithWhereUniqueWithoutLectureInput[]
+  createMany?: Prisma.StudyResourceCreateManyLectureInputEnvelope
+  set?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  disconnect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  delete?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  connect?: Prisma.StudyResourceWhereUniqueInput | Prisma.StudyResourceWhereUniqueInput[]
+  update?: Prisma.StudyResourceUpdateWithWhereUniqueWithoutLectureInput | Prisma.StudyResourceUpdateWithWhereUniqueWithoutLectureInput[]
+  updateMany?: Prisma.StudyResourceUpdateManyWithWhereWithoutLectureInput | Prisma.StudyResourceUpdateManyWithWhereWithoutLectureInput[]
+  deleteMany?: Prisma.StudyResourceScalarWhereInput | Prisma.StudyResourceScalarWhereInput[]
+}
+
 export type EnumResourceKindFieldUpdateOperationsInput = {
   set?: $Enums.ResourceKind
 }
@@ -715,10 +857,13 @@ export type StudyResourceCreateWithoutInstituteInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   course: Prisma.CourseCreateNestedOneWithoutStudyResourcesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutStudyResourcesInput
+  batch?: Prisma.BatchCreateNestedOneWithoutStudyResourcesInput
+  lecture?: Prisma.LectureCreateNestedOneWithoutStudyResourcesInput
   uploadedBy: Prisma.UserCreateNestedOneWithoutStudyResourcesAddedInput
 }
 
@@ -726,6 +871,8 @@ export type StudyResourceUncheckedCreateWithoutInstituteInput = {
   id?: string
   courseId: string
   subjectId?: string | null
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -733,6 +880,7 @@ export type StudyResourceUncheckedCreateWithoutInstituteInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   uploadedByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -772,6 +920,8 @@ export type StudyResourceScalarWhereInput = {
   instituteId?: Prisma.StringFilter<"StudyResource"> | string
   courseId?: Prisma.StringFilter<"StudyResource"> | string
   subjectId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  batchId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  lectureId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   title?: Prisma.StringFilter<"StudyResource"> | string
   description?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   kind?: Prisma.EnumResourceKindFilter<"StudyResource"> | $Enums.ResourceKind
@@ -779,6 +929,7 @@ export type StudyResourceScalarWhereInput = {
   assetName?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   assetPublicId?: Prisma.StringNullableFilter<"StudyResource"> | string | null
   externalUrl?: Prisma.StringNullableFilter<"StudyResource"> | string | null
+  dueDate?: Prisma.DateTimeNullableFilter<"StudyResource"> | Date | string | null
   uploadedByUserId?: Prisma.StringFilter<"StudyResource"> | string
   createdAt?: Prisma.DateTimeFilter<"StudyResource"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StudyResource"> | Date | string
@@ -793,11 +944,14 @@ export type StudyResourceCreateWithoutUploadedByInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutStudyResourcesInput
   course: Prisma.CourseCreateNestedOneWithoutStudyResourcesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutStudyResourcesInput
+  batch?: Prisma.BatchCreateNestedOneWithoutStudyResourcesInput
+  lecture?: Prisma.LectureCreateNestedOneWithoutStudyResourcesInput
 }
 
 export type StudyResourceUncheckedCreateWithoutUploadedByInput = {
@@ -805,6 +959,8 @@ export type StudyResourceUncheckedCreateWithoutUploadedByInput = {
   instituteId: string
   courseId: string
   subjectId?: string | null
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -812,6 +968,7 @@ export type StudyResourceUncheckedCreateWithoutUploadedByInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -851,10 +1008,13 @@ export type StudyResourceCreateWithoutCourseInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutStudyResourcesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutStudyResourcesInput
+  batch?: Prisma.BatchCreateNestedOneWithoutStudyResourcesInput
+  lecture?: Prisma.LectureCreateNestedOneWithoutStudyResourcesInput
   uploadedBy: Prisma.UserCreateNestedOneWithoutStudyResourcesAddedInput
 }
 
@@ -862,6 +1022,8 @@ export type StudyResourceUncheckedCreateWithoutCourseInput = {
   id?: string
   instituteId: string
   subjectId?: string | null
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -869,6 +1031,7 @@ export type StudyResourceUncheckedCreateWithoutCourseInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   uploadedByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -909,10 +1072,13 @@ export type StudyResourceCreateWithoutSubjectInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   institute: Prisma.InstituteCreateNestedOneWithoutStudyResourcesInput
   course: Prisma.CourseCreateNestedOneWithoutStudyResourcesInput
+  batch?: Prisma.BatchCreateNestedOneWithoutStudyResourcesInput
+  lecture?: Prisma.LectureCreateNestedOneWithoutStudyResourcesInput
   uploadedBy: Prisma.UserCreateNestedOneWithoutStudyResourcesAddedInput
 }
 
@@ -920,6 +1086,8 @@ export type StudyResourceUncheckedCreateWithoutSubjectInput = {
   id?: string
   instituteId: string
   courseId: string
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -927,6 +1095,7 @@ export type StudyResourceUncheckedCreateWithoutSubjectInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   uploadedByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -958,10 +1127,8 @@ export type StudyResourceUpdateManyWithWhereWithoutSubjectInput = {
   data: Prisma.XOR<Prisma.StudyResourceUpdateManyMutationInput, Prisma.StudyResourceUncheckedUpdateManyWithoutSubjectInput>
 }
 
-export type StudyResourceCreateManyInstituteInput = {
+export type StudyResourceCreateWithoutBatchInput = {
   id?: string
-  courseId: string
-  subjectId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -969,6 +1136,139 @@ export type StudyResourceCreateManyInstituteInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutStudyResourcesInput
+  course: Prisma.CourseCreateNestedOneWithoutStudyResourcesInput
+  subject?: Prisma.SubjectCreateNestedOneWithoutStudyResourcesInput
+  lecture?: Prisma.LectureCreateNestedOneWithoutStudyResourcesInput
+  uploadedBy: Prisma.UserCreateNestedOneWithoutStudyResourcesAddedInput
+}
+
+export type StudyResourceUncheckedCreateWithoutBatchInput = {
+  id?: string
+  instituteId: string
+  courseId: string
+  subjectId?: string | null
+  lectureId?: string | null
+  title: string
+  description?: string | null
+  kind: $Enums.ResourceKind
+  assetUrl?: string | null
+  assetName?: string | null
+  assetPublicId?: string | null
+  externalUrl?: string | null
+  dueDate?: Date | string | null
+  uploadedByUserId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type StudyResourceCreateOrConnectWithoutBatchInput = {
+  where: Prisma.StudyResourceWhereUniqueInput
+  create: Prisma.XOR<Prisma.StudyResourceCreateWithoutBatchInput, Prisma.StudyResourceUncheckedCreateWithoutBatchInput>
+}
+
+export type StudyResourceCreateManyBatchInputEnvelope = {
+  data: Prisma.StudyResourceCreateManyBatchInput | Prisma.StudyResourceCreateManyBatchInput[]
+  skipDuplicates?: boolean
+}
+
+export type StudyResourceUpsertWithWhereUniqueWithoutBatchInput = {
+  where: Prisma.StudyResourceWhereUniqueInput
+  update: Prisma.XOR<Prisma.StudyResourceUpdateWithoutBatchInput, Prisma.StudyResourceUncheckedUpdateWithoutBatchInput>
+  create: Prisma.XOR<Prisma.StudyResourceCreateWithoutBatchInput, Prisma.StudyResourceUncheckedCreateWithoutBatchInput>
+}
+
+export type StudyResourceUpdateWithWhereUniqueWithoutBatchInput = {
+  where: Prisma.StudyResourceWhereUniqueInput
+  data: Prisma.XOR<Prisma.StudyResourceUpdateWithoutBatchInput, Prisma.StudyResourceUncheckedUpdateWithoutBatchInput>
+}
+
+export type StudyResourceUpdateManyWithWhereWithoutBatchInput = {
+  where: Prisma.StudyResourceScalarWhereInput
+  data: Prisma.XOR<Prisma.StudyResourceUpdateManyMutationInput, Prisma.StudyResourceUncheckedUpdateManyWithoutBatchInput>
+}
+
+export type StudyResourceCreateWithoutLectureInput = {
+  id?: string
+  title: string
+  description?: string | null
+  kind: $Enums.ResourceKind
+  assetUrl?: string | null
+  assetName?: string | null
+  assetPublicId?: string | null
+  externalUrl?: string | null
+  dueDate?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutStudyResourcesInput
+  course: Prisma.CourseCreateNestedOneWithoutStudyResourcesInput
+  subject?: Prisma.SubjectCreateNestedOneWithoutStudyResourcesInput
+  batch?: Prisma.BatchCreateNestedOneWithoutStudyResourcesInput
+  uploadedBy: Prisma.UserCreateNestedOneWithoutStudyResourcesAddedInput
+}
+
+export type StudyResourceUncheckedCreateWithoutLectureInput = {
+  id?: string
+  instituteId: string
+  courseId: string
+  subjectId?: string | null
+  batchId?: string | null
+  title: string
+  description?: string | null
+  kind: $Enums.ResourceKind
+  assetUrl?: string | null
+  assetName?: string | null
+  assetPublicId?: string | null
+  externalUrl?: string | null
+  dueDate?: Date | string | null
+  uploadedByUserId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type StudyResourceCreateOrConnectWithoutLectureInput = {
+  where: Prisma.StudyResourceWhereUniqueInput
+  create: Prisma.XOR<Prisma.StudyResourceCreateWithoutLectureInput, Prisma.StudyResourceUncheckedCreateWithoutLectureInput>
+}
+
+export type StudyResourceCreateManyLectureInputEnvelope = {
+  data: Prisma.StudyResourceCreateManyLectureInput | Prisma.StudyResourceCreateManyLectureInput[]
+  skipDuplicates?: boolean
+}
+
+export type StudyResourceUpsertWithWhereUniqueWithoutLectureInput = {
+  where: Prisma.StudyResourceWhereUniqueInput
+  update: Prisma.XOR<Prisma.StudyResourceUpdateWithoutLectureInput, Prisma.StudyResourceUncheckedUpdateWithoutLectureInput>
+  create: Prisma.XOR<Prisma.StudyResourceCreateWithoutLectureInput, Prisma.StudyResourceUncheckedCreateWithoutLectureInput>
+}
+
+export type StudyResourceUpdateWithWhereUniqueWithoutLectureInput = {
+  where: Prisma.StudyResourceWhereUniqueInput
+  data: Prisma.XOR<Prisma.StudyResourceUpdateWithoutLectureInput, Prisma.StudyResourceUncheckedUpdateWithoutLectureInput>
+}
+
+export type StudyResourceUpdateManyWithWhereWithoutLectureInput = {
+  where: Prisma.StudyResourceScalarWhereInput
+  data: Prisma.XOR<Prisma.StudyResourceUpdateManyMutationInput, Prisma.StudyResourceUncheckedUpdateManyWithoutLectureInput>
+}
+
+export type StudyResourceCreateManyInstituteInput = {
+  id?: string
+  courseId: string
+  subjectId?: string | null
+  batchId?: string | null
+  lectureId?: string | null
+  title: string
+  description?: string | null
+  kind: $Enums.ResourceKind
+  assetUrl?: string | null
+  assetName?: string | null
+  assetPublicId?: string | null
+  externalUrl?: string | null
+  dueDate?: Date | string | null
   uploadedByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -983,10 +1283,13 @@ export type StudyResourceUpdateWithoutInstituteInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   course?: Prisma.CourseUpdateOneRequiredWithoutStudyResourcesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutStudyResourcesNestedInput
+  batch?: Prisma.BatchUpdateOneWithoutStudyResourcesNestedInput
+  lecture?: Prisma.LectureUpdateOneWithoutStudyResourcesNestedInput
   uploadedBy?: Prisma.UserUpdateOneRequiredWithoutStudyResourcesAddedNestedInput
 }
 
@@ -994,6 +1297,8 @@ export type StudyResourceUncheckedUpdateWithoutInstituteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -1001,6 +1306,7 @@ export type StudyResourceUncheckedUpdateWithoutInstituteInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1010,6 +1316,8 @@ export type StudyResourceUncheckedUpdateManyWithoutInstituteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -1017,6 +1325,7 @@ export type StudyResourceUncheckedUpdateManyWithoutInstituteInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1027,6 +1336,8 @@ export type StudyResourceCreateManyUploadedByInput = {
   instituteId: string
   courseId: string
   subjectId?: string | null
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -1034,6 +1345,7 @@ export type StudyResourceCreateManyUploadedByInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1047,11 +1359,14 @@ export type StudyResourceUpdateWithoutUploadedByInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutStudyResourcesNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudyResourcesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutStudyResourcesNestedInput
+  batch?: Prisma.BatchUpdateOneWithoutStudyResourcesNestedInput
+  lecture?: Prisma.LectureUpdateOneWithoutStudyResourcesNestedInput
 }
 
 export type StudyResourceUncheckedUpdateWithoutUploadedByInput = {
@@ -1059,6 +1374,8 @@ export type StudyResourceUncheckedUpdateWithoutUploadedByInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -1066,6 +1383,7 @@ export type StudyResourceUncheckedUpdateWithoutUploadedByInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1075,6 +1393,8 @@ export type StudyResourceUncheckedUpdateManyWithoutUploadedByInput = {
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -1082,6 +1402,7 @@ export type StudyResourceUncheckedUpdateManyWithoutUploadedByInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1090,6 +1411,8 @@ export type StudyResourceCreateManyCourseInput = {
   id?: string
   instituteId: string
   subjectId?: string | null
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -1097,6 +1420,7 @@ export type StudyResourceCreateManyCourseInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   uploadedByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1111,10 +1435,13 @@ export type StudyResourceUpdateWithoutCourseInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutStudyResourcesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutStudyResourcesNestedInput
+  batch?: Prisma.BatchUpdateOneWithoutStudyResourcesNestedInput
+  lecture?: Prisma.LectureUpdateOneWithoutStudyResourcesNestedInput
   uploadedBy?: Prisma.UserUpdateOneRequiredWithoutStudyResourcesAddedNestedInput
 }
 
@@ -1122,6 +1449,8 @@ export type StudyResourceUncheckedUpdateWithoutCourseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -1129,6 +1458,7 @@ export type StudyResourceUncheckedUpdateWithoutCourseInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1138,6 +1468,8 @@ export type StudyResourceUncheckedUpdateManyWithoutCourseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -1145,6 +1477,7 @@ export type StudyResourceUncheckedUpdateManyWithoutCourseInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1154,6 +1487,8 @@ export type StudyResourceCreateManySubjectInput = {
   id?: string
   instituteId: string
   courseId: string
+  batchId?: string | null
+  lectureId?: string | null
   title: string
   description?: string | null
   kind: $Enums.ResourceKind
@@ -1161,6 +1496,7 @@ export type StudyResourceCreateManySubjectInput = {
   assetName?: string | null
   assetPublicId?: string | null
   externalUrl?: string | null
+  dueDate?: Date | string | null
   uploadedByUserId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1175,10 +1511,13 @@ export type StudyResourceUpdateWithoutSubjectInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   institute?: Prisma.InstituteUpdateOneRequiredWithoutStudyResourcesNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutStudyResourcesNestedInput
+  batch?: Prisma.BatchUpdateOneWithoutStudyResourcesNestedInput
+  lecture?: Prisma.LectureUpdateOneWithoutStudyResourcesNestedInput
   uploadedBy?: Prisma.UserUpdateOneRequiredWithoutStudyResourcesAddedNestedInput
 }
 
@@ -1186,6 +1525,8 @@ export type StudyResourceUncheckedUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -1193,6 +1534,7 @@ export type StudyResourceUncheckedUpdateWithoutSubjectInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1202,6 +1544,8 @@ export type StudyResourceUncheckedUpdateManyWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   instituteId?: Prisma.StringFieldUpdateOperationsInput | string
   courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
@@ -1209,6 +1553,159 @@ export type StudyResourceUncheckedUpdateManyWithoutSubjectInput = {
   assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StudyResourceCreateManyBatchInput = {
+  id?: string
+  instituteId: string
+  courseId: string
+  subjectId?: string | null
+  lectureId?: string | null
+  title: string
+  description?: string | null
+  kind: $Enums.ResourceKind
+  assetUrl?: string | null
+  assetName?: string | null
+  assetPublicId?: string | null
+  externalUrl?: string | null
+  dueDate?: Date | string | null
+  uploadedByUserId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type StudyResourceUpdateWithoutBatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
+  assetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutStudyResourcesNestedInput
+  course?: Prisma.CourseUpdateOneRequiredWithoutStudyResourcesNestedInput
+  subject?: Prisma.SubjectUpdateOneWithoutStudyResourcesNestedInput
+  lecture?: Prisma.LectureUpdateOneWithoutStudyResourcesNestedInput
+  uploadedBy?: Prisma.UserUpdateOneRequiredWithoutStudyResourcesAddedNestedInput
+}
+
+export type StudyResourceUncheckedUpdateWithoutBatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
+  assetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StudyResourceUncheckedUpdateManyWithoutBatchInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lectureId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
+  assetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StudyResourceCreateManyLectureInput = {
+  id?: string
+  instituteId: string
+  courseId: string
+  subjectId?: string | null
+  batchId?: string | null
+  title: string
+  description?: string | null
+  kind: $Enums.ResourceKind
+  assetUrl?: string | null
+  assetName?: string | null
+  assetPublicId?: string | null
+  externalUrl?: string | null
+  dueDate?: Date | string | null
+  uploadedByUserId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type StudyResourceUpdateWithoutLectureInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
+  assetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutStudyResourcesNestedInput
+  course?: Prisma.CourseUpdateOneRequiredWithoutStudyResourcesNestedInput
+  subject?: Prisma.SubjectUpdateOneWithoutStudyResourcesNestedInput
+  batch?: Prisma.BatchUpdateOneWithoutStudyResourcesNestedInput
+  uploadedBy?: Prisma.UserUpdateOneRequiredWithoutStudyResourcesAddedNestedInput
+}
+
+export type StudyResourceUncheckedUpdateWithoutLectureInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
+  assetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StudyResourceUncheckedUpdateManyWithoutLectureInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  batchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kind?: Prisma.EnumResourceKindFieldUpdateOperationsInput | $Enums.ResourceKind
+  assetUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assetPublicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  externalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   uploadedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1221,6 +1718,8 @@ export type StudyResourceSelect<ExtArgs extends runtime.Types.Extensions.Interna
   instituteId?: boolean
   courseId?: boolean
   subjectId?: boolean
+  batchId?: boolean
+  lectureId?: boolean
   title?: boolean
   description?: boolean
   kind?: boolean
@@ -1228,12 +1727,15 @@ export type StudyResourceSelect<ExtArgs extends runtime.Types.Extensions.Interna
   assetName?: boolean
   assetPublicId?: boolean
   externalUrl?: boolean
+  dueDate?: boolean
   uploadedByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.StudyResource$subjectArgs<ExtArgs>
+  batch?: boolean | Prisma.StudyResource$batchArgs<ExtArgs>
+  lecture?: boolean | Prisma.StudyResource$lectureArgs<ExtArgs>
   uploadedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["studyResource"]>
 
@@ -1242,6 +1744,8 @@ export type StudyResourceSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   instituteId?: boolean
   courseId?: boolean
   subjectId?: boolean
+  batchId?: boolean
+  lectureId?: boolean
   title?: boolean
   description?: boolean
   kind?: boolean
@@ -1249,12 +1753,15 @@ export type StudyResourceSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   assetName?: boolean
   assetPublicId?: boolean
   externalUrl?: boolean
+  dueDate?: boolean
   uploadedByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.StudyResource$subjectArgs<ExtArgs>
+  batch?: boolean | Prisma.StudyResource$batchArgs<ExtArgs>
+  lecture?: boolean | Prisma.StudyResource$lectureArgs<ExtArgs>
   uploadedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["studyResource"]>
 
@@ -1263,6 +1770,8 @@ export type StudyResourceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   instituteId?: boolean
   courseId?: boolean
   subjectId?: boolean
+  batchId?: boolean
+  lectureId?: boolean
   title?: boolean
   description?: boolean
   kind?: boolean
@@ -1270,12 +1779,15 @@ export type StudyResourceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   assetName?: boolean
   assetPublicId?: boolean
   externalUrl?: boolean
+  dueDate?: boolean
   uploadedByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.StudyResource$subjectArgs<ExtArgs>
+  batch?: boolean | Prisma.StudyResource$batchArgs<ExtArgs>
+  lecture?: boolean | Prisma.StudyResource$lectureArgs<ExtArgs>
   uploadedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["studyResource"]>
 
@@ -1284,6 +1796,8 @@ export type StudyResourceSelectScalar = {
   instituteId?: boolean
   courseId?: boolean
   subjectId?: boolean
+  batchId?: boolean
+  lectureId?: boolean
   title?: boolean
   description?: boolean
   kind?: boolean
@@ -1291,28 +1805,35 @@ export type StudyResourceSelectScalar = {
   assetName?: boolean
   assetPublicId?: boolean
   externalUrl?: boolean
+  dueDate?: boolean
   uploadedByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type StudyResourceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "courseId" | "subjectId" | "title" | "description" | "kind" | "assetUrl" | "assetName" | "assetPublicId" | "externalUrl" | "uploadedByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["studyResource"]>
+export type StudyResourceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "instituteId" | "courseId" | "subjectId" | "batchId" | "lectureId" | "title" | "description" | "kind" | "assetUrl" | "assetName" | "assetPublicId" | "externalUrl" | "dueDate" | "uploadedByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["studyResource"]>
 export type StudyResourceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.StudyResource$subjectArgs<ExtArgs>
+  batch?: boolean | Prisma.StudyResource$batchArgs<ExtArgs>
+  lecture?: boolean | Prisma.StudyResource$lectureArgs<ExtArgs>
   uploadedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type StudyResourceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.StudyResource$subjectArgs<ExtArgs>
+  batch?: boolean | Prisma.StudyResource$batchArgs<ExtArgs>
+  lecture?: boolean | Prisma.StudyResource$lectureArgs<ExtArgs>
   uploadedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type StudyResourceIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   institute?: boolean | Prisma.InstituteDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   subject?: boolean | Prisma.StudyResource$subjectArgs<ExtArgs>
+  batch?: boolean | Prisma.StudyResource$batchArgs<ExtArgs>
+  lecture?: boolean | Prisma.StudyResource$lectureArgs<ExtArgs>
   uploadedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
@@ -1322,6 +1843,8 @@ export type $StudyResourcePayload<ExtArgs extends runtime.Types.Extensions.Inter
     institute: Prisma.$InstitutePayload<ExtArgs>
     course: Prisma.$CoursePayload<ExtArgs>
     subject: Prisma.$SubjectPayload<ExtArgs> | null
+    batch: Prisma.$BatchPayload<ExtArgs> | null
+    lecture: Prisma.$LecturePayload<ExtArgs> | null
     uploadedBy: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1332,20 +1855,22 @@ export type $StudyResourcePayload<ExtArgs extends runtime.Types.Extensions.Inter
      * Null = material for the whole course rather than one subject.
      */
     subjectId: string | null
+    batchId: string | null
+    lectureId: string | null
     title: string
     description: string | null
     kind: $Enums.ResourceKind
     /**
-     * Set for kind=FILE. publicId is what makes the Cloudinary asset
-     * deletable later — deleting the row without it would orphan the file.
+     * Set for kind=FILE. assetUrl is public link.
      */
     assetUrl: string | null
     assetName: string | null
     assetPublicId: string | null
     /**
-     * Set for kind=LINK — a YouTube video, a Drive folder, a Zoom recording.
+     * Set for kind=LINK or HOMEWORK external link (e.g. YouTube video, Drive folder).
      */
     externalUrl: string | null
+    dueDate: Date | null
     uploadedByUserId: string
     createdAt: Date
     updatedAt: Date
@@ -1746,6 +2271,8 @@ export interface Prisma__StudyResourceClient<T, Null = never, ExtArgs extends ru
   institute<T extends Prisma.InstituteDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InstituteDefaultArgs<ExtArgs>>): Prisma.Prisma__InstituteClient<runtime.Types.Result.GetResult<Prisma.$InstitutePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   course<T extends Prisma.CourseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   subject<T extends Prisma.StudyResource$subjectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudyResource$subjectArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  batch<T extends Prisma.StudyResource$batchArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudyResource$batchArgs<ExtArgs>>): Prisma.Prisma__BatchClient<runtime.Types.Result.GetResult<Prisma.$BatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  lecture<T extends Prisma.StudyResource$lectureArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudyResource$lectureArgs<ExtArgs>>): Prisma.Prisma__LectureClient<runtime.Types.Result.GetResult<Prisma.$LecturePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   uploadedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1780,6 +2307,8 @@ export interface StudyResourceFieldRefs {
   readonly instituteId: Prisma.FieldRef<"StudyResource", 'String'>
   readonly courseId: Prisma.FieldRef<"StudyResource", 'String'>
   readonly subjectId: Prisma.FieldRef<"StudyResource", 'String'>
+  readonly batchId: Prisma.FieldRef<"StudyResource", 'String'>
+  readonly lectureId: Prisma.FieldRef<"StudyResource", 'String'>
   readonly title: Prisma.FieldRef<"StudyResource", 'String'>
   readonly description: Prisma.FieldRef<"StudyResource", 'String'>
   readonly kind: Prisma.FieldRef<"StudyResource", 'ResourceKind'>
@@ -1787,6 +2316,7 @@ export interface StudyResourceFieldRefs {
   readonly assetName: Prisma.FieldRef<"StudyResource", 'String'>
   readonly assetPublicId: Prisma.FieldRef<"StudyResource", 'String'>
   readonly externalUrl: Prisma.FieldRef<"StudyResource", 'String'>
+  readonly dueDate: Prisma.FieldRef<"StudyResource", 'DateTime'>
   readonly uploadedByUserId: Prisma.FieldRef<"StudyResource", 'String'>
   readonly createdAt: Prisma.FieldRef<"StudyResource", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"StudyResource", 'DateTime'>
@@ -2207,6 +2737,44 @@ export type StudyResource$subjectArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   include?: Prisma.SubjectInclude<ExtArgs> | null
   where?: Prisma.SubjectWhereInput
+}
+
+/**
+ * StudyResource.batch
+ */
+export type StudyResource$batchArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Batch
+   */
+  select?: Prisma.BatchSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Batch
+   */
+  omit?: Prisma.BatchOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BatchInclude<ExtArgs> | null
+  where?: Prisma.BatchWhereInput
+}
+
+/**
+ * StudyResource.lecture
+ */
+export type StudyResource$lectureArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Lecture
+   */
+  select?: Prisma.LectureSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Lecture
+   */
+  omit?: Prisma.LectureOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LectureInclude<ExtArgs> | null
+  where?: Prisma.LectureWhereInput
 }
 
 /**

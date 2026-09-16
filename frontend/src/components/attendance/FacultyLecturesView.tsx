@@ -12,6 +12,7 @@ import { MarkAttendanceModal } from "@/components/attendance/MarkAttendanceModal
 import { EditLectureModal } from "@/components/attendance/EditLectureModal";
 import { CancelLectureModal } from "@/components/attendance/CancelLectureModal";
 import { CopyLectureButton } from "@/components/attendance/CopyLectureButton";
+import { CreateMaterialModal } from "@/components/academics/CreateMaterialModal";
 import type { AttendanceStats, Lecture } from "@/lib/types";
 import { formatDate, fmtTime12, todayInput, isFacultyWindowExpired } from "@/lib/format";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
@@ -21,6 +22,15 @@ function EditIcon() {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M12 20h9" strokeLinecap="round" />
       <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function BookPlusIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 8v6M9 11h6" strokeLinecap="round" />
     </svg>
   );
 }
@@ -55,6 +65,7 @@ export function FacultyLecturesView() {
   const [markLecture, setMarkLecture] = useState<Lecture | null>(null);
   const [editLecture, setEditLecture] = useState<Lecture | null>(null);
   const [cancelLecture, setCancelLecture] = useState<Lecture | null>(null);
+  const [homeworkLecture, setHomeworkLecture] = useState<Lecture | null>(null);
 
   const { paginatedItems, paginationProps } = useClientPagination(lectures, 10);
 
@@ -196,6 +207,15 @@ export function FacultyLecturesView() {
                               </button>
                             </>
                           )}
+                          <button
+                            type="button"
+                            onClick={() => setHomeworkLecture(l)}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                            aria-label="Assign Homework"
+                            title="Assign Homework"
+                          >
+                            <BookPlusIcon />
+                          </button>
                           <CopyLectureButton lecture={l} />
                           <Button variant={isFacultyWindowExpired(l.date) ? "ghost" : "secondary"} onClick={() => setMarkLecture(l)}>
                             {isFacultyWindowExpired(l.date) ? "Roster" : "Mark"}
@@ -276,6 +296,15 @@ export function FacultyLecturesView() {
                       </button>
                     </>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => setHomeworkLecture(l)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    aria-label="Assign Homework"
+                    title="Assign Homework"
+                  >
+                    <BookPlusIcon />
+                  </button>
                   <CopyLectureButton lecture={l} />
                   <Button variant={isFacultyWindowExpired(l.date) ? "ghost" : "secondary"} onClick={() => setMarkLecture(l)}>
                     {isFacultyWindowExpired(l.date) ? "View roster" : "Mark attendance"}
@@ -307,6 +336,18 @@ export function FacultyLecturesView() {
       <EditLectureModal lecture={editLecture} onClose={() => setEditLecture(null)} onSaved={load} />
 
       <CancelLectureModal lecture={cancelLecture} onClose={() => setCancelLecture(null)} onCancelled={load} />
+
+      <CreateMaterialModal
+        open={!!homeworkLecture}
+        onClose={() => setHomeworkLecture(null)}
+        onSuccess={load}
+        courses={[]}
+        batches={homeworkLecture ? [{ id: homeworkLecture.batch.id, name: homeworkLecture.batch.name, course: { id: "", name: "", code: "" }, startDate: "", endDate: null, isActive: true, enrolledCount: 0, lectureCount: 0 }] : []}
+        subjects={homeworkLecture ? [{ id: homeworkLecture.subject.id, name: homeworkLecture.subject.name, shortCode: "", isActive: true, courses: [] }] : []}
+        initialBatchId={homeworkLecture?.batch.id}
+        initialLectureId={homeworkLecture?.id}
+        initialKind="HOMEWORK"
+      />
     </div>
   );
 }

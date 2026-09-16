@@ -289,6 +289,7 @@ export type LectureWhereInput = {
   attendance?: Prisma.AttendanceRecordListRelationFilter
   results?: Prisma.TestResultListRelationFilter
   payrollLineItem?: Prisma.XOR<Prisma.PayrollLineItemNullableScalarRelationFilter, Prisma.PayrollLineItemWhereInput> | null
+  studyResources?: Prisma.StudyResourceListRelationFilter
 }
 
 export type LectureOrderByWithRelationInput = {
@@ -317,6 +318,7 @@ export type LectureOrderByWithRelationInput = {
   attendance?: Prisma.AttendanceRecordOrderByRelationAggregateInput
   results?: Prisma.TestResultOrderByRelationAggregateInput
   payrollLineItem?: Prisma.PayrollLineItemOrderByWithRelationInput
+  studyResources?: Prisma.StudyResourceOrderByRelationAggregateInput
 }
 
 export type LectureWhereUniqueInput = Prisma.AtLeast<{
@@ -348,6 +350,7 @@ export type LectureWhereUniqueInput = Prisma.AtLeast<{
   attendance?: Prisma.AttendanceRecordListRelationFilter
   results?: Prisma.TestResultListRelationFilter
   payrollLineItem?: Prisma.XOR<Prisma.PayrollLineItemNullableScalarRelationFilter, Prisma.PayrollLineItemWhereInput> | null
+  studyResources?: Prisma.StudyResourceListRelationFilter
 }, "id">
 
 export type LectureOrderByWithAggregationInput = {
@@ -414,6 +417,7 @@ export type LectureCreateInput = {
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateInput = {
@@ -436,6 +440,7 @@ export type LectureUncheckedCreateInput = {
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUpdateInput = {
@@ -458,6 +463,7 @@ export type LectureUpdateInput = {
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateInput = {
@@ -480,6 +486,7 @@ export type LectureUncheckedUpdateInput = {
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureCreateManyInput = {
@@ -910,6 +917,22 @@ export type LectureUpdateOneWithoutPayrollLineItemNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.LectureUpdateToOneWithWhereWithoutPayrollLineItemInput, Prisma.LectureUpdateWithoutPayrollLineItemInput>, Prisma.LectureUncheckedUpdateWithoutPayrollLineItemInput>
 }
 
+export type LectureCreateNestedOneWithoutStudyResourcesInput = {
+  create?: Prisma.XOR<Prisma.LectureCreateWithoutStudyResourcesInput, Prisma.LectureUncheckedCreateWithoutStudyResourcesInput>
+  connectOrCreate?: Prisma.LectureCreateOrConnectWithoutStudyResourcesInput
+  connect?: Prisma.LectureWhereUniqueInput
+}
+
+export type LectureUpdateOneWithoutStudyResourcesNestedInput = {
+  create?: Prisma.XOR<Prisma.LectureCreateWithoutStudyResourcesInput, Prisma.LectureUncheckedCreateWithoutStudyResourcesInput>
+  connectOrCreate?: Prisma.LectureCreateOrConnectWithoutStudyResourcesInput
+  upsert?: Prisma.LectureUpsertWithoutStudyResourcesInput
+  disconnect?: Prisma.LectureWhereInput | boolean
+  delete?: Prisma.LectureWhereInput | boolean
+  connect?: Prisma.LectureWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LectureUpdateToOneWithWhereWithoutStudyResourcesInput, Prisma.LectureUpdateWithoutStudyResourcesInput>, Prisma.LectureUncheckedUpdateWithoutStudyResourcesInput>
+}
+
 export type LectureCreateWithoutInstituteInput = {
   id?: string
   kind?: $Enums.LectureKind
@@ -929,6 +952,7 @@ export type LectureCreateWithoutInstituteInput = {
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutInstituteInput = {
@@ -950,6 +974,7 @@ export type LectureUncheckedCreateWithoutInstituteInput = {
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutInstituteInput = {
@@ -1019,6 +1044,7 @@ export type LectureCreateWithoutFacultyInput = {
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutFacultyInput = {
@@ -1040,6 +1066,7 @@ export type LectureUncheckedCreateWithoutFacultyInput = {
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutFacultyInput = {
@@ -1087,6 +1114,7 @@ export type LectureCreateWithoutSubjectInput = {
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutSubjectInput = {
@@ -1108,6 +1136,7 @@ export type LectureUncheckedCreateWithoutSubjectInput = {
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutSubjectInput = {
@@ -1155,6 +1184,7 @@ export type LectureCreateWithoutBatchInput = {
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutBatchInput = {
@@ -1176,6 +1206,7 @@ export type LectureUncheckedCreateWithoutBatchInput = {
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutBatchInput = {
@@ -1223,6 +1254,7 @@ export type LectureCreateWithoutRoomInput = {
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutRoomInput = {
@@ -1244,6 +1276,7 @@ export type LectureUncheckedCreateWithoutRoomInput = {
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutRoomInput = {
@@ -1291,6 +1324,7 @@ export type LectureCreateWithoutTestInput = {
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutTestInput = {
@@ -1312,6 +1346,7 @@ export type LectureUncheckedCreateWithoutTestInput = {
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutTestInput = {
@@ -1359,6 +1394,7 @@ export type LectureCreateWithoutResultsInput = {
   test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutResultsInput = {
@@ -1380,6 +1416,7 @@ export type LectureUncheckedCreateWithoutResultsInput = {
   updatedAt?: Date | string
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutResultsInput = {
@@ -1417,6 +1454,7 @@ export type LectureUpdateWithoutResultsInput = {
   test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutResultsInput = {
@@ -1438,6 +1476,7 @@ export type LectureUncheckedUpdateWithoutResultsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureCreateWithoutAttendanceInput = {
@@ -1459,6 +1498,7 @@ export type LectureCreateWithoutAttendanceInput = {
   test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutAttendanceInput = {
@@ -1480,6 +1520,7 @@ export type LectureUncheckedCreateWithoutAttendanceInput = {
   updatedAt?: Date | string
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutAttendanceInput = {
@@ -1517,6 +1558,7 @@ export type LectureUpdateWithoutAttendanceInput = {
   test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutAttendanceInput = {
@@ -1538,6 +1580,7 @@ export type LectureUncheckedUpdateWithoutAttendanceInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureCreateWithoutPayrollLineItemInput = {
@@ -1559,6 +1602,7 @@ export type LectureCreateWithoutPayrollLineItemInput = {
   test?: Prisma.TestCreateNestedOneWithoutSessionsInput
   attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
+  studyResources?: Prisma.StudyResourceCreateNestedManyWithoutLectureInput
 }
 
 export type LectureUncheckedCreateWithoutPayrollLineItemInput = {
@@ -1580,6 +1624,7 @@ export type LectureUncheckedCreateWithoutPayrollLineItemInput = {
   updatedAt?: Date | string
   attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
   results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
+  studyResources?: Prisma.StudyResourceUncheckedCreateNestedManyWithoutLectureInput
 }
 
 export type LectureCreateOrConnectWithoutPayrollLineItemInput = {
@@ -1617,6 +1662,7 @@ export type LectureUpdateWithoutPayrollLineItemInput = {
   test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutPayrollLineItemInput = {
@@ -1638,6 +1684,111 @@ export type LectureUncheckedUpdateWithoutPayrollLineItemInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
+}
+
+export type LectureCreateWithoutStudyResourcesInput = {
+  id?: string
+  kind?: $Enums.LectureKind
+  date: Date | string
+  startTime: Date | string
+  endTime: Date | string
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  institute: Prisma.InstituteCreateNestedOneWithoutLecturesInput
+  batch: Prisma.BatchCreateNestedOneWithoutLecturesInput
+  subject: Prisma.SubjectCreateNestedOneWithoutLecturesInput
+  faculty: Prisma.UserCreateNestedOneWithoutLecturesTaughtInput
+  room?: Prisma.RoomCreateNestedOneWithoutLecturesInput
+  test?: Prisma.TestCreateNestedOneWithoutSessionsInput
+  attendance?: Prisma.AttendanceRecordCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultCreateNestedManyWithoutLectureInput
+  payrollLineItem?: Prisma.PayrollLineItemCreateNestedOneWithoutLectureInput
+}
+
+export type LectureUncheckedCreateWithoutStudyResourcesInput = {
+  id?: string
+  instituteId: string
+  batchId: string
+  subjectId: string
+  facultyId: string
+  roomId?: string | null
+  kind?: $Enums.LectureKind
+  testId?: string | null
+  date: Date | string
+  startTime: Date | string
+  endTime: Date | string
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attendance?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutLectureInput
+  results?: Prisma.TestResultUncheckedCreateNestedManyWithoutLectureInput
+  payrollLineItem?: Prisma.PayrollLineItemUncheckedCreateNestedOneWithoutLectureInput
+}
+
+export type LectureCreateOrConnectWithoutStudyResourcesInput = {
+  where: Prisma.LectureWhereUniqueInput
+  create: Prisma.XOR<Prisma.LectureCreateWithoutStudyResourcesInput, Prisma.LectureUncheckedCreateWithoutStudyResourcesInput>
+}
+
+export type LectureUpsertWithoutStudyResourcesInput = {
+  update: Prisma.XOR<Prisma.LectureUpdateWithoutStudyResourcesInput, Prisma.LectureUncheckedUpdateWithoutStudyResourcesInput>
+  create: Prisma.XOR<Prisma.LectureCreateWithoutStudyResourcesInput, Prisma.LectureUncheckedCreateWithoutStudyResourcesInput>
+  where?: Prisma.LectureWhereInput
+}
+
+export type LectureUpdateToOneWithWhereWithoutStudyResourcesInput = {
+  where?: Prisma.LectureWhereInput
+  data: Prisma.XOR<Prisma.LectureUpdateWithoutStudyResourcesInput, Prisma.LectureUncheckedUpdateWithoutStudyResourcesInput>
+}
+
+export type LectureUpdateWithoutStudyResourcesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  institute?: Prisma.InstituteUpdateOneRequiredWithoutLecturesNestedInput
+  batch?: Prisma.BatchUpdateOneRequiredWithoutLecturesNestedInput
+  subject?: Prisma.SubjectUpdateOneRequiredWithoutLecturesNestedInput
+  faculty?: Prisma.UserUpdateOneRequiredWithoutLecturesTaughtNestedInput
+  room?: Prisma.RoomUpdateOneWithoutLecturesNestedInput
+  test?: Prisma.TestUpdateOneWithoutSessionsNestedInput
+  attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
+  payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+}
+
+export type LectureUncheckedUpdateWithoutStudyResourcesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instituteId?: Prisma.StringFieldUpdateOperationsInput | string
+  batchId?: Prisma.StringFieldUpdateOperationsInput | string
+  subjectId?: Prisma.StringFieldUpdateOperationsInput | string
+  facultyId?: Prisma.StringFieldUpdateOperationsInput | string
+  roomId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kind?: Prisma.EnumLectureKindFieldUpdateOperationsInput | $Enums.LectureKind
+  testId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
+  results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
+  payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
 }
 
 export type LectureCreateManyInstituteInput = {
@@ -1677,6 +1828,7 @@ export type LectureUpdateWithoutInstituteInput = {
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutInstituteInput = {
@@ -1698,6 +1850,7 @@ export type LectureUncheckedUpdateWithoutInstituteInput = {
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateManyWithoutInstituteInput = {
@@ -1755,6 +1908,7 @@ export type LectureUpdateWithoutFacultyInput = {
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutFacultyInput = {
@@ -1776,6 +1930,7 @@ export type LectureUncheckedUpdateWithoutFacultyInput = {
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateManyWithoutFacultyInput = {
@@ -1833,6 +1988,7 @@ export type LectureUpdateWithoutSubjectInput = {
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutSubjectInput = {
@@ -1854,6 +2010,7 @@ export type LectureUncheckedUpdateWithoutSubjectInput = {
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateManyWithoutSubjectInput = {
@@ -1911,6 +2068,7 @@ export type LectureUpdateWithoutBatchInput = {
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutBatchInput = {
@@ -1932,6 +2090,7 @@ export type LectureUncheckedUpdateWithoutBatchInput = {
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateManyWithoutBatchInput = {
@@ -1989,6 +2148,7 @@ export type LectureUpdateWithoutRoomInput = {
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutRoomInput = {
@@ -2010,6 +2170,7 @@ export type LectureUncheckedUpdateWithoutRoomInput = {
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateManyWithoutRoomInput = {
@@ -2067,6 +2228,7 @@ export type LectureUpdateWithoutTestInput = {
   attendance?: Prisma.AttendanceRecordUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateWithoutTestInput = {
@@ -2088,6 +2250,7 @@ export type LectureUncheckedUpdateWithoutTestInput = {
   attendance?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutLectureNestedInput
   results?: Prisma.TestResultUncheckedUpdateManyWithoutLectureNestedInput
   payrollLineItem?: Prisma.PayrollLineItemUncheckedUpdateOneWithoutLectureNestedInput
+  studyResources?: Prisma.StudyResourceUncheckedUpdateManyWithoutLectureNestedInput
 }
 
 export type LectureUncheckedUpdateManyWithoutTestInput = {
@@ -2116,11 +2279,13 @@ export type LectureUncheckedUpdateManyWithoutTestInput = {
 export type LectureCountOutputType = {
   attendance: number
   results: number
+  studyResources: number
 }
 
 export type LectureCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attendance?: boolean | LectureCountOutputTypeCountAttendanceArgs
   results?: boolean | LectureCountOutputTypeCountResultsArgs
+  studyResources?: boolean | LectureCountOutputTypeCountStudyResourcesArgs
 }
 
 /**
@@ -2145,6 +2310,13 @@ export type LectureCountOutputTypeCountAttendanceArgs<ExtArgs extends runtime.Ty
  */
 export type LectureCountOutputTypeCountResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TestResultWhereInput
+}
+
+/**
+ * LectureCountOutputType without action
+ */
+export type LectureCountOutputTypeCountStudyResourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StudyResourceWhereInput
 }
 
 
@@ -2174,6 +2346,7 @@ export type LectureSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   attendance?: boolean | Prisma.Lecture$attendanceArgs<ExtArgs>
   results?: boolean | Prisma.Lecture$resultsArgs<ExtArgs>
   payrollLineItem?: boolean | Prisma.Lecture$payrollLineItemArgs<ExtArgs>
+  studyResources?: boolean | Prisma.Lecture$studyResourcesArgs<ExtArgs>
   _count?: boolean | Prisma.LectureCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lecture"]>
 
@@ -2257,6 +2430,7 @@ export type LectureInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   attendance?: boolean | Prisma.Lecture$attendanceArgs<ExtArgs>
   results?: boolean | Prisma.Lecture$resultsArgs<ExtArgs>
   payrollLineItem?: boolean | Prisma.Lecture$payrollLineItemArgs<ExtArgs>
+  studyResources?: boolean | Prisma.Lecture$studyResourcesArgs<ExtArgs>
   _count?: boolean | Prisma.LectureCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LectureIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2288,6 +2462,7 @@ export type $LecturePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     attendance: Prisma.$AttendanceRecordPayload<ExtArgs>[]
     results: Prisma.$TestResultPayload<ExtArgs>[]
     payrollLineItem: Prisma.$PayrollLineItemPayload<ExtArgs> | null
+    studyResources: Prisma.$StudyResourcePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2709,6 +2884,7 @@ export interface Prisma__LectureClient<T, Null = never, ExtArgs extends runtime.
   attendance<T extends Prisma.Lecture$attendanceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lecture$attendanceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   results<T extends Prisma.Lecture$resultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lecture$resultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payrollLineItem<T extends Prisma.Lecture$payrollLineItemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lecture$payrollLineItemArgs<ExtArgs>>): Prisma.Prisma__PayrollLineItemClient<runtime.Types.Result.GetResult<Prisma.$PayrollLineItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  studyResources<T extends Prisma.Lecture$studyResourcesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Lecture$studyResourcesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StudyResourcePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3257,6 +3433,30 @@ export type Lecture$payrollLineItemArgs<ExtArgs extends runtime.Types.Extensions
    */
   include?: Prisma.PayrollLineItemInclude<ExtArgs> | null
   where?: Prisma.PayrollLineItemWhereInput
+}
+
+/**
+ * Lecture.studyResources
+ */
+export type Lecture$studyResourcesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StudyResource
+   */
+  select?: Prisma.StudyResourceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StudyResource
+   */
+  omit?: Prisma.StudyResourceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StudyResourceInclude<ExtArgs> | null
+  where?: Prisma.StudyResourceWhereInput
+  orderBy?: Prisma.StudyResourceOrderByWithRelationInput | Prisma.StudyResourceOrderByWithRelationInput[]
+  cursor?: Prisma.StudyResourceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StudyResourceScalarFieldEnum | Prisma.StudyResourceScalarFieldEnum[]
 }
 
 /**

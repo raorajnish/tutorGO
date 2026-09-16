@@ -8,7 +8,7 @@
  *     assets, so a repeat visit paints instantly and a flaky connection still
  *     shows *something*.
  *
- * The one rule that overrides everything else below: **/api/* is never
+ * The one rule that overrides everything else below: /api/* is never
  * cached.** Every API response is tenant- and user-scoped — a cached fee
  * record or attendance row sitting in this cache is another student's data
  * waiting to be served to whoever next opens the browser on a shared family
