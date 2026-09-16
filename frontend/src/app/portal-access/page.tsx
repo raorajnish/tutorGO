@@ -62,7 +62,7 @@ export default function PortalAccessPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Organization</p>
         <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Portal access</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground hidden sm:block">
           Turn the student portal on course by course, then send each student their login. Nobody gets an account
           automatically — including new admissions.
         </p>
@@ -83,7 +83,7 @@ export default function PortalAccessPage() {
         placeholder="Find a course…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="max-w-xs"
+        className="w-full sm:max-w-xs"
       />
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}

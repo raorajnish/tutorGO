@@ -31,12 +31,18 @@ export function ActionMenu({ items }: { items: ActionMenuItem[] }) {
     function reposition() {
       const rect = triggerRef.current?.getBoundingClientRect();
       if (!rect) return;
-      const GAP = 4;
-      const MENU_HEIGHT = items.length * 40 + 12;
+      const GAP = 6;
+      const MENU_WIDTH = 136;
+      const MENU_HEIGHT = items.length * 32 + 8;
       const spaceBelow = window.innerHeight - rect.bottom - GAP;
       const openUp = spaceBelow < MENU_HEIGHT && rect.top > spaceBelow;
+      
+      const targetLeft = rect.right - MENU_WIDTH;
+      const maxLeft = window.innerWidth - MENU_WIDTH - 8;
+      const calculatedLeft = Math.max(8, Math.min(targetLeft, maxLeft));
+
       setPosition({
-        left: Math.min(rect.right - 176, window.innerWidth - 184),
+        left: calculatedLeft,
         ...(openUp ? { bottom: window.innerHeight - rect.top + GAP } : { top: rect.bottom + GAP }),
       });
     }
@@ -86,8 +92,8 @@ export function ActionMenu({ items }: { items: ActionMenuItem[] }) {
           <div
             ref={menuRef}
             role="menu"
-            style={{ position: "fixed", left: position.left, top: position.top, bottom: position.bottom, width: 176 }}
-            className="z-100 overflow-hidden rounded-xl border border-border bg-card p-1.5 shadow-(--shadow-overlay)"
+            style={{ position: "fixed", left: position.left, top: position.top, bottom: position.bottom, width: 136 }}
+            className="z-100 overflow-hidden rounded-lg border border-border bg-card p-1 shadow-(--shadow-overlay)"
           >
             {items.map((item) => (
               <button
@@ -99,7 +105,7 @@ export function ActionMenu({ items }: { items: ActionMenuItem[] }) {
                   setOpen(false);
                   item.onClick();
                 }}
-                className={`flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                className={`flex w-full items-center rounded-md px-2.5 py-1.5 text-left text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                   item.tone === "danger" ? "text-danger hover:bg-danger-soft" : "text-foreground hover:bg-secondary"
                 }`}
               >

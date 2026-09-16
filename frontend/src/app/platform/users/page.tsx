@@ -48,7 +48,7 @@ export default function PlatformUsersPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Platform</p>
         <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Users</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Every staff account, across every organization.</p>
+        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Every staff account, across every organization.</p>
       </div>
 
       <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:flex-wrap sm:items-end">

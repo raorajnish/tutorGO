@@ -72,7 +72,7 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard label="Total batches" value={batches.length} tone="primary" />
         <StatCard label="Active" value={activeCount} tone="success" />
         <StatCard label="Students enrolled" value={totalEnrolled} tone="accent" />

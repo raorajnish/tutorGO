@@ -90,10 +90,10 @@ export default function StudentsPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
         <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Students</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Every student on file, across every course and batch.</p>
+        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Every student on file, across every course and batch.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
         <StatCard label="Active students" value={data?.stats.activeStudents ?? "—"} tone="primary" />
         <StatCard label="Total on file" value={data?.stats.totalStudents ?? "—"} tone="accent" />
         <StatCard label="Active batches" value={data?.stats.activeBatches ?? "—"} tone="success" />
@@ -102,30 +102,25 @@ export default function StudentsPage() {
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="flex flex-col gap-3 border-b border-border p-4">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Input
               placeholder="Search name, code, phone, email…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="max-w-xs"
             />
-            <div className="w-full max-w-50">
-              <Dropdown
-                value={courseId}
-                onChange={setCourseId}
-                options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
-                placeholder="All courses"
-              />
-            </div>
-            <div className="w-full max-w-50">
-              <Dropdown
-                value={batchId}
-                onChange={setBatchId}
-                options={[{ value: "", label: "All batches" }, ...batches.map((b) => ({ value: b.id, label: b.name }))]}
-                placeholder="All batches"
-                disabled={!courseId}
-              />
-            </div>
+            <Dropdown
+              value={courseId}
+              onChange={setCourseId}
+              options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
+              placeholder="All courses"
+            />
+            <Dropdown
+              value={batchId}
+              onChange={setBatchId}
+              options={[{ value: "", label: "All batches" }, ...batches.map((b) => ({ value: b.id, label: b.name }))]}
+              placeholder="All batches"
+              disabled={!courseId}
+            />
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex gap-1.5">

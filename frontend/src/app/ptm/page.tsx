@@ -176,7 +176,7 @@ export default function PtmPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Parent-Teacher Meetings</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Scheduled per batch — students and parents are notified automatically.</p>
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Scheduled per batch — students and parents are notified automatically.</p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="shrink-0">
           Schedule a PTM

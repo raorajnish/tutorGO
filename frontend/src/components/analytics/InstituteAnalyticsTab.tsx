@@ -135,9 +135,11 @@ export function InstituteAnalyticsTab() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:flex-wrap sm:items-end">
-        <Input label="From" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-        <Input label="To" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-        <div className="min-w-[200px] flex-1">
+        <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:gap-3">
+          <Input label="From" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          <Input label="To" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+        </div>
+        <div className="w-full sm:min-w-[200px] sm:flex-1">
           <Dropdown
             label="Course"
             value={courseId}
@@ -147,7 +149,7 @@ export function InstituteAnalyticsTab() {
           />
         </div>
         {batches.length > 1 && (
-          <div className="min-w-[160px] flex-1">
+          <div className="w-full sm:min-w-[160px] sm:flex-1">
             <Dropdown
               label="Batch"
               value={batchId}
@@ -164,7 +166,7 @@ export function InstituteAnalyticsTab() {
       {/* Enrollment */}
       <section className="space-y-4">
         <SectionHeading title="Enrollment" description="Who's actually here, and how fast that's growing." />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-2">
           <Skeleton loading={loading}>
             <StatCard label="Active students" value={data?.enrollment.totalActive ?? 0} tone="primary" />
           </Skeleton>
@@ -197,7 +199,7 @@ export function InstituteAnalyticsTab() {
       {/* Lectures */}
       <section className="space-y-4">
         <SectionHeading title="Lectures" description="Volume and reliability of what's actually being taught, by course." />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-2">
           <Skeleton loading={loading}>
             <StatCard label="Lectures held" value={data?.lectures.total ?? 0} tone="primary" />
           </Skeleton>
@@ -231,7 +233,7 @@ export function InstituteAnalyticsTab() {
       {/* Tests */}
       <section className="space-y-4">
         <SectionHeading title="Test performance" description="Average score and pass rate, weighted by how many students actually sat each test." />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           <Skeleton loading={loading}>
             <StatCard label="Tests" value={data?.tests.testCount ?? 0} tone="primary" />
           </Skeleton>
@@ -259,7 +261,7 @@ export function InstituteAnalyticsTab() {
       {/* Fees */}
       <section className="space-y-4">
         <SectionHeading title="Fees" description="Coverage against what's actually owed, and what's overdue right now." />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           <Skeleton loading={loading}>
             <StatCard label="Total due" value={formatMoney(data?.fees.totalDue ?? "0")} tone="primary" />
           </Skeleton>
@@ -288,7 +290,7 @@ export function InstituteAnalyticsTab() {
       {/* Payroll & Expenses */}
       <section className="space-y-4">
         <SectionHeading title="Payroll & expenses" description="What running the institute costs, independent of any course or batch filter above." />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-4 sm:grid-cols-3">
           <Skeleton loading={loading}>
             <StatCard label="Payroll (range)" value={formatMoney(data?.payroll.totalInRange ?? "0")} tone="warning" />
           </Skeleton>

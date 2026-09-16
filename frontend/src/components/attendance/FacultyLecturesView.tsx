@@ -102,7 +102,7 @@ export function FacultyLecturesView() {
         <Button onClick={() => setScheduleOpen(true)}>Schedule lecture</Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard label="Total lectures" value={stats?.total ?? "—"} tone="primary" />
         <StatCard label="Today" value={stats?.today ?? "—"} tone="accent" />
         <StatCard label="Upcoming" value={stats?.upcoming ?? "—"} tone="success" />

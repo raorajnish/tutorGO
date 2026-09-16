@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { ActionMenu } from "@/components/ui/ActionMenu";
 import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type Expense, type ExpenseCategory, type ExpenseEvent, type PaymentMode } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
@@ -93,59 +94,101 @@ export function ExpensesTab() {
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <tr>
-              <th className="px-4 py-2.5">Date</th>
-              <th className="px-4 py-2.5">Title</th>
-              <th className="px-4 py-2.5">Category</th>
-              <th className="px-4 py-2.5">Event</th>
-              <th className="px-4 py-2.5">Mode</th>
-              <th className="px-4 py-2.5 text-right">Amount</th>
-              <th className="px-4 py-2.5" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {expenses === null &&
-              Array.from({ length: 6 }, (_, i) => (
-                <tr key={`sk-${i}`}>
-                  <td colSpan={7}>
-                    <SkeletonRow lines={2} />
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden overflow-x-auto sm:block">
+          <table className="w-full text-sm">
+            <thead className="bg-muted text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-4 py-2.5">Date</th>
+                <th className="px-4 py-2.5">Title</th>
+                <th className="px-4 py-2.5">Category</th>
+                <th className="px-4 py-2.5">Event</th>
+                <th className="px-4 py-2.5">Mode</th>
+                <th className="px-4 py-2.5 text-right">Amount</th>
+                <th className="px-4 py-2.5" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {expenses === null &&
+                Array.from({ length: 6 }, (_, i) => (
+                  <tr key={`sk-${i}`}>
+                    <td colSpan={7}>
+                      <SkeletonRow lines={2} />
+                    </td>
+                  </tr>
+                ))}
+              {expenses?.map((e) => (
+                <tr key={e.id}>
+                  <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{formatDate(e.date)}</td>
+                  <td className="px-4 py-3 font-medium text-foreground">{e.title}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone="primary">{e.category.name}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{e.event?.name ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{PAYMENT_MODE_LABELS[e.mode]}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-foreground">{formatMoney(e.amount)}</td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" onClick={() => setEditing(e)}>
+                        Edit
+                      </Button>
+                      <Button variant="ghost" onClick={() => setDeleting(e)}>
+                        Delete
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
-            {expenses?.map((e) => (
-              <tr key={e.id}>
-                <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{formatDate(e.date)}</td>
-                <td className="px-4 py-3 font-medium text-foreground">{e.title}</td>
-                <td className="px-4 py-3">
-                  <Badge tone="primary">{e.category.name}</Badge>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">{e.event?.name ?? "—"}</td>
-                <td className="px-4 py-3 text-muted-foreground">{PAYMENT_MODE_LABELS[e.mode]}</td>
-                <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-foreground">{formatMoney(e.amount)}</td>
-                <td className="px-4 py-3 text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button variant="ghost" onClick={() => setEditing(e)}>
-                      Edit
-                    </Button>
-                    <Button variant="ghost" onClick={() => setDeleting(e)}>
-                      Delete
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {expenses && expenses.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                  No expenses recorded yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              {expenses && expenses.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                    No expenses recorded yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="divide-y divide-border sm:hidden">
+          {expenses === null && (
+            <div className="p-4 space-y-3">
+              <SkeletonRow lines={3} />
+            </div>
+          )}
+          {expenses?.map((e) => (
+            <div key={e.id} className="p-3.5 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h4 className="font-semibold text-foreground text-sm leading-tight">{e.title}</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">{formatDate(e.date)}</p>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <span className="font-bold text-foreground text-sm whitespace-nowrap">{formatMoney(e.amount)}</span>
+                  <ActionMenu
+                    items={[
+                      { label: "Edit", onClick: () => setEditing(e) },
+                      { label: "Delete", onClick: () => setDeleting(e), tone: "danger" },
+                    ]}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                <Badge tone="primary">{e.category.name}</Badge>
+                {e.event?.name && <span className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium">{e.event.name}</span>}
+                <span className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium">{PAYMENT_MODE_LABELS[e.mode]}</span>
+              </div>
+            </div>
+          ))}
+          {expenses && expenses.length === 0 && (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              No expenses recorded yet.
+            </div>
+          )}
+        </div>
       </div>
 
       <ExpenseModal

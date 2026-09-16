@@ -53,10 +53,10 @@ export default function PlatformInstitutesPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Platform</p>
         <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Institutes</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Every institute across every organization on the platform.</p>
+        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Every institute across every organization on the platform.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
         <StatCard label="Total institutes" value={institutes.length} tone="primary" />
         <StatCard label="Active" value={institutes.filter((i) => i.isActive).length} tone="success" />
         <StatCard label="Inactive" value={institutes.filter((i) => !i.isActive).length} tone="warning" />
@@ -68,7 +68,7 @@ export default function PlatformInstitutesPage() {
             placeholder="Search institute, organization, code…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="max-w-xs"
+            className="w-full sm:max-w-xs"
           />
           <Button variant="ghost" onClick={load}>
             Refresh

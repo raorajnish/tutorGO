@@ -57,7 +57,7 @@ export default function DistributionPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Distribution</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
             Track books, bags, T-shirts, or anything else your class hands out to students.
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function DistributionPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
         <StatCard label="Active items" value={items.filter((i) => i.isActive).length} tone="primary" />
         <StatCard label="Total receipts tracked" value={totalStudentSlots} tone="accent" />
         <StatCard label="Handed out" value={totalReceived} tone="success" />

@@ -65,7 +65,7 @@ export default function OrganizationsPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Platform</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Organizations</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Provision customer workspaces and their institutes.</p>
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Provision customer workspaces and their institutes.</p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>New organization</Button>
       </div>
@@ -83,7 +83,7 @@ export default function OrganizationsPage() {
             placeholder="Search name, code, city, email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="max-w-xs"
+            className="w-full sm:max-w-xs"
           />
           <Button variant="ghost" onClick={load}>
             Refresh

@@ -84,7 +84,7 @@ export default function AcademicsPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Academics</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
             Courses, subjects, batches, fee structures, study materials, and classrooms — the structure everything else in this institute hangs off of.
           </p>
         </div>

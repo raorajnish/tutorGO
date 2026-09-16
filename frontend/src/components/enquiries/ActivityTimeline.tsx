@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { ENQUIRY_ACTIVITY_LABELS, type EnquiryActivity } from "@/lib/types";
-import { SkeletonRow } from "@/components/ui/Skeleton";
+import { SkeletonCircle, SkeletonLine } from "@/components/ui/Skeleton";
 import { formatDate as fmtDate, formatDateTime as fmtDateTime } from "@/lib/format";
 
 const DOT_TONE: Record<EnquiryActivity["type"], string> = {
@@ -37,18 +37,30 @@ export function ActivityTimeline({ enquiryId }: { enquiryId: string }) {
 
   if (loading) {
     return (
-      <div className="space-y-2">
-        {Array.from({ length: 3 }, (_, i) => (
-          <SkeletonRow key={i} avatar lines={2} />
+      <div className="space-y-4 pt-1 min-h-[100px]">
+        {Array.from({ length: 2 }, (_, i) => (
+          <div key={i} className="flex gap-3 pl-1">
+            <div className="flex flex-col items-center">
+              <SkeletonCircle className="h-2.5 w-2.5 mt-1.5" />
+              {i < 1 && <span className="w-px flex-1 bg-border/50" />}
+            </div>
+            <div className="min-w-0 flex-1 space-y-2 pb-2">
+              <div className="flex justify-between items-center">
+                <SkeletonLine className="w-28 h-3.5" />
+                <SkeletonLine className="w-20 h-3" />
+              </div>
+              <SkeletonLine className="w-3/4 h-3" />
+            </div>
+          </div>
         ))}
       </div>
     );
   }
-  if (error) return <p className="text-sm text-danger">{error}</p>;
-  if (activities.length === 0) return <p className="text-sm text-muted-foreground">No follow-up activity yet.</p>;
+  if (error) return <p className="text-sm text-danger min-h-[100px]">{error}</p>;
+  if (activities.length === 0) return <p className="text-sm text-muted-foreground min-h-[60px]">No follow-up activity yet.</p>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-h-[100px]">
       {activities.map((a, i) => (
         <div key={a.id} className="relative flex gap-3 pl-1">
           <div className="flex flex-col items-center">

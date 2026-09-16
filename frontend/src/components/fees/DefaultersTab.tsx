@@ -75,7 +75,7 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard label="Overdue amount" value={formatMoney(totalOverdue)} tone="danger" />
         <StatCard label="Overdue installments" value={entries?.length ?? "—"} tone="warning" />
         <StatCard label="Students affected" value={studentCount} tone="primary" />
@@ -88,7 +88,7 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -112,7 +112,7 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
               {entries !== null && paginatedItems.map((e) => (
                 <tr key={e.installment.id} className="border-b border-border last:border-0 hover:bg-muted">
                   <td className="px-4 py-3">
-                    <button type="button" className="font-medium text-foreground hover:underline" onClick={() => onOpenStudent(e.student.id)}>
+                    <button type="button" className="font-medium text-foreground hover:underline text-left" onClick={() => onOpenStudent(e.student.id)}>
                       {e.student.name}
                     </button>
                     <p className="text-xs text-muted-foreground">{e.student.studentCode}</p>
@@ -156,6 +156,60 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
               )}
             </tbody>
           </table>
+        </div>
+
+        <div className="divide-y divide-border sm:hidden">
+          {entries === null && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {entries !== null && paginatedItems.map((e) => (
+            <div key={e.installment.id} className="space-y-2 p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <button type="button" className="font-medium text-foreground hover:underline text-left" onClick={() => onOpenStudent(e.student.id)}>
+                    {e.student.name}
+                  </button>
+                  <p className="text-xs text-muted-foreground">{e.student.studentCode}</p>
+                </div>
+                <Badge tone="danger">{e.daysOverdue} days overdue</Badge>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{e.student.course ? `${e.student.course.name} (${e.student.course.code})` : "—"}</span>
+                <span>Due: {fmtDate(e.installment.dueDate)}</span>
+              </div>
+
+              <div className="flex items-center justify-between pt-1">
+                <div>
+                  <p className="text-[11px] text-muted-foreground">Outstanding balance</p>
+                  <p className="font-semibold text-danger">{formatMoney(e.outstanding)}</p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleSendReminder(e)}
+                    disabled={sendingId === e.installment.id}
+                    className="rounded-lg bg-primary px-2.5 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    {sendingId === e.installment.id ? "Sending…" : "Send reminder"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleShowReminder(e)}
+                    className="rounded-lg bg-secondary px-2.5 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-secondary/70"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+              {sentResult?.id === e.installment.id && (
+                <p className="mt-1 text-xs text-muted-foreground">{sentResult.text}</p>
+              )}
+            </div>
+          ))}
+          {entries && entries.length === 0 && (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              No overdue installments. Nice work.
+            </div>
+          )}
         </div>
 
         {entries !== null && entries.length > 0 && (

@@ -117,7 +117,7 @@ export default function FeesPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
         <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Fees</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
           Fee accounts, installments, payments and receipts — search a student to view or set up their plan.
         </p>
       </div>
@@ -130,10 +130,10 @@ export default function FeesPage() {
             placeholder="Search name, code, phone, email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="max-w-xs"
+            className="w-full sm:max-w-md"
           />
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
             <Dropdown label="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
             <Dropdown label="Fee account" value={feeAccountFilter} onChange={setFeeAccountFilter} options={FEE_ACCOUNT_OPTIONS} />
             <Dropdown
@@ -151,13 +151,15 @@ export default function FeesPage() {
               placeholder={courseId ? "All batches" : "Select a class first"}
               disabled={!courseId}
             />
-            <Dropdown label="Sort by" value={sort} onChange={setSort} options={SORT_OPTIONS} />
+            <div className="col-span-2 sm:col-span-1">
+              <Dropdown label="Sort by" value={sort} onChange={setSort} options={SORT_OPTIONS} />
+            </div>
           </div>
 
           {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
           <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <div className="overflow-x-auto">
+            <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -197,7 +199,7 @@ export default function FeesPage() {
                           <button
                             type="button"
                             onClick={() => setSetupStudent(s)}
-                            className="cursor-pointer rounded-lg bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground hover:bg-secondary/70"
+                            className="cursor-pointer rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                           >
                             Set up fee account
                           </button>
@@ -214,6 +216,55 @@ export default function FeesPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            <div className="divide-y divide-border sm:hidden">
+              {paginatedStudents.map((s) => (
+                <div key={s.id} className="space-y-2 p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="cursor-pointer" onClick={() => setSelectedId(s.id)}>
+                      <p className="font-medium text-foreground">{s.name}</p>
+                      <p className="text-xs text-muted-foreground">{s.studentCode}</p>
+                    </div>
+                    <Badge tone={s.hasFeeAccount ? "success" : "warning"}>
+                      {s.hasFeeAccount ? "Set up" : "Not set up"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{s.course.name} ({s.course.code}) · {s.currentBatch?.name ?? "No batch"}</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-1">
+                    <div>
+                      <p className="text-[11px] text-muted-foreground">Pending fees</p>
+                      <p className="font-medium text-foreground">
+                        {s.hasFeeAccount && s.pendingFees != null ? formatMoney(s.pendingFees) : "—"}
+                      </p>
+                    </div>
+                    {s.hasFeeAccount ? (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedId(s.id)}
+                        className="rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-secondary/70"
+                      >
+                        View details
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setSetupStudent(s)}
+                        className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                      >
+                        Set up fee account
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {students.length === 0 && (
+                <div className="p-8 text-center text-sm text-muted-foreground">
+                  No students found.
+                </div>
+              )}
             </div>
 
             {students.length > 0 && (

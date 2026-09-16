@@ -42,7 +42,7 @@ export default function TestsPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Tests</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
             Schedule tests per batch, assign invigilators, then record attendance and marks.
           </p>
         </div>
@@ -53,7 +53,7 @@ export default function TestsPage() {
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
         <StatCard label="Tests" value={tests?.length ?? 0} tone="primary" />
         <StatCard label="Sessions scheduled" value={tests?.reduce((n, t) => n + t.sessionCount, 0) ?? 0} tone="accent" />
         <StatCard label="With results" value={graded} tone="success" />

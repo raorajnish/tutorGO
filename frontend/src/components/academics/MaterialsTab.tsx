@@ -156,7 +156,7 @@ export const MaterialsTab = forwardRef<AcademicsTabHandle, Props>(function Mater
   return (
     <div className="space-y-6">
       {/* Stat Cards Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
         <StatCard label="Total materials" value={materials.length} tone="primary" />
         <StatCard label="Homework tasks" value={homeworkCount} tone="warning" />
         <StatCard label="PDFs & notes" value={fileCount} tone="success" />
@@ -167,32 +167,24 @@ export const MaterialsTab = forwardRef<AcademicsTabHandle, Props>(function Mater
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="border-b border-border p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-1 flex-wrap items-center gap-3">
-              <div className="w-full sm:w-64">
-                <Input
-                  placeholder="Search title or subject..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-
-              <div className="w-full sm:w-48">
-                <Dropdown
-                  value={filterBatchId}
-                  onChange={setFilterBatchId}
-                  options={batchOptions}
-                  placeholder="All batches"
-                />
-              </div>
-
-              <div className="w-full sm:w-44">
-                <Dropdown
-                  value={filterType}
-                  onChange={setFilterType}
-                  options={typeOptions}
-                  placeholder="All types"
-                />
-              </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 flex-1">
+              <Input
+                placeholder="Search title or subject..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Dropdown
+                value={filterBatchId}
+                onChange={setFilterBatchId}
+                options={batchOptions}
+                placeholder="All batches"
+              />
+              <Dropdown
+                value={filterType}
+                onChange={setFilterType}
+                options={typeOptions}
+                placeholder="All types"
+              />
             </div>
 
             <Button onClick={() => setCreateModalOpen(true)}>Add material</Button>

@@ -156,12 +156,12 @@ export default function PlatformPlansPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Platform</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Plans</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Configure subscription tiers and headcount limits.</p>
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Configure subscription tiers and headcount limits.</p>
         </div>
         <Button onClick={openCreate}>New plan</Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
         <StatCard label="Total plans" value={plans.length} tone="primary" />
         <StatCard label="Active" value={activeCount} tone="success" />
         <StatCard label="Institutes assigned" value={totalInstitutesOnPlans} tone="accent" />

@@ -139,7 +139,7 @@ function StaffScheduleView() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Attendance & Timetable</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
             Schedule lectures, view weekly timetable matrix, and track daily attendance.
           </p>
         </div>
@@ -163,9 +163,8 @@ function StaffScheduleView() {
         <StaffTimetableTab />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
             <StatCard label="Lectures today" value={lectures.length} tone="primary" />
-            <StatCard label="Expected" value={totals.expected} tone="accent" />
             <StatCard label="Present" value={totals.present} tone="success" />
             <StatCard label="Late" value={totals.late} tone="warning" />
             <StatCard label="Absent" value={totals.absent} tone="danger" />

@@ -75,7 +75,7 @@ export function LedgerTab() {
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
       {ledger && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
           <StatCard label="Income" value={formatMoney(ledger.summary.income)} tone="success" />
           <StatCard label="Expense" value={formatMoney(ledger.summary.expense)} tone="danger" />
           <StatCard label="Payroll" value={formatMoney(ledger.summary.payroll)} tone="warning" />
@@ -83,38 +83,62 @@ export function LedgerTab() {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <tr>
-              <th className="px-4 py-2.5">Date</th>
-              <th className="px-4 py-2.5">Type</th>
-              <th className="px-4 py-2.5">Description</th>
-              <th className="px-4 py-2.5 text-right">Amount</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {ledger?.entries.map((e) => (
-              <tr key={`${e.kind}-${e.id}`}>
-                <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{formatDate(e.date)}</td>
-                <td className="px-4 py-3">
-                  <Badge tone={KIND_TONE[e.kind]}>{KIND_LABEL[e.kind]}</Badge>
-                </td>
-                <td className="px-4 py-3 text-foreground">{e.description}</td>
-                <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-foreground">
-                  {KIND_SIGN[e.kind]}{formatMoney(e.amount)}
-                </td>
-              </tr>
-            ))}
-            {ledger && ledger.entries.length === 0 && (
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="hidden overflow-x-auto sm:block">
+          <table className="w-full text-sm">
+            <thead className="bg-muted text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                  No activity in this range yet.
-                </td>
+                <th className="px-4 py-2.5">Date</th>
+                <th className="px-4 py-2.5">Type</th>
+                <th className="px-4 py-2.5">Description</th>
+                <th className="px-4 py-2.5 text-right">Amount</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {ledger?.entries.map((e) => (
+                <tr key={`${e.kind}-${e.id}`}>
+                  <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{formatDate(e.date)}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone={KIND_TONE[e.kind]}>{KIND_LABEL[e.kind]}</Badge>
+                  </td>
+                  <td className="px-4 py-3 text-foreground">{e.description}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-foreground">
+                    {KIND_SIGN[e.kind]}{formatMoney(e.amount)}
+                  </td>
+                </tr>
+              ))}
+              {ledger && ledger.entries.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                    No activity in this range yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="divide-y divide-border sm:hidden">
+          {ledger?.entries.map((e) => (
+            <div key={`${e.kind}-${e.id}`} className="space-y-1.5 p-4">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs text-muted-foreground">{formatDate(e.date)}</span>
+                <Badge tone={KIND_TONE[e.kind]}>{KIND_LABEL[e.kind]}</Badge>
+              </div>
+              <p className="text-sm font-medium text-foreground">{e.description}</p>
+              <div className="flex justify-end pt-1">
+                <span className={`text-sm font-semibold ${e.kind === "INCOME" ? "text-success" : "text-foreground"}`}>
+                  {KIND_SIGN[e.kind]}{formatMoney(e.amount)}
+                </span>
+              </div>
+            </div>
+          ))}
+          {ledger && ledger.entries.length === 0 && (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              No activity in this range yet.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

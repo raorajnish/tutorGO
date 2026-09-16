@@ -84,7 +84,7 @@ export default function StudyMaterialPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Study material</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
             Notes, PDFs and links shared with students — by course, and optionally by subject.
           </p>
         </div>

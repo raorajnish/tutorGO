@@ -37,12 +37,12 @@ export function ReceiptsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Input
           placeholder="Search receipt no., student name or phone…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
+          className="w-full sm:max-w-md"
         />
         <ExportButton
           path={`/fees/payments/export.csv${search ? `?search=${encodeURIComponent(search)}` : ""}`}
@@ -54,7 +54,7 @@ export function ReceiptsTab() {
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -106,6 +106,33 @@ export function ReceiptsTab() {
               )}
             </tbody>
           </table>
+        </div>
+
+        <div className="divide-y divide-border sm:hidden">
+          {receipts === null && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+          {receipts !== null && paginatedItems.map((r) => (
+            <div key={r.id} onClick={() => setSelectedPaymentId(r.id)} className="space-y-2 p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-medium text-foreground">{r.receiptNumber}</p>
+                  <p className="text-xs text-muted-foreground">{r.student.name} ({r.student.studentCode})</p>
+                </div>
+                {r.voided ? <Badge tone="danger">Void</Badge> : <Badge tone="success">Valid</Badge>}
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <div>
+                  <p className="text-[11px] text-muted-foreground">{PAYMENT_MODE_LABELS[r.mode]} · {fmtDate(r.paidOn)}</p>
+                  <p className="font-semibold text-foreground">{formatMoney(r.amount)}</p>
+                </div>
+                <span className="text-xs font-medium text-accent hover:underline">View receipt →</span>
+              </div>
+            </div>
+          ))}
+          {receipts && receipts.length === 0 && (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              No receipts found.
+            </div>
+          )}
         </div>
 
         {receipts !== null && receipts.length > 0 && (

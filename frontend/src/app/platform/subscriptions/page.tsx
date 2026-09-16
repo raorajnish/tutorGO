@@ -67,7 +67,7 @@ export default function SubscriptionsPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Platform</p>
         <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Subscriptions</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Every institute&apos;s plan, live usage, and active modules — in one place.</p>
+        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Every institute&apos;s plan, live usage, and active modules — in one place.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

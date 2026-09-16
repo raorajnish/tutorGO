@@ -52,7 +52,7 @@ export default function PayrollPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
         <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Payroll</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
           {canManage
             ? "Salary profiles, monthly runs, and per-staff payment ledgers — select lectures or months, pay any amount, the rest carries forward."
             : "Your salary ledger — periods, lectures, and payment status."}

@@ -225,7 +225,7 @@ export function StudentProfileModal({ studentId, onClose, onChanged }: Props) {
                 ) : (
                   <div className="space-y-2 rounded-xl border border-dashed border-border px-3.5 py-3 text-center">
                     <p className="text-sm text-muted-foreground">No fee account set up yet.</p>
-                    <Button variant="secondary" onClick={() => setSetupFeeOpen(true)}>
+                    <Button variant="primary" onClick={() => setSetupFeeOpen(true)}>
                       Set up fee account
                     </Button>
                   </div>

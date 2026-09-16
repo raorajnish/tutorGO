@@ -133,7 +133,7 @@ export function Tabs({
     <div className={`w-fit max-w-full overflow-x-auto no-scrollbar ${className}`}>
       <div
         ref={containerRef}
-        className="relative inline-flex items-center gap-1 rounded-xl border border-border/70 bg-secondary/50 p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.025)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)]"
+        className="relative inline-flex items-center gap-1 rounded-xl border border-border/70 bg-secondary/70 p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.025)] dark:shadow-[inset_0px_1px_2px_rgba(0,0,0,0.15)]"
         {...props}
       >
         {/* Sliding Active Pill Background Highlight */}

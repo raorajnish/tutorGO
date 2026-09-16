@@ -48,7 +48,7 @@ export function StaffTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard label="Staff on payroll" value={allStaff.length} tone="primary" />
         <StatCard label="Total pending" value={formatMoney(totalPending)} tone="warning" />
         <StatCard label="Total credit" value={formatMoney(totalCredit)} tone="success" />
@@ -72,7 +72,7 @@ export function StaffTab() {
           )}
         </div>
 
-        <Input placeholder="Search name or title…" value={search} onChange={(e) => setSearch(e.target.value)} className="mb-3 max-w-xs" />
+        <Input placeholder="Search name or title…" value={search} onChange={(e) => setSearch(e.target.value)} className="mb-3 w-full sm:max-w-xs" />
 
         {/* Desktop / tablet: table */}
         <div className="hidden overflow-hidden rounded-xl border border-border bg-card sm:block">

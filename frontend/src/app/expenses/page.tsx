@@ -20,7 +20,7 @@ export default function ExpensesPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
         <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Expenses</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
           Track general and event-based spend, and see it alongside fee income and payroll in one combined ledger.
         </p>
       </div>

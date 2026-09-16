@@ -148,8 +148,9 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
       </div>
 
       <div className="flex flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-2">
-          <div className="w-full max-w-[220px]">
+        {/* Course & Batch Filters — 2 columns side-by-side on mobile */}
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2">
+          <div className="w-full sm:w-[200px]">
             <Dropdown
               value={courseId}
               onChange={setCourseId}
@@ -157,7 +158,7 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
               placeholder="All courses"
             />
           </div>
-          <div className="w-full max-w-[220px]">
+          <div className="w-full sm:w-[200px]">
             <Dropdown
               value={batchId}
               onChange={setBatchId}
@@ -167,17 +168,21 @@ export function SelfFillTab({ courses }: { courses: Course[] }) {
             />
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={exportCsv} disabled={!courseId && !batchId}>
+
+        {/* Action Buttons — 2 per row grid on mobile */}
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+          <Button variant="secondary" onClick={exportCsv} disabled={!courseId && !batchId} className="w-full sm:w-auto text-xs sm:text-sm px-2 sm:px-3.5">
             Export CSV
           </Button>
-          <Button variant="secondary" onClick={openPrintRoster} disabled={!courseId && !batchId}>
+          <Button variant="secondary" onClick={openPrintRoster} disabled={!courseId && !batchId} className="w-full sm:w-auto text-xs sm:text-sm px-2 sm:px-3.5">
             Print roster
           </Button>
-          <Button variant="secondary" onClick={() => setEnableOpen(true)}>
+          <Button variant="secondary" onClick={() => setEnableOpen(true)} className="w-full sm:w-auto text-xs sm:text-sm px-2 sm:px-3.5">
             Enable for existing students
           </Button>
-          <Button onClick={() => setPrecreateOpen(true)}>Bulk pre-create</Button>
+          <Button onClick={() => setPrecreateOpen(true)} className="w-full sm:w-auto text-xs sm:text-sm px-2 sm:px-3.5">
+            Bulk pre-create
+          </Button>
         </div>
       </div>
 

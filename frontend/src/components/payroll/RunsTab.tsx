@@ -229,7 +229,7 @@ export function RunsTab() {
       <div>
         <p className="mb-2 text-sm font-semibold text-foreground">All runs</p>
         <div className="overflow-hidden rounded-xl border border-border bg-card">
-          <div className="overflow-x-auto">
+          <div className="hidden overflow-x-auto sm:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -267,6 +267,26 @@ export function RunsTab() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          <div className="divide-y divide-border sm:hidden">
+            {runsLoading && Array.from({ length: 4 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+            {!runsLoading && runs.map((r) => (
+              <div key={r.id} onClick={() => setPeriod(r.periodMonth)} className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+                <div>
+                  <p className="font-medium text-foreground">{r.label}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {r.paidAt ? `Paid on ${formatDate(r.paidAt)}` : r.approvedAt ? `Approved on ${formatDate(r.approvedAt)}` : "Draft status"}
+                  </p>
+                </div>
+                <Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge>
+              </div>
+            ))}
+            {!runsLoading && runs.length === 0 && (
+              <div className="p-8 text-center text-sm text-muted-foreground">
+                No payroll runs yet.
+              </div>
+            )}
           </div>
         </div>
       </div>

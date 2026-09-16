@@ -66,7 +66,7 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard label="Total subjects" value={subjects.length} tone="primary" />
         <StatCard label="Active" value={activeCount} tone="success" />
         <StatCard label="Not linked to a course" value={unlinkedCount} tone="warning" />

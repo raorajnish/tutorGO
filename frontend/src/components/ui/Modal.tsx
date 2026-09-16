@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title: ReactNode;
   description?: string;
   children: ReactNode;
   footer?: ReactNode;
@@ -24,11 +24,24 @@ const WIDTH_CLASSES = {
 };
 
 export function Modal({ open, onClose, title, description, children, footer, width = "md", noDividers = false }: ModalProps) {
-  const [mounted, setMounted] = useState(false);
+  const [shouldRender, setShouldRender] = useState(open);
+  const [animateIn, setAnimateIn] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (open) {
+      setShouldRender(true);
+      const timer = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimateIn(true));
+      });
+      return () => cancelAnimationFrame(timer);
+    } else {
+      setAnimateIn(false);
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -39,16 +52,26 @@ export function Modal({ open, onClose, title, description, children, footer, wid
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  if (!open || !mounted) return null;
+  if (!shouldRender) return null;
 
   return createPortal(
-    <div className="tg-modal-portal fixed inset-0 z-50 flex items-end justify-center sm:items-center print:static print:z-auto print:block print:w-full print:p-0 print:m-0">
+    <div className="tg-modal-portal fixed inset-0 z-50 flex items-end justify-center sm:items-start sm:pt-16 md:pt-20 print:static print:z-auto print:block print:w-full print:p-0 print:m-0">
       {/* Translucent backdrop — hidden during print */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] print:hidden" onClick={onClose} aria-hidden="true" />
+      <div
+        className={`absolute inset-0 bg-black/30 backdrop-blur-[2px] transition-opacity duration-200 ease-out print:hidden ${
+          animateIn ? "opacity-100" : "opacity-0"
+        }`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
       
       {/* Modal Dialog Card — unstyled during print so it fills the sheet without borders/shadows */}
       <div
-        className={`relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-xl border border-border bg-card shadow-(--shadow-overlay) sm:rounded-xl print:static print:max-h-none print:w-full print:max-w-none print:overflow-visible print:rounded-none print:border-0 print:bg-white print:p-0 print:m-0 print:shadow-none ${WIDTH_CLASSES[width]}`}
+        className={`relative flex max-h-[90vh] sm:max-h-[85vh] w-full flex-col overflow-hidden rounded-t-xl border border-border bg-card shadow-(--shadow-overlay) transition-all duration-200 ease-out sm:rounded-xl print:static print:max-h-none print:w-full print:max-w-none print:overflow-visible print:rounded-none print:border-0 print:bg-white print:p-0 print:m-0 print:shadow-none ${WIDTH_CLASSES[width]} ${
+          animateIn
+            ? "translate-y-0 opacity-100 sm:scale-100"
+            : "translate-y-8 opacity-0 sm:translate-y-6 sm:scale-98"
+        }`}
       >
         {/* Modal Header Bar — hidden during print */}
         <div className={`flex items-start justify-between ${noDividers ? "" : "border-b border-border"} px-6 py-4 print:hidden`}>
