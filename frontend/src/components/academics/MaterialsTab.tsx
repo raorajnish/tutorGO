@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -85,7 +85,7 @@ export const MaterialsTab = forwardRef<AcademicsTabHandle, Props>(function Mater
     openCreate: () => setCreateModalOpen(true),
   }));
 
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -104,11 +104,11 @@ export const MaterialsTab = forwardRef<AcademicsTabHandle, Props>(function Mater
     } finally {
       setLoading(false);
     }
-  }
+  }, [initialCourses, initialBatches, initialSubjects]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   async function handleDelete(id: string) {
     if (!confirm("Are you sure you want to delete this item?")) return;

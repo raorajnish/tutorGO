@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { Role } from "@/lib/types";
 import { navForRole, type NavIcon } from "@/lib/navigation";
@@ -271,7 +272,7 @@ export function Sidebar({ role, instituteName, workspaceLabel, open, onClose }: 
       >
         <div className="flex h-16 items-center justify-between gap-2 px-5">
           <div className="flex min-w-0 items-center gap-2">
-            <img src="/icons/icon-512.png" alt="TutorGO" className="h-7 w-7 rounded-lg shrink-0 object-contain" />
+            <Image src="/icons/icon-512.png" alt="TutorGO" width={28} height={28} className="h-7 w-7 rounded-lg shrink-0 object-contain" />
             <span className="font-display truncate text-lg font-bold text-foreground">TutorGO</span>
             <span className="text-accent">.</span>
           </div>
