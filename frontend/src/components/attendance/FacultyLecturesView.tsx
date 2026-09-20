@@ -134,16 +134,16 @@ export function FacultyLecturesView() {
 
         {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
 
-        <div className="hidden overflow-x-auto sm:block">
-          <table className="w-full table-fixed text-sm">
+        <div className="hidden overflow-x-auto lg:block">
+          <table className="w-full min-w-[700px] table-fixed text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="w-[17%] px-4 py-3 font-medium">Date</th>
-                <th className="w-[14%] px-4 py-3 font-medium">Time</th>
-                <th className="w-[13%] px-4 py-3 font-medium">Batch</th>
-                <th className="w-[11%] px-4 py-3 font-medium">Subject</th>
-                <th className="w-[9%] px-4 py-3 font-medium">Marked</th>
-                <th className="w-[36%] px-4 py-3 text-right font-medium">Action</th>
+                <th className="w-[15%] px-4 py-3 font-medium">Date</th>
+                <th className="w-[15%] px-4 py-3 font-medium">Time</th>
+                <th className="w-[18%] px-4 py-3 font-medium">Batch</th>
+                <th className="w-[16%] px-4 py-3 font-medium">Subject</th>
+                <th className="w-[14%] px-4 py-3 font-medium">Marked</th>
+                <th className="w-[22%] px-4 py-3 text-right font-medium">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -164,27 +164,29 @@ export function FacultyLecturesView() {
                     {l.batch.name} <span className="text-muted-foreground">· {l.batch.course.code}</span>
                   </td>
                   <td className="px-4 py-3 text-foreground">
-                    {l.subject.name}
-                    {l.kind === "TEST" && (
-                      <Badge tone="accent" className="ml-1.5">
-                        Test
-                      </Badge>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1">
+                      <span>{l.subject.name}</span>
+                      {l.kind === "TEST" && (
+                        <Badge tone="accent" className="whitespace-nowrap" title={l.testTitle ?? undefined}>
+                          Test{l.testTitle ? `: ${l.testTitle}` : ""}
+                        </Badge>
+                      )}
+                    </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     {l.cancelled ? (
-                      <Badge tone="danger">Cancelled</Badge>
+                      <Badge tone="danger" className="whitespace-nowrap">Cancelled</Badge>
                     ) : l.markedCount > 0 ? (
-                      <Badge tone="success">Marked</Badge>
+                      <Badge tone="success" className="whitespace-nowrap">Marked</Badge>
                     ) : (
-                      <Badge tone="warning">Unmarked</Badge>
+                      <Badge tone="warning" className="whitespace-nowrap">Unmarked</Badge>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
                       {l.kind === "TEST" ? (
                         <Link href={`/tests/${l.testId}`}>
-                          <Button variant="secondary">{l.testTitle ?? "View test"}</Button>
+                          <Button variant="secondary" className="whitespace-nowrap">View test</Button>
                         </Link>
                       ) : l.cancelled ? (
                         <>
@@ -245,7 +247,7 @@ export function FacultyLecturesView() {
           </table>
         </div>
 
-        <div className="divide-y divide-border sm:hidden">
+        <div className="divide-y divide-border lg:hidden">
           {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
           {!loading && paginatedItems.map((l) => (
             <div key={l.id} className="space-y-2 p-4">
@@ -254,8 +256,8 @@ export function FacultyLecturesView() {
                   <p className="font-medium text-foreground">
                     {l.subject.name} · {l.batch.name}
                     {l.kind === "TEST" && (
-                      <Badge tone="accent" className="ml-1.5">
-                        Test
+                      <Badge tone="accent" className="ml-1.5 whitespace-nowrap">
+                        Test{l.testTitle ? `: ${l.testTitle}` : ""}
                       </Badge>
                     )}
                   </p>
@@ -264,17 +266,17 @@ export function FacultyLecturesView() {
                   </p>
                 </div>
                 {l.cancelled ? (
-                  <Badge tone="danger">Cancelled</Badge>
+                  <Badge tone="danger" className="whitespace-nowrap">Cancelled</Badge>
                 ) : l.markedCount > 0 ? (
-                  <Badge tone="success">Marked</Badge>
+                  <Badge tone="success" className="whitespace-nowrap">Marked</Badge>
                 ) : (
-                  <Badge tone="warning">Unmarked</Badge>
+                  <Badge tone="warning" className="whitespace-nowrap">Unmarked</Badge>
                 )}
               </div>
               {l.kind === "TEST" ? (
                 <Link href={`/tests/${l.testId}`}>
                   <Button variant="secondary" className="w-full">
-                    {l.testTitle ?? "View test"}
+                    View test
                   </Button>
                 </Link>
               ) : l.cancelled ? (

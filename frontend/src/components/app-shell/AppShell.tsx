@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { MaintenanceBanner } from "./MaintenanceBanner";
@@ -11,6 +12,20 @@ import { QuickActionFab } from "./QuickActionFab";
 export function AppShell({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Reset window scroll when AppShell mounts or pathname changes so navigating
+  // from a standalone page (like 404 / StatusPage) into `.app-shell` (which has
+  // overflow:hidden) doesn't leave the window locked at a non-zero scroll position.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
+  }, [pathname]);
 
   if (!user) return null;
 
@@ -33,6 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <MaintenanceBanner />
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main
+          ref={mainRef}
           className={`content-scroll flex-1 px-4 py-6 sm:px-6 lg:px-8 ${showBottomNav ? "pb-28 lg:pb-6" : ""}`}
         >
           <div className="tg-page-enter mx-auto max-w-6xl">{children}</div>
