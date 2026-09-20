@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Tabs } from "@/components/ui/Tabs";
 import { LedgerTab } from "@/components/expenses/LedgerTab";
 import { ExpensesTab } from "@/components/expenses/ExpensesTab";
@@ -13,7 +14,24 @@ const TABS = [
 ];
 
 export default function ExpensesPage() {
+  return (
+    <Suspense fallback={null}>
+      <ExpensesContent />
+    </Suspense>
+  );
+}
+
+function ExpensesContent() {
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState("ledger");
+  const [initialAddOpen, setInitialAddOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("open") === "create" || searchParams.get("create") === "true") {
+      setTab("expenses");
+      setInitialAddOpen(true);
+    }
+  }, [searchParams]);
 
   return (
     <div className="space-y-6">
@@ -28,7 +46,7 @@ export default function ExpensesPage() {
       <Tabs tabs={TABS} activeId={tab} onChange={setTab} />
 
       {tab === "ledger" && <LedgerTab />}
-      {tab === "expenses" && <ExpensesTab />}
+      {tab === "expenses" && <ExpensesTab key={initialAddOpen ? "add-open" : "normal"} initialAddOpen={initialAddOpen} />}
       {tab === "categories" && <CategoriesTab />}
     </div>
   );

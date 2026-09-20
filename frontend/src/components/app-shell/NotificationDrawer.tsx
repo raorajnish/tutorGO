@@ -124,14 +124,15 @@ export function NotificationDrawer({ open, onClose, onUnreadCountChange }: Notif
           <span className="text-sm text-muted-foreground">
             {unreadCount ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}` : "You're all caught up"}
           </span>
-          <button
-            type="button"
-            onClick={markAllRead}
-            disabled={unreadCount === 0}
-            className="text-sm font-medium text-accent transition-colors duration-150 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Mark all read
-          </button>
+          {unreadCount > 0 && (
+            <button
+              type="button"
+              onClick={markAllRead}
+              className="text-sm font-medium text-accent transition-colors duration-150 hover:opacity-80"
+            >
+              Mark all read
+            </button>
+          )}
         </div>
 
         <div className="flex-1 divide-y divide-border overflow-y-auto">

@@ -1,6 +1,7 @@
 "use client";
 
 import { ATTENDANCE_STATUS_LABELS, ATTENDANCE_STATUSES, type AttendanceStatus } from "@/lib/types";
+import { haptic } from "@/lib/haptics";
 
 const TONE_CLASSES: Record<(typeof ATTENDANCE_STATUSES)[number], string> = {
   PRESENT: "data-[active=true]:bg-success data-[active=true]:text-success-foreground",
@@ -26,7 +27,12 @@ export function AttendanceToggleGroup({
           type="button"
           disabled={disabled}
           data-active={value === s}
-          onClick={() => !disabled && onChange(s)}
+          onClick={() => {
+            if (!disabled) {
+              haptic.tick();
+              onChange(s);
+            }
+          }}
           className={`rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 ${TONE_CLASSES[s]}`}
         >
           {ATTENDANCE_STATUS_LABELS[s]}

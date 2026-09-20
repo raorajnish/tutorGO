@@ -15,7 +15,11 @@ import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type Expense, type ExpenseCategory,
 import { formatDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 
-export function ExpensesTab() {
+interface ExpensesTabProps {
+  initialAddOpen?: boolean;
+}
+
+export function ExpensesTab({ initialAddOpen }: ExpensesTabProps) {
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [events, setEvents] = useState<ExpenseEvent[]>([]);
@@ -26,7 +30,7 @@ export function ExpensesTab() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [eventFilter, setEventFilter] = useState("");
 
-  const [addOpen, setAddOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(() => !!initialAddOpen);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [deleting, setDeleting] = useState<Expense | null>(null);
 

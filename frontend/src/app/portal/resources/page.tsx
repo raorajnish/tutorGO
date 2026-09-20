@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { SkeletonRow } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDate } from "@/lib/format";
 import type { PortalStudyResource } from "@/lib/types";
 
@@ -62,9 +63,7 @@ export default function PortalResourcesPage() {
       )}
 
       {resources && resources.length === 0 && (
-        <p className="rounded-xl border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-          Nothing shared yet. Material your institute uploads will appear here.
-        </p>
+        <EmptyState message="Nothing shared yet. Material your institute uploads will appear here." />
       )}
 
       {ordered.map(([key, group]) => (

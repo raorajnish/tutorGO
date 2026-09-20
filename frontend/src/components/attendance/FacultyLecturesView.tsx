@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { SkeletonRow } from "@/components/ui/Skeleton";
@@ -61,11 +62,18 @@ export function FacultyLecturesView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const searchParams = useSearchParams();
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [markLecture, setMarkLecture] = useState<Lecture | null>(null);
   const [editLecture, setEditLecture] = useState<Lecture | null>(null);
   const [cancelLecture, setCancelLecture] = useState<Lecture | null>(null);
   const [homeworkLecture, setHomeworkLecture] = useState<Lecture | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("open") === "create" || searchParams.get("schedule") === "true") {
+      setScheduleOpen(true);
+    }
+  }, [searchParams]);
 
   const { paginatedItems, paginationProps } = useClientPagination(lectures, 10);
 

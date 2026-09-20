@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -18,10 +18,25 @@ const ScheduleTestModal = dynamic(
 );
 
 export default function TestsPage() {
+  return (
+    <Suspense fallback={null}>
+      <TestsContent />
+    </Suspense>
+  );
+}
+
+function TestsContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [tests, setTests] = useState<TestListItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("open") === "create" || searchParams.get("create") === "true") {
+      setScheduleOpen(true);
+    }
+  }, [searchParams]);
 
   const testList = tests ?? [];
   const { paginatedItems, paginationProps } = useClientPagination(testList, 10);

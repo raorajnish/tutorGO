@@ -6,6 +6,7 @@ import { Header } from "./Header";
 import { MaintenanceBanner } from "./MaintenanceBanner";
 import { useAuth } from "@/lib/auth-context";
 import { StudentBottomNav } from "@/components/portal/StudentBottomNav";
+import { QuickActionFab } from "./QuickActionFab";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -38,6 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
+      <QuickActionFab />
       {showBottomNav && <StudentBottomNav />}
     </div>
   );

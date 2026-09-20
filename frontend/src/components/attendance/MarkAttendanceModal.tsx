@@ -14,6 +14,9 @@ import { attendanceMarkedVars, renderTemplate } from "@/lib/messageTemplates";
 import type { AttendanceStatus, Lecture, RosterEntry } from "@/lib/types";
 import { formatDate as fmtDate, isFacultyWindowExpired } from "@/lib/format";
 
+import { haptic } from "@/lib/haptics";
+import { clearQuickActionQuery } from "@/lib/urlClean";
+
 function fmtTime(d: string) {
   return new Date(d).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });
 }
@@ -72,10 +75,12 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
     setError(null);
     try {
       await apiFetch(`/attendance/lectures/${lecture.id}/mark-all-present`, { method: "POST" });
+      haptic.success();
       const fresh = await load();
       onMarked();
       if (fresh.length > 0 && fresh.every((r) => r.status !== null)) setFullyMarkedRoster(fresh);
     } catch (err) {
+      haptic.warning();
       setError(err instanceof ApiClientError ? err.message : "Could not mark everyone present.");
     } finally {
       setMarkingAll(false);
@@ -86,6 +91,7 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
     if (!lecture || !roster) return;
     const records = roster.filter((r) => statuses[r.student.id]).map((r) => ({ studentId: r.student.id, status: statuses[r.student.id] }));
     if (records.length === 0) {
+      haptic.warning();
       setError("Mark at least one student before saving.");
       return;
     }
@@ -93,14 +99,17 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
     setError(null);
     try {
       await apiFetch(`/attendance/lectures/${lecture.id}/mark`, { method: "POST", body: JSON.stringify({ records }) });
+      haptic.success();
       onMarked();
       const fresh = await load();
       if (fresh.length > 0 && fresh.every((r) => r.status !== null)) {
         setFullyMarkedRoster(fresh);
       } else {
+        clearQuickActionQuery();
         onClose();
       }
     } catch (err) {
+      haptic.warning();
       setError(err instanceof ApiClientError ? err.message : "Could not save attendance.");
     } finally {
       setSubmitting(false);

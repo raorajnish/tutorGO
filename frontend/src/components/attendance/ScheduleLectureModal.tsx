@@ -14,6 +14,9 @@ import { lectureScheduledVars, renderTemplate } from "@/lib/messageTemplates";
 import { MAX_NOTE_LENGTH, type Batch, type Course, type FacultyCourseAssignment, type FacultyRef, type Lecture, type Room, type ScheduleLecturePayload } from "@/lib/types";
 import { todayInput } from "@/lib/format";
 
+import { haptic } from "@/lib/haptics";
+import { clearQuickActionQuery } from "@/lib/urlClean";
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -192,9 +195,11 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
 
     try {
       const created = await apiFetch<Lecture>("/attendance/lectures", { method: "POST", body: JSON.stringify(payload) });
+      haptic.success();
       onScheduled();
       setScheduled(created);
     } catch (err) {
+      haptic.warning();
       setError(err instanceof ApiClientError ? err.message : "Could not schedule this lecture.");
     } finally {
       setSubmitting(false);
@@ -202,6 +207,7 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
   }
 
   function handleClose() {
+    clearQuickActionQuery();
     setScheduled(null);
     onClose();
   }

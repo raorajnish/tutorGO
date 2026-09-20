@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
@@ -79,12 +80,21 @@ function fmtDateLabel(iso: string) {
 }
 
 export default function AttendancePage() {
+  return (
+    <Suspense fallback={null}>
+      <AttendanceContent />
+    </Suspense>
+  );
+}
+
+function AttendanceContent() {
   const { user } = useAuth();
   if (user?.role === "FACULTY") return <FacultyLecturesView />;
   return <StaffScheduleView />;
 }
 
 function StaffScheduleView() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<"daily" | "timetable">("daily");
   const [date, setDate] = useState(todayInput());
   const [lectures, setLectures] = useState<LectureSummary[]>([]);
@@ -95,6 +105,12 @@ function StaffScheduleView() {
   const [markLecture, setMarkLecture] = useState<Lecture | null>(null);
   const [editLecture, setEditLecture] = useState<Lecture | null>(null);
   const [cancelLecture, setCancelLecture] = useState<Lecture | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("open") === "create" || searchParams.get("schedule") === "true") {
+      setScheduleOpen(true);
+    }
+  }, [searchParams]);
 
   const { paginatedItems, paginationProps } = useClientPagination(lectures, 10);
 

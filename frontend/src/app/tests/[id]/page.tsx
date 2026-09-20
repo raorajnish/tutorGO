@@ -56,8 +56,8 @@ export default function TestDetailPage({ params }: { params: Promise<{ id: strin
         <Link href="/tests" className="text-sm font-medium text-accent hover:opacity-80">
           ← All tests
         </Link>
-        <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
+        <div className="mt-2 flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
             <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">{test.title}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {test.course.name} · {test.subject.name} · {test.totalMarks} marks
@@ -65,9 +65,17 @@ export default function TestDetailPage({ params }: { params: Promise<{ id: strin
             </p>
           </div>
           {!anyAttendance && (
-            <Button variant="ghost" onClick={() => setDeleting(true)} className="w-full sm:w-auto">
-              Delete test
-            </Button>
+            <button
+              type="button"
+              onClick={() => setDeleting(true)}
+              title="Delete test"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-danger/30 text-danger/80 transition-colors hover:bg-danger-soft hover:text-danger sm:h-9 sm:w-auto sm:px-3 sm:text-xs sm:font-medium sm:gap-1.5"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="hidden sm:inline">Delete test</span>
+            </button>
           )}
         </div>
       </div>

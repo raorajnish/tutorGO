@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -26,7 +26,16 @@ const STATUS_TONE: Record<EnquiryStatus, "primary" | "accent" | "success" | "dan
 };
 
 export default function EnquiriesPage() {
+  return (
+    <Suspense fallback={null}>
+      <EnquiriesContent />
+    </Suspense>
+  );
+}
+
+function EnquiriesContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [search, setSearch] = useState("");
@@ -69,6 +78,13 @@ export default function EnquiriesPage() {
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
+
+  useEffect(() => {
+    if (searchParams.get("open") === "create" || searchParams.get("create") === "true") {
+      setEditing(null);
+      setModalOpen(true);
+    }
+  }, [searchParams]);
 
   function openCreate() {
     setEditing(null);

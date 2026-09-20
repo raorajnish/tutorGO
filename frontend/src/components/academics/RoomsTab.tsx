@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/Badge";
 import { RoomModal } from "@/components/academics/RoomModal";
 import type { Room } from "@/lib/types";
 
+import { EmptyState } from "@/components/ui/EmptyState";
+
 interface Props {
   canManage: boolean;
 }
@@ -67,23 +69,18 @@ export function RoomsTab({ canManage }: Props) {
       {loading && <p className="text-sm text-muted-foreground">Loading rooms…</p>}
 
       {!loading && rooms.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-          <p className="text-sm font-medium text-foreground">No rooms defined yet</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Add classrooms or labs to enable room-wise lecture scheduling and conflict prevention.
-          </p>
-          {canManage && (
-            <Button
-              className="mt-4"
-              onClick={() => {
-                setEditingRoom(null);
-                setModalOpen(true);
-              }}
-            >
-              Add your first room
-            </Button>
-          )}
-        </div>
+        <EmptyState
+          message="No classrooms or labs defined yet. Add rooms to enable room-wise lecture scheduling."
+          actionLabel={canManage ? "Add your first room" : undefined}
+          onAction={
+            canManage
+              ? () => {
+                  setEditingRoom(null);
+                  setModalOpen(true);
+                }
+              : undefined
+          }
+        />
       )}
 
       {!loading && rooms.length > 0 && (

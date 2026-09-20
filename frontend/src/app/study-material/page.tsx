@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { Suspense, useCallback, useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { apiFetch, apiUpload, ApiClientError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -32,6 +33,15 @@ const LINK_ICON = (
  * scoping per batch would only mean re-uploading the same PDF and letting the
  * copies drift. */
 export default function StudyMaterialPage() {
+  return (
+    <Suspense fallback={null}>
+      <StudyMaterialContent />
+    </Suspense>
+  );
+}
+
+function StudyMaterialContent() {
+  const searchParams = useSearchParams();
   const [courses, setCourses] = useState<Course[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [courseId, setCourseId] = useState("");
@@ -40,6 +50,12 @@ export default function StudyMaterialPage() {
   const [error, setError] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<StudyResource | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("open") === "create" || searchParams.get("create") === "true") {
+      setAddOpen(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     Promise.all([

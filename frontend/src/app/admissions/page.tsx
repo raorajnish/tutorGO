@@ -16,6 +16,7 @@ import { ImportModal } from "@/components/ui/ImportModal";
 import { ENQUIRY_SOURCE_LABELS, type Course, type Enquiry, type StudentListItem } from "@/lib/types";
 import { formatDate as fmtDate } from "@/lib/format";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
+import { clearQuickActionQuery } from "@/lib/urlClean";
 
 function UsersIcon() {
   return (
@@ -88,6 +89,11 @@ function AdmissionsContent() {
   }, []);
 
   useEffect(() => {
+    if (searchParams.get("admit") === "true" || searchParams.get("open") === "create") {
+      setAdmitEnquiry(null);
+      setAdmitOpen(true);
+      return;
+    }
     const enquiryId = searchParams.get("enquiryId");
     if (!enquiryId || pipeline.length === 0) return;
     const found = pipeline.find((e) => e.id === enquiryId);
@@ -342,7 +348,10 @@ function AdmissionsContent() {
 
       <AdmitModal
         open={admitOpen}
-        onClose={() => setAdmitOpen(false)}
+        onClose={() => {
+          clearQuickActionQuery();
+          setAdmitOpen(false);
+        }}
         onAdmitted={load}
         courses={courses}
         enquiry={admitEnquiry}

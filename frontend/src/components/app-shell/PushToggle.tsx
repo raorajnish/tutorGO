@@ -35,7 +35,7 @@ export function PushToggle() {
     }
   }
 
-  if (!supported) return null;
+  if (!supported || subscribed) return null;
 
   return (
     <div className="border-b border-border px-5 py-3">

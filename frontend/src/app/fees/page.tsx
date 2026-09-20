@@ -1,9 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Tabs } from "@/components/ui/Tabs";
 import { Dropdown } from "@/components/ui/Dropdown";
@@ -29,6 +31,9 @@ const FeeAccountModal = dynamic(
 );
 const SetupFeeAccountModal = dynamic(
   () => import("@/components/fees/SetupFeeAccountModal").then((m) => m.SetupFeeAccountModal)
+);
+const CollectFeeModal = dynamic(
+  () => import("@/components/fees/CollectFeeModal").then((m) => m.CollectFeeModal)
 );
 
 const STATUS_OPTIONS = [
@@ -58,6 +63,15 @@ const TABS = [
 ];
 
 export default function FeesPage() {
+  return (
+    <Suspense fallback={null}>
+      <FeesContent />
+    </Suspense>
+  );
+}
+
+function FeesContent() {
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState("students");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("active");
@@ -71,6 +85,13 @@ export default function FeesPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [setupStudent, setSetupStudent] = useState<StudentListItem | null>(null);
+  const [collectOpen, setCollectOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("open") === "collect" || searchParams.get("collect") === "true") {
+      setCollectOpen(true);
+    }
+  }, [searchParams]);
 
   function load() {
     const qs = new URLSearchParams({ status, sort });
@@ -114,12 +135,15 @@ export default function FeesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
-        <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Fees</h1>
-        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
-          Fee accounts, installments, payments and receipts — search a student to view or set up their plan.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
+          <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Fees</h1>
+          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
+            Fee accounts, installments, payments and receipts — search a student to view or set up their plan.
+          </p>
+        </div>
+        <Button onClick={() => setCollectOpen(true)}>Collect fee</Button>
       </div>
 
       <Tabs tabs={TABS} activeId={tab} onChange={setTab} />
@@ -284,6 +308,7 @@ export default function FeesPage() {
       {tab === "proofs" && <PaymentProofsTab />}
 
       <FeeAccountModal studentId={selectedId} onClose={() => setSelectedId(null)} />
+      <CollectFeeModal open={collectOpen} onClose={() => setCollectOpen(false)} />
 
       {setupStudent && (
         <SetupFeeAccountModal
