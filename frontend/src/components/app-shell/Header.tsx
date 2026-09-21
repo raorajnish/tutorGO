@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { NotificationDrawer } from "@/components/app-shell/NotificationDrawer";
 import { HelpDrawer } from "@/components/app-shell/HelpDrawer";
 import { PlatformSearch } from "@/components/app-shell/PlatformSearch";
+import { InstituteSearch } from "@/components/app-shell/InstituteSearch";
 import { ProfileMenu } from "@/components/app-shell/ProfileMenu";
 
 interface HeaderProps {
@@ -15,7 +16,6 @@ interface HeaderProps {
 export function Header({ onMenuClick }: HeaderProps) {
   const { user, exitInstitute, logout } = useAuth();
   const [exiting, setExiting] = useState(false);
-  const [search, setSearch] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -63,27 +63,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       {user?.role === "SUPERADMIN" ? (
         <PlatformSearch />
       ) : showSearch ? (
-      <div className="relative hidden min-w-0 flex-1 sm:block">
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
-        </svg>
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search students, staff, institutes…"
-          className="w-full max-w-md rounded-full border-none bg-muted py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
+        <InstituteSearch />
       ) : (
         <div className="hidden flex-1 sm:block" />
       )}
