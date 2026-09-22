@@ -84,8 +84,8 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
         </div>
 
         <div className="overflow-hidden rounded-xl border border-border bg-card">
-          <div className="flex items-center justify-between gap-3 border-b border-border p-4">
-            <div className="w-full max-w-xs">
+          <div className="flex items-center justify-between gap-2 border-b border-border p-4">
+            <div className="flex-1 sm:max-w-xs">
               <Dropdown
                 value={courseFilter}
                 onChange={setCourseFilter}
@@ -93,7 +93,7 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
                 placeholder="All courses"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <ExportButton path="/academics/batches/export.csv" filename="batches.csv" title="Export batches as CSV" />
               <ImportButton title="Bulk import batches from CSV/Excel" onClick={() => setImportOpen(true)} />
             </div>

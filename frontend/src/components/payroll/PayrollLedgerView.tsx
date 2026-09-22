@@ -102,7 +102,7 @@ export function PayrollLedgerView({ ledger, readOnly = false, submitting = false
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-4">
         <StatCard label={rateLabel} value={rate ? formatMoney(rate) : "—"} tone="primary" />
         {ledger.salaryType === "PER_LECTURE" && <StatCard label="Lectures taken" value={ledger.totals.lecturesCount} tone="accent" />}
         <StatCard label="Total earned" value={formatMoney(ledger.totals.totalEarned)} tone="accent" />

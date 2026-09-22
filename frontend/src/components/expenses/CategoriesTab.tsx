@@ -11,10 +11,20 @@ import { SkeletonRow } from "@/components/ui/Skeleton";
 import { ActionMenu } from "@/components/ui/ActionMenu";
 import type { ExpenseCategory } from "@/lib/types";
 
-export function CategoriesTab() {
+interface CategoriesTabProps {
+  addOpen?: boolean;
+  onAddOpenChange?: (open: boolean) => void;
+}
+
+export function CategoriesTab({ addOpen: controlledAddOpen, onAddOpenChange }: CategoriesTabProps = {}) {
   const [categories, setCategories] = useState<ExpenseCategory[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [addOpen, setAddOpen] = useState(false);
+  const [internalAddOpen, setInternalAddOpen] = useState(false);
+  const addOpen = controlledAddOpen !== undefined ? controlledAddOpen : internalAddOpen;
+  const setAddOpen = (val: boolean) => {
+    setInternalAddOpen(val);
+    onAddOpenChange?.(val);
+  };
   const [editing, setEditing] = useState<ExpenseCategory | null>(null);
   const [deactivating, setDeactivating] = useState<ExpenseCategory | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -44,16 +54,12 @@ export function CategoriesTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted-foreground">Manage the categories your expenses are grouped under.</p>
-        <Button onClick={() => setAddOpen(true)} className="w-full sm:w-auto">
-          Add category
-        </Button>
-      </div>
-
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
       <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="border-b border-border p-4">
+          <p className="text-sm text-muted-foreground">Manage the categories your expenses are grouped under.</p>
+        </div>
         {/* Desktop Table View */}
         <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-sm">

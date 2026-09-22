@@ -17,7 +17,7 @@ const TONE_CLASSES: Record<NonNullable<StatCardProps["tone"]>, string> = {
 
 export function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
   return (
-    <div className="flex items-center gap-2 sm:gap-4 rounded-xl border border-border bg-card p-2.5 sm:p-4 shadow-(--shadow-card) transition-all duration-150 hover:border-primary/30 hover:shadow-(--shadow-card-hover)">
+    <div className="flex items-center gap-1.5 sm:gap-4 rounded-xl border border-border bg-card p-2 sm:p-4 shadow-(--shadow-card) transition-all duration-150 hover:border-primary/30 hover:shadow-(--shadow-card-hover)">
       {icon && (
         <div className={`flex h-8 w-8 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg sm:rounded-xl ${TONE_CLASSES[tone]}`}>
           {icon}

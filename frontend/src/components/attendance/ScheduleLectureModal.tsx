@@ -5,6 +5,8 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { TimePicker } from "@/components/ui/TimePicker";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
@@ -302,8 +304,8 @@ export function ScheduleLectureModal({ open, onClose, onScheduled, defaultDate }
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Input label="Date" type="date" required min={todayInput()} value={date} onChange={(e) => setDate(e.target.value)} />
-          <Input label="Start time" type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+          <DatePicker label="Date" required min={todayInput()} value={date} onChange={setDate} />
+          <TimePicker label="Start time" required value={startTime} onChange={setStartTime} />
           <Dropdown label="Duration" value={duration} onChange={setDuration} options={DURATION_OPTIONS} />
         </div>
         {startTime && endTime && (

@@ -156,7 +156,7 @@ export const MaterialsTab = forwardRef<AcademicsTabHandle, Props>(function Mater
   return (
     <div className="space-y-6">
       {/* Stat Cards Grid */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-4">
         <StatCard label="Total materials" value={materials.length} tone="primary" />
         <StatCard label="Homework tasks" value={homeworkCount} tone="warning" />
         <StatCard label="PDFs & notes" value={fileCount} tone="success" />

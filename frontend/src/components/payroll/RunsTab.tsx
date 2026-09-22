@@ -52,24 +52,35 @@ export function RunsTab() {
     setError(null);
     const existing = runs.find((r) => r.periodMonth === p);
     if (existing) {
-      setActiveRun(null);
-      setPreview(null);
+      if (activeRun?.id !== existing.id) {
+        setActiveRun(null);
+        setPreview(null);
+      }
       apiFetch<PayrollRun>(`/payroll/runs/${existing.id}`)
-        .then(setActiveRun)
+        .then((run) => {
+          setActiveRun(run);
+          setPreview(null);
+        })
         .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load this run."));
     } else {
-      setActiveRun(null);
-      setPreview(null);
+      if (preview?.periodMonth !== p) {
+        setActiveRun(null);
+        setPreview(null);
+      }
       apiFetch<PayrollRunPreview>(`/payroll/runs/preview?period=${p}`)
-        .then(setPreview)
+        .then((prev) => {
+          setPreview(prev);
+          setActiveRun(null);
+        })
         .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load a preview for this period."));
     }
   }
 
   useEffect(() => {
-    if (runs.length >= 0) loadForPeriod(period);
+    if (runsLoading) return;
+    loadForPeriod(period);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period, runs]);
+  }, [period, runs, runsLoading]);
 
   async function handleCreateDraft() {
     setBusy(true);
@@ -91,7 +102,6 @@ export function RunsTab() {
     try {
       await apiFetch(`/payroll/runs/${activeRun.id}/${action}`, { method: "POST" });
       loadRuns();
-      loadForPeriod(period);
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Could not update this run.");
     } finally {
@@ -103,7 +113,6 @@ export function RunsTab() {
     if (!activeRun) return;
     await apiFetch(`/payroll/runs/${activeRun.id}/pay`, { method: "POST" });
     loadRuns();
-    loadForPeriod(period);
   }
 
   return (

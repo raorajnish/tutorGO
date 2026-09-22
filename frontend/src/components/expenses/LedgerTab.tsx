@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFetch, apiDownload, ApiClientError } from "@/lib/api";
+import { apiFetch, ApiClientError } from "@/lib/api";
 import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { ExportButton } from "@/components/ui/ExportButton";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import type { LedgerEntry, LedgerResponse } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
+import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 const KIND_TONE: Record<LedgerEntry["kind"], "success" | "danger" | "warning"> = {
   INCOME: "success",
@@ -29,11 +30,10 @@ const KIND_SIGN: Record<LedgerEntry["kind"], "+" | "−"> = {
 };
 
 export function LedgerTab() {
-  const [ledger, setLedger] = useState<LedgerResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [exporting, setExporting] = useState(false);
+  const [ledger, setLedger] = useState<LedgerResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   function load() {
     const params = new URLSearchParams();
@@ -41,35 +41,31 @@ export function LedgerTab() {
     if (to) params.set("to", to);
     apiFetch<LedgerResponse>(`/expenses/ledger?${params.toString()}`)
       .then(setLedger)
-      .catch(() => setError("Could not load the ledger."));
+      .catch((err) => setError(err instanceof ApiClientError ? err.message : "Could not load the ledger."));
   }
 
   useEffect(load, [from, to]);
 
-  async function exportCsv() {
-    setExporting(true);
-    try {
-      const params = new URLSearchParams();
-      if (from) params.set("from", from);
-      if (to) params.set("to", to);
-      await apiDownload(`/expenses/ledger/export.csv?${params.toString()}`, "ledger.csv");
-    } catch (err) {
-      setError(err instanceof ApiClientError ? err.message : "Could not export the ledger.");
-    } finally {
-      setExporting(false);
-    }
-  }
+  const items = ledger?.entries ?? [];
+  const { paginatedItems, paginationProps } = useClientPagination(items, 10);
+
+  const exportQs = new URLSearchParams();
+  if (from) exportQs.set("from", from);
+  if (to) exportQs.set("to", to);
+  const exportPath = `/expenses/ledger/export.csv${exportQs.toString() ? `?${exportQs.toString()}` : ""}`;
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-3">
+      <div className="flex items-end justify-between gap-3">
+        <div className="grid grid-cols-2 gap-2 flex-1 sm:flex sm:gap-3">
           <Input label="From" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           <Input label="To" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
         </div>
-        <Button variant="secondary" onClick={exportCsv} disabled={exporting} className="w-full sm:w-auto">
-          {exporting ? "Exporting…" : "Export CSV"}
-        </Button>
+        <ExportButton
+          path={exportPath}
+          filename="ledger.csv"
+          title="Export ledger as CSV"
+        />
       </div>
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}

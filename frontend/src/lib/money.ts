@@ -8,7 +8,8 @@ export function parseMoney(v: string | null | undefined): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-export function formatMoney(v: string | number | null | undefined): string {
+export function formatMoney(v: string | number | null | undefined, options?: { noDecimals?: boolean }): string {
   const n = typeof v === "number" ? v : parseMoney(v);
-  return `₹${n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const digits = options?.noDecimals ? 0 : 2;
+  return `₹${n.toLocaleString("en-IN", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }

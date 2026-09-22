@@ -115,17 +115,17 @@ function AdmissionsContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
-          <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Admissions</h1>
-          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Admit directly, or convert an open enquiry into a student.</p>
+          <h1 className="font-display mt-0.5 text-2xl font-bold text-foreground sm:text-3xl truncate">Admissions</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <ImportButton title="Bulk import students from CSV" onClick={() => setImportOpen(true)} />
           <Button onClick={openAdmitDirect}>Admit directly</Button>
         </div>
       </div>
+      <p className="text-sm text-muted-foreground hidden sm:block -mt-3">Admit directly, or convert an open enquiry into a student.</p>
 
       <div className="grid grid-cols-2 gap-2 sm:gap-4">
         <StatCard label="Open in pipeline" value={pipeline.length} tone="primary" />

@@ -233,7 +233,7 @@ export function InstituteAnalyticsTab() {
       {/* Tests */}
       <section className="space-y-4">
         <SectionHeading title="Test performance" description="Average score and pass rate, weighted by how many students actually sat each test." />
-        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-4">
           <Skeleton loading={loading}>
             <StatCard label="Tests" value={data?.tests.testCount ?? 0} tone="primary" />
           </Skeleton>
@@ -261,7 +261,7 @@ export function InstituteAnalyticsTab() {
       {/* Fees */}
       <section className="space-y-4">
         <SectionHeading title="Fees" description="Coverage against what's actually owed, and what's overdue right now." />
-        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-4">
           <Skeleton loading={loading}>
             <StatCard label="Total due" value={formatMoney(data?.fees.totalDue ?? "0")} tone="primary" />
           </Skeleton>
@@ -315,7 +315,7 @@ export function InstituteAnalyticsTab() {
       {/* Finance */}
       <section className="space-y-4">
         <SectionHeading title="Finance" description="Fees collected against payroll and expenses paid — a cash view for the range above, not a formal P&L." />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-4">
           <Skeleton loading={loading}>
             <StatCard label="Collected" value={formatMoney(data?.finance.collected ?? "0")} tone="success" />
           </Skeleton>

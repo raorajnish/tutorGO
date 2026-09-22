@@ -1,4 +1,6 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
+import { DatePicker } from "./DatePicker";
+import { TimePicker } from "./TimePicker";
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "label"> {
   label?: ReactNode;
@@ -11,6 +13,65 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   ref
 ) {
   const showStar = requiredStar ?? required;
+
+  if (props.type === "date") {
+    const { value, onChange, min, max, disabled, placeholder } = props as any;
+    return (
+      <DatePicker
+        id={id}
+        label={label}
+        error={error}
+        required={required}
+        requiredStar={requiredStar}
+        disabled={disabled}
+        min={min ? String(min) : undefined}
+        max={max ? String(max) : undefined}
+        value={value !== undefined && value !== null ? String(value) : ""}
+        placeholder={placeholder}
+        className={className}
+        onChange={(newVal: string) => {
+          if (onChange) {
+            const fakeEvent = {
+              target: { value: newVal, name: props.name || id || "" },
+              currentTarget: { value: newVal, name: props.name || id || "" },
+              preventDefault: () => {},
+              stopPropagation: () => {},
+            };
+            onChange(fakeEvent);
+          }
+        }}
+      />
+    );
+  }
+
+  if (props.type === "time") {
+    const { value, onChange, disabled, placeholder } = props as any;
+    return (
+      <TimePicker
+        id={id}
+        label={label}
+        error={error}
+        required={required}
+        requiredStar={requiredStar}
+        disabled={disabled}
+        value={value !== undefined && value !== null ? String(value) : ""}
+        placeholder={placeholder}
+        className={className}
+        onChange={(newVal: string) => {
+          if (onChange) {
+            const fakeEvent = {
+              target: { value: newVal, name: props.name || id || "" },
+              currentTarget: { value: newVal, name: props.name || id || "" },
+              preventDefault: () => {},
+              stopPropagation: () => {},
+            };
+            onChange(fakeEvent);
+          }
+        }}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-1.5">
       {label && (

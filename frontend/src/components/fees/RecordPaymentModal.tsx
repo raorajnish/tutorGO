@@ -5,6 +5,7 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Textarea } from "@/components/ui/Textarea";
 import { formatMoney, parseMoney } from "@/lib/money";
@@ -167,7 +168,7 @@ export function RecordPaymentModal({ open, onClose, onSaved, studentId, remainin
             onChange={(v) => setMode(v as PaymentMode)}
             options={PAYMENT_MODES.map((m) => ({ value: m, label: PAYMENT_MODE_LABELS[m] }))}
           />
-          <Input label="Paid on" type="date" required value={paidOn} onChange={(e) => setPaidOn(e.target.value)} />
+          <DatePicker label="Paid on" required value={paidOn} onChange={setPaidOn} />
           <Textarea label="Notes (optional)" maxLength={300} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
           {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
         </form>

@@ -128,20 +128,20 @@ function EnquiriesContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
-          <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Enquiries</h1>
-          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Capture leads and work them through to admission.</p>
+          <h1 className="font-display mt-0.5 text-2xl font-bold text-foreground sm:text-3xl truncate">Enquiries</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <ExportButton path="/enquiries/export.csv" filename="enquiries.csv" title="Export enquiries as CSV" />
           <ImportButton title="Bulk import enquiries from CSV/Excel" onClick={() => setImportOpen(true)} />
           <Button onClick={openCreate}>New enquiry</Button>
         </div>
       </div>
+      <p className="text-sm text-muted-foreground hidden sm:block -mt-3">Capture leads and work them through to admission.</p>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-4">
         <Skeleton loading={loading}>
           <StatCard label="New" value={counts.NEW} tone="primary" />
         </Skeleton>

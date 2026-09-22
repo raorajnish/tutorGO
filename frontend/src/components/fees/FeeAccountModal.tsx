@@ -100,7 +100,7 @@ export function FeeAccountModal({ studentId, onClose }: Props) {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
             <StatTile label="Total due" value={formatMoney(account.totalDue)} tone="primary" />
             <StatTile label="Paid" value={formatMoney(account.totalPaid)} tone="success" />
             <StatTile label="Waived" value={formatMoney(account.totalWaived)} tone="accent" />

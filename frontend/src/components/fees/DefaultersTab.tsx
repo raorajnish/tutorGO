@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
+import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { StatCard } from "@/components/ui/StatCard";
 import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
@@ -15,6 +16,7 @@ import { formatDate as fmtDate } from "@/lib/format";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
 export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: string) => void }) {
+  const [search, setSearch] = useState("");
   const [entries, setEntries] = useState<OverdueEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reminderFor, setReminderFor] = useState<string | null>(null);
@@ -22,7 +24,16 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [sentResult, setSentResult] = useState<{ id: string; text: string } | null>(null);
 
-  const entryList = entries ?? [];
+  const query = search.toLowerCase().trim();
+  const entryList = (entries ?? []).filter((e) => {
+    if (!query) return true;
+    return (
+      e.student.name.toLowerCase().includes(query) ||
+      e.student.studentCode.toLowerCase().includes(query) ||
+      (e.student.phone && e.student.phone.includes(query)) ||
+      (e.student.course && (e.student.course.name.toLowerCase().includes(query) || e.student.course.code.toLowerCase().includes(query)))
+    );
+  });
   const { paginatedItems, paginationProps } = useClientPagination(entryList, 10);
 
   function load() {
@@ -75,7 +86,7 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
         <StatCard label="Overdue amount" value={formatMoney(totalOverdue)} tone="danger" />
         <StatCard label="Overdue installments" value={entries?.length ?? "—"} tone="warning" />
         <StatCard label="Students affected" value={studentCount} tone="primary" />
@@ -83,11 +94,19 @@ export function DefaultersTab({ onOpenStudent }: { onOpenStudent: (studentId: st
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
-      <div className="flex justify-end">
-        <ExportButton path="/fees/overdue/export.csv" filename="defaulters.csv" title="Export defaulters as CSV" />
-      </div>
-
       <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="border-b border-border p-4">
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <Input
+                placeholder="Search student or course..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <ExportButton path="/fees/overdue/export.csv" filename="defaulters.csv" title="Export defaulters as CSV" />
+          </div>
+        </div>
         <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-sm">
             <thead>

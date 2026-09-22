@@ -4,6 +4,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { TimePicker } from "@/components/ui/TimePicker";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
@@ -90,10 +92,10 @@ export function EditLectureModal({ lecture, onClose, onSaved }: Props) {
       }
     >
       <form id="edit-lecture-form" onSubmit={handleSubmit} className="space-y-4">
-        <Input label="Date" type="date" required min={todayInput()} value={date} onChange={(e) => setDate(e.target.value)} />
+        <DatePicker label="Date" required min={todayInput()} value={date} onChange={setDate} />
         <div className="grid grid-cols-2 gap-4">
-          <Input label="Start time" type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-          <Input label="End time" type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+          <TimePicker label="Start time" required value={startTime} onChange={setStartTime} />
+          <TimePicker label="End time" required value={endTime} onChange={setEndTime} />
         </div>
 
         <Dropdown

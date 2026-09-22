@@ -102,15 +102,16 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
     <div className="space-y-6">
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="w-full max-w-xs">
-              <Input
-                placeholder="Search fee structures…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            <div className="w-full max-w-xs">
+          <div className="w-full sm:max-w-xs">
+            <Input
+              placeholder="Search fee structures…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2 w-full sm:w-auto">
+            <div className="flex-1 sm:w-60">
               <Dropdown
                 value={courseFilter}
                 onChange={setCourseFilter}
@@ -121,10 +122,10 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
                 placeholder="Filter by course"
               />
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <ExportButton path="/academics/fee-structures/export.csv" filename="fee-structures.csv" title="Export fee structures as CSV" />
-            <ImportButton title="Bulk import fee structures from CSV/Excel" onClick={() => setImportOpen(true)} />
+            <div className="flex items-center gap-2 shrink-0">
+              <ExportButton path="/academics/fee-structures/export.csv" filename="fee-structures.csv" title="Export fee structures as CSV" />
+              <ImportButton title="Bulk import fee structures from CSV/Excel" onClick={() => setImportOpen(true)} />
+            </div>
           </div>
         </div>
 
@@ -198,33 +199,49 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
         <div className="divide-y divide-border sm:hidden">
           {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
           {!loading && paginatedItems.map((s) => (
-            <div key={s.id} className="p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-foreground">{s.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {s.course.name} ({s.course.code})
-                  </p>
-                </div>
-                <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-                  <Badge tone={s.isActive ? "success" : "danger"}>{s.isActive ? "Active" : "Inactive"}</Badge>
+            <div key={s.id} className="p-4 space-y-2.5 hover:bg-muted/30 transition-colors">
+              {/* Top Row: Title on Left, Badges on Right */}
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-bold text-sm text-foreground tracking-tight min-w-0 truncate">
+                  {s.name}
+                </h3>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Badge tone={s.isActive ? "success" : "danger"}>
+                    {s.isActive ? "Active" : "Inactive"}
+                  </Badge>
                   {s.isDefault && <Badge tone="accent">Default</Badge>}
                 </div>
               </div>
 
-              <p className="mt-2 text-xs text-muted-foreground">
-                {FEE_PLAN_TYPE_LABELS[s.planType]} · {structureAmountSummary(s)}
+              {/* Subtitle: Course Name & Code */}
+              <p className="text-xs font-medium text-muted-foreground">
+                {s.course.name} <span className="opacity-75">({s.course.code})</span>
               </p>
 
-              <div className="mt-2.5 flex gap-4 border-t border-border pt-2.5">
-                <button type="button" onClick={() => openEdit(s)} className="text-xs font-medium text-accent underline underline-offset-2">
-                  Edit
-                </button>
-                {!s.isDefault && (
-                  <button type="button" onClick={() => handleSetDefault(s)} className="text-xs font-medium text-accent underline underline-offset-2">
-                    Set default
+              {/* Bottom Row: Plan Details on Left + Actions on Right */}
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-medium text-foreground/80 min-w-0 truncate">
+                  {FEE_PLAN_TYPE_LABELS[s.planType]} · <span className="font-semibold text-foreground">{structureAmountSummary(s)}</span>
+                </p>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  {!s.isDefault && (
+                    <button
+                      type="button"
+                      onClick={() => handleSetDefault(s)}
+                      className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-2 cursor-pointer"
+                    >
+                      Set default
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => openEdit(s)}
+                    className="text-xs font-bold text-accent hover:underline underline-offset-2 cursor-pointer"
+                  >
+                    Edit
                   </button>
-                )}
+                </div>
               </div>
             </div>
           ))}

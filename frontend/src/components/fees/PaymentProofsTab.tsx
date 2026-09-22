@@ -207,14 +207,24 @@ export function PaymentProofsTab() {
     load();
   }, [load]);
 
+  const [search, setSearch] = useState("");
+
   const pendingCount = (proofs ?? []).filter((p) => p.status === "PENDING").length;
 
-  const proofList = proofs ?? [];
+  const query = search.toLowerCase().trim();
+  const proofList = (proofs ?? []).filter((p) => {
+    if (!query) return true;
+    return (
+      p.student.name.toLowerCase().includes(query) ||
+      p.student.studentCode.toLowerCase().includes(query) ||
+      (p.referenceNo && p.referenceNo.toLowerCase().includes(query))
+    );
+  });
   const { paginatedItems, paginationProps } = useClientPagination(proofList, 10);
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
         <StatCard label="Awaiting review" value={filter === "PENDING" ? (proofs?.length ?? "—") : pendingCount} tone="warning" />
         <StatCard
           label="Claimed (this view)"
@@ -224,24 +234,30 @@ export function PaymentProofsTab() {
         <StatCard label="Shown" value={proofs?.length ?? "—"} tone="accent" />
       </div>
 
-      <div className="flex gap-1.5">
-        {FILTERS.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            onClick={() => setFilter(f.id)}
-            className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              filter === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="border-b border-border p-4 space-y-3">
+          <Input
+            placeholder="Search student name, code, or reference no..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFilter(f.id)}
+                className={`shrink-0 rounded-full px-3.5 py-1 text-xs font-medium transition-colors ${
+                  filter === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-sm">
             <thead>

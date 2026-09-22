@@ -93,7 +93,7 @@ export default function StudentsPage() {
         <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Every student on file, across every course and batch.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-4">
         <StatCard label="Active students" value={data?.stats.activeStudents ?? "—"} tone="primary" />
         <StatCard label="Total on file" value={data?.stats.totalStudents ?? "—"} tone="accent" />
         <StatCard label="Active batches" value={data?.stats.activeBatches ?? "—"} tone="success" />

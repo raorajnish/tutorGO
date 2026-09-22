@@ -4,6 +4,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { TimePicker } from "@/components/ui/TimePicker";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
@@ -393,23 +395,21 @@ export function ScheduleTestModal({ open, onClose, onScheduled }: Props) {
 
             {sessions.length > 1 && (
               <div className="grid grid-cols-1 gap-3 rounded-xl bg-muted p-3 sm:grid-cols-2 lg:grid-cols-4">
-                <Input
+                <DatePicker
                   label="Date"
-                  type="date"
                   min={todayInput()}
                   value={defaultDate}
-                  onChange={(e) => {
-                    setDefaultDate(e.target.value);
-                    applyDefault({ date: e.target.value });
+                  onChange={(v) => {
+                    setDefaultDate(v);
+                    applyDefault({ date: v });
                   }}
                 />
-                <Input
+                <TimePicker
                   label="Start"
-                  type="time"
                   value={defaultStart}
-                  onChange={(e) => {
-                    setDefaultStart(e.target.value);
-                    applyDefault({ startTime: e.target.value });
+                  onChange={(v) => {
+                    setDefaultStart(v);
+                    applyDefault({ startTime: v });
                   }}
                 />
                 <Dropdown
@@ -439,18 +439,16 @@ export function ScheduleTestModal({ open, onClose, onScheduled }: Props) {
                 <div key={s.batchId} className="rounded-xl border border-border p-3.5">
                   {sessions.length > 1 && <p className="mb-2.5 text-sm font-medium text-foreground">{s.batchName}</p>}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <Input
+                    <DatePicker
                       label="Date"
-                      type="date"
                       min={todayInput()}
                       value={s.date}
-                      onChange={(e) => updateSession(s.batchId, { date: e.target.value })}
+                      onChange={(v) => updateSession(s.batchId, { date: v })}
                     />
-                    <Input
+                    <TimePicker
                       label="Start time"
-                      type="time"
                       value={s.startTime}
-                      onChange={(e) => updateSession(s.batchId, { startTime: e.target.value })}
+                      onChange={(v) => updateSession(s.batchId, { startTime: v })}
                     />
                     <Dropdown
                       label="Duration"

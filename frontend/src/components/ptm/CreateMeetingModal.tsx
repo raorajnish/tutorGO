@@ -5,6 +5,8 @@ import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
+import { TimePicker } from "@/components/ui/TimePicker";
 import { Dropdown } from "@/components/ui/Dropdown";
 import type { Batch, Course, CreateParentMeetingBatch } from "@/lib/types";
 
@@ -140,9 +142,9 @@ export function CreateMeetingModal({ open, onClose, onCreated }: { open: boolean
         )}
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <Input label="Date" type="date" value={sharedDate} onChange={(e) => setSharedDate(e.target.value)} />
-          <Input label="Start time" type="time" value={sharedStart} onChange={(e) => setSharedStart(e.target.value)} />
-          <Input label="End time" type="time" value={sharedEnd} onChange={(e) => setSharedEnd(e.target.value)} />
+          <DatePicker label="Date" value={sharedDate} onChange={setSharedDate} />
+          <TimePicker label="Start time" value={sharedStart} onChange={setSharedStart} />
+          <TimePicker label="End time" value={sharedEnd} onChange={setSharedEnd} />
         </div>
 
         <Input label="Venue (optional)" placeholder="e.g. Room 204, or a video call link" value={venue} onChange={(e) => setVenue(e.target.value)} />

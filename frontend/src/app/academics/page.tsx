@@ -83,13 +83,10 @@ export default function AcademicsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
-          <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Academics</h1>
-          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
-            Courses, subjects, batches, fee structures, study materials, and classrooms — the structure everything else in this institute hangs off of.
-          </p>
+          <h1 className="font-display mt-0.5 text-2xl font-bold text-foreground sm:text-3xl truncate">Academics</h1>
         </div>
         {CREATE_LABEL[tab] && (
           <Button onClick={handleCreate} className="shrink-0 whitespace-nowrap">
@@ -97,6 +94,9 @@ export default function AcademicsPage() {
           </Button>
         )}
       </div>
+      <p className="text-sm text-muted-foreground hidden sm:block -mt-3">
+        Courses, subjects, batches, fee structures, study materials, and classrooms — the structure everything else in this institute hangs off of.
+      </p>
 
       <Tabs tabs={TABS} activeId={tab} onChange={(id) => setTab(id as TabId)} />
 

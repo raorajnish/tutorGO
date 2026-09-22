@@ -48,10 +48,10 @@ export function StaffTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+      <div className="grid grid-cols-[0.7fr_1.15fr_1.15fr] gap-2 sm:gap-4">
         <StatCard label="Staff on payroll" value={allStaff.length} tone="primary" />
-        <StatCard label="Total pending" value={formatMoney(totalPending)} tone="warning" />
-        <StatCard label="Total credit" value={formatMoney(totalCredit)} tone="success" />
+        <StatCard label="Total pending" value={formatMoney(totalPending, { noDecimals: true })} tone="warning" />
+        <StatCard label="Total credit" value={formatMoney(totalCredit, { noDecimals: true })} tone="success" />
       </div>
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}

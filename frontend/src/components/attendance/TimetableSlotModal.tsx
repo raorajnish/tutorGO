@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { TimePicker } from "@/components/ui/TimePicker";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/Button";
 import {
@@ -270,7 +271,7 @@ export function TimetableSlotModal({ open, onClose, onSaved, slotToEdit }: Props
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input label="Start time" type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+          <TimePicker label="Start time" required value={startTime} onChange={setStartTime} />
           <Dropdown label="Duration" value={duration} onChange={setDuration} options={DURATION_OPTIONS} />
         </div>
         {startTime && endTime && (

@@ -135,54 +135,58 @@ function FeesContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
-          <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Fees</h1>
-          <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
-            Fee accounts, installments, payments and receipts — search a student to view or set up their plan.
-          </p>
+      <div>
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Institute</p>
+            <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Fees</h1>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button onClick={() => setCollectOpen(true)}>Collect fee</Button>
+          </div>
         </div>
-        <Button onClick={() => setCollectOpen(true)}>Collect fee</Button>
+        <p className="mt-1 text-sm text-muted-foreground hidden sm:block">
+          Fee accounts, installments, payments and receipts — search a student to view or set up their plan.
+        </p>
       </div>
 
       <Tabs tabs={TABS} activeId={tab} onChange={setTab} />
 
       {tab === "students" && (
         <div className="space-y-4">
-          <Input
-            placeholder="Search name, code, phone, email…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:max-w-md"
-          />
-
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-            <Dropdown label="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
-            <Dropdown label="Fee account" value={feeAccountFilter} onChange={setFeeAccountFilter} options={FEE_ACCOUNT_OPTIONS} />
-            <Dropdown
-              label="Class"
-              value={courseId}
-              onChange={setCourseId}
-              options={courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))}
-              placeholder="All classes"
-            />
-            <Dropdown
-              label="Batch"
-              value={batchId}
-              onChange={setBatchId}
-              options={batches.map((b) => ({ value: b.id, label: b.name }))}
-              placeholder={courseId ? "All batches" : "Select a class first"}
-              disabled={!courseId}
-            />
-            <div className="col-span-2 sm:col-span-1">
-              <Dropdown label="Sort by" value={sort} onChange={setSort} options={SORT_OPTIONS} />
-            </div>
-          </div>
-
-          {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
-
           <div className="overflow-hidden rounded-xl border border-border bg-card">
+            <div className="border-b border-border p-4 space-y-3">
+              <Input
+                placeholder="Search name, code, phone, email…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+                <Dropdown label="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
+                <Dropdown label="Fee account" value={feeAccountFilter} onChange={setFeeAccountFilter} options={FEE_ACCOUNT_OPTIONS} />
+                <Dropdown
+                  label="Class"
+                  value={courseId}
+                  onChange={setCourseId}
+                  options={courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))}
+                  placeholder="All classes"
+                />
+                <Dropdown
+                  label="Batch"
+                  value={batchId}
+                  onChange={setBatchId}
+                  options={batches.map((b) => ({ value: b.id, label: b.name }))}
+                  placeholder={courseId ? "All batches" : "Select a class first"}
+                  disabled={!courseId}
+                />
+                <div className="col-span-2 sm:col-span-1">
+                  <Dropdown label="Sort by" value={sort} onChange={setSort} options={SORT_OPTIONS} />
+                </div>
+              </div>
+            </div>
+
+            {error && <div className="p-4"><div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div></div>}
             <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-sm">
                 <thead>

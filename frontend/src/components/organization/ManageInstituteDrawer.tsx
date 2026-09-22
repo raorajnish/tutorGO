@@ -36,7 +36,7 @@ function PlanUsage({ detail }: { detail: InstituteDetail }) {
         <p className="text-sm font-medium text-foreground">Plan</p>
         <Badge tone="primary">{detail.plan.name}</Badge>
       </div>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <ul className="grid grid-cols-4 gap-1.5 sm:gap-4">
         {CAPPED_ROLES.map((role) => {
           const limit = detail.plan!.limits[role];
           const atLimit = limit.used >= limit.max;

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
+import { DatePicker } from "@/components/ui/DatePicker";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -21,9 +22,19 @@ import { ImportModal } from "@/components/ui/ImportModal";
 
 interface ExpensesTabProps {
   initialAddOpen?: boolean;
+  addOpen?: boolean;
+  onAddOpenChange?: (open: boolean) => void;
+  importOpen?: boolean;
+  onImportOpenChange?: (open: boolean) => void;
 }
 
-export function ExpensesTab({ initialAddOpen }: ExpensesTabProps) {
+export function ExpensesTab({
+  initialAddOpen,
+  addOpen: controlledAddOpen,
+  onAddOpenChange,
+  importOpen: controlledImportOpen,
+  onImportOpenChange,
+}: ExpensesTabProps) {
   const [expenses, setExpenses] = useState<Expense[] | null>(null);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [events, setEvents] = useState<ExpenseEvent[]>([]);
@@ -34,8 +45,19 @@ export function ExpensesTab({ initialAddOpen }: ExpensesTabProps) {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [eventFilter, setEventFilter] = useState("");
 
-  const [addOpen, setAddOpen] = useState(() => !!initialAddOpen);
-  const [importOpen, setImportOpen] = useState(false);
+  const [internalAddOpen, setInternalAddOpen] = useState(() => !!initialAddOpen);
+  const addOpen = controlledAddOpen !== undefined ? controlledAddOpen : internalAddOpen;
+  const setAddOpen = (val: boolean) => {
+    setInternalAddOpen(val);
+    onAddOpenChange?.(val);
+  };
+
+  const [internalImportOpen, setInternalImportOpen] = useState(false);
+  const importOpen = controlledImportOpen !== undefined ? controlledImportOpen : internalImportOpen;
+  const setImportOpen = (val: boolean) => {
+    setInternalImportOpen(val);
+    onImportOpenChange?.(val);
+  };
   const [editing, setEditing] = useState<Expense | null>(null);
   const [deleting, setDeleting] = useState<Expense | null>(null);
 
@@ -86,29 +108,17 @@ export function ExpensesTab({ initialAddOpen }: ExpensesTabProps) {
   return (
     <>
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:flex lg:flex-1 lg:gap-3">
-          <Input label="From" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-          <Input label="To" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-          <div className="col-span-2 sm:col-span-1 lg:w-48">
-            <Dropdown label="Category" value={categoryFilter} onChange={setCategoryFilter} options={categoryOptions} />
-          </div>
-          <div className="col-span-2 sm:col-span-1 lg:w-48">
-            <Dropdown label="Event" value={eventFilter} onChange={setEventFilter} options={eventOptions} />
-          </div>
-        </div>
-        <div className="flex items-center gap-2 w-full lg:w-auto">
-          <ExportButton path="/expenses/export.csv" filename="expenses.csv" title="Export expenses as CSV" />
-          <ImportButton title="Bulk import expenses from CSV/Excel" onClick={() => setImportOpen(true)} />
-          <Button onClick={() => setAddOpen(true)} className="flex-1 lg:flex-initial">
-            Add expense
-          </Button>
-        </div>
-      </div>
-
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
 
       <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="border-b border-border p-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
+            <DatePicker label="From" value={from} onChange={setFrom} />
+            <DatePicker label="To" value={to} onChange={setTo} />
+            <Dropdown label="Category" value={categoryFilter} onChange={setCategoryFilter} options={categoryOptions} />
+            <Dropdown label="Event" value={eventFilter} onChange={setEventFilter} options={eventOptions} />
+          </div>
+        </div>
         {/* Desktop Table View */}
         <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-sm">
@@ -354,7 +364,7 @@ function ExpenseModal({
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Input label="Date" type="date" required value={date} onChange={(e) => setDate(e.target.value)} />
+          <DatePicker label="Date" required value={date} onChange={setDate} />
           <Dropdown label="Payment mode" value={mode} onChange={(v) => setMode(v as PaymentMode)} options={PAYMENT_MODES.map((m) => ({ value: m, label: PAYMENT_MODE_LABELS[m] }))} />
         </div>
 

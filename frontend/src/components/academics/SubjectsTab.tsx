@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import type { Course, Subject } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
+import { ExportButton } from "@/components/ui/ExportButton";
 
 export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_props, ref) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -73,7 +74,7 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="border-b border-border p-4">
+        <div className="flex items-center justify-between gap-3 border-b border-border p-4">
           <div className="w-full max-w-xs">
             <Dropdown
               value={courseFilter}
@@ -81,6 +82,9 @@ export const SubjectsTab = forwardRef<AcademicsTabHandle>(function SubjectsTab(_
               options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
               placeholder="All courses"
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <ExportButton path="/academics/subjects/export.csv" filename="subjects.csv" title="Export subjects as CSV" />
           </div>
         </div>
 
