@@ -51,8 +51,8 @@ interface Props {
   onImported: () => void;
   /** Row-specific extra detail shown in its own column — a generated student
    * code, a temp password. Different endpoints surface different things. */
-  extraColumnLabel: string;
-  extraColumnValue: (row: ImportRow) => string;
+  extraColumnLabel?: string;
+  extraColumnValue?: (row: ImportRow) => string;
 }
 
 /** Shared bulk-CSV-import flow: pick a file, preview what it would do against
@@ -188,7 +188,7 @@ export function ImportModal({
                     <th className="px-3 py-2">Line</th>
                     <th className="px-3 py-2">Name</th>
                     <th className="px-3 py-2">Status</th>
-                    <th className="px-3 py-2">{extraColumnLabel} / reason</th>
+                    <th className="px-3 py-2">{extraColumnLabel ? `${extraColumnLabel} / reason` : "Detail / Reason"}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -197,7 +197,7 @@ export function ImportModal({
                       <td className="px-3 py-2 text-muted-foreground">{r.line}</td>
                       <td className="px-3 py-2 text-foreground">{r.name ?? "—"}</td>
                       <td className={`px-3 py-2 font-medium ${STATUS_STYLES[r.status]}`}>{r.status}</td>
-                      <td className="px-3 py-2 text-muted-foreground">{extraColumnValue(r) || r.reason || "—"}</td>
+                      <td className="px-3 py-2 text-muted-foreground">{(extraColumnValue ? extraColumnValue(r) : "") || r.reason || "—"}</td>
                     </tr>
                   ))}
                 </tbody>

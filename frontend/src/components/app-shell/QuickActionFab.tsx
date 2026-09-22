@@ -457,15 +457,14 @@ export function QuickActionFab() {
       }
     }
     function handleKeyDown(event: KeyboardEvent) {
-      // Global shortcut: Cmd+K, Ctrl+K, or Shift+C
-      if ((event.key === "k" || event.key === "K") && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        toggleOpen();
-        return;
-      }
-      if ((event.key === "c" || event.key === "C") && event.shiftKey && !event.metaKey && !event.ctrlKey) {
+      // Global shortcut: Ctrl+C / Cmd+C (or Shift+C) toggles Create Quick Actions
+      if (
+        (event.key === "c" || event.key === "C") &&
+        ((event.metaKey || event.ctrlKey) || event.shiftKey)
+      ) {
+        const selection = window.getSelection()?.toString();
         const tag = (event.target as HTMLElement)?.tagName;
-        if (tag !== "INPUT" && tag !== "TEXTAREA" && !(event.target as HTMLElement)?.isContentEditable) {
+        if (!selection && tag !== "INPUT" && tag !== "TEXTAREA" && !(event.target as HTMLElement)?.isContentEditable) {
           event.preventDefault();
           toggleOpen();
           return;
@@ -637,7 +636,7 @@ export function QuickActionFab() {
             Create
             <kbd className="hidden md:inline-flex items-center rounded-md bg-primary-foreground/20 px-2 py-1 text-[11px] font-mono font-medium leading-none text-primary-foreground opacity-90">
               <span>⌘</span>
-              <span className="ml-0.5">K</span>
+              <span className="ml-0.5">C</span>
             </kbd>
           </span>
         </div>

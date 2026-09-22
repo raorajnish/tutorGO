@@ -52,6 +52,7 @@ const CREATE_LABEL: Partial<Record<TabId, string>> = {
   subjects: "New subject",
   batches: "New batch",
   "fee-structures": "New fee structure",
+  rooms: "New room",
   materials: "New material",
 };
 
@@ -64,6 +65,7 @@ export default function AcademicsPage() {
   const subjectsRef = useRef<AcademicsTabHandle>(null);
   const batchesRef = useRef<AcademicsTabHandle>(null);
   const feeStructuresRef = useRef<AcademicsTabHandle>(null);
+  const roomsRef = useRef<AcademicsTabHandle>(null);
   const materialsRef = useRef<AcademicsTabHandle>(null);
 
   function handleCreate() {
@@ -72,6 +74,7 @@ export default function AcademicsPage() {
       subjects: subjectsRef,
       batches: batchesRef,
       "fee-structures": feeStructuresRef,
+      rooms: roomsRef,
       materials: materialsRef,
     };
     const handle = handleMap[tab];
@@ -88,7 +91,11 @@ export default function AcademicsPage() {
             Courses, subjects, batches, fee structures, study materials, and classrooms — the structure everything else in this institute hangs off of.
           </p>
         </div>
-        {CREATE_LABEL[tab] && <Button onClick={handleCreate}>{CREATE_LABEL[tab]}</Button>}
+        {CREATE_LABEL[tab] && (
+          <Button onClick={handleCreate} className="shrink-0 whitespace-nowrap">
+            {CREATE_LABEL[tab]}
+          </Button>
+        )}
       </div>
 
       <Tabs tabs={TABS} activeId={tab} onChange={(id) => setTab(id as TabId)} />
@@ -98,7 +105,7 @@ export default function AcademicsPage() {
         {tab === "subjects" && <SubjectsTab ref={subjectsRef} />}
         {tab === "batches" && <BatchesTab ref={batchesRef} />}
         {tab === "fee-structures" && <FeeStructuresTab ref={feeStructuresRef} />}
-        {tab === "rooms" && <RoomsTab canManage={true} />}
+        {tab === "rooms" && <RoomsTab ref={roomsRef} />}
         {tab === "materials" && <MaterialsTab ref={materialsRef} />}
       </div>
     </div>

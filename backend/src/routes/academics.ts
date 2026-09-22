@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import type { Prisma } from "../generated/prisma/client.js";
+import { type Prisma, FeePlanType } from "../generated/prisma/client.js";
 import { ApiError } from "../lib/http.js";
 import { authenticate, requireInstitute, requireRoles } from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.js";
 import { auditLog } from "../services/audit.js";
+
+import { toCsv } from "../lib/csv.js";
 
 export const academicsRouter = Router();
 
@@ -667,3 +669,251 @@ academicsRouter.patch(
     }
   }
 );
+
+// ---------------------------------------------------------------------------
+// Import & Export Routes for Academics (Courses, Batches, Fee Structures)
+// ---------------------------------------------------------------------------
+
+academicsRouter.get("/courses/export.csv", async (req, res, next) => {
+  try {
+    const courses = await prisma.course.findMany({
+      where: { instituteId: req.tenantId! },
+      include: { _count: { select: { batches: true, students: true, subjects: true } } },
+      orderBy: { name: "asc" },
+    });
+
+    const rows = [
+      ["Course Name", "Code", "Description", "Active", "Students Enrolled", "Batches", "Subjects"],
+      ...courses.map((c) => [
+        c.name,
+        c.code,
+        c.description ?? "",
+        c.isActive ? "Yes" : "No",
+        String(c._count.students),
+        String(c._count.batches),
+        String(c._count.subjects),
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="courses.csv"');
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
+academicsRouter.get("/courses/import/template.csv", (_req, res) => {
+  const rows = [
+    ["Course Name", "Code", "Description"],
+    ["Class 10 Science & Maths", "C10-SM", "Comprehensive curriculum for Class 10 board exams"],
+    ["Class 12 Physics & Chemistry", "C12-PCM", "Senior secondary science coaching"],
+  ];
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="course-import-template.csv"');
+  res.send(toCsv(rows));
+});
+
+const bulkImportCourseSchema = z.object({
+  records: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Course name is required"),
+        code: courseCodeSchema,
+        description: z.string().optional(),
+      })
+    )
+    .min(1, "At least 1 record required"),
+});
+
+academicsRouter.post("/courses/import", requireRoles(...MANAGE_ROLES), validateBody(bulkImportCourseSchema), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const { records } = req.body as z.infer<typeof bulkImportCourseSchema>;
+
+    const created = await prisma.$transaction(
+      records.map((r) =>
+        prisma.course.create({
+          data: {
+            instituteId,
+            name: r.name,
+            code: r.code.toUpperCase(),
+            description: r.description,
+          },
+        })
+      )
+    );
+
+    res.status(201).json({ importedCount: created.length });
+  } catch (err) {
+    next(err);
+  }
+});
+
+academicsRouter.get("/batches/export.csv", async (req, res, next) => {
+  try {
+    const batches = await prisma.batch.findMany({
+      where: { instituteId: req.tenantId! },
+      include: { course: { select: { name: true, code: true } }, _count: { select: { students: true } } },
+      orderBy: { name: "asc" },
+    });
+
+    const rows = [
+      ["Batch Name", "Course", "Course Code", "Students Enrolled", "Active"],
+      ...batches.map((b) => [
+        b.name,
+        b.course.name,
+        b.course.code,
+        String(b._count.students),
+        b.isActive ? "Yes" : "No",
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="batches.csv"');
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
+academicsRouter.get("/batches/import/template.csv", (_req, res) => {
+  const rows = [
+    ["Batch Name", "Course Code", "Max Capacity"],
+    ["Batch A - Morning", "C10-SM", "30"],
+    ["Batch B - Evening", "C10-SM", "40"],
+  ];
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="batch-import-template.csv"');
+  res.send(toCsv(rows));
+});
+
+const bulkImportBatchSchema = z.object({
+  records: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Batch name is required"),
+        courseCode: z.string().min(1, "Course code is required"),
+        maxCapacity: z.coerce.number().optional(),
+      })
+    )
+    .min(1, "At least 1 record required"),
+});
+
+academicsRouter.post("/batches/import", requireRoles(...MANAGE_ROLES), validateBody(bulkImportBatchSchema), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const { records } = req.body as z.infer<typeof bulkImportBatchSchema>;
+
+    const courses = await prisma.course.findMany({ where: { instituteId } });
+    const courseMap = new Map(courses.map((c) => [c.code.toUpperCase(), c.id]));
+
+    const created = await prisma.$transaction(
+      records.map((r) => {
+        const courseId = courseMap.get(r.courseCode.toUpperCase());
+        if (!courseId) throw ApiError.badRequest(`Course code "${r.courseCode}" not found`);
+        return prisma.batch.create({
+          data: {
+            instituteId,
+            courseId,
+            name: r.name,
+            startDate: new Date(),
+          },
+        });
+      })
+    );
+
+    res.status(201).json({ importedCount: created.length });
+  } catch (err) {
+    next(err);
+  }
+});
+
+academicsRouter.get("/fee-structures/export.csv", async (req, res, next) => {
+  try {
+    const structures = await prisma.feeStructure.findMany({
+      where: { instituteId: req.tenantId! },
+      include: { course: { select: { name: true, code: true } } },
+      orderBy: { name: "asc" },
+    });
+
+    const rows = [
+      ["Plan Name", "Course", "Course Code", "Plan Type", "Course Fee", "Monthly Amount", "Installments", "Default", "Active"],
+      ...structures.map((s) => [
+        s.name,
+        s.course.name,
+        s.course.code,
+        s.planType,
+        s.courseFee ? String(s.courseFee) : "0",
+        s.monthlyAmount ? String(s.monthlyAmount) : "0",
+        String(s.installmentCount),
+        s.isDefault ? "Yes" : "No",
+        s.isActive ? "Yes" : "No",
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="fee-structures.csv"');
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
+academicsRouter.get("/fee-structures/import/template.csv", (_req, res) => {
+  const rows = [
+    ["Plan Name", "Course Code", "Plan Type", "Course Fee", "Monthly Amount", "Installments"],
+    ["Standard Annual Fee Plan", "C10-SM", "ONE_TIME", "25000", "0", "4"],
+    ["Monthly Subscription Plan", "C10-SM", "MONTHLY", "0", "2500", "10"],
+  ];
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="fee-structure-import-template.csv"');
+  res.send(toCsv(rows));
+});
+
+const bulkImportFeeStructureSchema = z.object({
+  records: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Plan name is required"),
+        courseCode: z.string().min(1, "Course code is required"),
+        planType: z.enum(["ONE_TIME", "MONTHLY", "SUBJECT_WISE"]).default("ONE_TIME"),
+        courseFee: z.coerce.number().default(0),
+        monthlyAmount: z.coerce.number().default(0),
+        installmentCount: z.coerce.number().default(1),
+      })
+    )
+    .min(1, "At least 1 record required"),
+});
+
+academicsRouter.post("/fee-structures/import", requireRoles(...MANAGE_ROLES), validateBody(bulkImportFeeStructureSchema), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const { records } = req.body as z.infer<typeof bulkImportFeeStructureSchema>;
+
+    const courses = await prisma.course.findMany({ where: { instituteId } });
+    const courseMap = new Map(courses.map((c) => [c.code.toUpperCase(), c.id]));
+
+    const created = await prisma.$transaction(
+      records.map((r) => {
+        const courseId = courseMap.get(r.courseCode.toUpperCase());
+        if (!courseId) throw ApiError.badRequest(`Course code "${r.courseCode}" not found`);
+        return prisma.feeStructure.create({
+          data: {
+            instituteId,
+            courseId,
+            name: r.name,
+            planType: r.planType as FeePlanType,
+            courseFee: r.courseFee,
+            monthlyAmount: r.monthlyAmount,
+            installmentCount: r.installmentCount,
+          },
+        });
+      })
+    );
+
+    res.status(201).json({ importedCount: created.length });
+  } catch (err) {
+    next(err);
+  }
+});

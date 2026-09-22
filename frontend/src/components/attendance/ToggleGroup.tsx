@@ -20,7 +20,7 @@ export function AttendanceToggleGroup({
   disabled?: boolean;
 }) {
   return (
-    <div className="inline-flex flex-wrap gap-1 rounded-lg bg-muted p-1">
+    <div className="grid grid-cols-4 w-full sm:w-80 gap-1 rounded-lg bg-muted p-1">
       {ATTENDANCE_STATUSES.map((s) => (
         <button
           key={s}
@@ -33,7 +33,7 @@ export function AttendanceToggleGroup({
               onChange(s);
             }
           }}
-          className={`rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 ${TONE_CLASSES[s]}`}
+          className={`flex flex-1 items-center justify-center rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 ${TONE_CLASSES[s]}`}
         >
           {ATTENDANCE_STATUS_LABELS[s]}
         </button>

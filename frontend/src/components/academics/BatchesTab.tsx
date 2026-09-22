@@ -15,6 +15,9 @@ import type { AcademicsTabHandle } from "./tabHandle";
 import { formatDate as fmtDate } from "@/lib/format";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 import { BatchAnnouncementModal } from "@/components/academics/BatchAnnouncementModal";
+import { ImportButton } from "@/components/ui/ImportButton";
+import { ExportButton } from "@/components/ui/ExportButton";
+import { ImportModal } from "@/components/ui/ImportModal";
 
 export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_props, ref) {
   const [batches, setBatches] = useState<Batch[]>([]);
@@ -25,6 +28,7 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
   const [editing, setEditing] = useState<Batch | null>(null);
   const [announcementBatch, setAnnouncementBatch] = useState<Batch | null>(null);
   const [courseFilter, setCourseFilter] = useState("");
+  const [importOpen, setImportOpen] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -71,137 +75,154 @@ export const BatchesTab = forwardRef<AcademicsTabHandle>(function BatchesTab(_pr
   const { paginatedItems, paginationProps } = useClientPagination(visible, 10);
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <StatCard label="Total batches" value={batches.length} tone="primary" />
-        <StatCard label="Active" value={activeCount} tone="success" />
-        <StatCard label="Students enrolled" value={totalEnrolled} tone="accent" />
-      </div>
-
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="border-b border-border p-4">
-          <div className="w-full max-w-xs">
-            <Dropdown
-              value={courseFilter}
-              onChange={setCourseFilter}
-              options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
-              placeholder="All courses"
-            />
-          </div>
+    <>
+      <div className="space-y-6">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <StatCard label="Total batches" value={batches.length} tone="primary" />
+          <StatCard label="Active" value={activeCount} tone="success" />
+          <StatCard label="Students enrolled" value={totalEnrolled} tone="accent" />
         </div>
 
-        {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
-        {!loading && courses.length === 0 && (
-          <div className="border-b border-border bg-warning-soft px-4 py-2 text-sm text-warning">
-            Create a course first — batches always belong to one.
-          </div>
-        )}
-
-        <div className="hidden overflow-x-auto sm:block">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="px-4 py-3 font-medium">Batch</th>
-                <th className="px-4 py-3 font-medium">Course</th>
-                <th className="px-4 py-3 font-medium">Starts</th>
-                <th className="px-4 py-3 font-medium">Ends</th>
-                <th className="px-4 py-3 font-medium">Enrolled</th>
-                <th className="px-4 py-3 font-medium">Lectures</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && Array.from({ length: 5 }, (_, i) => (
-                <tr key={`sk-${i}`}>
-                  <td colSpan={8}>
-                    <SkeletonRow lines={2} />
-                  </td>
-                </tr>
-              ))}
-              {!loading && paginatedItems.map((b) => (
-                <tr key={b.id} className="border-b border-border last:border-0 hover:bg-muted">
-                  <td className="px-4 py-3 font-medium text-foreground">{b.name}</td>
-                  <td className="px-4 py-3 text-foreground">
-                    {b.course.name} <span className="text-muted-foreground">· {b.course.code}</span>
-                  </td>
-                  <td className="px-4 py-3 text-foreground">{fmtDate(b.startDate)}</td>
-                  <td className="px-4 py-3 text-foreground">{b.endDate ? fmtDate(b.endDate) : "Ongoing"}</td>
-                  <td className="px-4 py-3 text-foreground">{b.enrolledCount}</td>
-                  <td className="px-4 py-3 text-foreground">{b.lectureCount}</td>
-                  <td className="px-4 py-3">
-                    <Badge tone={b.isActive ? "success" : "danger"}>{b.isActive ? "Active" : "Inactive"}</Badge>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" onClick={() => setAnnouncementBatch(b)} title="Broadcast announcement to batch" className="whitespace-nowrap">
-                        Broadcast
-                      </Button>
-                      <Button variant="ghost" onClick={() => openEdit(b)} className="whitespace-nowrap">
-                        Edit
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {!loading && visible.length === 0 && (
-                <tr>
-                  <td colSpan={8}>
-                    <EmptyState
-                      message={courseFilter ? "No batches under this course." : "No batches yet."}
-                      actionLabel={courses.length > 0 ? "New batch" : undefined}
-                      onAction={courses.length > 0 ? openCreate : undefined}
-                    />
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="divide-y divide-border sm:hidden">
-          {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
-          {!loading && paginatedItems.map((b) => (
-            <div key={b.id} className="space-y-2 p-4" onClick={() => openEdit(b)}>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-medium text-foreground">{b.name}</p>
-                  <p className="text-xs text-muted-foreground">{b.course.name} · {b.course.code}</p>
-                </div>
-                <Badge tone={b.isActive ? "success" : "danger"}>{b.isActive ? "Active" : "Inactive"}</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {fmtDate(b.startDate)} – {b.endDate ? fmtDate(b.endDate) : "Ongoing"}
-              </p>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs text-muted-foreground">{b.enrolledCount} enrolled · {b.lectureCount} lectures</p>
-                <Button variant="secondary" onClick={(e) => { e.stopPropagation(); setAnnouncementBatch(b); }} className="text-xs whitespace-nowrap">
-                  Broadcast
-                </Button>
-              </div>
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="flex items-center justify-between gap-3 border-b border-border p-4">
+            <div className="w-full max-w-xs">
+              <Dropdown
+                value={courseFilter}
+                onChange={setCourseFilter}
+                options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
+                placeholder="All courses"
+              />
             </div>
-          ))}
-          {!loading && visible.length === 0 && (
-            <EmptyState
-              message={courseFilter ? "No batches under this course." : "No batches yet."}
-              actionLabel={courses.length > 0 ? "New batch" : undefined}
-              onAction={courses.length > 0 ? openCreate : undefined}
+            <div className="flex items-center gap-2">
+              <ExportButton path="/academics/batches/export.csv" filename="batches.csv" title="Export batches as CSV" />
+              <ImportButton title="Bulk import batches from CSV/Excel" onClick={() => setImportOpen(true)} />
+            </div>
+          </div>
+
+          {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
+          {!loading && courses.length === 0 && (
+            <div className="border-b border-border bg-warning-soft px-4 py-2 text-sm text-warning">
+              Create a course first — batches always belong to one.
+            </div>
+          )}
+
+          <div className="hidden overflow-x-auto sm:block">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-4 py-3 font-medium">Batch</th>
+                  <th className="px-4 py-3 font-medium">Course</th>
+                  <th className="px-4 py-3 font-medium">Starts</th>
+                  <th className="px-4 py-3 font-medium">Ends</th>
+                  <th className="px-4 py-3 font-medium">Enrolled</th>
+                  <th className="px-4 py-3 font-medium">Lectures</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading && Array.from({ length: 5 }, (_, i) => (
+                  <tr key={`sk-${i}`}>
+                    <td colSpan={8}>
+                      <SkeletonRow lines={2} />
+                    </td>
+                  </tr>
+                ))}
+                {!loading && paginatedItems.map((b) => (
+                  <tr key={b.id} className="border-b border-border last:border-0 hover:bg-muted">
+                    <td className="px-4 py-3 font-medium text-foreground">{b.name}</td>
+                    <td className="px-4 py-3 text-foreground">
+                      {b.course.name} <span className="text-muted-foreground">· {b.course.code}</span>
+                    </td>
+                    <td className="px-4 py-3 text-foreground">{fmtDate(b.startDate)}</td>
+                    <td className="px-4 py-3 text-foreground">{b.endDate ? fmtDate(b.endDate) : "Ongoing"}</td>
+                    <td className="px-4 py-3 text-foreground">{b.enrolledCount}</td>
+                    <td className="px-4 py-3 text-foreground">{b.lectureCount}</td>
+                    <td className="px-4 py-3">
+                      <Badge tone={b.isActive ? "success" : "danger"}>{b.isActive ? "Active" : "Inactive"}</Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" onClick={() => setAnnouncementBatch(b)} title="Broadcast announcement to batch" className="whitespace-nowrap">
+                          Broadcast
+                        </Button>
+                        <Button variant="ghost" onClick={() => openEdit(b)} className="whitespace-nowrap">
+                          Edit
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {!loading && visible.length === 0 && (
+                  <tr>
+                    <td colSpan={8}>
+                      <EmptyState
+                        message={courseFilter ? "No batches under this course." : "No batches yet."}
+                        actionLabel={courses.length > 0 ? "New batch" : undefined}
+                        onAction={courses.length > 0 ? openCreate : undefined}
+                      />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="divide-y divide-border sm:hidden">
+            {loading && Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`sk-${i}`} lines={2} />)}
+            {!loading && paginatedItems.map((b) => (
+              <div key={b.id} className="space-y-2 p-4" onClick={() => openEdit(b)}>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-medium text-foreground">{b.name}</p>
+                    <p className="text-xs text-muted-foreground">{b.course.name} · {b.course.code}</p>
+                  </div>
+                  <Badge tone={b.isActive ? "success" : "danger"}>{b.isActive ? "Active" : "Inactive"}</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {fmtDate(b.startDate)} – {b.endDate ? fmtDate(b.endDate) : "Ongoing"}
+                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs text-muted-foreground">{b.enrolledCount} enrolled · {b.lectureCount} lectures</p>
+                  <Button variant="secondary" onClick={(e) => { e.stopPropagation(); setAnnouncementBatch(b); }} className="text-xs whitespace-nowrap">
+                    Broadcast
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {!loading && visible.length === 0 && (
+              <EmptyState
+                message={courseFilter ? "No batches under this course." : "No batches yet."}
+                actionLabel={courses.length > 0 ? "New batch" : undefined}
+                onAction={courses.length > 0 ? openCreate : undefined}
+              />
+            )}
+          </div>
+
+          {!loading && visible.length > 0 && (
+            <Pagination
+              {...paginationProps}
+              pageSizeOptions={[10, 20, 50]}
+              className="border-t border-border bg-card/50"
             />
           )}
         </div>
 
-        {!loading && visible.length > 0 && (
-          <Pagination
-            {...paginationProps}
-            pageSizeOptions={[10, 20, 50]}
-            className="border-t border-border bg-card/50"
-          />
-        )}
+        <BatchModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />
+        <BatchAnnouncementModal batch={announcementBatch} onClose={() => setAnnouncementBatch(null)} />
       </div>
 
-      <BatchModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />
-      <BatchAnnouncementModal batch={announcementBatch} onClose={() => setAnnouncementBatch(null)} />
-    </div>
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        title="Import batches"
+        description="Upload a CSV/Excel file to create multiple batches at once."
+        templatePath="/academics/batches/import/template.csv"
+        templateFilename="batch-import-template.csv"
+        importPath="/academics/batches/import"
+        onImported={load}
+      />
+    </>
   );
 });
 
@@ -324,7 +345,6 @@ function BatchModal({
           </label>
         )}
 
-        {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
       </form>
     </Modal>
   );

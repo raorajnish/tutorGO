@@ -433,13 +433,105 @@ expensesRouter.get("/ledger/export.csv", requireRoles(...MANAGE_ROLES), async (r
 
     const rows = [
       ["Date", "Type", "Description", "Amount"],
-      ...entries.map((e) => [e.date.toISOString().slice(0, 10), e.kind, e.description, e.amount]),
+      ...entries.map((e) => [e.date.toISOString().slice(0, 10), e.kind, e.description, String(e.amount)]),
     ];
-    const csv = toCsv(rows.map((row) => row.map(String)));
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="ledger.csv"');
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
 
-    res.setHeader("Content-Type", "text/csv");
-    res.setHeader("Content-Disposition", `attachment; filename="ledger.csv"`);
-    res.send(csv);
+expensesRouter.get("/export.csv", requireRoles(...MANAGE_ROLES), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const expenses = await prisma.expense.findMany({
+      where: { instituteId },
+      include: { category: { select: { name: true } } },
+      orderBy: { date: "desc" },
+    });
+
+    const rows = [
+      ["Title", "Amount", "Category", "Payment Mode", "Date", "Notes"],
+      ...expenses.map((e) => [
+        e.title,
+        String(e.amount),
+        e.category?.name ?? "",
+        e.mode,
+        e.date.toISOString().slice(0, 10),
+        e.notes ?? "",
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="expenses.csv"');
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
+expensesRouter.get("/import/template.csv", (_req, res) => {
+  const rows = [
+    ["Title", "Amount", "Category Name", "Payment Mode", "Date (YYYY-MM-DD)", "Notes"],
+    ["Office Stationery & Paper", "2500", "Office Supplies", "UPI", "2026-09-01", "Monthly paper & printer ink"],
+    ["Internet Broadband Bill", "1999", "Utilities", "CASH", "2026-09-05", "Airtel fiber monthly bill"],
+  ];
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="expense-import-template.csv"');
+  res.send(toCsv(rows));
+});
+
+const bulkImportExpenseSchema = z.object({
+  records: z
+    .array(
+      z.object({
+        title: z.string().min(1, "Title is required"),
+        amount: z.coerce.number().positive("Amount must be positive"),
+        categoryName: z.string().optional(),
+        mode: z.enum(["CASH", "UPI", "BANK_TRANSFER", "CHEQUE", "CARD"]).default("CASH"),
+        date: z.coerce.date().default(() => new Date()),
+        notes: z.string().optional(),
+      })
+    )
+    .min(1, "At least 1 record required"),
+});
+
+expensesRouter.post("/import", requireRoles(...MANAGE_ROLES), validateBody(bulkImportExpenseSchema), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const { records } = req.body as z.infer<typeof bulkImportExpenseSchema>;
+
+    let categories = await prisma.expenseCategory.findMany({ where: { instituteId } });
+    if (categories.length === 0) {
+      const defaultCat = await prisma.expenseCategory.create({
+        data: { instituteId, name: "General Expense", kind: "EXPENSE" },
+      });
+      categories = [defaultCat];
+    }
+    const categoryMap = new Map(categories.map((c) => [c.name.toLowerCase(), c.id]));
+    const fallbackCategoryId = categories[0]!.id;
+
+    const created = await prisma.$transaction(
+      records.map((r) => {
+        const categoryId = r.categoryName ? categoryMap.get(r.categoryName.toLowerCase()) ?? fallbackCategoryId : fallbackCategoryId;
+        return prisma.expense.create({
+          data: {
+            instituteId,
+            title: r.title,
+            amount: r.amount,
+            mode: r.mode,
+            date: r.date,
+            categoryId,
+            notes: r.notes,
+            createdByUserId: req.user!.id,
+          },
+        });
+      })
+    );
+
+    res.status(201).json({ importedCount: created.length });
   } catch (err) {
     next(err);
   }

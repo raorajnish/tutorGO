@@ -179,7 +179,7 @@ function StaffScheduleView() {
         <StaffTimetableTab />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
+          <div className="grid grid-cols-4 gap-2 sm:gap-4">
             <StatCard label="Lectures today" value={lectures.length} tone="primary" />
             <StatCard label="Present" value={totals.present} tone="success" />
             <StatCard label="Late" value={totals.late} tone="warning" />
@@ -387,7 +387,7 @@ function StaffScheduleView() {
                   <CopyLectureButton lecture={l} />
                 </div>
               ) : (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center justify-end gap-1">
                   <button
                     type="button"
                     onClick={() => setEditLecture(l)}

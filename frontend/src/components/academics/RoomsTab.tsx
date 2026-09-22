@@ -1,25 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { apiFetch, ApiClientError } from "@/lib/api";
-import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { RoomModal } from "@/components/academics/RoomModal";
 import type { Room } from "@/lib/types";
-
+import type { AcademicsTabHandle } from "./tabHandle";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 interface Props {
-  canManage: boolean;
+  canManage?: boolean;
 }
 
-export function RoomsTab({ canManage }: Props) {
+export const RoomsTab = forwardRef<AcademicsTabHandle, Props>(function RoomsTab({ canManage = true }: Props, ref) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+
+  function openCreate() {
+    setEditingRoom(null);
+    setModalOpen(true);
+  }
+
+  useImperativeHandle(ref, () => ({ openCreate }));
 
   function loadRooms() {
     setLoading(true);
@@ -45,23 +51,11 @@ export function RoomsTab({ canManage }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">Classrooms & Labs</h2>
-          <p className="text-sm text-muted-foreground">
-            Manage physical rooms and seating capacity for lecture scheduling and clash detection.
-          </p>
-        </div>
-        {canManage && (
-          <Button
-            onClick={() => {
-              setEditingRoom(null);
-              setModalOpen(true);
-            }}
-          >
-            + Add room
-          </Button>
-        )}
+      <div>
+        <h2 className="text-lg font-semibold text-foreground">Classrooms & Labs</h2>
+        <p className="text-sm text-muted-foreground">
+          Manage physical rooms and seating capacity for lecture scheduling and clash detection.
+        </p>
       </div>
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
@@ -150,4 +144,4 @@ export function RoomsTab({ canManage }: Props) {
       />
     </div>
   );
-}
+});

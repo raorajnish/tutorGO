@@ -177,6 +177,92 @@ enquiryRouter.post("/:id/lost", requireRoles(...MANAGE_ROLES), validateBody(lost
   }
 });
 
+import { toCsv } from "../lib/csv.js";
+
+enquiryRouter.get("/export.csv", async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const enquiries = await prisma.enquiry.findMany({
+      where: { instituteId },
+      include: { course: { select: { name: true, code: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const rows = [
+      ["Name", "Phone", "Course", "Source", "Status", "Notes", "Date"],
+      ...enquiries.map((e) => [
+        e.name,
+        e.phone,
+        e.course ? `${e.course.name} (${e.course.code})` : "",
+        e.source,
+        e.status,
+        e.notes ?? "",
+        e.createdAt.toISOString().slice(0, 10),
+      ]),
+    ];
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="enquiries.csv"');
+    res.send(toCsv(rows));
+  } catch (err) {
+    next(err);
+  }
+});
+
+enquiryRouter.get("/import/template.csv", (_req, res) => {
+  const rows = [
+    ["Name", "Phone", "Course Code", "Source", "Notes"],
+    ["Aarav Sharma", "+91 98765 43210", "C10-SM", "WALK_IN", "Interested in evening batch"],
+    ["Priya Patel", "+91 91234 56789", "C12-PCM", "REFERRAL", "Friend of Rohan"],
+  ];
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="enquiry-import-template.csv"');
+  res.send(toCsv(rows));
+});
+
+const bulkImportEnquirySchema = z.object({
+  records: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Name is required"),
+        phone: z.string().min(1, "Phone is required"),
+        courseCode: z.string().optional(),
+        source: SOURCE_ENUM.optional().default("OTHER"),
+        notes: noteSchema.optional(),
+      })
+    )
+    .min(1, "At least 1 record required"),
+});
+
+enquiryRouter.post("/import", requireRoles(...MANAGE_ROLES), validateBody(bulkImportEnquirySchema), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const { records } = req.body as z.infer<typeof bulkImportEnquirySchema>;
+
+    const courses = await prisma.course.findMany({ where: { instituteId } });
+    const courseMap = new Map(courses.map((c) => [c.code.toUpperCase(), c.id]));
+
+    const created = await prisma.$transaction(
+      records.map((r) =>
+        prisma.enquiry.create({
+          data: {
+            instituteId,
+            name: r.name,
+            phone: r.phone,
+            courseId: r.courseCode ? courseMap.get(r.courseCode.toUpperCase()) ?? null : null,
+            source: r.source,
+            notes: r.notes,
+          },
+        })
+      )
+    );
+
+    res.status(201).json({ importedCount: created.length });
+  } catch (err) {
+    next(err);
+  }
+});
+
 enquiryRouter.get("/:id/activities", async (req, res, next) => {
   try {
     const instituteId = req.tenantId!;

@@ -15,6 +15,10 @@ import { FEE_PLAN_TYPE_LABELS } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
+import { ImportButton } from "@/components/ui/ImportButton";
+import { ExportButton } from "@/components/ui/ExportButton";
+import { ImportModal } from "@/components/ui/ImportModal";
+
 /** courseFee is null on a SUBJECT_WISE structure — its price lives on
  * subjectLines instead, since the total is per-student (whichever subjects
  * they pick), not one fixed number on the structure. Sum those lines to show
@@ -34,9 +38,22 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<FeeStructure | null>(null);
+  const [search, setSearch] = useState("");
+  const [courseFilter, setCourseFilter] = useState("");
 
-  const { paginatedItems, paginationProps } = useClientPagination(structures, 10);
+  const visibleStructures = structures.filter((s) => {
+    if (courseFilter && s.course?.id !== courseFilter) return false;
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    const nameMatch = s.name.toLowerCase().includes(q);
+    const courseMatch = `${s.course?.name ?? ""} ${s.course?.code ?? ""}`.toLowerCase().includes(q);
+    const planTypeMatch = (FEE_PLAN_TYPE_LABELS[s.planType] ?? "").toLowerCase().includes(q);
+    return nameMatch || courseMatch || planTypeMatch;
+  });
+
+  const { paginatedItems, paginationProps } = useClientPagination(visibleStructures, 10);
 
   async function load() {
     setLoading(true);
@@ -81,12 +98,34 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
   }
 
   return (
+    <>
     <div className="space-y-6">
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="border-b border-border p-4">
-          <p className="text-sm text-muted-foreground">
-            Reusable fee plans per course — attach one to a student instead of typing amounts each time.
-          </p>
+        <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="w-full max-w-xs">
+              <Input
+                placeholder="Search fee structures…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="w-full max-w-xs">
+              <Dropdown
+                value={courseFilter}
+                onChange={setCourseFilter}
+                options={[
+                  { value: "", label: "All courses" },
+                  ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` })),
+                ]}
+                placeholder="Filter by course"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <ExportButton path="/academics/fee-structures/export.csv" filename="fee-structures.csv" title="Export fee structures as CSV" />
+            <ImportButton title="Bulk import fee structures from CSV/Excel" onClick={() => setImportOpen(true)} />
+          </div>
         </div>
 
         {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
@@ -140,10 +179,14 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
                   </td>
                 </tr>
               ))}
-              {!loading && structures.length === 0 && (
+              {!loading && visibleStructures.length === 0 && (
                 <tr>
                   <td colSpan={6}>
-                    <EmptyState message="No fee structures yet." actionLabel="New fee structure" onAction={openCreate} />
+                    <EmptyState
+                      message={structures.length === 0 ? "No fee structures yet." : `No fee structures match "${search}"`}
+                      actionLabel={structures.length === 0 ? "New fee structure" : undefined}
+                      onAction={structures.length === 0 ? openCreate : undefined}
+                    />
                   </td>
                 </tr>
               )}
@@ -185,12 +228,16 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
               </div>
             </div>
           ))}
-          {!loading && structures.length === 0 && (
-            <EmptyState message="No fee structures yet." actionLabel="New fee structure" onAction={openCreate} />
+          {!loading && visibleStructures.length === 0 && (
+            <EmptyState
+              message={structures.length === 0 ? "No fee structures yet." : `No fee structures match "${search}"`}
+              actionLabel={structures.length === 0 ? "New fee structure" : undefined}
+              onAction={structures.length === 0 ? openCreate : undefined}
+            />
           )}
         </div>
 
-        {!loading && structures.length > 0 && (
+        {!loading && visibleStructures.length > 0 && (
           <Pagination
             {...paginationProps}
             pageSizeOptions={[10, 20, 50]}
@@ -200,7 +247,19 @@ export const FeeStructuresTab = forwardRef<AcademicsTabHandle>(function FeeStruc
       </div>
 
       <FeeStructureModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} courses={courses} />
+
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        title="Import fee structures"
+        description="Upload a CSV/Excel file to create multiple fee plans at once."
+        templatePath="/academics/fee-structures/import/template.csv"
+        templateFilename="fee-structure-import-template.csv"
+        importPath="/academics/fee-structures/import"
+        onImported={load}
+      />
     </div>
+    </>
   );
 });
 

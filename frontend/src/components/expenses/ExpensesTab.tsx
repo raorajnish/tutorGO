@@ -15,6 +15,10 @@ import { PAYMENT_MODES, PAYMENT_MODE_LABELS, type Expense, type ExpenseCategory,
 import { formatDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 
+import { ImportButton } from "@/components/ui/ImportButton";
+import { ExportButton } from "@/components/ui/ExportButton";
+import { ImportModal } from "@/components/ui/ImportModal";
+
 interface ExpensesTabProps {
   initialAddOpen?: boolean;
 }
@@ -31,6 +35,7 @@ export function ExpensesTab({ initialAddOpen }: ExpensesTabProps) {
   const [eventFilter, setEventFilter] = useState("");
 
   const [addOpen, setAddOpen] = useState(() => !!initialAddOpen);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [deleting, setDeleting] = useState<Expense | null>(null);
 
@@ -79,6 +84,7 @@ export function ExpensesTab({ initialAddOpen }: ExpensesTabProps) {
   }
 
   return (
+    <>
     <div className="space-y-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:flex lg:flex-1 lg:gap-3">
@@ -91,9 +97,13 @@ export function ExpensesTab({ initialAddOpen }: ExpensesTabProps) {
             <Dropdown label="Event" value={eventFilter} onChange={setEventFilter} options={eventOptions} />
           </div>
         </div>
-        <Button onClick={() => setAddOpen(true)} className="w-full lg:w-auto">
-          Add expense
-        </Button>
+        <div className="flex items-center gap-2 w-full lg:w-auto">
+          <ExportButton path="/expenses/export.csv" filename="expenses.csv" title="Export expenses as CSV" />
+          <ImportButton title="Bulk import expenses from CSV/Excel" onClick={() => setImportOpen(true)} />
+          <Button onClick={() => setAddOpen(true)} className="flex-1 lg:flex-initial">
+            Add expense
+          </Button>
+        </div>
       </div>
 
       {error && <div className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm text-danger">{error}</div>}
@@ -225,6 +235,18 @@ export function ExpensesTab({ initialAddOpen }: ExpensesTabProps) {
         description="This removes the expense and its entry from the combined ledger."
       />
     </div>
+
+    <ImportModal
+      open={importOpen}
+      onClose={() => setImportOpen(false)}
+      title="Import expenses"
+      description="Upload a CSV/Excel file to create multiple expense entries at once."
+      templatePath="/expenses/import/template.csv"
+      templateFilename="expense-import-template.csv"
+      importPath="/expenses/import"
+      onImported={loadExpenses}
+    />
+    </>
   );
 }
 

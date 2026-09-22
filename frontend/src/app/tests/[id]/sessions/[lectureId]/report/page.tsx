@@ -8,6 +8,8 @@ import { CopyMessageBox } from "@/components/attendance/CopyMessageBox";
 import type { TestReport } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 
+import { ExportButton } from "@/components/ui/ExportButton";
+
 /** Plain-text summary sized for a WhatsApp message — no markdown tables,
  * since WhatsApp renders them as literal pipes. */
 function whatsappSummary(r: TestReport): string {
@@ -72,9 +74,16 @@ export default function TestReportPage({ params }: { params: Promise<{ id: strin
               {test.title} · {session.batch.name}
             </p>
           </div>
-          <Button onClick={() => window.print()} className="w-full sm:w-auto">
-            Print / Save as PDF
-          </Button>
+          <div className="flex items-center gap-2">
+            <ExportButton
+              path={`/tests/${id}/sessions/${lectureId}/export.csv`}
+              filename={`test-marks-${test.id}.csv`}
+              title="Export marks as CSV/Excel"
+            />
+            <Button onClick={() => window.print()} className="w-full sm:w-auto">
+              Print / Save as PDF
+            </Button>
+          </div>
         </div>
       </div>
 

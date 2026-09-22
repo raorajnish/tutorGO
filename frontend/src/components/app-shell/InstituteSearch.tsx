@@ -54,8 +54,23 @@ export function InstituteSearch() {
   const [results, setResults] = useState<SearchResults>(EMPTY_RESULTS);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [placeholder, setPlaceholder] = useState("Search…");
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Dynamic responsive placeholder
+  useEffect(() => {
+    const updatePlaceholder = () => {
+      if (window.innerWidth >= 640) {
+        setPlaceholder("Search students, staff, enquiries, batches… (Ctrl+K)");
+      } else {
+        setPlaceholder("Search…");
+      }
+    };
+    updatePlaceholder();
+    window.addEventListener("resize", updatePlaceholder);
+    return () => window.removeEventListener("resize", updatePlaceholder);
+  }, []);
 
   // Global Ctrl+K / Cmd+K listener to focus search input
   useEffect(() => {
@@ -116,8 +131,8 @@ export function InstituteSearch() {
     results.batches.length > 0;
 
   return (
-    <div ref={containerRef} className="relative hidden min-w-0 flex-1 sm:block">
-      <div className="relative max-w-md">
+    <div ref={containerRef} className="relative min-w-0 flex-1">
+      <div className="relative w-full max-w-md">
         <svg
           width="16"
           height="16"
@@ -137,8 +152,8 @@ export function InstituteSearch() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onFocus={() => q.trim().length >= 2 && setOpen(true)}
-          placeholder="Search students, staff, enquiries, batches… (Ctrl+K)"
-          className="w-full rounded-full border-none bg-muted py-2 pl-10 pr-14 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          placeholder={placeholder}
+          className="w-full rounded-full border-none bg-muted py-2 pl-9 pr-3 sm:pl-10 sm:pr-14 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         />
 
         <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">

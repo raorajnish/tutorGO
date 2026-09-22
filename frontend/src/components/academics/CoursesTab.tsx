@@ -13,11 +13,16 @@ import type { Course, CourseFeeMode } from "@/lib/types";
 import type { AcademicsTabHandle } from "./tabHandle";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
+import { ImportButton } from "@/components/ui/ImportButton";
+import { ExportButton } from "@/components/ui/ExportButton";
+import { ImportModal } from "@/components/ui/ImportModal";
+
 export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_props, ref) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Course | null>(null);
 
   const { paginatedItems, paginationProps } = useClientPagination(courses, 10);
@@ -54,6 +59,7 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
   const totalStudents = courses.reduce((sum, c) => sum + c.studentCount, 0);
 
   return (
+    <>
     <div className="space-y-6">
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard label="Total courses" value={courses.length} tone="primary" />
@@ -64,6 +70,10 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="flex items-center justify-between gap-3 border-b border-border p-4">
           <p className="text-sm font-medium text-foreground">All courses</p>
+          <div className="flex items-center gap-2">
+            <ExportButton path="/academics/courses/export.csv" filename="courses.csv" title="Export courses as CSV" />
+            <ImportButton title="Bulk import courses from CSV/Excel" onClick={() => setImportOpen(true)} />
+          </div>
         </div>
 
         {error && <div className="border-b border-border bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
@@ -153,7 +163,19 @@ export const CoursesTab = forwardRef<AcademicsTabHandle>(function CoursesTab(_pr
       </div>
 
       <CourseModal open={modalOpen} onClose={() => setModalOpen(false)} onSaved={load} editing={editing} />
-    </div>
+      </div>
+
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        title="Import courses"
+        description="Upload a CSV/Excel file to create multiple courses at once."
+        templatePath="/academics/courses/import/template.csv"
+        templateFilename="course-import-template.csv"
+        importPath="/academics/courses/import"
+        onImported={load}
+      />
+    </>
   );
 });
 

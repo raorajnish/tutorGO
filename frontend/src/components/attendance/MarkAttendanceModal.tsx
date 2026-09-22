@@ -37,7 +37,6 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [markingAll, setMarkingAll] = useState(false);
   const [search, setSearch] = useState("");
   const [fullyMarkedRoster, setFullyMarkedRoster] = useState<RosterEntry[] | null>(null);
 
@@ -50,7 +49,11 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
     return apiFetch<RosterEntry[]>(`/attendance/lectures/${lecture.id}/roster`)
       .then((data) => {
         setRoster(data);
-        setStatuses(Object.fromEntries(data.filter((r) => r.status).map((r) => [r.student.id, r.status as AttendanceStatus])));
+        setStatuses(
+          Object.fromEntries(
+            data.map((r) => [r.student.id, (r.status as AttendanceStatus) || "PRESENT"])
+          )
+        );
         return data;
       })
       .catch((err) => {
@@ -68,24 +71,6 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lecture?.id]);
-
-  async function markAllPresent() {
-    if (!lecture) return;
-    setMarkingAll(true);
-    setError(null);
-    try {
-      await apiFetch(`/attendance/lectures/${lecture.id}/mark-all-present`, { method: "POST" });
-      haptic.success();
-      const fresh = await load();
-      onMarked();
-      if (fresh.length > 0 && fresh.every((r) => r.status !== null)) setFullyMarkedRoster(fresh);
-    } catch (err) {
-      haptic.warning();
-      setError(err instanceof ApiClientError ? err.message : "Could not mark everyone present.");
-    } finally {
-      setMarkingAll(false);
-    }
-  }
 
   async function handleSave() {
     if (!lecture || !roster) return;
@@ -156,17 +141,14 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
         isExpired ? (
           <Button onClick={onClose}>Close</Button>
         ) : (
-          <>
+          <div className="flex items-center justify-end gap-3 w-full">
             <Button variant="ghost" onClick={onClose}>
               Cancel
-            </Button>
-            <Button variant="secondary" onClick={markAllPresent} disabled={markingAll || loading}>
-              {markingAll ? "Marking…" : "Mark all present"}
             </Button>
             <Button onClick={handleSave} disabled={submitting || loading}>
               {submitting ? "Saving…" : "Save attendance"}
             </Button>
-          </>
+          </div>
         )
       }
     >
@@ -195,12 +177,13 @@ export function MarkAttendanceModal({ lecture, onClose, onMarked }: Props) {
       {!loading && roster && roster.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <Input
-              placeholder="Search students…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="max-w-xs"
-            />
+            <div className="flex-1">
+              <Input
+                placeholder="Search students…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
             <p className="shrink-0 text-xs text-muted-foreground">
               {markedCount} of {roster.length} marked
             </p>

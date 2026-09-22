@@ -20,6 +20,8 @@ import { checkSessionConflict, type ConflictSplit } from "../services/lectureCon
 import { notifyStudent } from "../services/studentNotify.js";
 import { MAX_UPLOAD_BYTES, deleteAsset, uploadTestPaper } from "../services/uploads.js";
 
+import { toCsv } from "../lib/csv.js";
+
 export const testsRouter = Router();
 
 // Tests are the same lecture/attendance machinery with kind = TEST, so they
@@ -613,6 +615,47 @@ testsRouter.get("/:id/sessions/:lectureId/report", requireRoles(...MANAGE_ROLES)
       rows,
       summary,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+testsRouter.get("/:id/sessions/:lectureId/export.csv", requireRoles(...MANAGE_ROLES), async (req, res, next) => {
+  try {
+    const instituteId = req.tenantId!;
+    const test = await loadTest(req.params.id as string, instituteId);
+    const session = await loadSession(test.id, req.params.lectureId as string, instituteId);
+
+    const [roster, attendance, results] = await Promise.all([
+      deriveRoster(session.batchId, session.date, session.subjectId),
+      prisma.attendanceRecord.findMany({ where: { lectureId: session.id } }),
+      prisma.testResult.findMany({ where: { lectureId: session.id } }),
+    ]);
+
+    const statusByStudent = new Map(attendance.map((a) => [a.studentId, a.status]));
+    const resultByStudent = new Map(results.map((r) => [r.studentId, r]));
+
+    const rows = [
+      ["Student Name", "Student Code", "Attendance", "Marks Obtained", "Total Marks", "Result", "Remarks"],
+      ...roster.map((s) => {
+        const status = statusByStudent.get(s.id) ?? "UNMARKED";
+        const result = resultByStudent.get(s.id);
+        const present = status !== null && PRESENT_STATUSES.includes(status as (typeof PRESENT_STATUSES)[number]);
+        const marksStr = result ? String(result.marksObtained) : present ? "Not Entered" : "Absent";
+        const passedStr =
+          result && test.passingMarks !== null
+            ? result.marksObtained.gte(test.passingMarks)
+              ? "PASSED"
+              : "FAILED"
+            : "—";
+
+        return [s.name, s.studentCode, status, marksStr, String(test.totalMarks), passedStr, result?.remarks ?? ""];
+      }),
+    ];
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="test-marks-${test.id}.csv"`);
+    res.send(toCsv(rows));
   } catch (err) {
     next(err);
   }

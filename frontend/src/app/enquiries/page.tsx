@@ -18,6 +18,10 @@ import { ENQUIRY_SOURCE_LABELS, ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, type Co
 import { formatDate as fmtDate } from "@/lib/format";
 import { Pagination, useClientPagination } from "@/components/ui/Pagination";
 
+import { ImportButton } from "@/components/ui/ImportButton";
+import { ExportButton } from "@/components/ui/ExportButton";
+import { ImportModal } from "@/components/ui/ImportModal";
+
 const STATUS_TONE: Record<EnquiryStatus, "primary" | "accent" | "success" | "danger"> = {
   NEW: "primary",
   CONTACTED: "accent",
@@ -44,6 +48,7 @@ function EnquiriesContent() {
   const [error, setError] = useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Enquiry | null>(null);
   const [detailTarget, setDetailTarget] = useState<Enquiry | null>(null);
   const [contactTarget, setContactTarget] = useState<Enquiry | null>(null);
@@ -129,7 +134,11 @@ function EnquiriesContent() {
           <h1 className="font-display mt-1 text-3xl font-bold text-foreground">Enquiries</h1>
           <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Capture leads and work them through to admission.</p>
         </div>
-        <Button onClick={openCreate}>New enquiry</Button>
+        <div className="flex items-center gap-2">
+          <ExportButton path="/enquiries/export.csv" filename="enquiries.csv" title="Export enquiries as CSV" />
+          <ImportButton title="Bulk import enquiries from CSV/Excel" onClick={() => setImportOpen(true)} />
+          <Button onClick={openCreate}>New enquiry</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
@@ -363,6 +372,17 @@ function EnquiriesContent() {
         onConfirm={handleDelete}
         title={`Delete ${deleteTarget?.name ?? "this enquiry"}?`}
         confirmLabel="Delete enquiry"
+      />
+
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        title="Import enquiries"
+        description="Upload a CSV/Excel file to create multiple leads at once."
+        templatePath="/enquiries/import/template.csv"
+        templateFilename="enquiry-import-template.csv"
+        importPath="/enquiries/import"
+        onImported={load}
       />
     </div>
   );
