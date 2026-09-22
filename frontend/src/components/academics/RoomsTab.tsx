@@ -79,7 +79,7 @@ export const RoomsTab = forwardRef<AcademicsTabHandle, Props>(function RoomsTab(
 
       {!loading && rooms.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-border bg-card">
-          <div className="overflow-x-auto">
+          <div className="hidden overflow-x-auto sm:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -132,6 +132,46 @@ export const RoomsTab = forwardRef<AcademicsTabHandle, Props>(function RoomsTab(
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="divide-y divide-border sm:hidden">
+            {rooms.map((r) => (
+              <div key={r.id} className="p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-medium text-foreground">{r.name}</p>
+                    <p className="text-xs text-muted-foreground">{r.code ?? "No code"} · {r.building ?? "No location"}</p>
+                  </div>
+                  <Badge tone={r.isActive ? "success" : "warning"}>
+                    {r.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Capacity: {r.capacity ? `${r.capacity} seats` : "—"}
+                </p>
+                {canManage && (
+                  <div className="mt-3 flex items-center justify-end gap-4 border-t border-border pt-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingRoom(r);
+                        setModalOpen(true);
+                      }}
+                      className="text-xs font-medium text-accent underline underline-offset-2 hover:text-accent/80"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(r)}
+                      className="text-xs font-medium text-danger hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}

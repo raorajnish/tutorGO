@@ -93,9 +93,8 @@ export default function StudentsPage() {
         <p className="mt-1 text-sm text-muted-foreground hidden sm:block">Every student on file, across every course and batch.</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-1.5 sm:gap-4">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
         <StatCard label="Active students" value={data?.stats.activeStudents ?? "—"} tone="primary" />
-        <StatCard label="Total on file" value={data?.stats.totalStudents ?? "—"} tone="accent" />
         <StatCard label="Active batches" value={data?.stats.activeBatches ?? "—"} tone="success" />
         <StatCard label="Fee book value" value={data ? formatMoney(data.stats.feeBookValue) : "—"} tone="warning" />
       </div>
@@ -114,28 +113,36 @@ export default function StudentsPage() {
               options={[{ value: "", label: "All courses" }, ...courses.map((c) => ({ value: c.id, label: `${c.name} (${c.code})` }))]}
               placeholder="All courses"
             />
-            <Dropdown
-              value={batchId}
-              onChange={setBatchId}
-              options={[{ value: "", label: "All batches" }, ...batches.map((b) => ({ value: b.id, label: b.name }))]}
-              placeholder="All batches"
-              disabled={!courseId}
-            />
+            {courseId && (
+              <Dropdown
+                value={batchId}
+                onChange={setBatchId}
+                options={[{ value: "", label: "All batches" }, ...batches.map((b) => ({ value: b.id, label: b.name }))]}
+                placeholder="All batches"
+              />
+            )}
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex gap-1.5">
-              {STATUS_FILTERS.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setStatus(f.id)}
-                  className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                    status === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
+              {STATUS_FILTERS.map((f) => {
+                let label = f.label;
+                const inactiveCount = (data?.stats.totalStudents ?? 0) - (data?.stats.activeStudents ?? 0);
+                if (f.id === "inactive" && inactiveCount > 0) {
+                  label = `${f.label} (${inactiveCount})`;
+                }
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setStatus(f.id)}
+                    className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                      status === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
             <ExportButton path={`/students/export.csv?${buildQuery().toString()}`} filename="students.csv" title="Export student directory as CSV" />
           </div>
