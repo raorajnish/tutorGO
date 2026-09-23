@@ -18,7 +18,7 @@ import { daysBetween, todayDateOnly } from "../lib/dateOnly.js";
 import multer from "multer";
 import { parse as parseCsv } from "csv-parse/sync";
 import { toCsv } from "../lib/csv.js";
-import { buildInstituteExportArchive } from "../services/instituteExport.js";
+
 
 export const orgRouter = Router();
 
@@ -52,23 +52,7 @@ orgRouter.get("/", async (req, res, next) => {
   }
 });
 
-/** Self-service full data export (changes-phase14.md §14.2) — an owner's own
- * copy of their institute's records, for their own peace of mind or in case
- * they ever leave the platform. Read-only, no new write path; reuses
- * toCsv() the same as every other export in this app, just bundled as a zip
- * since it's several tables at once rather than one. */
-orgRouter.get("/export", requireRoles("OWNER", "ADMIN"), (req, res, next) => {
-  try {
-    const instituteId = req.tenantId!;
-    res.setHeader("Content-Type", "application/zip");
-    res.setHeader("Content-Disposition", `attachment; filename="institute-export-${instituteId}.zip"`);
-    const archive = buildInstituteExportArchive(instituteId);
-    archive.on("error", next);
-    archive.pipe(res);
-  } catch (err) {
-    next(err);
-  }
-});
+
 
 const updateProfileSchema = z.object({
   name: z.string().min(1).optional(),
